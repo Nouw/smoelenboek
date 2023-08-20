@@ -6,7 +6,7 @@
   "author": "Fabio Dijkshoorn <nouw@nouw.net>",
   "license": "MIT",
   "packageManager": "yarn@3.5.1",
-   "scripts": {
+  "scripts": {
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",

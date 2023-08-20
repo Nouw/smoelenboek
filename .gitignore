@@ -63,3 +63,4 @@ storage
 
 .idea
 .fleet
+/frontend/.yarn/cache/
