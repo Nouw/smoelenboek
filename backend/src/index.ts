@@ -37,7 +37,7 @@ const controllers: Type[] = [
 const corsAllowed = [
 	"http://localhost:3000",
   'https://smoelenboek.usvprotos.nl',
-  "http://127.0.0.1:4173/\n"
+  "http://127.0.0.1:4173/"
 ];
 
 const middlewares = [
