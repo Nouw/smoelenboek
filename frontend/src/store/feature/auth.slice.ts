@@ -1,0 +1,59 @@
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {Role} from "smoelenboek-types";
+
+export interface AuthState {
+  language: string,
+  id?: number,
+  accessToken?: string,
+  refreshToken?: string,
+  roles?: Role[]
+}
+
+const initialState: AuthState = {
+  language: 'nl',
+  accessToken: undefined,
+  refreshToken: undefined,
+}
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState,
+  reducers: {
+    setCredentials(state, action: PayloadAction<{ id: number, accessToken: string, refreshToken: string }>) {
+      state.id = action.payload.id;
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+    },
+    setAccessToken(state, action: PayloadAction<string | undefined>) {
+      state.accessToken = action.payload;
+    },
+    setRefreshToken(state, action: PayloadAction<string | undefined>) {
+      state.refreshToken = action.payload;
+    },
+    logout(state) {
+      state.accessToken = undefined;
+      state.refreshToken = undefined;
+      state.roles = undefined;
+    },
+    setRoles(state, action: PayloadAction<Role[]>) {
+      state.roles = action.payload;
+    },
+    setLanguage(state, action: PayloadAction<string>) {
+      state.language = action.payload;
+    },
+    setId(state, action: PayloadAction<number>) {
+      state.id = action.payload;
+    }
+  },
+})
+
+export const {
+  logout,
+  setAccessToken,
+  setCredentials ,
+  setRoles,
+  setLanguage,
+  setId
+} = authSlice.actions;
+
+export default authSlice.reducer;
