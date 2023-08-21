@@ -24,7 +24,7 @@ export default class UserSubscriber implements EntitySubscriberInterface<User> {
 				"Nieuwe waarde": event.entity[column.propertyPath]
 			});
 		}
-
+    console.log(process.env);
 		const mail = new Mail(`[Smoelenboek] Gegevens zijn aangepast van ${event.entity.firstName}`, process.env.MAIL_SEND_TO);
 
 		mail.addIntro(`${event.entity.firstName} ${event.entity.lastName} heeft zijn/haar gegevens aangepast, hieronder zijn de aanpassingen te vinden:`)

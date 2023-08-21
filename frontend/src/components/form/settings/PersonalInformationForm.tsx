@@ -51,7 +51,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
     }
 
     try {
-      await trigger({ user: {...values as unknown as User, id}} as unknown as PutUserRequest).unwrap();
+      await trigger({ user: {...values as unknown as User, id}, admin: false} as unknown as PutUserRequest).unwrap();
 
       snackbar.openSnackbar(t("message.settings.informationUpdated"), Severity.SUCCESS)
     } catch (e) {

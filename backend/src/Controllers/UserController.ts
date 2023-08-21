@@ -166,7 +166,7 @@ export default class UserController {
 	@Authenticated()
 	async updateUser(@Request() req, @Response() res, @Next() next) {
 		const { id } = req.params;
-		const { admin } = req.query;
+    const { admin } = req.query;
 
 		const user = await Database.manager.findOneBy(User, { id });
 

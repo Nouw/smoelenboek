@@ -20,7 +20,7 @@ const people: VCP[] = [
 
 export const VCP: React.FC<VCPProps> = () => {
   return (
-    <Stack direction="horizontal" justifyContent="space-evenly">
+    <Stack direction="row" justifyContent="space-evenly">
       {people.map((person) => (
         <Card>
           <CardContent>
