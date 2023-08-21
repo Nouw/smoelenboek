@@ -38,7 +38,8 @@
           "predict": "Predict"
         },
         "documents": "Documents",
-        "administration": "Administration"
+        "administration": "Administration",
+        "vcp": "Confidential contact person"
       },
       "dashboard": {
         "goBack": "Back to smoelenboek",
@@ -235,7 +236,8 @@
           "predict": "Voorspellen"
         },
         "documents": "Documenten",
-        "administration": "Administratie"
+        "administration": "Administratie",
+        "vcp": "Vertrouwens contact persoon"
       },
       "dashboard": {
         "goBack": "Terug naar smoelenboek",

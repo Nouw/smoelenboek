@@ -53,6 +53,10 @@ const defaultItems: DrawerItem[] = [
   {
     title: "Sponsorhengel",
     navigateTo: "sponsorhengel"
+  },
+  {
+    title: 'navigation.vcp',
+    navigateTo: "vcp"
   }
 ];
 

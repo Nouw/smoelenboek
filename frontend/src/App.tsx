@@ -50,6 +50,7 @@ import {ChangePassword} from "./screens/settings/ChangePassword";
 import {PersonalInformation} from "./screens/settings/PersonalInformation";
 import {ChangeProfilePicture} from "./screens/settings/ChangeProfilePicture";
 import { SponsorHengel } from "./screens/SponsorHengel";
+import {VCP} from "./screens/VCP.tsx";
 
 const router = createBrowserRouter([
   {
@@ -103,6 +104,10 @@ const router = createBrowserRouter([
       {
         path: "sponsorhengel",
         element: <SponsorHengel/>
+      },
+      {
+        path: "vcp",
+        element: <VCP/>
       }
     ]
   },

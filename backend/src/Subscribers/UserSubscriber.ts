@@ -25,7 +25,7 @@ export default class UserSubscriber implements EntitySubscriberInterface<User> {
 			});
 		}
 
-		const mail = new Mail(`[Smoelenboek] Gegevens zijn aangepast van ${event.entity.firstName}`, "offabio@outlook.com");
+		const mail = new Mail(`[Smoelenboek] Gegevens zijn aangepast van ${event.entity.firstName}`, process.env.MAIL_SEND_TO);
 
 		mail.addIntro(`${event.entity.firstName} ${event.entity.lastName} heeft zijn/haar gegevens aangepast, hieronder zijn de aanpassingen te vinden:`)
 			.addTable(table)
