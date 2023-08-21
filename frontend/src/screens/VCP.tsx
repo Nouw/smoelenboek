@@ -1,5 +1,7 @@
 import React from "react";
-import {Avatar, Card, CardContent, Stack, Typography} from "@mui/material";
+import {Avatar, Card, CardContent, List, ListItem, ListItemIcon, ListItemText, Stack, Typography} from "@mui/material";
+import Mail from "@mui/icons-material/Mail";
+import {Phone} from "@mui/icons-material";
 
 interface VCPProps {
 
@@ -26,6 +28,20 @@ export const VCP: React.FC<VCPProps> = () => {
           <CardContent>
             <Avatar alt={person.name} src={`${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/user/${person.avatar}`} sx={{ width: 200, height: 200, marginLeft: 'auto', marginRight: 'auto'}} />
             <Typography variant="h4" align="center">{person.name}</Typography>
+            <List>
+              <ListItem>
+                <ListItemIcon>
+                  <Mail color="primary"/>
+                </ListItemIcon>
+                <ListItemText primary={person.email}/>
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <Phone color="primary"/>
+                </ListItemIcon>
+                <ListItemText primary={person.phone}/>
+              </ListItem>
+            </List>
           </CardContent>
         </Card>
       ))}

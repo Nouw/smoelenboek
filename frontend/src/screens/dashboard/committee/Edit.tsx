@@ -16,28 +16,32 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
 } from "@mui/material";
-import {CommitteeForm} from "../../../components/form/committee/CommitteeForm";
-import {Add, Delete} from "@mui/icons-material";
-import {SelectRole} from "../../../components/form/committee/SelectRole";
-import {SearchUser, User} from "../../../components/SearchUser";
-import {Severity} from "../../../providers/SnackbarProvider";
-import {SnackbarContext} from "../../../providers/SnackbarContext";
-import {useParams} from "react-router-dom";
+import { CommitteeForm } from "../../../components/form/committee/CommitteeForm";
+import { Add, Delete } from "@mui/icons-material";
+import { SelectRole } from "../../../components/form/committee/SelectRole";
+import { SearchUser, User } from "../../../components/SearchUser";
+import { Severity } from "../../../providers/SnackbarProvider";
+import { SnackbarContext } from "../../../providers/SnackbarContext";
+import { useParams } from "react-router-dom";
 import {
   Member,
   useAddMemberToCommitteeMutation,
-  useGetCommitteeMutation,
-  useRemoveMemberFromCommitteeMutation, useUpdateMemberCommitteeMutation
+  useLazyGetCommitteeQuery,
+  useRemoveMemberFromCommitteeMutation,
+  useUpdateMemberCommitteeMutation,
 } from "../../../api/endpoints/committees";
-import {useAppDispatch, useAppSelector} from "../../../store/hooks";
-import {addMemberToCommittee, removeMemberFromCommittee, setCommittee, updateMember as updateMemberState} from "../../../store/feature/committees.slice";
-import {useTranslation} from "react-i18next";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {
+  addMemberToCommittee,
+  removeMemberFromCommittee,
+  setCommittee,
+  updateMember as updateMemberState,
+} from "../../../store/feature/committees.slice";
+import { useTranslation } from "react-i18next";
 
-interface EditProps {
-
-}
+interface EditProps {}
 
 export const Edit: React.FC<EditProps> = () => {
   const params = useParams();
@@ -45,12 +49,12 @@ export const Edit: React.FC<EditProps> = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
-  const [getCommittee] = useGetCommitteeMutation();
+  const [getCommittee] = useLazyGetCommitteeQuery();
   const [addMember] = useAddMemberToCommitteeMutation();
   const [removeMemberApi] = useRemoveMemberFromCommitteeMutation();
   const [updateMemberApi] = useUpdateMemberCommitteeMutation();
 
-  const committee = useAppSelector(state => state.committees.committeeInfo);
+  const committee = useAppSelector((state) => state.committees.committeeInfo);
 
   const [visible, setVisible] = React.useState<boolean>(false);
 
@@ -61,25 +65,37 @@ export const Edit: React.FC<EditProps> = () => {
 
         dispatch(setCommittee(res.data));
       } catch (e) {
-         console.error(e);
+        console.error(e);
       }
-    }
+    };
 
     getData();
-  }, [dispatch, getCommittee, params.id])
+  }, [dispatch, getCommittee, params.id]);
 
   async function addUser(value: User) {
     if (committee?.members !== undefined) {
       if (committee.members.findIndex((x) => x.id === value.id) >= 0) {
-        snackbar.openSnackbar(`${value.firstName} ${value.lastName} ${t("message.committee.alreadyPart")}`);
+        snackbar.openSnackbar(
+          `${value.firstName} ${value.lastName} ${t(
+            "message.committee.alreadyPart"
+          )}`
+        );
       }
     }
 
     try {
-      const res = await addMember({ id: parseInt(params.id as string), userId: value.id}).unwrap();
+      const res = await addMember({
+        id: parseInt(params.id as string),
+        userId: value.id,
+      }).unwrap();
       dispatch(addMemberToCommittee(res.data));
 
-      snackbar.openSnackbar(`${t("message.committee.added")} ${value.firstName} ${value.lastName} ${t("message.committee.toCommittee")}`, Severity.SUCCESS);
+      snackbar.openSnackbar(
+        `${t("message.committee.added")} ${value.firstName} ${
+          value.lastName
+        } ${t("message.committee.toCommittee")}`,
+        Severity.SUCCESS
+      );
     } catch (e) {
       console.error(e);
       snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
@@ -88,10 +104,13 @@ export const Edit: React.FC<EditProps> = () => {
 
   async function updateMember(member: Member, index: number, role: string) {
     try {
-      const res = await updateMemberApi({ id: member.id, role}).unwrap();
+      const res = await updateMemberApi({ id: member.id, role }).unwrap();
 
-      dispatch(updateMemberState({ key: index, data: res.data}));
-      snackbar.openSnackbar(t("message.committee.roleUpdate"), Severity.SUCCESS);
+      dispatch(updateMemberState({ key: index, data: res.data }));
+      snackbar.openSnackbar(
+        t("message.committee.roleUpdate"),
+        Severity.SUCCESS
+      );
     } catch (e) {
       console.error(e);
       snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
@@ -100,55 +119,63 @@ export const Edit: React.FC<EditProps> = () => {
 
   async function removeMember(member: Member) {
     try {
-      await removeMemberApi(member.id)
+      await removeMemberApi(member.id);
 
       dispatch(removeMemberFromCommittee(member.id));
-      snackbar.openSnackbar(t("message.committee.removeUser"), Severity.SUCCESS)
+      snackbar.openSnackbar(
+        t("message.committee.removeUser"),
+        Severity.SUCCESS
+      );
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
     }
   }
 
   if (committee === undefined) {
-    return <CircularProgress/>
+    return <CircularProgress />;
   }
 
   return (
     <>
       <Stack spacing={2}>
-        <CommitteeForm method="put" message={t("message.committee.update")} name={committee.committee.name} email={committee.committee.email}/>
+        <CommitteeForm
+          method="put"
+          message={t("message.committee.update")}
+          name={committee.committee.name}
+          email={committee.committee.email}
+        />
         <Card>
           <CardContent>
             <Button variant="contained" onClick={() => setVisible(true)}>
-              <Add/>
+              <Add />
               {t("dashboard.committee.addMember")}
             </Button>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>
-                      {t("dashboard.committee.name")}
-                    </TableCell>
-                    <TableCell>
-                      {t("dashboard.committee.role")}
-                    </TableCell>
-                    <TableCell>
-                      {t("remove")}
-                    </TableCell>
+                    <TableCell>{t("dashboard.committee.name")}</TableCell>
+                    <TableCell>{t("dashboard.committee.role")}</TableCell>
+                    <TableCell>{t("remove")}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {committee.members.map((member, index) => (
                     <TableRow key={member.user.id}>
-                      <TableCell>{member.user.firstName} {member.user.lastName}</TableCell>
                       <TableCell>
-                        <SelectRole id={member.id} role={member.function} onUpdate={(p) => updateMember(member, index, p)}/>
+                        {member.user.firstName} {member.user.lastName}
+                      </TableCell>
+                      <TableCell>
+                        <SelectRole
+                          id={member.id}
+                          role={member.function}
+                          onUpdate={(p) => updateMember(member, index, p)}
+                        />
                       </TableCell>
                       <TableCell>
                         <IconButton onClick={() => removeMember(member)}>
-                          <Delete/>
+                          <Delete />
                         </IconButton>
                       </TableCell>
                     </TableRow>
@@ -159,15 +186,15 @@ export const Edit: React.FC<EditProps> = () => {
           </CardContent>
         </Card>
       </Stack>
-      <Dialog open={visible} onClose={() => setVisible(false)} >
+      <Dialog open={visible} onClose={() => setVisible(false)}>
         <DialogTitle>{t("dashboard.committee.addUser")}</DialogTitle>
-        <DialogContent style={{width: 400, height: 200}}>
-          <SearchUser onSelect={addUser}/>
+        <DialogContent style={{ width: 400, height: 200 }}>
+          <SearchUser onSelect={addUser} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setVisible(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
-  )
-}
+  );
+};

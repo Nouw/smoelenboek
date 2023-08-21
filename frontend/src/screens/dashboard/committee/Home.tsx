@@ -19,7 +19,7 @@ import {Severity} from "../../../providers/SnackbarProvider";
 import {SnackbarContext} from "../../../providers/SnackbarContext";
 import {useAppDispatch, useAppSelector} from "../../../store/hooks";
 import {addCommittees, committeesSelector} from "../../../store/feature/committees.slice";
-import {useCommitteesMutation, useRemoveCommitteeMutation} from "../../../api/endpoints/committees";
+import {useLazyCommitteesQuery, useRemoveCommitteeMutation} from "../../../api/endpoints/committees";
 import { removeCommittee as removeCommitteeState } from "../../../store/feature/committees.slice";
 import {useTranslation} from "react-i18next";
 
@@ -33,7 +33,7 @@ export const Home: React.FC<HomeProps> = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
-  const [getCommittees] = useCommitteesMutation();
+  const [getCommittees] = useLazyCommitteesQuery();
   const [removeCommitteeApi] = useRemoveCommitteeMutation();
 
   const committees = useAppSelector(committeesSelector.selectAll);

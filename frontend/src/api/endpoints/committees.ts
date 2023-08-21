@@ -38,9 +38,9 @@ interface PutCommitteeRequest {
   email: string;
 }
 
-export const committeesApiSlice = API.enhanceEndpoints({ addTagTypes: ['Committees']}).injectEndpoints({
+export const committeesApiSlice = API.enhanceEndpoints({addTagTypes: ['Committees']}).injectEndpoints({
   endpoints: builder => ({
-    committees: builder.mutation<Response<Committee[]>, null>({
+    committees: builder.query<Response<Committee[]>, null>({
       query: () => ({
         url: 'committee',
         method: 'GET'
@@ -52,7 +52,7 @@ export const committeesApiSlice = API.enhanceEndpoints({ addTagTypes: ['Committe
         method: 'DELETE'
       })
     }),
-    getCommittee: builder.mutation<Response<GetCommitteeResponse>, number>({
+    getCommittee: builder.query<Response<GetCommitteeResponse>, number>({
       query: (id) => ({
         url: `committee/${id}`,
         method: 'GET',
@@ -82,7 +82,7 @@ export const committeesApiSlice = API.enhanceEndpoints({ addTagTypes: ['Committe
         }
       })
     }),
-    createCommittee: builder.mutation<Response<Committee>,PostCommitteeRequest>({
+    createCommittee: builder.mutation<Response<Committee>, PostCommitteeRequest>({
       query: (data) => ({
         url: `committee/`,
         method: 'POST',
@@ -106,9 +106,11 @@ export const committeesApiSlice = API.enhanceEndpoints({ addTagTypes: ['Committe
 });
 
 export const {
-  useCommitteesMutation,
+  useCommitteesQuery,
+  useLazyCommitteesQuery,
   useRemoveCommitteeMutation,
-  useGetCommitteeMutation,
+  useGetCommitteeQuery,
+  useLazyGetCommitteeQuery,
   useAddMemberToCommitteeMutation,
   useRemoveMemberFromCommitteeMutation,
   useUpdateMemberCommitteeMutation,
