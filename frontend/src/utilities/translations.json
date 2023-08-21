@@ -41,6 +41,7 @@
         "administration": "Administration"
       },
       "dashboard": {
+        "goBack": "Back to smoelenboek",
         "form": {
           "header": "Form management",
           "createForm": "Create form",
@@ -237,6 +238,7 @@
         "administration": "Administratie"
       },
       "dashboard": {
+        "goBack": "Terug naar smoelenboek",
         "form": {
           "header": "Formulierbeheer",
           "createForm": "Formulier aanmaken",

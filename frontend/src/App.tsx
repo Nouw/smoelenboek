@@ -49,6 +49,7 @@ import { Home as Settings } from './screens/settings/Home';
 import {ChangePassword} from "./screens/settings/ChangePassword";
 import {PersonalInformation} from "./screens/settings/PersonalInformation";
 import {ChangeProfilePicture} from "./screens/settings/ChangeProfilePicture";
+import { SponsorHengel } from "./screens/SponsorHengel";
 
 const router = createBrowserRouter([
   {
@@ -98,6 +99,10 @@ const router = createBrowserRouter([
       {
         path: 'settings/picture',
         element: <ChangeProfilePicture/>
+      },
+      {
+        path: "sponsorhengel",
+        element: <SponsorHengel/>
       }
     ]
   },

@@ -104,13 +104,12 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = () => {
               </IconButton>
             </Box>
             <Box sx={{flexGrow: 0}}>
-              <Stack spacing={5} direction="row" alignItems="center">
+              <Stack spacing={2} direction="row" alignItems="center">
                 <SearchUser inDrawer onSelect={(user) => navigate(`/profile/${user.id}`)}/>
                 <IconButton size="large" onClick={(e) => setMenuAnchor(e.currentTarget)}>
                   <Avatar src={`${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${data?.data ?? '/user/default.jpg'}`}/>
                 </IconButton>
               </Stack>
-
             </Box>
             <Menu
               id="menu-appbar"

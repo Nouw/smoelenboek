@@ -50,6 +50,10 @@ const defaultItems: DrawerItem[] = [
     title: "navigation.documents",
     navigateTo: "documents/"
   },
+  {
+    title: "Sponsorhengel",
+    navigateTo: "sponsorhengel"
+  }
 ];
 
 const adminDefaultItem: DrawerItem =  {
@@ -65,6 +69,11 @@ const adminDefaultItem: DrawerItem =  {
     };
 
 const adminItems: DrawerItem[] = [
+  {
+    title: "dashboard.goBack",
+    translateHeader: true,
+    navigateTo: '/teams/female'
+  },
   {
     title: "dashboard.form.header",
     subheader: true,

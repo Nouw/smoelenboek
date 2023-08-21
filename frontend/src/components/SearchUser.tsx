@@ -58,7 +58,7 @@ export const SearchUser: React.FC<SearchUserProps> = (props) => {
     return (
       <Autocomplete
         ref={autoComplete}
-        sx={{width: 300}}
+        sx={{width: 143}}
         open={open}
         onOpen={() => {
           setOpen(true);
