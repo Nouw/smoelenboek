@@ -43,7 +43,7 @@ if [[ "${GIT_COMMIT}" = 1 ]]; then
     echo "Pushing version to remote"
     git push --follow-tags --set-upstream origin "$(git branch --show-current)"
 
-    scp dist/ deb95993@s243.webhostingserver.nl:/domains/usvprotos.nl/smoelenboek/frontend
+    scp -r dist/ deb95993@s243.webhostingserver.nl:/domains/usvprotos.nl/smoelenboek/frontend
   else
     echo "GIT commit failed, aborting!"
     exit
