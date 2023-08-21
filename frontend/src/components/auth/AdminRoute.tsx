@@ -13,7 +13,7 @@ export const AdminRoute: React.FC<AdminRouteProps> = (props) => {
 
 
   if (!isAdmin(roles ?? [])) {
-    return <Navigate to="/home" state={{ from: history.location }}/>
+    return <Navigate to="/teams/female" state={{ from: history.location }}/>
   }
 
   return props.children
