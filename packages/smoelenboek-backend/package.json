@@ -14,7 +14,7 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "create:migration": "yarn typeorm -d ./src/Database.ts migration:generate",
     "migrate": "yarn typeorm -d ./src/Database.ts migration:run",
-    "build": "rm -rf ./dist && tsc --project ./",
+    "compile": "rm -rf ./dist && tsc --project ./",
     "dev": "nodemon",
     "start": "node ./dist/index.js",
     "deploy": "./bin/deploy.sh"

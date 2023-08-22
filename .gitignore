@@ -33,3 +33,6 @@ typings/
 # Environment variables
 **/.env
 **/google_credentials.json
+
+# Build
+**/dist
