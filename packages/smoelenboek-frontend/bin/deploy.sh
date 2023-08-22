@@ -1,3 +1,13 @@
+#!/usr/bin/env sh
+
+######################################################################
+# @author      : fabiodijkshoorn (fabiodijkshoorn@$HOSTNAME)
+# @file        : deploy
+# @created     : Tuesday Aug 22, 2023 21:38:24 CEST
+#
+# @description :
+######################################################################
+
 if [[ $* = *--patch* ]]; then
   yarn version patch
 elif [[ $* = *--minor* ]]; then
@@ -23,6 +33,4 @@ read -p "If compilation went well, press any key to continue with deployment of 
 
 echo
 echo "## DEPLOYING ##"
-scp -r dist/ deploy@158.101.196.66:smoelenboek/
-echo
-echo "## Finished deploying ##"
+scp -r dist/ deb95993@s243.webhostingserver.nl:domains/usvprotos.nl/smoelenboek/frontend
