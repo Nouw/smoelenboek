@@ -1,5 +1,6 @@
 {
   "name": "smoelenboek-mono",
+  "version": "4.0.0",
   "packageManager": "yarn@3.6.2",
   "private": true,
   "workspaces": [
