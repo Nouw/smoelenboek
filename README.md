@@ -25,7 +25,7 @@ A custom-modified Express framework that features:
 ### smoelenboek-types
 This package houses entities used in both the frontend and backend. It ensures type safety across the board, solidifying the integrity of data interactions between different parts of the application.
 
-### Git Workflow Rules
+## Git Workflow Rules
 
 - **Features**: When working on a new feature, please create a new branch using the format feature/{name}.
 - **Bugs**: If you're addressing a bug, use the branch naming format bug/{name}.
@@ -35,5 +35,5 @@ This package houses entities used in both the frontend and backend. It ensures t
 
 For any queries, suggestions, or contributions, please reach out to the project lead:
 
-Fabio Dijkshoorn<nouw@nouw.net>
+Fabio Dijkshoorn - <nouw@nouw.net>
 
