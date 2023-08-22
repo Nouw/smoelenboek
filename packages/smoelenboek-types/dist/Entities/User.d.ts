@@ -1,0 +1,33 @@
+import { Relation } from "typeorm";
+import { Role } from "./Role";
+import { UserTeamSeason } from "./UserTeamSeason";
+import { UserCommitteeSeason } from "./UserCommitteeSeason";
+import { ProtototoPredictionResults } from "./ProtototoPredictionResults";
+import { ProtototoPredictions } from "./ProtototoPredictions";
+import { Activity } from "./Activity";
+export declare class User {
+    id: number;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    streetName: string;
+    houseNumber: string;
+    postcode: string;
+    city: string;
+    phoneNumber: string;
+    bankaccountNumber: string;
+    birthDate: Date;
+    bondNumber: string;
+    joinDate: Date;
+    leaveDate?: Date;
+    backNumber?: number;
+    profilePicture?: string;
+    refereeLicense?: string;
+    roles: Relation<Role[]>;
+    userTeamSeason: Relation<UserTeamSeason[]>;
+    userCommitteeSeason: Relation<UserCommitteeSeason[]>;
+    predictionResults: Relation<ProtototoPredictionResults[]>;
+    predictions: Relation<ProtototoPredictions[]>;
+    activities: Relation<Activity[]>;
+}

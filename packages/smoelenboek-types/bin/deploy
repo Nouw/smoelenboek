@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+yarn version $1
+
+VERSION=$(cat package.json \
+  | grep version \
+  | head -1 \
+  | awk -F: '{ print $2 }' \
+  | sed 's/[",]//g' \
+  | tr -d '[[:space:]]')
+
+echo "Compiling project"
+yarn compile
+
+read -p "If compilation went well, press any key to continue with deployment of ${VERSION}. Otherwise do CTRL+C"
+
+echo "Adding all changes to GIT"
+git add -A
+read -p "About to commit changes and deploy NuGet package, press any key to continue. Do CTRL+C to abort."
+git commit --allow-empty-message
+if [ $? -eq 0 ]
+then
+  echo "GIT commit completed"
+  git tag -a "v${VERSION}" -m "Version ${VERSION}"
+  echo "Pushing version to remote"
+  git push --follow-tags --set-upstream origin "$(git branch --show-current)"
+else
+  echo "GIT commit failed, aborting!"
+  exit
+fi

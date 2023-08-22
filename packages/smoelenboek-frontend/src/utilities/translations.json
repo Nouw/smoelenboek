@@ -1,0 +1,398 @@
+{
+  "en": {
+    "translation": {
+      "players": "Players",
+      "coaches": "Coaches",
+      "email": "Email",
+      "phoneNumber": "Phone number",
+      "birthdate": "Birthdate",
+      "bondNumber": "Association number",
+      "registrationDate": "Registration date",
+      "backNumber": "Back number",
+      "refereeLicense": "Referee license",
+      "activities": "Seasonal participation",
+      "protototo": {
+        "win": "Win",
+        "lose": "Lose",
+        "submitMessage": "Successfully send bet!"
+      },
+      "errorMessage": "Something went wrong :(",
+      "submit": "Submit",
+      "settings": {
+        "settings": "Settings",
+        "changePassword": "Change password",
+        "updateInformation": "Update personal information",
+        "changeProfilePicture": "Change profile picture",
+        "otherSettings": "Other settings",
+        "language": "Language",
+        "currentPassword": "Current password",
+        "newPassword": "New password"
+      },
+      "search": "Search user",
+      "navigation": {
+        "teams": {
+          "women": "Women",
+          "men": "Men"
+        },
+        "protototo": {
+          "predict": "Predict"
+        },
+        "documents": "Documents",
+        "administration": "Administration",
+        "vcp": "Confidential contact person"
+      },
+      "dashboard": {
+        "goBack": "Back to smoelenboek",
+        "form": {
+          "header": "Form management",
+          "createForm": "Create form",
+          "title": "Form title",
+          "question": {
+            "addQuestion": "Add question",
+            "type": "Type",
+            "text": "Text",
+            "choice": "Choice",
+            "select": "Select",
+            "answer": "Your answer",
+            "question": "Question",
+            "paragraph": "Paragraph",
+            "required": "Required"
+          }
+        },
+        "season": {
+          "header": "Season management",
+          "seasons": "Seasons",
+          "createSeason": "Create season",
+          "name": "Name",
+          "startDate": "Start date",
+          "endDate": "End date"
+        },
+        "user": {
+          "header": "User management",
+          "users": "Users",
+          "createUser": "Add user",
+          "updateUser": "Update user",
+          "name": "Name",
+          "deleteUser": "Remove user",
+          "firstName": "First name",
+          "lastName": "Last name",
+          "streetName": "Street name",
+          "houseNumber": "House number",
+          "postcode": "Postcode",
+          "city": "City",
+          "IBAN": "IBAN"
+        },
+        "team": {
+          "header": "Team management",
+          "teams": "Teams",
+          "createTeam": "Add team",
+          "name": "Name",
+          "deleteTeam": "Delete team",
+          "league": "League",
+          "addPlayer": "Add player",
+          "role": "Role",
+          "addUser": "Add user to team"
+        },
+        "committee": {
+          "header": "Committee management",
+          "committees": "Committees",
+          "createCommittee": "Add committee",
+          "updateCommittee": "Update committee",
+          "name": "Name",
+          "options": "Options",
+          "deleteCommittee": "Delete committee",
+          "addMember": "Add member",
+          "role": "Role",
+          "addUser": "Add user to committee"
+        },
+        "protototo": {
+          "header": "Protototo management",
+          "seasons": "Seasons",
+          "createSeason": "Add season",
+          "id": "Id",
+          "start": "Start",
+          "end": "End",
+          "options": "Options",
+          "tikkie": "Tikkie",
+          "playDate": "Play date",
+          "home": "Home",
+          "away": "Away",
+          "deleteMatch": "Delete match",
+          "predictionsAlert": "This also deletes all predictions",
+          "updateMatch": "Update match"
+        },
+        "documents": {
+          "header": "Documents management",
+          "categories": "Categories",
+          "createCategory": "Add category",
+          "updateCategory": "Update category",
+          "name": "Name",
+          "deleteFiles": "Delete files",
+          "areYouSure": "Are you sure you want to delete",
+          "files": "files"
+        },
+        "options": {
+          "options": "Options",
+          "edit": "Edit",
+          "remove": "Delete",
+          "addMatch": "Add match"
+        }
+      },
+      "message": {
+        "season": {
+          "create": "Created season!",
+          "delete": "Deleted season!",
+          "update": "Updated season!"
+        },
+        "user": {
+          "delete": "Deleted user!",
+          "create": "Created user!",
+          "update": "Updated user!"
+        },
+        "teams": {
+          "delete": "Deleted team!",
+          "create": "Created team!",
+          "update": "Updated team!",
+          "alreadyPart": "is already part of the team!",
+          "added": "Added",
+          "toTeam": "to team!",
+          "removePlayer": "Removed player from team!",
+          "roleUpdate": "Role updated!"
+        },
+        "committee": {
+          "delete": "Deleted committee!",
+          "create": "Created committee!",
+          "update": "Updated committee!",
+          "added": "Added",
+          "toCommittee": "to committee!",
+          "alreadyPart": "is already part of the committee!",
+          "roleUpdate": "Role updated!",
+          "removeUser": "Removed user from committee!"
+        },
+        "protototo": {
+          "season": {
+            "delete": "Deleted season!",
+            "create": "Created season!",
+            "update": "Updated season!"
+          },
+          "match": {
+            "delete": "Deleted match!",
+            "create": "Created match!",
+            "update": "Updated match!"
+          }
+        },
+        "documents": {
+          "create": "Created category!",
+          "update": "Updated category!",
+          "delete": "Deleted category!"
+        },
+        "settings": {
+          "success": "Password updated!",
+          "informationUpdated": "Updated information!"
+        }
+      },
+      "confirmation": "Are you sure you want to remove",
+      "cancel": "Cancel",
+      "remove": "Remove",
+      "save": "Save"
+    }
+  },
+  "nl": {
+    "translation": {
+      "players": "Spelers",
+      "coaches": "Trainers",
+      "email": "E-mail",
+      "phoneNumber": "Telefoonnummer",
+      "birthdate": "Geboortedatum",
+      "bondNumber": "Bondnummer",
+      "registrationDate": "Registratiedatum",
+      "backNumber": "Rugnummer",
+      "refereeLicense": "Scheidsrechterslicentie",
+      "activities": "Seizoensdeelname",
+      "protototo": {
+        "win": "Winnen",
+        "lose": "Verliezen",
+        "submitMessage": "Weddenschap succesvol verzonden!"
+      },
+      "errorMessage": "Er is iets misgegaan :(",
+      "submit": "Verzenden",
+      "settings": {
+        "settings": "Instellingen",
+        "changePassword": "Wachtwoord wijzigen",
+        "updateInformation": "Persoonlijke informatie bijwerken",
+        "changeProfilePicture": "Profielfoto wijzigen",
+        "otherSettings": "Overige instellingen",
+        "language": "Taal",
+        "currentPassword": "Huidig wachtwoord",
+        "newPassword": "Nieuw wachtwoord"
+      },
+      "search": "Vind een lid",
+      "navigation": {
+        "teams": {
+          "women": "Vrouwen",
+          "men": "Mannen"
+        },
+        "protototo": {
+          "predict": "Voorspellen"
+        },
+        "documents": "Documenten",
+        "administration": "Administratie",
+        "vcp": "Vertrouwens contact persoon"
+      },
+      "dashboard": {
+        "goBack": "Terug naar smoelenboek",
+        "form": {
+          "header": "Formulierbeheer",
+          "createForm": "Formulier aanmaken",
+          "title": "Formulier titel",
+          "question": {
+            "addQuestion": "Vraag toevoegen",
+            "type": "Type",
+            "text": "Tekst",
+            "choice": "Keuze",
+            "select": "Selecteer",
+            "answer": "Jouw antwoord",
+            "question": "Vraag",
+            "paragraph": "Paragraaf",
+            "required": "Vereist"
+          }
+        },
+        "season": {
+          "header": "Seizoenbeheer",
+          "seasons": "Seizoenen",
+          "createSeason": "Seizoen aanmaken",
+          "name": "Naam",
+          "startDate": "Startdatum",
+          "endDate": "Einddatum"
+        },
+        "user": {
+          "header": "Ledenbeheer",
+          "users": "Leden",
+          "createUser": "Lid toevoegen",
+          "updateUser": "Lid updaten",
+          "name": "Naam",
+          "deleteUser": "Lid verwijderen",
+          "firstName": "Voornaam",
+          "lastName": "Achternaam",
+          "streetName": "Straatnaam",
+          "houseNumber": "Huisnummer",
+          "postcode": "Postcode",
+          "city": "Stad",
+          "IBAN": "IBAN"
+        },
+        "team": {
+          "header": "Teambeheer",
+          "teams": "Teams",
+          "createTeam": "Team toevoegen",
+          "name": "Naam",
+          "deleteTeam": "Team verwijderen",
+          "league": "Competitie",
+          "addPlayer": "Speler toevoegen",
+          "role": "Rol",
+          "addUser": "Gebruiker aan team toevoegen"
+        },
+        "committee": {
+          "header": "Commissiebeheer",
+          "committees": "Commissies",
+          "createCommittee": "Commissie toevoegen",
+          "updateCommittee": "Commissie updaten",
+          "name": "Naam",
+          "options": "Opties",
+          "deleteCommittee": "Commissie verwijderen",
+          "addMember": "Lid toevoegen",
+          "role": "Rol",
+          "addUser": "Gebruiker aan commissie toevoegen"
+        },
+        "protototo": {
+          "header": "Protototo beheer",
+          "seasons": "Seizoenen",
+          "createSeason": "Seizoen toevoegen",
+          "id": "Id",
+          "start": "Start",
+          "end": "Eind",
+          "options": "Opties",
+          "tikkie": "Tikkie",
+          "playDate": "Speeldatum",
+          "home": "Thuis",
+          "away": "Uit",
+          "deleteMatch": "Wedstrijd verwijderen",
+          "predictionsAlert": "Dit verwijdert ook alle voorspellingen",
+          "updateMatch": "Wedstrijd bijwerken"
+        },
+        "documents": {
+          "header": "Documentenbeheer",
+          "categories": "Categorieën",
+          "createCategory": "Categorie toevoegen",
+          "updateCategory": "Categorie updaten",
+          "name": "Naam",
+          "deleteFiles": "Bestanden verwijderen",
+          "areYouSure": "Weet je zeker dat je wilt verwijderen",
+          "files": "bestanden"
+        },
+        "options": {
+          "options": "Opties",
+          "edit": "Bewerken",
+          "remove": "Verwijderen",
+          "addMatch": "Wedstrijd toevoegen"
+        }
+      },
+      "message": {
+        "season": {
+          "create": "Seizoen aangemaakt!",
+          "delete": "Seizoen verwijderd!",
+          "update": "Seizoen bijgewerkt!"
+        },
+        "user": {
+          "delete": "Lid verwijderd!",
+          "create": "Lid aangemaakt!",
+          "update": "Lid bijgewerkt!"
+        },
+        "teams": {
+          "delete": "Team verwijderd!",
+          "create": "Team aangemaakt!",
+          "update": "Team bijgewerkt!",
+          "alreadyPart": "is al onderdeel van het team!",
+          "added": "Toegevoegd",
+          "toTeam": "aan team!",
+          "removePlayer": "Speler uit team verwijderd!",
+          "roleUpdate": "Rol bijgewerkt!"
+        },
+        "committee": {
+          "delete": "Commissie verwijderd!",
+          "create": "Commissie aangemaakt!",
+          "update": "Commissie bijgewerkt!",
+          "added": "Toegevoegd",
+          "toCommittee": "aan commissie!",
+          "alreadyPart": "is al onderdeel van de commissie!",
+          "roleUpdate": "Rol bijgewerkt!",
+          "removeUser": "Lid uit commissie verwijderd!"
+        },
+        "protototo": {
+          "season": {
+            "delete": "Seizoen verwijderd!",
+            "create": "Seizoen aangemaakt!",
+            "update": "Seizoen bijgewerkt!"
+          },
+          "match": {
+            "delete": "Wedstrijd verwijderd!",
+            "create": "Wedstrijd aangemaakt!",
+            "update": "Wedstrijd bijgewerkt!"
+          }
+        },
+        "documents": {
+          "create": "Categorie aangemaakt!",
+          "update": "Categorie bijgewerkt!",
+          "delete": "Categorie verwijderd!"
+        },
+        "settings": {
+          "success": "Wachtwoord aangepast!",
+          "informationUpdated": "Information bijgewerkt!"
+        }
+      },
+      "confirmation": "Weet je zeker dat je wilt verwijderen",
+      "cancel": "Annuleren",
+      "remove": "Verwijderen",
+      "save": "Opslaan"
+    }
+  }
+}
