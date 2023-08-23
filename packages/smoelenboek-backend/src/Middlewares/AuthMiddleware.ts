@@ -51,9 +51,6 @@ export function Authenticated(fail = true) {
 
 				next(e);
 			}
-
-
-
 		});
 	};
 }

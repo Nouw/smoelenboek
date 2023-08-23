@@ -10755,7 +10755,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lexical@npm:^0.11.1, lexical@npm:^0.11.3":
+"lexical@npm:^0.11.1":
   version: 0.11.3
   resolution: "lexical@npm:0.11.3"
   checksum: 89fa276db6e253c1b52f097155e6bd6402c4292845a37a0910b992c9051e339df5186d41f3f35eb3040ad8f322716c63c22b5e154b04e698814f5f4a02e49635
@@ -16020,7 +16020,7 @@ __metadata:
     react-router-dom: ^6.12.1
     react-scripts: 5.0.1
     redux-persist: ^6.0.0
-    smoelenboek-types: "git+ssh://git@gitlab.com:usv-protos/smoelenboek-types.git#v0.1.2"
+    smoelenboek-types: "workspace:^"
     typeorm: ^0.3.17
     typescript: ^4.4.2
     uuid: ^9.0.0
@@ -16037,16 +16037,6 @@ __metadata:
     typescript: ^5.1.6
   languageName: unknown
   linkType: soft
-
-"smoelenboek-types@git+ssh://git@gitlab.com:usv-protos/smoelenboek-types.git#v0.1.2":
-  version: 0.1.2
-  resolution: "smoelenboek-types@git+ssh://git@gitlab.com:usv-protos/smoelenboek-types.git#commit=0ab9cae61f3b20d4bbd826793c2086663162cbe1"
-  dependencies:
-    lexical: ^0.11.3
-    typeorm: ^0.3.17
-  checksum: 7a1cc837b1a0ca963a0b204750e757c756cfbafbe84dac6b18fab953ebde78b935e35181f7460485e9b0a608a831d130d63b7f65e7ca1f91b1f663ac925a922b
-  languageName: node
-  linkType: hard
 
 "smoelenboek-types@workspace:^, smoelenboek-types@workspace:packages/smoelenboek-types":
   version: 0.0.0-use.local
