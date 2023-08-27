@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {Role} from "smoelenboek-types";
+import i18n from "../../utilities/i18n/i18n.ts";
 
 export interface AuthState {
   language: string,
@@ -40,6 +41,7 @@ const authSlice = createSlice({
     },
     setLanguage(state, action: PayloadAction<string>) {
       state.language = action.payload;
+      i18n.changeLanguage(action.payload);
     },
     setId(state, action: PayloadAction<number>) {
       state.id = action.payload;

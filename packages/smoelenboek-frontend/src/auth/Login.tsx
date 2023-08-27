@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Box,
+  Box, Button,
   Card,
   CardContent,
   Container,
@@ -14,9 +14,12 @@ import * as Yup from 'yup';
 import {Formik, FormikProps} from "formik";
 import {LoadingButton} from "@mui/lab";
 import {useAppDispatch, useAppSelector} from "../store/hooks";
-import {setCredentials, setRoles} from "../store/feature/auth.slice";
+import {setCredentials, setLanguage, setRoles} from "../store/feature/auth.slice";
 import {useNavigate} from "react-router-dom";
 import {useLazyGetRolesQuery, useLoginMutation} from "../api/endpoints/auth";
+import {useTranslation} from "react-i18next";
+import GB from "../assets/gb.svg";
+import NL from "../assets/nl.svg";
 
 interface LoginProps {
 
@@ -27,12 +30,13 @@ interface FormValues {
   password: string
 }
 
-const schema = Yup.object({
-  email: Yup.string().required('An email address is required').email('Please enter a valid email address'),
-  password: Yup.string().required("An password is required").min(2, 'Password must be longer than 2 characters')
-})
+
 
 export const Login: React.FC<LoginProps> = () => {
+  const { t } = useTranslation();
+
+  const language = useAppSelector((state) => state.auth.language);
+
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
 
   const auth = useAppSelector((state) => state.auth);
@@ -47,6 +51,11 @@ export const Login: React.FC<LoginProps> = () => {
       navigate("/teams/female");
     }
   }, [auth.refreshToken, navigate])
+
+  const schema = Yup.object({
+    email: Yup.string().required(t("message.auth.required.email")).email('Please enter a valid email address'),
+    password: Yup.string().required(t("message.auth.required.password")).min(2, 'Password must be longer than 2 characters')
+  })
 
   const submit = async (data: { email: string, password: string }) => {
     try {
@@ -63,6 +72,14 @@ export const Login: React.FC<LoginProps> = () => {
       navigate('/')
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  function changeLanguage() {
+    if (language === "nl") {
+      dispatch(setLanguage("en"))
+    } else if (language === "en") {
+      dispatch(setLanguage("nl"))
     }
   }
 
@@ -87,7 +104,7 @@ export const Login: React.FC<LoginProps> = () => {
                     <Stack spacing={2}>
                       <TextField
                         id="email"
-                        label="Email address"
+                        label={t("email")}
                         type="email"
                         value={props.values.email}
                         onChange={props.handleChange}
@@ -96,7 +113,7 @@ export const Login: React.FC<LoginProps> = () => {
                       />
                       <TextField
                         id="password"
-                        label="Password"
+                        label={t("password")}
                         type={showPassword ? "text" : "password"}
                         value={props.values.password}
                         error={props.touched.password && Boolean(props.errors.password)}
@@ -112,11 +129,11 @@ export const Login: React.FC<LoginProps> = () => {
                       />
                       <Link href="#">
                         <Typography variant="caption" color={theme => theme.palette.primary.main}>
-                          Forgot password?
+                          {t("auth.forgotPassword")}?
                         </Typography>
                       </Link>
                       <LoadingButton type="submit" loading={props.isSubmitting || isLoading}>
-                        <span>Submit</span>
+                        <span>{t("submit")}</span>
                       </LoadingButton>
                     </Stack>
                   </form>
@@ -125,6 +142,16 @@ export const Login: React.FC<LoginProps> = () => {
             </CardContent>
           </Card>
         </Container>
+        <Box position="absolute" right={5} bottom={5}>
+          <Button onClick={() => changeLanguage()}>
+            {language === "nl" ? (
+              <img src={NL} alt="Flag of NL" height={30}/>
+            ) : (
+              <img src={GB} alt="Flag of GB" height={30}/>
+            )}
+          </Button>
+        </Box>
+
       </Box>
   )
 }

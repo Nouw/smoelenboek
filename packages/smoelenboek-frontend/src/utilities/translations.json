@@ -4,6 +4,7 @@
       "players": "Players",
       "coaches": "Coaches",
       "email": "Email",
+      "password": "Password",
       "phoneNumber": "Phone number",
       "birthdate": "Birthdate",
       "bondNumber": "Association number",
@@ -189,7 +190,16 @@
         "settings": {
           "success": "Password updated!",
           "informationUpdated": "Updated information!"
+        },
+        "auth": {
+          "required": {
+            "password": "Password is required",
+            "email": "Email is required"
+          }
         }
+      },
+      "auth": {
+        "forgotPassword": "Forgot password"
       },
       "confirmation": "Are you sure you want to remove",
       "cancel": "Cancel",
@@ -202,6 +212,7 @@
       "players": "Spelers",
       "coaches": "Trainers",
       "email": "E-mail",
+      "password": "Wachtwoord",
       "phoneNumber": "Telefoonnummer",
       "birthdate": "Geboortedatum",
       "bondNumber": "Bondnummer",
@@ -387,7 +398,16 @@
         "settings": {
           "success": "Wachtwoord aangepast!",
           "informationUpdated": "Information bijgewerkt!"
+        },
+        "auth": {
+          "required": {
+            "password": "Wachtwoord is verplicht",
+            "email": "Email is verplicht"
+          }
         }
+      },
+      "auth": {
+        "forgotPassword": "Wachtwoord vergeten"
       },
       "confirmation": "Weet je zeker dat je wilt verwijderen",
       "cancel": "Annuleren",
