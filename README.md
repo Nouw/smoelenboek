@@ -27,8 +27,8 @@ This package houses entities used in both the frontend and backend. It ensures t
 
 ## Git Workflow Rules
 
-- **Features**: When working on a new feature, please create a new branch using the format feature/{name}.
-- **Bugs**: If you're addressing a bug, use the branch naming format bug/{name}.
+- **Features**: When working on a new feature, please create a new branch using the format `feature/{name}`.
+- **Bugs**: If you're addressing a bug, use the branch naming format `bug/{name}`.
 - **Pull Requests**: Once your work is ready for review, please create a pull request. Your changes will be reviewed before merging.
 
 ## Lead & Contact
