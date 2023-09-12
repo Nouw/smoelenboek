@@ -118,9 +118,9 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = () => {
               open={Boolean(menuAnchor)}
               onClose={closeMenu}
             >
-              <MenuItem onClick={() => {closeMenu(); navigate(`/profile/${id ?? 1}`)}}>Profile</MenuItem>
-              <MenuItem onClick={() => {closeMenu(); navigate(`/settings`)}}>Settings</MenuItem>
-              <MenuItem onClick={() => {closeMenu(); dispatch(logout(undefined))}}>Logout</MenuItem>
+              <MenuItem onClick={() => {closeMenu(); navigate(`/profile/${id ?? 1}`)}}>{i18n.t("menu.profile")}</MenuItem>
+              <MenuItem onClick={() => {closeMenu(); navigate(`/settings`)}}>{i18n.t("settings.settings")}</MenuItem>
+              <MenuItem onClick={() => {closeMenu(); dispatch(logout(undefined))}}>{i18n.t("menu.logout")}</MenuItem>
             </Menu>
           </Toolbar>
         </AppBar>
