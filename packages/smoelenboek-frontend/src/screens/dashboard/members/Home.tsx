@@ -20,7 +20,7 @@ import {Severity} from "../../../providers/SnackbarProvider";
 import {SnackbarContext} from "../../../providers/SnackbarContext";
 import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../../store/hooks";
-import {useMembersMutation, useRemoveMutation} from "../../../api/endpoints/members";
+import {useMembersMutation, useRemoveMemberMutation} from "../../../api/endpoints/members";
 import {addMembers, membersSelector} from "../../../store/feature/members.slice";
 import {useTranslation} from "react-i18next";
 
@@ -36,7 +36,7 @@ export const Home: React.FC<HomeProps> = () => {
   const { t } = useTranslation();
 
   const [getMembers, { isLoading }] = useMembersMutation();
-  const [removeMember] = useRemoveMutation();
+  const [removeMember] = useRemoveMemberMutation();
 
 
   const [visible, setVisible] = React.useState<boolean>(false);

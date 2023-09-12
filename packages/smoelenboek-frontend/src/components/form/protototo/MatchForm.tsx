@@ -1,6 +1,5 @@
 import React from "react";
 import moment from "moment";
-import * as Yup from 'yup';
 import {
   Box,
   Card,
@@ -32,14 +31,13 @@ export interface FormValues {
   gender: "male" | "female"
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore
-const schema = Yup.object({
-  playDate: Yup.date().required(),
-  homeTeam: Yup.string().required(),
-  awayTeam: Yup.string().required(),
-  gender: Yup.string().required(),
-})
+
+// const schema = Yup.object({
+//   playDate: Yup.date().required(),
+//   homeTeam: Yup.string().required(),
+//   awayTeam: Yup.string().required(),
+//   gender: Yup.string().required(),
+// })
 
 export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, title }) => {
   const { t } = useTranslation();

@@ -1,5 +1,4 @@
 import React from "react";
-import * as Yup from 'yup';
 import {SnackbarContext} from "../../../providers/SnackbarContext";
 import {useParams} from "react-router-dom";
 import {
@@ -36,13 +35,11 @@ interface FormValues {
   gender: "male" | "female"
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore
-const schema = Yup.object({
-  name: Yup.string().required(),
-  league: Yup.string().required(),
-  gender: Yup.string()
-})
+// const schema = Yup.object({
+//   name: Yup.string().required(),
+//   league: Yup.string().required(),
+//   gender: Yup.string()
+// })
 
 export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, league, gender }) => {
   const snackbar = React.useContext(SnackbarContext);
