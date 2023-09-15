@@ -33,6 +33,11 @@ const defaultItems: DrawerItem[] = [
     ]
   },
   {
+    title: "navigation.committees",
+    subheader: false,
+    navigateTo: "committees"
+  },
+  {
     title: "Protototo",
     subheader: true,
     subItems: [

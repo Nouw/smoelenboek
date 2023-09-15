@@ -40,7 +40,8 @@
         },
         "documents": "Documents",
         "administration": "Administration",
-        "vcp": "Confidential contact person"
+        "vcp": "Confidential contact person",
+        "committees": "Committees"
       },
       "dashboard": {
         "goBack": "Back to smoelenboek",
@@ -260,7 +261,8 @@
         },
         "documents": "Documenten",
         "administration": "Administratie",
-        "vcp": "Vertrouwens contact persoon"
+        "vcp": "Vertrouwens contact persoon",
+        "committees": "Commissies"
       },
       "dashboard": {
         "goBack": "Terug naar smoelenboek",
