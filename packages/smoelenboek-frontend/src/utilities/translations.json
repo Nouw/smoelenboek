@@ -40,7 +40,8 @@
         },
         "documents": "Documents",
         "administration": "Administration",
-        "vcp": "Confidential contact person"
+        "vcp": "Confidential contact person",
+        "committees": "Committees"
       },
       "dashboard": {
         "goBack": "Back to smoelenboek",
@@ -204,7 +205,19 @@
       "confirmation": "Are you sure you want to remove",
       "cancel": "Cancel",
       "remove": "Remove",
-      "save": "Save"
+      "save": "Save",
+      "functions": {
+        "Coach / Trainer": "Coach / Trainer",
+        "Middle": "Middle",
+        "Outside hitter": "Outside hitter",
+        "Opposite hitter": "Opposite hitter",
+        "Libero": "Libero",
+        "Setter": "Setter"
+      },
+      "menu": {
+        "logout": "Logout",
+        "profile": "Profile"
+      }
     }
   },
   "nl": {
@@ -248,7 +261,8 @@
         },
         "documents": "Documenten",
         "administration": "Administratie",
-        "vcp": "Vertrouwens contact persoon"
+        "vcp": "Vertrouwens contact persoon",
+        "committees": "Commissies"
       },
       "dashboard": {
         "goBack": "Terug naar smoelenboek",
@@ -412,7 +426,19 @@
       "confirmation": "Weet je zeker dat je wilt verwijderen",
       "cancel": "Annuleren",
       "remove": "Verwijderen",
-      "save": "Opslaan"
+      "save": "Opslaan",
+      "functions": {
+        "Coach / Trainer": "Coach / Trainer",
+        "Middle": "Midden",
+        "Outside hitter": "Passer/loper",
+        "Opposite hitter": "Diagonaal",
+        "Libero": "Libero",
+        "Setter": "Spelverdeler"
+      },
+      "menu": {
+        "logout": "Uitloggen",
+        "profile": "Profiel"
+      }
     }
   }
 }

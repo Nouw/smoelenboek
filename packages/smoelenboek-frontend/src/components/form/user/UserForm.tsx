@@ -1,6 +1,5 @@
 import React from "react";
 import moment from "moment";
-import * as Yup from 'yup';
 import {Box, Card, CardContent, Stack, TextField, Typography} from "@mui/material";
 import {Field, Formik, FormikProps} from "formik";
 import {DatePicker} from "@mui/x-date-pickers/DatePicker";
@@ -35,22 +34,20 @@ export interface FormValues {
   birthDate: moment.Moment | string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore
-const schema = Yup.object({
-  firstName: Yup.string().required(),
-  lastName: Yup.string().required(),
-  email: Yup.array().of(Yup.string().email()).required(),
-  streetName: Yup.string().required(),
-  houseNumber: Yup.string().required(),
-  postCode: Yup.string().length(6).matches(/^[1-9][0-9]{3} ?(?!sa|sd|ss)[a-z]{2}$/i).required(),
-  city: Yup.string().required(),
-  phoneNumber: Yup.string().required(),
-  bankaccountNumber: Yup.string(),
-  bondNumber: Yup.string(),
-  backNumber: Yup.number(),
-  birthDate: Yup.date()
-});
+// const schema = Yup.object({
+//   firstName: Yup.string().required(),
+//   lastName: Yup.string().required(),
+//   email: Yup.array().of(Yup.string().email()).required(),
+//   streetName: Yup.string().required(),
+//   houseNumber: Yup.string().required(),
+//   postCode: Yup.string().length(6).matches(/^[1-9][0-9]{3} ?(?!sa|sd|ss)[a-z]{2}$/i).required(),
+//   city: Yup.string().required(),
+//   phoneNumber: Yup.string().required(),
+//   bankaccountNumber: Yup.string(),
+//   bondNumber: Yup.string(),
+//   backNumber: Yup.number(),
+//   birthDate: Yup.date()
+// });
 
 
 

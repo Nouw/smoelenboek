@@ -14,7 +14,7 @@ export const MembersApiSlice = API.enhanceEndpoints({ addTagTypes: ['Members'] }
         method: 'GET'
       })
     }),
-    remove: builder.mutation<Response<null>, number>({
+    removeMember: builder.mutation<Response<null>, number>({
       query: (id) => ({
         url: `user/${id}`,
         method: 'DELETE'
@@ -37,4 +37,4 @@ export const MembersApiSlice = API.enhanceEndpoints({ addTagTypes: ['Members'] }
   })
 });
 
-export const { useMembersMutation, useRemoveMutation, useUpdateMemberMutation, useCreateMemberMutation } = MembersApiSlice;
+export const { useMembersMutation, useRemoveMemberMutation, useUpdateMemberMutation, useCreateMemberMutation } = MembersApiSlice;

@@ -1,5 +1,4 @@
 import React from "react";
-import * as Yup from 'yup';
 import {Box, Card, CardContent, Stack, TextField, Typography} from "@mui/material";
 import {Formik} from "formik";
 import {LoadingButton} from "@mui/lab";
@@ -23,12 +22,10 @@ interface FormValues {
   email: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-ts-comment
-// @ts-ignore
-const schema = Yup.object({
-  name: Yup.string().required(),
-  email: Yup.string().email()
-})
+// const schema = Yup.object({
+//   name: Yup.string().required(),
+//   email: Yup.string().email()
+// })
 
 export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, name, email }) => {
   const params = useParams();

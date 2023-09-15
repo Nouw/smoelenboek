@@ -1,0 +1,8 @@
+services:
+  smoelenboek:
+    build:
+      context: .
+    ports:
+      - 3000:8000
+    environment:
+      - BUILD_AND_SERVE=false

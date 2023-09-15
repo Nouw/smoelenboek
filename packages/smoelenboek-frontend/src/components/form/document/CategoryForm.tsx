@@ -1,5 +1,4 @@
 import React from "react";
-import * as Yup from "yup";
 import {
   Card,
   CardContent,
@@ -26,13 +25,11 @@ export interface FormValues {
   type: "photos" | "documents",
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-ignore
-const schema = Yup.object({
-  name: Yup.string().required(),
-  type: Yup.string().required(),
-})
-
+// const schema = Yup.object({
+//   name: Yup.string().required(),
+//   type: Yup.string().required(),
+// })
+//
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({ initialValues, title, submit }) => {
   const { t } = useTranslation();
