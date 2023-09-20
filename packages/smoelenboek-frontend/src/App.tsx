@@ -54,6 +54,7 @@ import { VCP } from "./screens/VCP.tsx";
 import { Home as Committees } from "./screens/committees/Home";
 import { Info as CommitteeInfo } from "./screens/committees/Info";
 import {External} from "./screens/protototo/External.tsx";
+import { Result as ProtototoMatchResult } from "./screens/dashboard/protototo/match/Result";
 
 const router = createBrowserRouter([
   {
@@ -213,6 +214,10 @@ const router = createBrowserRouter([
       {
         path: "protototo/season/:id/matches/edit/:matchId",
         element: <ProtototoSeasonEditMatch />,
+      },
+      {
+        path: "protototo/season/:id/matches/result/:matchId",
+        element: <ProtototoMatchResult />
       },
       {
         path: "documents/",

@@ -140,7 +140,8 @@
           "options": "Options",
           "edit": "Edit",
           "remove": "Delete",
-          "addMatch": "Add match"
+          "addMatch": "Add match",
+          "exportParticipants": "Export participants"
         }
       },
       "message": {
@@ -364,7 +365,8 @@
           "options": "Opties",
           "edit": "Bewerken",
           "remove": "Verwijderen",
-          "addMatch": "Wedstrijd toevoegen"
+          "addMatch": "Wedstrijd toevoegen",
+          "exportParticipants": "Deelnemers exporteren"
         }
       },
       "message": {

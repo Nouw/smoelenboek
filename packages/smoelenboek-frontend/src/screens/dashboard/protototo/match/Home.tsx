@@ -14,13 +14,15 @@ import {
 import moment from "moment";
 import {useNavigate, useParams} from "react-router-dom";
 import {Options} from "../../../../components/dashboard/Options";
-import {Delete, Edit} from "@mui/icons-material";
+import {Delete, Edit, Flag} from "@mui/icons-material";
 import {useAppDispatch, useAppSelector} from "../../../../store/hooks";
 import {useLazyProtototoMatchesQuery, useProtototoRemoveMatchMutation} from "../../../../api/endpoints/protototo";
 import {addMatches, protototoMatchSelector, removeMatch as removeMatchState} from "../../../../store/feature/protototo.slice";
 import {Severity} from "../../../../providers/SnackbarProvider";
 import {SnackbarContext} from "../../../../providers/SnackbarContext";
 import {useTranslation} from "react-i18next";
+import {ProtototoMatch} from "smoelenboek-types";
+import { Response } from "../../../../api/API.ts";
 
 interface HomeProps {
 
@@ -45,8 +47,8 @@ export const Home: React.FC<HomeProps> = () => {
   React.useEffect(() => {
     const getData = async () => {
       try {
-        const res = await getMatches(parseInt(params.id as string)).unwrap();
-        dispatch(addMatches(res.data.map((match) => match.match)));
+        const res = await getMatches(parseInt(params.id as string)).unwrap() as never as Response<ProtototoMatch[]>;
+        dispatch(addMatches(res.data));
       } catch (e) {
         console.error(e);
       }
@@ -105,8 +107,14 @@ export const Home: React.FC<HomeProps> = () => {
                         <MenuItem onClick={() => navigate(`/dashboard/protototo/season/${params.id}/matches/edit/${match.id}`)}>
                           <ListItemIcon>
                             <Edit fontSize="small"/>
-                            {t("dashboard.options.edit")}
                           </ListItemIcon>
+                          {t("dashboard.options.edit")}
+                        </MenuItem>
+                        <MenuItem onClick={() => navigate(`/dashboard/protototo/season/${params.id}/matches/result/${match.id}`)}>
+                          <ListItemIcon>
+                            <Flag fontSize="small"/>
+                          </ListItemIcon>
+                          Resultaat invoeren
                         </MenuItem>
                         <MenuItem onClick={() => {
                           setSelected(key);
@@ -114,8 +122,8 @@ export const Home: React.FC<HomeProps> = () => {
                         }}>
                           <ListItemIcon>
                             <Delete fontSize="small"/>
-                            {t("dashboard.options.delete")}
                           </ListItemIcon>
+                          {t("dashboard.options.remove")}
                         </MenuItem>
                       </Options>
                     </TableCell>

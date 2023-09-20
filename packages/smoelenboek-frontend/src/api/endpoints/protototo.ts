@@ -129,7 +129,24 @@ export const protototoApiSlice = API.enhanceEndpoints({ addTagTypes: ['Protototo
         url: 'protototo/external/season',
         method: 'GET'
       })
-    })
+    }),
+    getExportParticipants: builder.mutation<unknown, number>({
+      query: id => ({
+        url: `protototo/export/players/${id}`,
+        method: 'GET',
+        responseHandler: async (response) => window.location.assign(window.URL.createObjectURL(await response.blob())),
+        cache: "no-cache",
+      })
+    }),
+    postProtototoResult: builder.mutation<Response<null>, PostProtototoBet>({
+      query: (data) => ({
+        url: `protototo/match/${data.id}`,
+        method: 'POST',
+        body: {
+          ...data
+        }
+      })
+    }),
   })
 })
 
@@ -145,5 +162,7 @@ export const {
   useProtototoMatchMutation,
   useUpdateProtototoMatchMutation,
   usePostProtototoBetMutation,
-  useGetProtototoExternalSeasonQuery
+  useGetProtototoExternalSeasonQuery,
+  useGetExportParticipantsMutation,
+  usePostProtototoResultMutation,
 } = protototoApiSlice;
