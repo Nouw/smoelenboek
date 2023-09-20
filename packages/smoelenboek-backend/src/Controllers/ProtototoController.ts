@@ -2,14 +2,20 @@ import { Controller, Delete, Get, Next, Post, Put, Request, Response } from "@de
 import { Authenticated, Guard } from "../Middlewares/AuthMiddleware";
 import ProtototoRepository from "../Repository/ProtototoRepository";
 import { RequestE } from "../Utilities/RequestE";
-import { ProtototoMatch, ProtototoPredictions, ProtototoSeason, ProtototoResults } from "smoelenboek-types";
+import {
+	ProtototoMatch,
+	ProtototoPredictions,
+	ProtototoSeason,
+	ProtototoResults,
+	ProtototoPredictionsExternal
+} from "smoelenboek-types";
 import { Database } from "../Database";
 import ResponseData from "../Utilities/ResponseData";
 import { body, matchedData, param, query, validationResult } from "express-validator";
 
 type MatchPrediction = {
 	match: ProtototoMatch,
-	prediction?: ProtototoPredictions
+	prediction?: ProtototoPredictions | ProtototoPredictionsExternal
 }
 
 @Controller("/protototo")
@@ -23,7 +29,7 @@ export default class ProtototoController {
 	}
 
 	@Authenticated(false)
-	@Get("/matches", [query("seasonId").toInt()])
+	@Get("/matches", [query("seasonId").toInt(), body(["firstName", "lastName", "email"])])
 	async getMatches(@Request() req: RequestE, @Response() res, @Next() next) {
 		const data = matchedData(req);
 
@@ -49,7 +55,14 @@ export default class ProtototoController {
 				const prediction = await this.protototoRepository.getPrediction(req.user.id, match.id);
 				elements.push({ match: match, prediction });
 			}
-		} else if(data.seasonId) {
+		} else {
+			for (const match of matches) {
+				const prediction = await this.protototoRepository.GetExternalPrediction(data.firstName, data.lastName, data.email, match.id);
+				elements.push({ match, prediction });
+			}
+		}
+
+		if(data.seasonId) {
 			// This returns all the matches from the selected season
 			res.json(ResponseData.build("OK", matches));
 			return;
@@ -89,9 +102,28 @@ export default class ProtototoController {
 			prediction.setFive = setFive;
 
 			await Database.manager.save(prediction);
-		}
+		} else {
+			const { firstName, lastName, email } = req.body;
 
-		//TODO: Add anonymous predictions
+			let bet = await this.protototoRepository.GetExternalPrediction(firstName, lastName, email, match.id);
+
+			if (!bet) {
+				bet = new ProtototoPredictionsExternal();
+				bet.firstName = firstName;
+				bet.lastName = lastName;
+				bet.email = email;
+				bet.match = match;
+			}
+
+			bet.setOne = setOne;
+			bet.setTwo = setTwo;
+			bet.setThree = setThree;
+			bet.setFour = setFour;
+			bet.setFive = setFive ?? null;
+			console.log(bet);
+
+			await Database.manager.save(bet);
+		}
 
 		res.json(ResponseData.build("OK", null, "Stored prediction!"));
 	}
@@ -350,5 +382,12 @@ export default class ProtototoController {
 		await Database.manager.delete(ProtototoMatch, { id: parseInt(id) });
 
 		res.json(ResponseData.build("OK", null, "Deleted match!"));
+	}
+
+  @Get("/external/season")
+	async getSeasonExternal(@Request() req, @Response() res) {
+		const result = await this.protototoRepository.getCurrentSeason();
+
+		res.json(ResponseData.build("OK", result));
 	}
 }

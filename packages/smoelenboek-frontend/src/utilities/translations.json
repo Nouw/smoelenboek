@@ -15,7 +15,10 @@
       "protototo": {
         "win": "Win",
         "lose": "Lose",
-        "submitMessage": "Successfully send bet!"
+        "submitMessage": "Successfully send bet!",
+        "form": {
+          "required": "This field is required!"
+        }
       },
       "errorMessage": "Something went wrong :(",
       "submit": "Submit",
@@ -236,7 +239,10 @@
       "protototo": {
         "win": "Winnen",
         "lose": "Verliezen",
-        "submitMessage": "Weddenschap succesvol verzonden!"
+        "submitMessage": "Weddenschap succesvol verzonden!",
+        "form": {
+          "required": "Dit veld is verplicht!"
+        }
       },
       "errorMessage": "Er is iets misgegaan :(",
       "submit": "Verzenden",

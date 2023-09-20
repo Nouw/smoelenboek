@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Database } from "../Database";
-import { ProtototoSeason, ProtototoMatch, ProtototoPredictions } from "smoelenboek-types";
+import { ProtototoSeason, ProtototoMatch, ProtototoPredictions, ProtototoPredictionsExternal } from "smoelenboek-types";
 
 export default class ProtototoRepository {
 	getCurrentSeason() {
@@ -46,4 +46,14 @@ export default class ProtototoRepository {
 			})
 			.getOne();
 	}
+
+	GetExternalPrediction(firstName: string, lastName: string, email: string, id: number) {
+		return Database.createQueryBuilder(ProtototoPredictionsExternal, "ppe")
+			.where("ppe.firstName = :firstName", { firstName })
+			.andWhere("ppe.lastName = :lastName", { lastName })
+			.andWhere("ppe.email = :email", { email })
+			.andWhere("ppe.match.id = :id", { id })
+			.getOne();
+	}
+
 }

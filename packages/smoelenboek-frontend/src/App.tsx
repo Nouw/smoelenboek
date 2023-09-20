@@ -53,6 +53,7 @@ import { SponsorHengel } from "./screens/SponsorHengel";
 import { VCP } from "./screens/VCP.tsx";
 import { Home as Committees } from "./screens/committees/Home";
 import { Info as CommitteeInfo } from "./screens/committees/Info";
+import {External} from "./screens/protototo/External.tsx";
 
 const router = createBrowserRouter([
   {
@@ -235,6 +236,10 @@ const router = createBrowserRouter([
     path: "/debug",
     element: <LoginDebug />,
   },
+  {
+    path: "/externe/protototo",
+    element: <External/>
+  }
 ]);
 
 function App() {

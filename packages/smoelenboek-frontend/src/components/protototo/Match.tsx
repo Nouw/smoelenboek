@@ -27,6 +27,9 @@ interface MatchProps {
   matchId: number;
   gender: string;
   previousBet?: ProtototoPredictions | ProtototoPredictionsExternal,
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 }
 
 interface FormValues {
@@ -37,7 +40,7 @@ interface FormValues {
   setFive?: boolean;
 }
 
-export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender, previousBet }) => {
+export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender, previousBet, firstName, lastName, email }) => {
   const initialValues: FormValues = {
     setOne: previousBet?.setOne ?? true,
     setTwo: previousBet?.setTwo ?? true,
@@ -73,23 +76,23 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
       } else {
         setSetFourVisible(false);
       }
+    } else if (gender === 'women') {
+      setSetFourVisible(true);
+      if (
+        (!formValues.setOne && !formValues.setTwo && formValues.setThree && formValues.setFour) ||
+        (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
+        (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
+        (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
+        (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
+        (formValues.setOne && formValues.setTwo && !formValues.setThree && !formValues.setFour) ||
+        (formValues.setOne && !formValues.setTwo && formValues.setThree && !formValues.setFour) ||
+        (formValues.setOne && !formValues.setTwo && !formValues.setThree && formValues.setFour)
+      ) {
+        setSetFiveVisible(true);
+      } else {
+        setSetFiveVisible(false);
+      }
     }
-
-    if (
-      (!formValues.setOne && !formValues.setTwo && formValues.setThree && formValues.setFour) ||
-      (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
-      (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-      (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-      (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
-      (formValues.setOne && formValues.setTwo && !formValues.setThree && !formValues.setFour) ||
-      (formValues.setOne && !formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-      (formValues.setOne && !formValues.setTwo && !formValues.setThree && formValues.setFour)
-    ) {
-      setSetFiveVisible(true);
-    } else {
-      setSetFiveVisible(false);
-    }
-
   }, [formValues, gender])
 
   React.useEffect(() => {
@@ -106,7 +109,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
 
   async function submit(values: FormValues & { setSubmitting: (submitting: boolean) => void}) {
     try {
-      await trigger({id: matchId, ...values});
+      await trigger({id: matchId, ...values, firstName, lastName, email});
 
       snackbar.openSnackbar(t("protototo.submitMessage"), Severity.SUCCESS);
     } catch (e) {
