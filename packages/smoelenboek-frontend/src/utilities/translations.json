@@ -18,7 +18,8 @@
         "submitMessage": "Successfully send bet!",
         "form": {
           "required": "This field is required!"
-        }
+        },
+        "details": "Details"
       },
       "errorMessage": "Something went wrong :(",
       "submit": "Submit",
@@ -201,7 +202,9 @@
             "password": "Password is required",
             "email": "Email is required"
           }
-        }
+        },
+        "avg": "I agree to the processing of my personal data by USV Protos",
+        "tikkie": "I hereby confirm that I have paid the above tikkie and am participating in the ProtoToto"
       },
       "auth": {
         "forgotPassword": "Forgot password"
@@ -243,7 +246,8 @@
         "submitMessage": "Weddenschap succesvol verzonden!",
         "form": {
           "required": "Dit veld is verplicht!"
-        }
+        },
+        "details": "Gegevens"
       },
       "errorMessage": "Er is iets misgegaan :(",
       "submit": "Verzenden",
@@ -426,7 +430,9 @@
             "password": "Wachtwoord is verplicht",
             "email": "Email is verplicht"
           }
-        }
+        },
+        "avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
+        "tikkie": "Hierbij bevestig ik dat ik bovenstaande tikkie heb betaald en deelneem aan de ProtoToto"
       },
       "auth": {
         "forgotPassword": "Wachtwoord vergeten"

@@ -59,7 +59,7 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
     {(props: FormikProps<FormValues>) => (
       <form onSubmit={props.handleSubmit} noValidate>
         <Stack spacing={2}>
-          <Typography variant="h4" textAlign="center">Gegevens</Typography>
+          <Typography variant="h4" textAlign="center">{t("protototo.details")}</Typography>
           <TextField
             id="firstName"
             label={t("dashboard.user.firstName")}
@@ -89,7 +89,7 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
           />
           <FormGroup>
             <FormControl required error={Boolean(props.errors.acceptAVG)}>
-              <FormControlLabel control={<Checkbox id="acceptAVG" checked={props.values.acceptAVG} onChange={props.handleChange}/>} label="Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos"/>
+              <FormControlLabel control={<Checkbox id="acceptAVG" checked={props.values.acceptAVG} onChange={props.handleChange}/>} label={t("message.avg")}/>
                 <FormHelperText>{props.errors.acceptAVG}</FormHelperText>
             </FormControl>
 
@@ -98,7 +98,7 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
                 <FormControl required error={Boolean(props.errors.tikkie)}>
                   <Button sx={{ mr: 'auto', my: 2, backgroundColor: '#413f80'}} variant="contained" onClick={() => window.open(tikkie, '_blank')?.focus()}>Tikkie betalen</Button>
                   <FormControlLabel control={<Checkbox id="tikkie" checked={props.values.tikkie} onChange={(_event,checked) => props.setFieldValue("tikkie", checked)}/>}
-                                    label="Hierbij bevestig ik dat ik bovenstaande tikkie heb betaald en deelneem aan de ProtoToto"/>
+                                    label={t("message.tikkie")}/>
                     <FormHelperText>{props.errors.tikkie}</FormHelperText>
                 </FormControl>
 
