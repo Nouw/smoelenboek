@@ -129,7 +129,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
               helperText={props.touched.bankaccountNumber && props.errors.bankaccountNumber}
             />
             <TextField
-              id="backNumer"
+              id="backNumber"
               label={t("backNumber")}
               type="number"
               value={props.values.backNumber}
