@@ -36,6 +36,9 @@ interface PostProtototoBet {
   setThree: boolean;
   setFour?: boolean;
   setFive?: boolean;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 }
 
 export const protototoApiSlice = API.enhanceEndpoints({ addTagTypes: ['Protototo']}).injectEndpoints({
@@ -117,14 +120,33 @@ export const protototoApiSlice = API.enhanceEndpoints({ addTagTypes: ['Protototo
         url: `protototo/bet?id=${data.id}`,
         method: 'POST',
         body: {
-          setOne: data.setOne,
-          setTwo: data.setTwo,
-          setThree: data.setThree,
-          setFour: data.setFour,
-          setFive: data.setFive,
+          ...data
         }
       })
-    })
+    }),
+    getProtototoExternalSeason: builder.query<Response<ProtototoSeason>, void>({
+      query: () => ({
+        url: 'protototo/external/season',
+        method: 'GET'
+      })
+    }),
+    getExportParticipants: builder.mutation<unknown, number>({
+      query: id => ({
+        url: `protototo/export/players/${id}`,
+        method: 'GET',
+        responseHandler: async (response) => window.location.assign(window.URL.createObjectURL(await response.blob())),
+        cache: "no-cache",
+      })
+    }),
+    postProtototoResult: builder.mutation<Response<null>, PostProtototoBet>({
+      query: (data) => ({
+        url: `protototo/match/${data.id}`,
+        method: 'POST',
+        body: {
+          ...data
+        }
+      })
+    }),
   })
 })
 
@@ -140,4 +162,7 @@ export const {
   useProtototoMatchMutation,
   useUpdateProtototoMatchMutation,
   usePostProtototoBetMutation,
+  useGetProtototoExternalSeasonQuery,
+  useGetExportParticipantsMutation,
+  usePostProtototoResultMutation,
 } = protototoApiSlice;

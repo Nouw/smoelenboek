@@ -12,11 +12,12 @@ import {
   TableRow
 } from "@mui/material";
 import {Options} from "../../../components/dashboard/Options";
-import {Add, Delete, Edit} from "@mui/icons-material";
+import {Add, Delete, Download, Edit} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../../store/hooks";
 import {addSeasons, protototoSeasonSelector, removeSeason as removeSeasonState} from "../../../store/feature/protototo.slice";
 import {
+  useGetExportParticipantsMutation,
   useProtototoSeasonsMutation,
   useRemoveProtototoSeasonMutation,
 } from "../../../api/endpoints/protototo";
@@ -39,6 +40,7 @@ export const Home: React.FC<HomeProps> = () => {
 
   const [getSeasons] = useProtototoSeasonsMutation();
   const [removeSeasonApi] = useRemoveProtototoSeasonMutation();
+  const [exportParticipants] = useGetExportParticipantsMutation();
 
   React.useEffect(() => {
     const getData = async () => {
@@ -65,6 +67,10 @@ export const Home: React.FC<HomeProps> = () => {
       console.error(e);
       snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
     }
+  }
+
+  function exportPlayers(id: number) {
+    exportParticipants(id);
   }
 
   return (
@@ -98,20 +104,26 @@ export const Home: React.FC<HomeProps> = () => {
                     <MenuItem onClick={() => navigate(`season/${season.id}`)}>
                       <ListItemIcon>
                         <Edit fontSize="small"/>
-                        {t("dashboard.options.edit")}
                       </ListItemIcon>
+                      {t("dashboard.options.edit")}
                     </MenuItem>
                     <MenuItem onClick={() => navigate(`season/${season.id}/matches`)}>
                       <ListItemIcon>
                         <Add fontSize="small"/>
-                        {t("dashboard.options.addMatch")}
                       </ListItemIcon>
+                      {t("dashboard.options.addMatch")}
                     </MenuItem>
                     <MenuItem onClick={() => removeSeason(season.id)}>
                       <ListItemIcon>
                         <Delete fontSize="small"/>
-                        {t("dashboard.options.remove")}
                       </ListItemIcon>
+                      {t("dashboard.options.remove")}
+                    </MenuItem>
+                    <MenuItem onClick={() => exportPlayers(season.id)}>
+                      <ListItemIcon>
+                        <Download fontSize="small"/>
+                      </ListItemIcon>
+                      {t("dashboard.options.exportParticipants")}
                     </MenuItem>
                   </Options>
                 </TableCell>
