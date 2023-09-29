@@ -4,7 +4,7 @@ import {AuthState} from "../store/feature/auth.slice";
 
 const apiclient = axios;
 
-apiclient.defaults.baseURL = import.meta.env.REACT_APP_API_URL ?? "http://localhost:8080";
+apiclient.defaults.baseURL = import.meta.env.VITE_APP_API_URL ?? "http://localhost:8080";
 
 apiclient.interceptors.request.use((config) => {
   // Skip checking if logging in

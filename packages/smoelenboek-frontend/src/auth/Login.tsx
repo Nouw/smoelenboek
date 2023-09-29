@@ -127,7 +127,7 @@ export const Login: React.FC<LoginProps> = () => {
                           )
                         }}
                       />
-                      <Link href="#">
+                      <Link href="/password/reset">
                         <Typography variant="caption" color={theme => theme.palette.primary.main}>
                           {t("auth.forgotPassword")}?
                         </Typography>

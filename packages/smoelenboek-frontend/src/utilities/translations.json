@@ -219,12 +219,20 @@
         "Outside hitter": "Outside hitter",
         "Opposite hitter": "Opposite hitter",
         "Libero": "Libero",
-        "Setter": "Setter"
+        "Setter": "Setter",
+        "Commissielid": "Committee member",
+        "Voorzitter": "President",
+        "Secretaris": "Secretary",
+        "Penningmeeseter": "Treasurer",
+        "Wedstrijdsecretaris": "Match secretary",
+        "Commissaris zaalwacht en arbitrage": "Commissioner of Hall Watch and Arbitration",
+        "Commissaris externe zaken": "External Affairs Commissioner"
       },
       "menu": {
         "logout": "Logout",
         "profile": "Profile"
-      }
+      },
+      "emailRequest": "Send email password reset request!"
     }
   },
   "nl": {
@@ -447,12 +455,20 @@
         "Outside hitter": "Passer/loper",
         "Opposite hitter": "Diagonaal",
         "Libero": "Libero",
-        "Setter": "Spelverdeler"
+        "Setter": "Spelverdeler",
+        "Commissielid": "Commissielid",
+        "Voorzitter": "Voorzitter",
+        "Secretaris": "Secretaris",
+        "Penningmeester": "Penningmeester",
+        "Wedstrijdsecretaris": "Wedstrijdsecretaris",
+        "Commissaris zaalwacht en arbitrage": "Commissaris Zaalwacht en Arbitrage",
+        "Commissaris externe zaken": "Commissaris Externe Zaken"
       },
       "menu": {
         "logout": "Uitloggen",
         "profile": "Profiel"
-      }
+      },
+      "emailRequest": "Verzoek om email adres te resetten verstuurd!"
     }
   }
 }

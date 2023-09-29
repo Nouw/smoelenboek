@@ -1,5 +1,5 @@
 import React from "react";
-import {SeasonForm, SeasonFormValues} from "../../../components/form/season/SeasonForm";
+import {SeasonForm, SeasonFormValues} from "../../../components/form/protototo/SeasonForm";
 import schema from "./schema";
 import {SnackbarContext} from "../../../providers/SnackbarContext";
 import {Severity} from "../../../providers/SnackbarProvider";

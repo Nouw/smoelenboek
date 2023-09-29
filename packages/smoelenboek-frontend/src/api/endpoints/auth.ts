@@ -60,6 +60,15 @@ export const authApiSlice = API.enhanceEndpoints({ addTagTypes: ['Auth']}).injec
         url: 'user/picture',
         method: 'GET'
       })
+    }),
+    postResetPassword: builder.mutation<Response<void>, string>({
+      query: (email) => ({
+        url: 'auth/password/reset',
+        method: 'POST',
+        body: {
+          email
+        }
+      })
     })
   })
 })
@@ -71,5 +80,6 @@ export const {
   useGetUserInformationQuery,
   usePostProfilePictureMutation,
   useGetProfilePictureQuery,
-  useLazyGetProfilePictureQuery
+  useLazyGetProfilePictureQuery,
+  usePostResetPasswordMutation
 } = authApiSlice;

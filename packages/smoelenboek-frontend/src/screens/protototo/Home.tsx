@@ -15,7 +15,7 @@ export const Home: React.FC<HomeProps> = () => {
   return <>
     <Stack direction="column" gap={5}>
       {matches?.data.map((item) => (
-        <Match home={item.match.homeTeam} away={item.match.awayTeam} date={item.match.playDate} gender={item.match.gender} matchId={item.match.id} previousBet={item.prediction}/>
+        <Match key={item.match.id} home={item.match.homeTeam} away={item.match.awayTeam} date={item.match.playDate} gender={item.match.gender} matchId={item.match.id} previousBet={item.prediction}/>
       ))}
     </Stack>
   </>;

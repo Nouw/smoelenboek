@@ -55,6 +55,7 @@ import { Home as Committees } from "./screens/committees/Home";
 import { Info as CommitteeInfo } from "./screens/committees/Info";
 import {External} from "./screens/protototo/External.tsx";
 import { Result as ProtototoMatchResult } from "./screens/dashboard/protototo/match/Result";
+import {ResetPassword} from "./auth/ResetPassword.tsx";
 
 const router = createBrowserRouter([
   {
@@ -236,6 +237,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/password/reset",
+    element: <ResetPassword/>
   },
   {
     path: "/debug",

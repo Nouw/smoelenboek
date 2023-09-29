@@ -46,7 +46,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     setOne: previousBet?.setOne ?? true,
     setTwo: previousBet?.setTwo ?? true,
     setThree: previousBet?.setThree ?? true,
-    setFour: gender === "women" ? previousBet?.setFour ?? undefined : undefined,
+    setFour: gender == "female" ? previousBet?.setFour ?? true : true,
     setFive: previousBet?.setFive ?? undefined,
   }
 
@@ -58,14 +58,14 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
   const [trigger] = usePostProtototoBetMutation();
   const [resultTrigger] = usePostProtototoResultMutation();
 
-  const [formValues, setFormValues] = React.useState<FormValues>();
+  const [formValues, setFormValues] = React.useState<FormValues>(initialValues);
   const [setFourVisible, setSetFourVisible] = React.useState<boolean>(false);
   const [setFiveVisible, setSetFiveVisible] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     if (!formValues) return;
 
-    if (gender === 'men') {
+    if (gender == 'male') {
       if (
         (!formValues.setOne && formValues.setTwo  && formValues.setThree ) ||
         (formValues.setOne  && !formValues.setTwo && formValues.setThree) ||
@@ -75,11 +75,28 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
         (!formValues.setOne  && !formValues.setTwo && formValues.setThree)
       ) {
         setSetFourVisible(true);
+
+        if (
+          (!formValues.setOne && !formValues.setTwo && formValues.setThree && formValues.setFour) ||
+          (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
+          (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
+          (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
+          (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
+          (formValues.setOne && formValues.setTwo && !formValues.setThree && !formValues.setFour) ||
+          (formValues.setOne && !formValues.setTwo && formValues.setThree && !formValues.setFour) ||
+          (formValues.setOne && !formValues.setTwo && !formValues.setThree && formValues.setFour)
+        ) {
+          setSetFiveVisible(true);
+          formRef.current?.setFieldValue("setFive", true);
+        } else {
+          setSetFiveVisible(false);
+        }
       } else {
         setSetFourVisible(false);
       }
-    } else if (gender === 'women') {
+    } else if (gender == 'female') {
       setSetFourVisible(true);
+
       if (
         (!formValues.setOne && !formValues.setTwo && formValues.setThree && formValues.setFour) ||
         (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
@@ -101,11 +118,11 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     if (!formRef.current) return;
 
     if (!setFourVisible) {
-      formRef.current.setFieldValue("setFour", undefined);
+      formRef.current.setFieldValue("setFour", true);
     }
 
     if (!setFiveVisible) {
-      formRef.current.setFieldValue("setFive", undefined);
+      formRef.current.setFieldValue("setFive", true);
     }
   }, [setFourVisible, setFiveVisible, formRef])
 
@@ -134,7 +151,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
       }}
       >
         {(props: FormikProps<FormValues>) => {
-          setFormValues(props.values);
+          setFormValues(props.values)
           return <form onSubmit={props.handleSubmit} noValidate>
             <List>
             <ListItem>
@@ -187,7 +204,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
           </List>
             <Stack direction="row">
               <Typography variant="caption" sx={{marginLeft: 2}}>
-                {moment(date).locale('nl').fromNow(true)}
+                {moment(date).fromNow(true)}
               </Typography>
               <LoadingButton type="submit" loading={props.isSubmitting} sx={{ marginLeft: "auto" }}>{t("submit")}</LoadingButton>
             </Stack>

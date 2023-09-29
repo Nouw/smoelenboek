@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import {Field, Formik, FormikProps} from "formik";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import {LoadingButton} from "@mui/lab";
 import {useTranslation} from "react-i18next";
 
@@ -71,10 +70,11 @@ export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, tit
                           helperText: <p>{errors.playDate}</p> }
                       }}
                       viewRenderers={{
-                        hours: renderTimeViewClock,
-                        minutes: renderTimeViewClock,
-                        seconds: renderTimeViewClock,
+                        // hours: renderTimeViewClock,
+                        // minutes: renderTimeViewClock,
+                        // seconds: renderTimeViewClock,
                       }}
+                      ampm={false}
                     />
                   )}
                 </Field>
