@@ -187,7 +187,17 @@ export default class DocumentController {
 			await Database.manager.delete(File, file.id);
 		}
 
-		await this.oracle.remove(`${category.name}/`);
+		try {
+			await this.oracle.remove(`${category.name}/`);
+		} catch (e) {
+			if (e instanceof  OciError) {
+				if (e.serviceCode === "ObjectNotFound") {
+					logger.warn("Object not found in bucket!");
+				}
+			} else {
+				throw e;
+			}
+		}
 
 		await Database.manager.delete(Category, category.id);
 
