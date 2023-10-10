@@ -1,7 +1,13 @@
 import React from "react";
 import {
   Button,
-  CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemIcon,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  ListItemIcon,
   MenuItem,
   Paper,
   Table,
@@ -9,20 +15,27 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
 } from "@mui/material";
-import {Options} from "../../../components/dashboard/Options";
-import {Delete, Edit} from "@mui/icons-material";
-import {useNavigate} from "react-router-dom";
-import {Severity} from "../../../providers/SnackbarProvider";
-import {SnackbarContext} from "../../../providers/SnackbarContext";
-import {useRemoveTeamMutation, useTeamsMutation} from "../../../api/endpoints/team";
-import {useAppDispatch, useAppSelector} from "../../../store/hooks";
-import {addTeams, removeTeam, teamsSelector} from "../../../store/feature/teams.slice";
-import {useTranslation} from "react-i18next";
+import { Options } from "../../../components/dashboard/Options";
+import { Delete, Edit, Sync } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { Severity } from "../../../providers/SnackbarProvider";
+import { SnackbarContext } from "../../../providers/SnackbarContext";
+import {
+  useRemoveTeamMutation,
+  useTeamsMutation,
+} from "../../../api/endpoints/team";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {
+  addTeams,
+  removeTeam,
+  teamsSelector,
+} from "../../../store/feature/teams.slice";
+import { useTranslation } from "react-i18next";
+import { useJobSyncTeamPhotosMutation } from "../../../api/endpoints/job";
 
 interface HomeProps {
-
 }
 
 export const Home: React.FC<HomeProps> = () => {
@@ -33,6 +46,9 @@ export const Home: React.FC<HomeProps> = () => {
 
   const [getTeams, { isLoading }] = useTeamsMutation();
   const [removeTeamApi] = useRemoveTeamMutation();
+  const [syncPhotosApi, { isLoading: syncPhotosIsLoading }] =
+    useJobSyncTeamPhotosMutation();
+
   const teams = useAppSelector(teamsSelector.selectAll);
 
   // const [teams, setTeams] = React.useState<Team[]>([]);
@@ -48,13 +64,13 @@ export const Home: React.FC<HomeProps> = () => {
       } catch (e) {
         console.error(e);
       }
-    }
+    };
 
     getData();
-  }, [dispatch, getTeams])
+  }, [dispatch, getTeams]);
 
   if (isLoading) {
-    return <CircularProgress/>
+    return <CircularProgress />;
   }
 
   async function remove() {
@@ -71,12 +87,31 @@ export const Home: React.FC<HomeProps> = () => {
       snackbar.openSnackbar(t("message.teams.delete"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+    }
+  }
+
+  async function syncPhotos() {
+    try {
+        await syncPhotosApi();
+
+        snackbar.openSnackbar(t("message.teams.syncPhoto"), Severity.SUCCESS);
+    } catch (e) {
+        console.error(e);
+        snackbar.openSnackbar(t("errorMessage", Severity.ERROR));
     }
   }
 
   return (
     <>
+      <Button
+        variant="contained"
+        onClick={() => syncPhotos()}
+        sx={{ mb: 2 }}
+        startIcon={<Sync />}
+      >
+        Sync Foto's
+      </Button>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -99,16 +134,18 @@ export const Home: React.FC<HomeProps> = () => {
                   <Options>
                     <MenuItem onClick={() => navigate(`edit/${team.id}`)}>
                       <ListItemIcon>
-                        <Edit fontSize="small"/>
+                        <Edit fontSize="small" />
                       </ListItemIcon>
                       {t("dashboard.options.edit")}
                     </MenuItem>
-                    <MenuItem onClick={() => {
-                      setSelected(key);
-                      setVisible(true);
-                    }}>
+                    <MenuItem
+                      onClick={() => {
+                        setSelected(key);
+                        setVisible(true);
+                      }}
+                    >
                       <ListItemIcon>
-                        <Delete fontSize="small"/>
+                        <Delete fontSize="small" />
                       </ListItemIcon>
                       {t("dashboard.options.remove")}
                     </MenuItem>
@@ -123,14 +160,18 @@ export const Home: React.FC<HomeProps> = () => {
         <DialogTitle>{t("dashboard.team.deleteTeam")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && (
-            <DialogContentText>{t("confirmation")} {teams[selected].name}?</DialogContentText>
+            <DialogContentText>
+              {t("confirmation")} {teams[selected].name}?
+            </DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setVisible(false)}>{t("cancel")}</Button>
-          <Button variant="contained" onClick={() => remove()}>{t("remove")}</Button>
+          <Button variant="contained" onClick={() => remove()}>
+            {t("remove")}
+          </Button>
         </DialogActions>
       </Dialog>
     </>
-  )
-}
+  );
+};

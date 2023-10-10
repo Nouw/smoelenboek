@@ -8,8 +8,8 @@ export default class Oracle {
 	public static namespaceName = process.env.ORACLE_NAMESPACE;
 	public static bucketName = process.env.ORACLE_BUCKET_NAME;
 
-	protected async client() {
-		const provider: common.ConfigFileAuthenticationDetailsProvider = await new ConfigFileAuthenticationDetailsProvider();
+	public async client() {
+		const provider: common.ConfigFileAuthenticationDetailsProvider = new ConfigFileAuthenticationDetailsProvider();
 
 		return new os.ObjectStorageClient({
 			authenticationDetailsProvider: provider
