@@ -1,9 +1,10 @@
 import React from "react";
-import {useLazyDocumentsCategoriesQuery } from "../../../api/endpoints/documents";
+import {useDocumentsDeleteCategoryMutation, useLazyDocumentsCategoriesQuery} from "../../../api/endpoints/documents";
 import {useAppDispatch, useAppSelector} from "../../../store/hooks";
 import {addCategories, documentsSelector} from "../../../store/feature/documents.slice";
 import {
-  CircularProgress, ListItemIcon,
+  Button,
+  CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemIcon,
   MenuItem,
   Paper,
   Table,
@@ -19,6 +20,9 @@ import {useNavigate} from "react-router-dom";
 import {Category} from "smoelenboek-types";
 import moment from "moment";
 import {useTranslation} from "react-i18next";
+import {removeSeason} from "../../../store/feature/season.slice.ts";
+import {Severity} from "../../../providers/SnackbarProvider.tsx";
+import {SnackbarContext} from "../../../providers/SnackbarContext.ts";
 
 interface HomeProps {
 
@@ -28,10 +32,15 @@ export const Home: React.FC<HomeProps> = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const snackbar = React.useContext(SnackbarContext);
 
   const [getCategories, { isLoading }] = useLazyDocumentsCategoriesQuery();
+  const [removeCategoryAPI] = useDocumentsDeleteCategoryMutation();
 
   const categories = useAppSelector(documentsSelector.selectAll).sort((a, b) => moment(a.created).unix() - moment(b.created).unix());
+
+  const [visible, setVisible] = React.useState<boolean>(false);
+  const [selected, setSelected] = React.useState<number>(-1)
 
   React.useEffect(() => {
     const getData = async () => {
@@ -46,6 +55,26 @@ export const Home: React.FC<HomeProps> = () => {
 
     getData();
   }, [dispatch, getCategories])
+
+  async function deleteCategory() {
+    try {
+      const category = categories.find((x) => x.id === selected);
+
+      if (!category) {
+        return;
+      }
+
+      await removeCategoryAPI(category.id).unwrap();
+      dispatch(removeSeason(category.id));
+      setSelected(-1);
+      setVisible(false);
+
+      snackbar.openSnackbar(t("message.documents.delete"), Severity.SUCCESS);
+    } catch (e) {
+      console.error(e);
+      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+    }
+  }
 
   if (isLoading) {
     return <CircularProgress/>
@@ -80,7 +109,8 @@ export const Home: React.FC<HomeProps> = () => {
                       {t("dashboard.options.edit")}
                     </MenuItem>
                     <MenuItem onClick={() => {
-
+                      setVisible(true);
+                      setSelected(category.id);
                     }}>
                       <ListItemIcon>
                         <Delete fontSize="small"/>
@@ -94,6 +124,18 @@ export const Home: React.FC<HomeProps> = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Dialog open={visible} onClose={() => setVisible(false)}>
+        <DialogTitle>Delete category?</DialogTitle>
+        <DialogContent>
+          {selected >= 0 && (
+            <DialogContentText>Are you sure you want to delete category {categories[selected]?.name}?</DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setVisible(false)}>Cancel</Button>
+          <Button variant="contained" onClick={() => deleteCategory()}>Delete</Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

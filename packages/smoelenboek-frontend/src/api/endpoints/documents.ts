@@ -63,6 +63,15 @@ export const documentsApiSlice = API.enhanceEndpoints({ addTagTypes: ['Documents
           docs: data
         }
       })
+    }),
+    documentsDeleteCategory: builder.mutation<Response<null>, number>({
+      query: (id) => ({
+        url: `documents/category`,
+        method: "DELETE",
+        body: {
+          id
+        }
+      })
     })
   })
 });
@@ -76,4 +85,5 @@ export const {
   useLazyDocumentsGetFilesQuery,
   useDocumentsUploadFilesMutation,
   useDocumentsDeleteFilesMutation,
+  useDocumentsDeleteCategoryMutation
 } = documentsApiSlice;
