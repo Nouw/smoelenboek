@@ -8,6 +8,8 @@ import multer from "multer";
 import Oracle from "../Utilities/Oracle";
 import DocumentRepository from "../Repository/DocumentRepository";
 import { matchedData, param, query } from "express-validator";
+import { OciError } from "oci-sdk";
+import logger from "../Utilities/Logger";
 
 const oracleUpload = multer({ storage: multer.memoryStorage() });
 
@@ -171,7 +173,17 @@ export default class DocumentController {
 		const files = await Database.manager.createQueryBuilder(File, "f").where("f.category.id = :id", { id: parseInt(id) }).getMany();
 
 		for (const file of files) {
-			await this.oracle.remove(file.path);
+			try {
+				await this.oracle.remove(file.path);
+			} catch (e) {
+				if (e instanceof OciError) {
+					if (e.serviceCode === "ObjectNotFound") {
+						logger.warn("Object not found in bucket!");
+					}
+				} else {
+					throw e;
+				}
+			}
 			await Database.manager.delete(File, file.id);
 		}
 
