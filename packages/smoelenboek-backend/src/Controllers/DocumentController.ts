@@ -131,7 +131,7 @@ export default class DocumentController {
 
 	@Authenticated()
 	@Guard(["UPDATE_DOCUMENT"])
-	@Put("/documents")
+	@Put("/category")
 	async updateCategory(@Request() req, @Response() res, @Next() next) {
 		const { id, name, pinned } = req.body;
 
