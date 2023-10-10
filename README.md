@@ -6,6 +6,7 @@ Smoelenboek is a TypeScript monorepo for USV Protos, dedicated to managing files
 
 - Node.js: Version 18 or higher
 - MySQL: Version 8
+- Redis: Version 2.6.12 or higher
 
 ## Packages
 
