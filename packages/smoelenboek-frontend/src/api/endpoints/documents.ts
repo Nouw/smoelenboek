@@ -11,6 +11,7 @@ interface GetDocumentsCategories {
 }
 
 interface PostCategory {
+  id?: number;
   name?: string;
   type?: "photos" | "documents";
 }

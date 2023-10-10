@@ -97,7 +97,7 @@ export const Edit: React.FC<EditProps> = () => {
 
   async function categorySubmit(values: FormValues & { setSubmitting:(submitting: boolean) => void}) {
     try {
-      const res = await updateCategoryApi({ name: values.name, type: values.type}).unwrap();
+      const res = await updateCategoryApi({ id: parseInt(params.id as string),  name: values.name, type: values.type}).unwrap();
       dispatch(updateCategory([res.data]));
 
       snackbar.openSnackbar(t("message.documents.update"), Severity.SUCCESS)
