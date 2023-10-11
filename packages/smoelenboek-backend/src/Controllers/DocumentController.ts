@@ -142,9 +142,9 @@ export default class DocumentController {
 			return;
 		}
 
-		if (name) {
+		if (name) { 
 			// TODO: Check error handling?
-			await this.oracle.rename(category.name, name);
+			await this.oracle.renameFolder(category.name, name);
 			category.name = name;
 		}
 
@@ -154,7 +154,7 @@ export default class DocumentController {
 
 		await Database.manager.save(category);
 
-		res.json(ResponseData.build("OK", null, "Updated category!"));
+		res.json(ResponseData.build("OK", category, "Updated category!"));
 	}
 
 	@Authenticated()
