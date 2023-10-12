@@ -12,7 +12,7 @@ export default class Oracle {
   public static bucketName = process.env.ORACLE_BUCKET_NAME;
   public static region = process.env.ORACLE_REGION;
 
-  protected async client() {
+  protected client() {
     const provider: common.ConfigFileAuthenticationDetailsProvider =
       new ConfigFileAuthenticationDetailsProvider();
 
@@ -48,7 +48,7 @@ export default class Oracle {
     };
 
     try {
-      const client = await this.client();
+      const client = this.client();
 
       await client.putObject(request);
 
@@ -61,7 +61,7 @@ export default class Oracle {
   }
 
   public async rename(sourceName: string, newName: string) {
-    const client = await this.client();
+    const client = this.client();
 
     const renameObjectDetails = {
       sourceName,
@@ -78,7 +78,7 @@ export default class Oracle {
   }
 
   public async renameFolder(sourceFolder: string, destinationFolder: string) {
-    const client = await this.client();
+    const client = this.client();
 
     const listObjectsRequest = {
       namespaceName: Oracle.namespaceName,
@@ -88,7 +88,7 @@ export default class Oracle {
 
     const res = await client.listObjects(listObjectsRequest);
     const objects = res.listObjects.objects;
-    
+
     for (const object of objects) {
       const fileName = object.name.split("/").pop();
       await this.rename(object.name, `${destinationFolder}/${fileName}`);
@@ -98,7 +98,7 @@ export default class Oracle {
   }
 
   public async remove(path: string) {
-    const client = await this.client();
+    const client = this.client();
 
     const request: objectstorage.requests.DeleteObjectRequest = {
       namespaceName: Oracle.namespaceName,

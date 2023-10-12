@@ -17,6 +17,8 @@ import TeamController from "./Controllers/TeamController";
 import UserController from "./Controllers/UserController";
 import SeasonController from "./Controllers/SeasonController";
 import ProtototoController from "./Controllers/ProtototoController";
+import JobController from "./Controllers/JobController";
+import TeamPhotoQueue from "./Queues/TeamPhotoQueue";
 
 
 dotenv.config();
@@ -32,6 +34,7 @@ const controllers: Type[] = [
 	UserController,
 	SeasonController,
 	ProtototoController,
+    JobController,
 ];
 
 const corsAllowed = [
@@ -72,6 +75,9 @@ async function run() {
 	app.listen(port);
 
 	logger.info(`Server is running on port: ${port}`);
+
+    TeamPhotoQueue.empty();
+    logger.info('Cleaned job queue for TeamPhotoQueue');
 }
 
 run();
