@@ -14,7 +14,11 @@ import Mail from "../Utilities/Mail";
 const TeamPhotoQueue = new Queue("team photo queue");
 
 TeamPhotoQueue.process(async (_job, done: any) => {
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+    headless: "new",
+    executablePath: "/usr/bin/chromium-browser",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
   const page = await browser.newPage();
 
   const teams = await Database.manager.find(Team);
@@ -84,7 +88,10 @@ TeamPhotoQueue.process(async (_job, done: any) => {
       team.image = `team/${fileName}.jpg`;
 
       i++;
-      logger.info("Team Photo Sync | Progress: " + Math.floor(i / teams.length * 100) + "%");
+      logger.info(
+        "Team Photo Sync | Progress: " + Math.floor(i / teams.length * 100) +
+          "%",
+      );
     } catch (e) {
       logger.error(e);
       error = true;
