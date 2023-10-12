@@ -34,6 +34,7 @@ import {
 } from "../../../store/feature/teams.slice";
 import { useTranslation } from "react-i18next";
 import { useJobSyncTeamPhotosMutation } from "../../../api/endpoints/job";
+import { LoadingButton } from "@mui/lab";
 
 interface HomeProps {
 }
@@ -104,14 +105,15 @@ export const Home: React.FC<HomeProps> = () => {
 
   return (
     <>
-      <Button
+      <LoadingButton
         variant="contained"
         onClick={() => syncPhotos()}
         sx={{ mb: 2 }}
-        startIcon={<Sync />}
+        startIcon={<Sync />} 
+        loading={syncPhotosIsLoading}
       >
         Sync Foto's
-      </Button>
+      </LoadingButton>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
