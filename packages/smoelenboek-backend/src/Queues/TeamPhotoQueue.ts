@@ -65,7 +65,7 @@ TeamPhotoQueue.process(async (_job, done: any) => {
 
       await download(image, filepath);
 
-      const client = await new Oracle().client();
+      const client = new Oracle().client();
       const file = await fs.promises.readFile(filepath);
       const stream = new Readable();
       stream.push(file);

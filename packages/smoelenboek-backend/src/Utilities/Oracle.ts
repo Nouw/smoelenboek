@@ -12,7 +12,7 @@ export default class Oracle {
   public static bucketName = process.env.ORACLE_BUCKET_NAME;
   public static region = process.env.ORACLE_REGION;
 
-  protected client() {
+  public client() {
     const provider: common.ConfigFileAuthenticationDetailsProvider =
       new ConfigFileAuthenticationDetailsProvider();
 
