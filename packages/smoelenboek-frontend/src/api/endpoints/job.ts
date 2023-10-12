@@ -5,7 +5,7 @@ export const jobApiSlice = API.enhanceEndpoints({ addTagTypes: ["job"] })
     endpoints: (builder) => ({
       jobSyncTeamPhotos: builder.mutation<Response<void>, void>({
         query: () => ({
-          url: "jobs/teamPhoto",
+          url: "job/teamPhoto",
           method: "POST",
         }),
       }),
