@@ -1,13 +1,9 @@
 FROM node:18
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY ./ ./
+# COPY . .
 
-RUN yarn set version 3.6.2
+RUN yarn 
 
-RUN yarn install
-
-EXPOSE 8000
-
-CMD ["yarn", "workspace", "smoelenboek-frontend", "dev"]
+CMD ["yarn", "workspace", "smoelenboek-backend", "dev"]

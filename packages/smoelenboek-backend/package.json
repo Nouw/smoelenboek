@@ -17,6 +17,7 @@
     "compile": "rm -rf ./dist && tsc --project ./",
     "dev": "nodemon",
     "start": "node ./dist/index.js",
+    "start:dev": "yarn run ts-node --swc ./src/index.ts --inspect",
     "deploy": "./bin/deploy.sh"
   },
   "devDependencies": {

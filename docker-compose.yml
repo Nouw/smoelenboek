@@ -1,8 +1,43 @@
+version: '3'
+
 services:
-  smoelenboek:
+  # Express App
+  database:
+    container_name: smoelenboek-mysql
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: smoelenboek
+      MYSQL_USER: smoelenboek
+      MYSQL_PASSWORD: smoelenboek
+    ports:
+      - 3307:3306
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - smoelenboek 
+  backend:
+    container_name: smoelenboek-backend
+    restart: always
     build:
       context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    depends_on:
+      - database
     ports:
-      - 3000:8000
-    environment:
-      - BUILD_AND_SERVE=false
+      - 8080:8080
+    networks:
+        - smoelenboek 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+networks:
+  smoelenboek:
+
+volumes:
+  mono-node-modules: null
+  db-data:
