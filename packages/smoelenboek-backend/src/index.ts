@@ -76,8 +76,8 @@ async function run() {
 
 	logger.info(`Server is running on port: ${port}`);
 
-    TeamPhotoQueue.empty();
-    logger.info('Cleaned job queue for TeamPhotoQueue');
+    // TeamPhotoQueue.empty();
+    // logger.info('Cleaned job queue for TeamPhotoQueue');
 }
 
 run();

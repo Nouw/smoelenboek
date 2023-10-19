@@ -27,7 +27,7 @@ dotenv.config();
 
 const root = process.env.PRODUCTION === "false" ? "src" : "dist";
 const extension = process.env.PRODUCTION === "false" ? "ts" : "js";
-console.log("hello worlds")
+
 export const Database = new DataSource({
 	type: "mysql",
 	host: process.env.MYSQL_HOSTNAME ?? "localhost",

@@ -2,8 +2,8 @@ FROM node:18
 
 WORKDIR /app
 
-# COPY . .
+COPY . .
 
 RUN yarn 
 
-CMD ["yarn", "workspace", "smoelenboek-backend", "dev"]
+CMD ["yarn", "workspace", "smoelenboek-frontend", "dev"]
