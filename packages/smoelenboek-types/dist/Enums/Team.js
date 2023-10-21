@@ -5,13 +5,13 @@ var TeamRank;
 (function (TeamRank) {
     TeamRank["Eredivisie"] = "Eredivisie";
     TeamRank["Topdivisie"] = "Top divisie";
-})(TeamRank = exports.TeamRank || (exports.TeamRank = {}));
+})(TeamRank || (exports.TeamRank = TeamRank = {}));
 ;
 var Gender;
 (function (Gender) {
     Gender["Male"] = "male";
     Gender["Female"] = "female";
-})(Gender = exports.Gender || (exports.Gender = {}));
+})(Gender || (exports.Gender = Gender = {}));
 var TeamFunction;
 (function (TeamFunction) {
     TeamFunction["CoachTrainer"] = "Coach / Trainer";
@@ -20,5 +20,5 @@ var TeamFunction;
     TeamFunction["OppositeHitter"] = "Opposite hitter";
     TeamFunction["Libero"] = "Libero";
     TeamFunction["Setter"] = "Setter";
-})(TeamFunction = exports.TeamFunction || (exports.TeamFunction = {}));
+})(TeamFunction || (exports.TeamFunction = TeamFunction = {}));
 //# sourceMappingURL=Team.js.map

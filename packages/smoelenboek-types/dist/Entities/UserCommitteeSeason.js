@@ -14,7 +14,7 @@ const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const Committee_1 = require("./Committee");
 const Season_1 = require("./Season");
-let UserCommitteeSeason = class UserCommitteeSeason {
+let UserCommitteeSeason = exports.UserCommitteeSeason = class UserCommitteeSeason {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -36,8 +36,7 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => Season_1.Season, season => season.userCommitteeSeason),
     __metadata("design:type", Object)
 ], UserCommitteeSeason.prototype, "season", void 0);
-UserCommitteeSeason = __decorate([
+exports.UserCommitteeSeason = UserCommitteeSeason = __decorate([
     (0, typeorm_1.Entity)()
 ], UserCommitteeSeason);
-exports.UserCommitteeSeason = UserCommitteeSeason;
 //# sourceMappingURL=UserCommitteeSeason.js.map

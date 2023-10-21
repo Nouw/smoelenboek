@@ -13,7 +13,7 @@ exports.ProtototoPredictionResults = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const ProtototoSeason_1 = require("./ProtototoSeason");
-let ProtototoPredictionResults = class ProtototoPredictionResults {
+let ProtototoPredictionResults = exports.ProtototoPredictionResults = class ProtototoPredictionResults {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -31,8 +31,7 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], ProtototoPredictionResults.prototype, "points", void 0);
-ProtototoPredictionResults = __decorate([
+exports.ProtototoPredictionResults = ProtototoPredictionResults = __decorate([
     (0, typeorm_1.Entity)()
 ], ProtototoPredictionResults);
-exports.ProtototoPredictionResults = ProtototoPredictionResults;
 //# sourceMappingURL=ProtototoPredictionResults.js.map

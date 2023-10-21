@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtototoPredictionsExternal = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoMatch_1 = require("./ProtototoMatch");
-let ProtototoPredictionsExternal = class ProtototoPredictionsExternal {
+let ProtototoPredictionsExternal = exports.ProtototoPredictionsExternal = class ProtototoPredictionsExternal {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -55,8 +55,7 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Boolean)
 ], ProtototoPredictionsExternal.prototype, "setFive", void 0);
-ProtototoPredictionsExternal = __decorate([
+exports.ProtototoPredictionsExternal = ProtototoPredictionsExternal = __decorate([
     (0, typeorm_1.Entity)()
 ], ProtototoPredictionsExternal);
-exports.ProtototoPredictionsExternal = ProtototoPredictionsExternal;
 //# sourceMappingURL=ProtototoPredictionsExternal.js.map

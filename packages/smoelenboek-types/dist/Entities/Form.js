@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Form = void 0;
 const typeorm_1 = require("typeorm");
-let Form = class Form {
+let Form = exports.Form = class Form {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
@@ -44,8 +44,7 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Form.prototype, "sheetLink", void 0);
-Form = __decorate([
+exports.Form = Form = __decorate([
     (0, typeorm_1.Entity)()
 ], Form);
-exports.Form = Form;
 //# sourceMappingURL=Form.js.map

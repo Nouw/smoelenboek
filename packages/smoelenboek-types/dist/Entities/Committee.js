@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Committee = void 0;
 const typeorm_1 = require("typeorm");
 const UserCommitteeSeason_1 = require("./UserCommitteeSeason");
-let Committee = class Committee {
+let Committee = exports.Committee = class Committee {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -38,8 +38,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => UserCommitteeSeason_1.UserCommitteeSeason, userCommittee => userCommittee.committee),
     __metadata("design:type", Object)
 ], Committee.prototype, "userCommitteeSeason", void 0);
-Committee = __decorate([
+exports.Committee = Committee = __decorate([
     (0, typeorm_1.Entity)()
 ], Committee);
-exports.Committee = Committee;
 //# sourceMappingURL=Committee.js.map

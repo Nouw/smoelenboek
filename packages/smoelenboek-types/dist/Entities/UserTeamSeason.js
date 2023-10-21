@@ -15,7 +15,7 @@ const User_1 = require("./User");
 const Team_1 = require("./Team");
 const Team_2 = require("../Enums/Team");
 const Season_1 = require("./Season");
-let UserTeamSeason = class UserTeamSeason {
+let UserTeamSeason = exports.UserTeamSeason = class UserTeamSeason {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -37,8 +37,7 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => Season_1.Season, season => season.userTeamSeason),
     __metadata("design:type", Object)
 ], UserTeamSeason.prototype, "season", void 0);
-UserTeamSeason = __decorate([
+exports.UserTeamSeason = UserTeamSeason = __decorate([
     (0, typeorm_1.Entity)()
 ], UserTeamSeason);
-exports.UserTeamSeason = UserTeamSeason;
 //# sourceMappingURL=UserTeamSeason.js.map

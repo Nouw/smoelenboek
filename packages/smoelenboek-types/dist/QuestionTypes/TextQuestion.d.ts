@@ -1,4 +1,4 @@
-export declare type TextQuestion = {
+export type TextQuestion = {
     type: "text";
     paragraph: boolean;
 };

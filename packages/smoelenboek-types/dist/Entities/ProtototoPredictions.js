@@ -13,7 +13,7 @@ exports.ProtototoPredictions = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoMatch_1 = require("./ProtototoMatch");
 const User_1 = require("./User");
-let ProtototoPredictions = class ProtototoPredictions {
+let ProtototoPredictions = exports.ProtototoPredictions = class ProtototoPredictions {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -49,8 +49,7 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Boolean)
 ], ProtototoPredictions.prototype, "setFive", void 0);
-ProtototoPredictions = __decorate([
+exports.ProtototoPredictions = ProtototoPredictions = __decorate([
     (0, typeorm_1.Entity)()
 ], ProtototoPredictions);
-exports.ProtototoPredictions = ProtototoPredictions;
 //# sourceMappingURL=ProtototoPredictions.js.map

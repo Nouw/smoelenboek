@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Photobook = void 0;
 const typeorm_1 = require("typeorm");
 const Photo_1 = require("./Photo");
-let Photobook = class Photobook {
+let Photobook = exports.Photobook = class Photobook {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -26,8 +26,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Photo_1.Photo, photo => photo.photobook),
     __metadata("design:type", Object)
 ], Photobook.prototype, "photos", void 0);
-Photobook = __decorate([
+exports.Photobook = Photobook = __decorate([
     (0, typeorm_1.Entity)()
 ], Photobook);
-exports.Photobook = Photobook;
 //# sourceMappingURL=Photobook.js.map
