@@ -13,7 +13,7 @@ exports.ProtototoSeason = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoMatch_1 = require("./ProtototoMatch");
 const ProtototoPredictionResults_1 = require("./ProtototoPredictionResults");
-let ProtototoSeason = class ProtototoSeason {
+let ProtototoSeason = exports.ProtototoSeason = class ProtototoSeason {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -39,8 +39,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => ProtototoPredictionResults_1.ProtototoPredictionResults, result => result.season, { onDelete: "CASCADE" }),
     __metadata("design:type", Object)
 ], ProtototoSeason.prototype, "predictionResults", void 0);
-ProtototoSeason = __decorate([
+exports.ProtototoSeason = ProtototoSeason = __decorate([
     (0, typeorm_1.Entity)()
 ], ProtototoSeason);
-exports.ProtototoSeason = ProtototoSeason;
 //# sourceMappingURL=ProtototoSeason.js.map

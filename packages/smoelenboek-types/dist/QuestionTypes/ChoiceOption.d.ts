@@ -1,5 +1,5 @@
 import { Action } from "../Action";
-export declare type ChoiceOption = {
+export type ChoiceOption = {
     value: string;
     goToAction?: Action;
     goToSection?: string;

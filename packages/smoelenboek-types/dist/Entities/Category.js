@@ -16,8 +16,8 @@ var CategoryType;
 (function (CategoryType) {
     CategoryType["CATEGORY_TYPE_DOCUMENTS"] = "documents";
     CategoryType["CATEGORY_TYPE_PHOTOS"] = "photos";
-})(CategoryType = exports.CategoryType || (exports.CategoryType = {}));
-let Category = class Category {
+})(CategoryType || (exports.CategoryType = CategoryType = {}));
+let Category = exports.Category = class Category {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -49,8 +49,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => File_1.File, file => file.category),
     __metadata("design:type", Object)
 ], Category.prototype, "files", void 0);
-Category = __decorate([
+exports.Category = Category = __decorate([
     (0, typeorm_1.Entity)()
 ], Category);
-exports.Category = Category;
 //# sourceMappingURL=Category.js.map

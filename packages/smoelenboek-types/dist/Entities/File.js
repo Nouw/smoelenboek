@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.File = void 0;
 const typeorm_1 = require("typeorm");
 const Category_1 = require("./Category");
-let File = class File {
+let File = exports.File = class File {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -26,8 +26,7 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => Category_1.Category, category => category.files),
     __metadata("design:type", Object)
 ], File.prototype, "category", void 0);
-File = __decorate([
+exports.File = File = __decorate([
     (0, typeorm_1.Entity)()
 ], File);
-exports.File = File;
 //# sourceMappingURL=File.js.map

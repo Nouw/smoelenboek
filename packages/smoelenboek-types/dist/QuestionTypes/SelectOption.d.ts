@@ -1,4 +1,4 @@
-export declare type SelectOption = {
+export type SelectOption = {
     id: number;
     value: string;
 };

@@ -17,7 +17,7 @@ const UserCommitteeSeason_1 = require("./UserCommitteeSeason");
 const ProtototoPredictionResults_1 = require("./ProtototoPredictionResults");
 const ProtototoPredictions_1 = require("./ProtototoPredictions");
 const Activity_1 = require("./Activity");
-let User = class User {
+let User = exports.User = class User {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -117,8 +117,7 @@ __decorate([
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Object)
 ], User.prototype, "activities", void 0);
-User = __decorate([
+exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);
-exports.User = User;
 //# sourceMappingURL=User.js.map

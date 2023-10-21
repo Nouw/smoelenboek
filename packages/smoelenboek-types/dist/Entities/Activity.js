@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Activity = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
-let Activity = class Activity {
+let Activity = exports.Activity = class Activity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -59,8 +59,7 @@ __decorate([
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Object)
 ], Activity.prototype, "users", void 0);
-Activity = __decorate([
+exports.Activity = Activity = __decorate([
     (0, typeorm_1.Entity)()
 ], Activity);
-exports.Activity = Activity;
 //# sourceMappingURL=Activity.js.map

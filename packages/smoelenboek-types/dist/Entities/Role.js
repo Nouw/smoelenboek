@@ -18,8 +18,8 @@ var Roles;
     Roles[Roles["DEFAULT"] = 1] = "DEFAULT";
     Roles[Roles["ADMIN"] = 2] = "ADMIN";
     Roles[Roles["TEMP"] = 3] = "TEMP";
-})(Roles = exports.Roles || (exports.Roles = {}));
-let Role = class Role {
+})(Roles || (exports.Roles = Roles = {}));
+let Role = exports.Role = class Role {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -34,12 +34,13 @@ __decorate([
     __metadata("design:type", Object)
 ], Role.prototype, "users", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => Permission_1.Permission, (permission) => permission.roles),
+    (0, typeorm_1.ManyToMany)(() => Permission_1.Permission, (permission) => permission.roles, {
+        cascade: true,
+    }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Object)
 ], Role.prototype, "permissions", void 0);
-Role = __decorate([
+exports.Role = Role = __decorate([
     (0, typeorm_1.Entity)()
 ], Role);
-exports.Role = Role;
 //# sourceMappingURL=Role.js.map

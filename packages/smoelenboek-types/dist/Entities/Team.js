@@ -13,7 +13,7 @@ exports.Team = void 0;
 const typeorm_1 = require("typeorm");
 const Team_1 = require("../Enums/Team");
 const UserTeamSeason_1 = require("./UserTeamSeason");
-let Team = class Team {
+let Team = exports.Team = class Team {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -39,8 +39,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => UserTeamSeason_1.UserTeamSeason, userTeam => userTeam.team),
     __metadata("design:type", Object)
 ], Team.prototype, "userTeamSeason", void 0);
-Team = __decorate([
+exports.Team = Team = __decorate([
     (0, typeorm_1.Entity)()
 ], Team);
-exports.Team = Team;
 //# sourceMappingURL=Team.js.map

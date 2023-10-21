@@ -13,7 +13,7 @@ exports.Season = void 0;
 const typeorm_1 = require("typeorm");
 const UserTeamSeason_1 = require("./UserTeamSeason");
 const UserCommitteeSeason_1 = require("./UserCommitteeSeason");
-let Season = class Season {
+let Season = exports.Season = class Season {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -43,8 +43,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => UserCommitteeSeason_1.UserCommitteeSeason, userCommittee => userCommittee.season),
     __metadata("design:type", Object)
 ], Season.prototype, "userCommitteeSeason", void 0);
-Season = __decorate([
+exports.Season = Season = __decorate([
     (0, typeorm_1.Entity)()
 ], Season);
-exports.Season = Season;
 //# sourceMappingURL=Season.js.map

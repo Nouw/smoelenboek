@@ -13,7 +13,7 @@ exports.ProtototoMatch = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoSeason_1 = require("./ProtototoSeason");
 const ProtototoPredictions_1 = require("./ProtototoPredictions");
-let ProtototoMatch = class ProtototoMatch {
+let ProtototoMatch = exports.ProtototoMatch = class ProtototoMatch {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -47,8 +47,7 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => ProtototoPredictions_1.ProtototoPredictions, (prediction) => prediction.match),
     __metadata("design:type", Object)
 ], ProtototoMatch.prototype, "predictions", void 0);
-ProtototoMatch = __decorate([
+exports.ProtototoMatch = ProtototoMatch = __decorate([
     (0, typeorm_1.Entity)()
 ], ProtototoMatch);
-exports.ProtototoMatch = ProtototoMatch;
 //# sourceMappingURL=ProtototoMatch.js.map

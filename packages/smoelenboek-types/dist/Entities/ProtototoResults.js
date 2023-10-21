@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtototoResults = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoMatch_1 = require("./ProtototoMatch");
-let ProtototoResults = class ProtototoResults {
+let ProtototoResults = exports.ProtototoResults = class ProtototoResults {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -43,8 +43,7 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Boolean)
 ], ProtototoResults.prototype, "setFive", void 0);
-ProtototoResults = __decorate([
+exports.ProtototoResults = ProtototoResults = __decorate([
     (0, typeorm_1.Entity)()
 ], ProtototoResults);
-exports.ProtototoResults = ProtototoResults;
 //# sourceMappingURL=ProtototoResults.js.map

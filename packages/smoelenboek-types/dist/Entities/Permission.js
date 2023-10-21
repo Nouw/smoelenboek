@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Permission = void 0;
 const typeorm_1 = require("typeorm");
 const Role_1 = require("./Role");
-let Permission = class Permission {
+let Permission = exports.Permission = class Permission {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -26,8 +26,7 @@ __decorate([
     (0, typeorm_1.ManyToMany)(() => Role_1.Role, role => role.permissions),
     __metadata("design:type", Object)
 ], Permission.prototype, "roles", void 0);
-Permission = __decorate([
+exports.Permission = Permission = __decorate([
     (0, typeorm_1.Entity)()
 ], Permission);
-exports.Permission = Permission;
 //# sourceMappingURL=Permission.js.map
