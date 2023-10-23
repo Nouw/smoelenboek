@@ -26,6 +26,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - $HOME/.oci:/root/.oci
     command: ./bin/run_backend_dev.sh
     depends_on:
       - database
@@ -42,7 +43,7 @@ services:
     working_dir: /app
     command: ./bin/run_frontend_dev.sh
     volumes:
-      - .:/app
+      - .:/app 
       - /app/node_modules
     depends_on:
       - backend

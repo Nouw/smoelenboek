@@ -2,10 +2,13 @@ import common from "oci-common";
 import * as os from "oci-objectstorage";
 import {
   ConfigFileAuthenticationDetailsProvider,
+  LOG,
   objectstorage,
 } from "oci-sdk";
 import { Readable } from "stream";
 import logger from "./Logger";
+
+LOG.logger = logger;
 
 export default class Oracle {
   public static namespaceName = process.env.ORACLE_NAMESPACE;
