@@ -15,7 +15,7 @@ interface VCP {
 }
 
 const people: VCP[] = [
-  {name: 'Brian Groenewege', phone: '+31 6 31949300', email: 'vcp-intern@usvprotos.nl', avatar: 'brian.jpg'},
+  {name: 'Silke Geraats', phone: '+31 6 18984397', email: 'vcp-intern@usvprotos.nl', avatar: 'silke.jpg'},
   {name: 'Stan van Hees', phone: '+31 6 14658332', email: 'vcp-alumnus@usvprotos.nl', avatar: 'stan.jpeg'},
   {name: 'Rosanne Kars', phone: '+31 6 28496457', email: 'vcp-extern@usvprotos.nl', avatar: 'rosanne.jpeg'}
 ]

@@ -135,8 +135,8 @@ export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, leagu
                         onChange={(value) => props.setFieldValue("gender", value.target.value)}
                         fullWidth
                       >
-                        <MenuItem value="male">{t("navigation.teams.women")}</MenuItem>
-                        <MenuItem value="female">{t("navigation.teams.men")}</MenuItem>
+                        <MenuItem value="male">{t("navigation.teams.men")}</MenuItem>
+                        <MenuItem value="female">{t("navigation.teams.women")}</MenuItem>
 
                       </Select>
                       {touched.gender && Boolean(errors.gender) &&
