@@ -27,10 +27,6 @@ export const Home: React.FC<HomeProps> = () => {
 
   return (
     <>
-      <Alert severity="warning" sx={{ mb: 2 }}>
-        Er zijn momenteel problemen met het laden van sommige foto's, dit
-        probleem is bekend bij Oracle en die zijn bezig met een oplossing.
-      </Alert>
       <Card>
         <CardContent>
           <List>

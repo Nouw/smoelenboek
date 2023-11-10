@@ -205,7 +205,11 @@
           }
         },
         "avg": "I agree to the processing of my personal data by USV Protos",
-        "tikkie": "I hereby confirm that I have paid the above tikkie and am participating in the ProtoToto"
+        "tikkie": "I hereby confirm that I have paid the above tikkie and am participating in the ProtoToto",
+        "error": {
+          "something": "Something went wrong trying to load this page...",
+          "info": "If you believe this is an error, please send a message to WebCie"
+        }
       },
       "auth": {
         "forgotPassword": "Forgot password"
@@ -442,7 +446,11 @@
           }
         },
         "avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
-        "tikkie": "Hierbij bevestig ik dat ik bovenstaande tikkie heb betaald en deelneem aan de ProtoToto"
+        "tikkie": "Hierbij bevestig ik dat ik bovenstaande tikkie heb betaald en deelneem aan de ProtoToto",
+        "error": {
+          "something": "Er is iets misgegaan bij het laden van deze pagina...",
+          "info": "Als je denkt dat dit een fout is, stuur dan een bericht naar WebCie"
+        }
       },
       "auth": {
         "forgotPassword": "Wachtwoord vergeten"

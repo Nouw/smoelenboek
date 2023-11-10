@@ -56,10 +56,12 @@ import { Info as CommitteeInfo } from "./screens/committees/Info";
 import {External} from "./screens/protototo/External.tsx";
 import { Result as ProtototoMatchResult } from "./screens/dashboard/protototo/match/Result";
 import {ResetPassword} from "./auth/ResetPassword.tsx";
+import { ApplicationError } from "./screens/errors/ApplicationError.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: <ApplicationError/>,
     element: (
       <ProtectedRoute>
         <ScreenWrapper />

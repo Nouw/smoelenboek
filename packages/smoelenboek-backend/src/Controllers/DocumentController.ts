@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, Next, Post, Put, Request, Response } from "@decorators/express";
-import { Authenticated, Guard } from "../Middlewares/AuthMiddleware";
+import { Authenticated, Guard, IsAdmin } from "../Middlewares/AuthMiddleware";
 import { Database } from "../Database";
 import { Category, Season, File } from "smoelenboek-types";
 import moment from "moment";
@@ -11,6 +11,7 @@ import { matchedData, param, query } from "express-validator";
 import { OciError } from "oci-sdk";
 import logger from "../Utilities/Logger";
 import crypto from "crypto";
+import { RequestE } from "../Utilities/RequestE";
 
 const oracleUpload = multer({ storage: multer.memoryStorage() });
 
@@ -21,9 +22,9 @@ export default class DocumentController {
 
 	@Authenticated()
 	@Get("/", [query("raw").toBoolean()])
-	async getCategories(@Request() req, @Response() res) {
+	async getCategories(@Request() req: RequestE, @Response() res) {
 		const { raw } = matchedData(req);
-
+    
 		const categories = await Database.manager.find(Category, { order: { pinned: "DESC" } });
 
 		if (raw) {
@@ -36,7 +37,11 @@ export default class DocumentController {
 
 		const data = {};
 
-		for (const season of seasons) {
+		for (const season of seasons) { 
+      if (moment(season.endDate).isBefore(req.user.joinDate) && !IsAdmin(req.user)) {
+        continue;
+      }
+
 			data[season.name] = { categories: [], ...season };
 		}
 
