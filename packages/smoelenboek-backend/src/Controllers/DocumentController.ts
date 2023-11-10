@@ -10,6 +10,7 @@ import DocumentRepository from "../Repository/DocumentRepository";
 import { matchedData, param, query } from "express-validator";
 import { OciError } from "oci-sdk";
 import logger from "../Utilities/Logger";
+import crypto from "crypto";
 
 const oracleUpload = multer({ storage: multer.memoryStorage() });
 
@@ -69,10 +70,11 @@ export default class DocumentController {
 		const fileEntities = [];
 
 		for (const file of files) {
-			const filename = await this.oracle.upload(file, category.name, category.type === "documents");
+			const folder = crypto.createHash('md5').update(category.name).digest('hex'); 
+      const filename = await this.oracle.upload(file, folder, category.type === "documents");
 
 			fileEntities.push({
-				path: `${category.name}/${filename}`,
+				path: `${folder}/${filename}`,
 				originalName: file.originalname,
 				category,
 			});
