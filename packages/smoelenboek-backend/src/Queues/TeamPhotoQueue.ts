@@ -30,7 +30,7 @@ TeamPhotoQueue.process(async (_job, done: any) => {
     const gender = team.gender === Gender.Male ? "herenteams" : "damesteams";
 
     const name = team.name.split(" ");
-    const sub = `${name[0].toLowerCase()}-${name[1]}`;
+    const sub = `${name[name.length - 2].toLowerCase()}-${name[name.length - 1]}`;
     const url = `https://www.usvprotos.nl/teams/${gender}/${sub}`;
 
     await page.goto(url);
@@ -92,6 +92,8 @@ TeamPhotoQueue.process(async (_job, done: any) => {
         "Team Photo Sync | Progress: " + Math.floor(i / teams.length * 100) +
           "%",
       );
+      
+      await Database.manager.save(team);
     } catch (e) {
       logger.error(e);
       error = true;
@@ -99,8 +101,7 @@ TeamPhotoQueue.process(async (_job, done: any) => {
     }
   }
 
-  if (!error) {
-    await Database.manager.save(teams);
+  if (!error) { 
     const mail = new Mail(
       "[Smoelenboek] Synchronisatie Team Foto's Compleet",
       process.env.MAIL_SEND_TO,
