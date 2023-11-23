@@ -115,6 +115,7 @@
           "header": "Protototo management",
           "seasons": "Seasons",
           "createSeason": "Add season",
+					"deleteSeason": "Delete season",
           "id": "Id",
           "start": "Start",
           "end": "End",
@@ -356,6 +357,7 @@
           "header": "Protototo beheer",
           "seasons": "Seizoenen",
           "createSeason": "Seizoen toevoegen",
+					"deleteSeason": "Seizoen verwijderen",
           "id": "Id",
           "start": "Start",
           "end": "Eind",
@@ -384,7 +386,7 @@
           "remove": "Verwijderen",
           "addMatch": "Wedstrijd toevoegen",
           "exportParticipants": "Deelnemers exporteren"
-        }
+        }	
       },
       "message": {
         "season": {
