@@ -4,6 +4,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {useAppSelector} from "../../store/hooks";
 import { isAdmin } from "../../utilities/permissions";
 import {useTranslation} from "react-i18next";
+import { Roles } from 'smoelenboek-types';
 
 interface DrawerItemsProps {
   admin?: boolean
@@ -215,11 +216,12 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
   const location = useLocation();
 
   React.useEffect(() => {
-    if (!roles) {
+    console.log('roles', roles);
+		if (!roles) {
       return;
     }
 
-    if (isAdmin(roles) && !items.includes(adminDefaultItem) && !location.pathname.includes("dashboard")) {
+    if ((roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) && !items.includes(adminDefaultItem) && !location.pathname.includes("dashboard")) {
       setItems([...items, adminDefaultItem]);
     }
   }, [items, location.pathname, roles])

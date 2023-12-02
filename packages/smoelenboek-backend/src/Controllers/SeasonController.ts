@@ -8,7 +8,7 @@ import { body, matchedData, validationResult, param, query } from "express-valid
 @Controller("/season")
 export default class SeasonController {
 	@Authenticated()
-	@Guard(["CREATE_SEASON"])
+	@Guard("season.edit")
 	@Get("/list")
 	async getSeasons(@Request() req, @Response() res) {
 		const seasons = await Database.manager.find(Season);
@@ -17,7 +17,7 @@ export default class SeasonController {
 	}
 
 	@Authenticated()
-	@Guard(["CREATE_SEASON"])
+	@Guard("season.edit")
 	@Get("/info/:id")
 	async get(@Request() req, @Response() res, @Next() next) {
 		const season = await Database.manager.findOneBy(Season, { id: parseInt(req.params.id) });
@@ -30,7 +30,7 @@ export default class SeasonController {
 	}
 
 	@Authenticated()
-	@Guard(["CREATE_SEASON"])
+	@Guard("season.edit")
 	@Post("/", [body(["startDate", "endDate"]).exists().toDate()])
 	async post(@Request() req, @Response() res, @Next() next) {
 		const errors = validationResult(req);
@@ -54,7 +54,7 @@ export default class SeasonController {
 	}
 
 	@Authenticated()
-	@Guard(["UPDATE_SEASON"])
+	@Guard("season.edit")
 	@Put("/:id", [body(["startDate", "endDate"]).toDate(), body("current").toBoolean()])
 	async put(@Request() req, @Response() res, @Next() next) {
 		const { startDate, endDate, current } = matchedData(req);
@@ -75,7 +75,7 @@ export default class SeasonController {
 	}
 
 	@Authenticated()
-	@Guard(["DELETE_SEASON"])
+	@Guard("season.edit")
 	@Delete("/:id")
 	async remove(@Request() req, @Response() res) {
 		const { id } = req.params;
@@ -89,7 +89,7 @@ export default class SeasonController {
 	}
 
   @Authenticated()
-  @Guard(["CREATE_SEASON", "UPDATE_SEASON"])
+  @Guard("season.edit")
   @Get("/overlap/:date", [param("date").toDate(), query("id").default(0).toInt()])
 	async overlap(@Request() req, @Response() res) {
 		const { date, id } = matchedData(req);

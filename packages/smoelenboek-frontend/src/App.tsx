@@ -53,20 +53,18 @@ import { SponsorHengel } from "./screens/SponsorHengel";
 import { VCP } from "./screens/VCP.tsx";
 import { Home as Committees } from "./screens/committees/Home";
 import { Info as CommitteeInfo } from "./screens/committees/Info";
-import {External} from "./screens/protototo/External.tsx";
+import { External } from "./screens/protototo/External.tsx";
 import { Result as ProtototoMatchResult } from "./screens/dashboard/protototo/match/Result";
-import {ResetPassword} from "./auth/ResetPassword.tsx";
+import { ResetPassword } from "./auth/ResetPassword.tsx";
 import { ApplicationError } from "./screens/errors/ApplicationError.tsx";
+import { Guard } from "./components/auth/Guard.tsx";
+import { Roles } from "smoelenboek-types";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    errorElement: <ApplicationError/>,
-    element: (
-      <ProtectedRoute>
-        <ScreenWrapper />
-      </ProtectedRoute>
-    ),
+    errorElement: <ApplicationError />,
+    element: <ScreenWrapper />,
     children: [
       {
         path: "home",
@@ -74,11 +72,11 @@ const router = createBrowserRouter([
       },
       {
         path: "teams/:type",
-        element: <Teams />,
+        element: <Guard roles={[Roles.USER]}><Teams /></Guard>,
       },
       {
         path: "teams/info/:id",
-        element: <TeamsInfo />,
+        element: <Guard roles={[Roles.USER]}><TeamsInfo /></Guard>,
       },
       {
         path: "profile/:id",
@@ -220,7 +218,7 @@ const router = createBrowserRouter([
       },
       {
         path: "protototo/season/:id/matches/result/:matchId",
-        element: <ProtototoMatchResult />
+        element: <ProtototoMatchResult />,
       },
       {
         path: "documents/",
@@ -242,7 +240,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/password/reset",
-    element: <ResetPassword/>
+    element: <ResetPassword />,
   },
   {
     path: "/debug",
@@ -250,8 +248,8 @@ const router = createBrowserRouter([
   },
   {
     path: "/externe/protototo",
-    element: <External/>
-  }
+    element: <External />,
+  },
 ]);
 
 function App() {
@@ -269,7 +267,7 @@ function App() {
           mode: prefersDarkMode ? "dark" : "light",
         },
       }),
-    [prefersDarkMode]
+    [prefersDarkMode],
   );
 
   return (

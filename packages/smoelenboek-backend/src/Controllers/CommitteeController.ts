@@ -24,7 +24,7 @@ export default class CommitteeController {
 	}
 
 	@Authenticated()
-	@Guard(["CREATE_COMMITTEE"])
+	@Guard("committee.edit")
 	@Post("/", [body("name")])
 	async post(@Request() req: RequestE, @Response() res, @Next() next) {
 		const errors = validationResult(req);
@@ -49,7 +49,7 @@ export default class CommitteeController {
 		res.json(ResponseData.build("OK", committee, `Created ${name}`));
 	}
 	@Authenticated()
-	@Guard(["UPDATE_COMMITTEE"])
+	@Guard("committee.edit")
 	@Put("/:id")
 	// TODO: Add updating of committee image
 	async put(@Request() req: RequestE, @Response() res, @Next() next) {
@@ -87,7 +87,7 @@ export default class CommitteeController {
 	}
 
 	@Authenticated()
-	@Guard(["DELETE_COMMITTEE"])
+	@Guard("committee.edit")
 	@Delete("/:id")
 	async delete(@Request() req: RequestE, @Response() res) {
 		const id = req.params.id;
@@ -108,7 +108,7 @@ export default class CommitteeController {
 	}
 
 	@Authenticated()
-	@Guard(["UPDATE_USER"])
+	@Guard("committee.edit")
 	@Post("/user/:id", [body("userId").exists().toInt(), param("id").exists().toInt()])
 	async addUser(@Request() req: RequestE, @Response() res, @Next() next: NextFunction) {
 		const { userId, id } = matchedData(req);
@@ -138,7 +138,7 @@ export default class CommitteeController {
 	}
 
 	@Authenticated()
-	@Guard(["DELETE_USER"])
+	@Guard("committee.edit")
 	@Delete("/user/:id", [param("id").exists().toInt()])
 	async deleteUser(@Request() req: RequestE, @Response() res) {
 		const { id } = matchedData(req);
@@ -149,7 +149,7 @@ export default class CommitteeController {
 	}
 
 	@Authenticated()
-	@Guard(["UPDATE_USER"])
+	@Guard("committee.edit")
 	@Put("/user/:id", [param("id").toInt(), body("role").exists()])
 	async updateUser(@Request() req: RequestE, @Response() res, @Next() next) {
 		const { id, role } = matchedData(req);

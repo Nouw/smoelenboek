@@ -92,7 +92,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "refereeLicense", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => Role_1.Role),
+    (0, typeorm_1.OneToMany)(() => Role_1.Role, (role) => role.user),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Object)
 ], User.prototype, "roles", void 0);

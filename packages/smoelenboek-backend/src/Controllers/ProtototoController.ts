@@ -139,7 +139,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["CREATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Get("/seasons")
   async getSeasons(@Request() req, @Response() res) {
   	const seasons = await Database.manager.find(ProtototoSeason, { order: { id: "ASC" } });
@@ -148,7 +148,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["UPDATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Get("/season/:id", [param("id").toInt()])
   async getSeason(@Request() req, @Response() res, @Next() next) {
   	const { id } = matchedData(req);
@@ -163,7 +163,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["CREATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Post("/season", [body("start").exists().toDate(), body("end").exists().toDate(), body("tikkie").default("")])
   async postSeason(@Request() req, @Response() res, @Next() next) {
   	const errors = validationResult(req);
@@ -201,7 +201,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["UPDATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Put("/season/:id", [body("start").exists().toDate(), body("end").exists().toDate(), body("tikkie")])
   async updateSeason(@Request() req, @Response() res, @Next() next) {
   	const { id } = req.params;
@@ -237,7 +237,7 @@ export default class ProtototoController {
 
 
   @Authenticated()
-  @Guard(["DELETE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Delete("/season/:id")
   async deleteSeason(@Request() req, @Response() res) {
   	const { id } = req.params;
@@ -248,7 +248,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["CREATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Get("/overlap/:date", [param("date").toDate(), query("id").default(0).toInt()])
   async getSeasonOverlap(@Request() req, @Response() res) {
   	const { date, id } = matchedData(req);
@@ -274,7 +274,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["UPDATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Get("/match/:id", [param("id").toInt()])
   async getMatch(@Request() req, @Response() res, @Next() next) {
   	const { id } = matchedData(req);
@@ -285,7 +285,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["CREATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Post("/match", [body("playDate").exists().toDate(), body(["homeTeam", "awayTeam", "gender", "seasonId"]).exists()])
   async postMatch(@Request() req, @Response() res, @Next() next) {
   	const errors = validationResult(req);
@@ -295,7 +295,7 @@ export default class ProtototoController {
   		return;
   	}
 
-  	const { playDate, homeTeam, awayTeam, location, gender, seasonId } = matchedData(req);
+  	const { playDate, homeTeam, awayTeam, gender, seasonId } = matchedData(req);
 
   	const season = await Database.manager.findOneBy(ProtototoSeason, { id: seasonId });
 
@@ -319,7 +319,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["UPDATED_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Put("/match/:id", [param("id").toInt(), body("playDate").exists().toDate(), body(["homeTeam", "awayTeam", "gender"]).exists()])
   async updateMatch(@Request() req, @Response() res, @Next() next) {
   	const errors = validationResult(req);
@@ -351,7 +351,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["CREATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Post("/match/:id")
   async postResult(@Request() req, @Response() res, @Next() next) {
   	const { setOne, setTwo, setThree, setFour, setFive } = req.body;
@@ -384,7 +384,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["DELETE_PROTOTO"])
+  @Guard("protototo.edit")
   @Delete("/match/:id")
   async deleteMatch(@Request() req, @Response() res, @Next() next) {
   	const { id } = req.params;
@@ -402,7 +402,7 @@ export default class ProtototoController {
   }
 
   @Authenticated()
-  @Guard(["CREATE_PROTOTOTO"])
+  @Guard("protototo.edit")
   @Get("/export/players/:id", [param("id").exists().toInt()])
   async getExportPlayers(@Request() req, @Response() res, @Next() next) {
   	const errors = validationResult(req);

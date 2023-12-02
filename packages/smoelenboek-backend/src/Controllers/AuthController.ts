@@ -5,7 +5,7 @@ import ResponseData from "../Utilities/ResponseData";
 import { RequestE } from "../Utilities/RequestE";
 import { Authenticated } from "../Middlewares/AuthMiddleware";
 import { Database } from "../Database";
-import { User } from "smoelenboek-types";
+import { Role, Roles, User } from "smoelenboek-types";
 import bcrypt from "bcrypt";
 import { body, matchedData, validationResult } from "express-validator";
 import Mail from "../Utilities/Mail";
@@ -22,11 +22,13 @@ export default class AuthController {
 		const user = await this.userService.checkPassword(email, password);
 
 		const { authToken, refreshToken } = this.authService.getTokens(user);
+		const roles = await this.authService.getRoles(user);
 
 		res.json(ResponseData.build("OK", {
 			id: user.id,
 			accessToken: authToken,
 			refreshToken,
+			roles: roles.map((role: Role) => role.role),
 		}));
 	}
 
@@ -64,12 +66,6 @@ export default class AuthController {
 		await Database.manager.save(user, { listeners: false });
 
 		res.json(ResponseData.build("OK", "Updated password!"));
-	}
-
-	@Authenticated()
-	@Get("/test")
-	async test(@Request() req: RequestE, @Response() res) {
-		res.send("Authenticated!");
 	}
 
   @Post("/password/reset", [body("email").exists().isEmail()])
@@ -113,4 +109,18 @@ export default class AuthController {
 
 		res.json(ResponseData.build("OK", {}));
 	}
+
+	@Post("/role/add", [body("userId").isNumeric()])
+  async addRoleToUser(@Request() req, @Response() res) {
+  	const { userId } = matchedData(req);
+
+  	const user = await Database.manager.findOneBy(User, { id: userId });
+  	const role = new Role();
+  	role.role = Roles.ADMIN;
+  	// @ts-ignore
+  	role.user = user;
+
+  	await Database.manager.save(role);
+  	res.json("Added role!");
+  }
 }

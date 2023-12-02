@@ -69,7 +69,7 @@ export class User {
     @Column({ nullable: true, type: "text" })
     	refereeLicense?: string;
 
-    @ManyToMany(() => Role)
+    @OneToMany(() => Role, (role) => role.user)
     @JoinTable()
     	roles: Relation<Role[]>;
 

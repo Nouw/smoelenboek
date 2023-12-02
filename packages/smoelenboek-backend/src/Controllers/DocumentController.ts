@@ -24,7 +24,7 @@ export default class DocumentController {
 	@Get("/", [query("raw").toBoolean()])
 	async getCategories(@Request() req: RequestE, @Response() res) {
 		const { raw } = matchedData(req);
-    
+
 		const categories = await Database.manager.find(Category, { order: { pinned: "DESC" } });
 
 		if (raw) {
@@ -37,10 +37,10 @@ export default class DocumentController {
 
 		const data = {};
 
-		for (const season of seasons) { 
-      if (moment(season.endDate).isBefore(req.user.joinDate) && !IsAdmin(req.user)) {
-        continue;
-      }
+		for (const season of seasons) {
+			if (moment(season.endDate).isBefore(req.user.joinDate) && !IsAdmin(req.user)) {
+				continue;
+			}
 
 			data[season.name] = { categories: [], ...season };
 		}
@@ -65,7 +65,7 @@ export default class DocumentController {
 	}
 
 	@Authenticated()
-	@Guard(["CREATE_DOCUMENT"])
+	@Guard("documents.edit")
 	@Post("/upload", [oracleUpload.array("documents")])
 	async uploadFiles(@Request() req, @Response() res) {
 		const files = req.files;
@@ -75,8 +75,8 @@ export default class DocumentController {
 		const fileEntities = [];
 
 		for (const file of files) {
-			const folder = crypto.createHash('md5').update(category.name).digest('hex'); 
-      const filename = await this.oracle.upload(file, folder, category.type === "documents");
+			const folder = crypto.createHash("md5").update(category.name).digest("hex");
+			const filename = await this.oracle.upload(file, folder, category.type === "documents");
 
 			fileEntities.push({
 				path: `${folder}/${filename}`,
@@ -91,7 +91,7 @@ export default class DocumentController {
 	}
 
 	@Authenticated()
-	@Guard(["DELETE_DOCUMENT"])
+	@Guard("documents.edit")
 	@Delete("/")
 	async deleteFile(@Request() req, @Response() res, @Next() next) {
 		const docs: number[] = req.body.docs;
@@ -113,7 +113,7 @@ export default class DocumentController {
 	}
 
 	@Authenticated()
-	@Guard(["CREATE_DOCUMENT"])
+	@Guard("documents.edit")
 	@Post("/category")
 	async createCategory(@Request() req, @Response() res, @Next() next) {
 		const { name, type } = req.body;
@@ -137,7 +137,7 @@ export default class DocumentController {
 	}
 
 	@Authenticated()
-	@Guard(["UPDATE_DOCUMENT"])
+	@Guard("documents.edit")
 	@Put("/category")
 	async updateCategory(@Request() req, @Response() res, @Next() next) {
 		const { id, name, pinned } = req.body;
@@ -149,7 +149,7 @@ export default class DocumentController {
 			return;
 		}
 
-		if (name) { 
+		if (name) {
 			// TODO: Check error handling?
 			await this.oracle.renameFolder(category.name, name);
 			category.name = name;
@@ -165,7 +165,7 @@ export default class DocumentController {
 	}
 
 	@Authenticated()
-	@Guard(["DELETE_DOCUMENT"])
+	@Guard("documents.edit")
 	@Delete("/category")
 	async deleteCategory(@Request() req, @Response() res, @Next() next) {
 		const { id } = req.body;

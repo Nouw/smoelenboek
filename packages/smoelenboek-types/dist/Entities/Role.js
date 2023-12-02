@@ -9,16 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Role = exports.Roles = void 0;
+exports.Role = void 0;
 const typeorm_1 = require("typeorm");
-const Permission_1 = require("./Permission");
 const User_1 = require("./User");
-var Roles;
-(function (Roles) {
-    Roles[Roles["DEFAULT"] = 1] = "DEFAULT";
-    Roles[Roles["ADMIN"] = 2] = "ADMIN";
-    Roles[Roles["TEMP"] = 3] = "TEMP";
-})(Roles || (exports.Roles = Roles = {}));
+const Roles_1 = require("../Auth/Roles");
 let Role = exports.Role = class Role {
 };
 __decorate([
@@ -28,18 +22,11 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
-], Role.prototype, "name", void 0);
+], Role.prototype, "role", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => User_1.User, (user) => user.roles),
+    (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.roles),
     __metadata("design:type", Object)
-], Role.prototype, "users", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => Permission_1.Permission, (permission) => permission.roles, {
-        cascade: true,
-    }),
-    (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", Object)
-], Role.prototype, "permissions", void 0);
+], Role.prototype, "user", void 0);
 exports.Role = Role = __decorate([
     (0, typeorm_1.Entity)()
 ], Role);

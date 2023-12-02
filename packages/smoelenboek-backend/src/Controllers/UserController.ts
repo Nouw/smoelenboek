@@ -119,7 +119,7 @@ export default class UserController {
 
 	@Get("/list")
 	@Authenticated()
-	@Guard(["CREATE_USER"])
+	@Guard("user.edit")
 	async getUsers(@Response() res) {
 		const users = await Database.manager.findBy(User, { leaveDate: IsNull() });
 
@@ -128,7 +128,7 @@ export default class UserController {
 
 	@Delete("/:id")
 	@Authenticated()
-	@Guard(["DELETE_USER"])
+	@Guard("user.edit")
 	async deleteUser(@Request() req, @Response() res, @Next() next) {
 		const { id } = req.params;
 
@@ -148,7 +148,7 @@ export default class UserController {
 
 	@Get("/info/:id")
 	@Authenticated()
-	@Guard(["CREATE_USER"])
+	@Guard("user.edit")
 	async getUser(@Request() req, @Response() res, @Next() next) {
 		const { id  } = req.params;
 
@@ -166,7 +166,7 @@ export default class UserController {
 	@Authenticated()
 	async updateUser(@Request() req, @Response() res, @Next() next) {
 		const { id } = req.params;
-        const admin  = req.query.admin.toString().toLowerCase() === 'true';
+		const admin  = req.query.admin.toString().toLowerCase() === "true";
 
 		const user = await Database.manager.findOneBy(User, { id });
 
@@ -237,7 +237,7 @@ export default class UserController {
 	}
 
 	@Authenticated()
-	@Guard(["CREATE_USER"])
+	@Guard("user.edit")
 	@Post("/", [
 		body("firstName").exists(),
 		body("lastName").exists(),

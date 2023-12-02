@@ -1,5 +1,5 @@
 import {API, Response} from "../API";
-import {Role, User} from "smoelenboek-types";
+import {Role, Roles, User} from "smoelenboek-types";
 
 export interface LoginRequest {
   email: string;
@@ -10,6 +10,7 @@ export interface LoginResponse {
   id: number;
   refreshToken: string;
   accessToken: string;
+  roles: Roles[];
 }
 
 interface PostChangePassword {

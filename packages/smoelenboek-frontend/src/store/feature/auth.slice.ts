@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Role} from "smoelenboek-types";
+import {Roles} from 'smoelenboek-types';
 import i18n from "../../utilities/i18n/i18n.ts";
 
 export interface AuthState {
@@ -7,13 +7,14 @@ export interface AuthState {
   id?: number,
   accessToken?: string,
   refreshToken?: string,
-  roles?: Role[]
+  roles: Array<Roles>,
 }
 
 const initialState: AuthState = {
   language: 'nl',
   accessToken: undefined,
   refreshToken: undefined,
+  roles: [],
 }
 
 const authSlice = createSlice({
@@ -34,9 +35,9 @@ const authSlice = createSlice({
     logout(state) {
       state.accessToken = undefined;
       state.refreshToken = undefined;
-      state.roles = undefined;
+      state.roles = [Roles.ANONYMOUS];
     },
-    setRoles(state, action: PayloadAction<Role[]>) {
+    setRoles(state, action: PayloadAction<Roles[]>) {
       state.roles = action.payload;
     },
     setLanguage(state, action: PayloadAction<string>) {

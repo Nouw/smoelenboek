@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeamFunction = exports.Gender = exports.TeamRank = exports.UserTeamSeason = exports.UserCommitteeSeason = exports.User = exports.Team = exports.Season = exports.Role = exports.ProtototoSeason = exports.ProtototoResults = exports.ProtototoPredictionsExternal = exports.ProtototoPredictions = exports.ProtototoPredictionResults = exports.ProtototoMatch = exports.Photobook = exports.Photo = exports.Permission = exports.Form = exports.File = exports.Committee = exports.Category = exports.Activity = exports.Action = void 0;
+exports.RolesHierarchy = exports.Roles = exports.Permissions = exports.TeamFunction = exports.Gender = exports.TeamRank = exports.UserTeamSeason = exports.UserCommitteeSeason = exports.User = exports.Team = exports.Season = exports.Role = exports.ProtototoSeason = exports.ProtototoResults = exports.ProtototoPredictionsExternal = exports.ProtototoPredictions = exports.ProtototoPredictionResults = exports.ProtototoMatch = exports.Photobook = exports.Photo = exports.Form = exports.File = exports.Committee = exports.Category = exports.Activity = exports.Action = void 0;
 var Action_1 = require("./Action");
 Object.defineProperty(exports, "Action", { enumerable: true, get: function () { return Action_1.Action; } });
 var Activity_1 = require("./Entities/Activity");
@@ -13,8 +13,6 @@ var File_1 = require("./Entities/File");
 Object.defineProperty(exports, "File", { enumerable: true, get: function () { return File_1.File; } });
 var Form_1 = require("./Entities/Form");
 Object.defineProperty(exports, "Form", { enumerable: true, get: function () { return Form_1.Form; } });
-var Permission_1 = require("./Entities/Permission");
-Object.defineProperty(exports, "Permission", { enumerable: true, get: function () { return Permission_1.Permission; } });
 var Photo_1 = require("./Entities/Photo");
 Object.defineProperty(exports, "Photo", { enumerable: true, get: function () { return Photo_1.Photo; } });
 var Photobook_1 = require("./Entities/Photobook");
@@ -47,4 +45,9 @@ var Team_2 = require("./Enums/Team");
 Object.defineProperty(exports, "TeamRank", { enumerable: true, get: function () { return Team_2.TeamRank; } });
 Object.defineProperty(exports, "Gender", { enumerable: true, get: function () { return Team_2.Gender; } });
 Object.defineProperty(exports, "TeamFunction", { enumerable: true, get: function () { return Team_2.TeamFunction; } });
+var Permissions_1 = require("./Auth/Permissions");
+Object.defineProperty(exports, "Permissions", { enumerable: true, get: function () { return Permissions_1.Permissions; } });
+var Roles_1 = require("./Auth/Roles");
+Object.defineProperty(exports, "Roles", { enumerable: true, get: function () { return Roles_1.Roles; } });
+Object.defineProperty(exports, "RolesHierarchy", { enumerable: true, get: function () { return Roles_1.RolesHierarchy; } });
 //# sourceMappingURL=index.js.map

@@ -16,10 +16,11 @@ import {LoadingButton} from "@mui/lab";
 import {useAppDispatch, useAppSelector} from "../store/hooks";
 import {setCredentials, setLanguage, setRoles} from "../store/feature/auth.slice";
 import {useNavigate} from "react-router-dom";
-import {useLazyGetRolesQuery, useLoginMutation} from "../api/endpoints/auth";
+import {useLoginMutation} from "../api/endpoints/auth";
 import {useTranslation} from "react-i18next";
 import GB from "../assets/gb.svg";
 import NL from "../assets/nl.svg";
+import {Roles, RolesHierarchy} from 'smoelenboek-types';
 
 interface LoginProps {
 
@@ -44,7 +45,6 @@ export const Login: React.FC<LoginProps> = () => {
   const dispatch = useAppDispatch();
 
   const [login, { isLoading }] = useLoginMutation()
-  const [getRoles] = useLazyGetRolesQuery();
 
   React.useEffect(() => {
     if (auth.refreshToken) {
@@ -62,12 +62,8 @@ export const Login: React.FC<LoginProps> = () => {
       const res = await login(data).unwrap();
 
       dispatch(setCredentials(res.data));
-
-      const rolesRes = await getRoles().unwrap();
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      dispatch(setRoles(rolesRes.data.roles));
+      console.log(res.data);
+      dispatch(setRoles(res.data.roles));
 
       navigate('/')
     } catch (e) {

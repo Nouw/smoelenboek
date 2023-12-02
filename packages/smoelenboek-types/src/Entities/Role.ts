@@ -2,19 +2,12 @@ import {
   Column,
   Entity,
   JoinTable,
-  ManyToMany,
-  OneToMany,
+  ManyToMany, ManyToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { Permission } from "./Permission";
 import { User } from "./User";
-
-export enum Roles {
-  DEFAULT = 1,
-  ADMIN,
-  TEMP,
-}
+import { Roles } from "../Auth/Roles";
 
 @Entity()
 export class Role {
@@ -22,21 +15,11 @@ export class Role {
   id: number;
 
   @Column({ unique: true })
-  name: string;
+  role: Roles;
 
-  @ManyToMany(
+  @ManyToOne(
     () => User,
     (user) => user.roles,
   )
-  users: Relation<User[]>;
-
-  @ManyToMany(
-    () => Permission,
-    (permission) => permission.roles,
-    {
-      cascade: true,
-    },
-  )
-  @JoinTable()
-  permissions: Relation<Permission[]>;
+  user: Relation<User>;
 }

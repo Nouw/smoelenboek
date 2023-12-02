@@ -6,12 +6,12 @@ import ResponseData from "../Utilities/ResponseData";
 @Controller("/job")
 export default class JobController {
   @Authenticated()
-  @Guard(["CREATE_TEAM"])
+  @Guard("team.edit")
   @Post("/teamPhoto")
-  async syncTeamPhotosJob(@Request() req, @Response() res) {
-    TeamPhotoQueue.add({});
+	async syncTeamPhotosJob(@Request() req, @Response() res) {
+		TeamPhotoQueue.add({});
 
-    res.json(ResponseData.build("OK", "Added team photo sync to job queue!"));
-    return;
-  }
+		res.json(ResponseData.build("OK", "Added team photo sync to job queue!"));
+		return;
+	}
 }

@@ -6,7 +6,6 @@ import {
 	Committee,
 	File,
 	Form,
-	Permission,
 	Photo,
 	Photobook,
 	ProtototoMatch,
@@ -36,7 +35,7 @@ export const Database = new DataSource({
 	password: process.env.MYSQL_PASSWORD ?? "root",
 	database: process.env.MYSQL_DATABASE ?? "smoelenboek",
 	entities:  [
-		Activity, Category, Committee, File, Form, Permission, Photo, Photobook, ProtototoMatch, ProtototoPredictionResults,
+		Activity, Category, Committee, File, Form, Photo, Photobook, ProtototoMatch, ProtototoPredictionResults,
 		ProtototoPredictions, ProtototoPredictionsExternal, ProtototoResults, ProtototoSeason, Role, Season, Team, User,
 		UserCommitteeSeason, UserTeamSeason
 	],

@@ -13,7 +13,6 @@ export { Category } from "./Entities/Category";
 export { Committee } from "./Entities/Committee";
 export { File } from "./Entities/File";
 export { Form } from "./Entities/Form";
-export { Permission } from "./Entities/Permission";
 export { Photo } from "./Entities/Photo";
 export { Photobook } from "./Entities/Photobook";
 export { ProtototoMatch } from "./Entities/ProtototoMatch";
@@ -30,3 +29,6 @@ export { UserCommitteeSeason } from "./Entities/UserCommitteeSeason";
 export { UserTeamSeason } from "./Entities/UserTeamSeason";
 
 export { TeamRank, Gender, TeamFunction} from "./Enums/Team";
+
+export { Permissions, PermissionName } from "./Auth/Permissions";
+export { Roles, RolesHierarchy } from "./Auth/Roles";
