@@ -58,7 +58,7 @@ import { Result as ProtototoMatchResult } from "./screens/dashboard/protototo/ma
 import { ResetPassword } from "./auth/ResetPassword.tsx";
 import { ApplicationError } from "./screens/errors/ApplicationError.tsx";
 import { Guard } from "./components/auth/Guard.tsx";
-import { Roles } from "smoelenboek-types";
+import { AUTHENTICATED } from "./components/auth/RolesConstants.ts";
 
 const router = createBrowserRouter([
   {
@@ -72,15 +72,15 @@ const router = createBrowserRouter([
       },
       {
         path: "teams/:type",
-        element: <Guard roles={[Roles.USER]}><Teams /></Guard>,
+        element: <Guard roles={AUTHENTICATED}><Teams /></Guard>,
       },
       {
         path: "teams/info/:id",
-        element: <Guard roles={[Roles.USER]}><TeamsInfo /></Guard>,
+        element: <Guard roles={AUTHENTICATED}><TeamsInfo /></Guard>,
       },
       {
         path: "profile/:id",
-        element: <Profile />,
+        element: <Guard roles={AUTHENTICATED}><Profile /></Guard>,
       },
       {
         path: "protototo/",
@@ -88,43 +88,43 @@ const router = createBrowserRouter([
       },
       {
         path: "documents/",
-        element: <Categories />,
+        element: <Guard roles={AUTHENTICATED}><Categories /></Guard>,
       },
       {
         path: `documents/files/:id`,
-        element: <Files />,
+        element: <Guard roles={AUTHENTICATED}><Files /></Guard>,
       },
       {
         path: "settings",
-        element: <Settings />,
+        element: <Guard roles={AUTHENTICATED}><Settings /></Guard>,
       },
       {
         path: "settings/password",
-        element: <ChangePassword />,
+        element: <Guard roles={AUTHENTICATED}><ChangePassword /></Guard>,
       },
       {
         path: "settings/information",
-        element: <PersonalInformation />,
+        element: <Guard roles={AUTHENTICATED}><PersonalInformation /></Guard>,
       },
       {
         path: "settings/picture",
-        element: <ChangeProfilePicture />,
+        element: <Guard roles={AUTHENTICATED}><ChangeProfilePicture /></Guard>,
       },
       {
         path: "sponsorhengel",
-        element: <SponsorHengel />,
+        element: <Guard roles={AUTHENTICATED}><SponsorHengel /></Guard>,
       },
       {
         path: "vcp",
-        element: <VCP />,
+        element: <Guard roles={AUTHENTICATED}><VCP /></Guard>,
       },
       {
         path: "committees/",
-        element: <Committees />,
+        element: <Guard roles={AUTHENTICATED}><Committees /></Guard>,
       },
       {
         path: "committees/info/:id",
-        element: <CommitteeInfo />,
+        element: <Guard roles={AUTHENTICATED}><CommitteeInfo /></Guard>,
       },
     ],
   },

@@ -14,6 +14,8 @@ import { useLazyGetProfilePictureQuery } from "../../api/endpoints/auth";
 import { SearchUser } from "../SearchUser";
 import { useTranslation } from "react-i18next";
 import { red } from "@mui/material/colors";
+import { logout } from "../../store/feature/auth.slice";
+import { useIsAnonymous } from "../../hooks/useIsAnonymous";
 
 interface AppBarRightWidgetProps {}
 
@@ -22,6 +24,7 @@ export const AppBarRightWidget: React.FC<AppBarRightWidgetProps> = () => {
 
   const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
   const id = useAppSelector((state) => state.auth.id);
+	const isAnonymous = useIsAnonymous();
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -52,8 +55,8 @@ export const AppBarRightWidget: React.FC<AppBarRightWidgetProps> = () => {
   function closeMenu() {
     setMenuAnchor(null);
   }
-
-  if (!id) {
+	console.log(isAnonymous);	
+  if (!id || isAnonymous) {
     return (
       <Box sx={{ flexGrow: 0 }}>
         <Button

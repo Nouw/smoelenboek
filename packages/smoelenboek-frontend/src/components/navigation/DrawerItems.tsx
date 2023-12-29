@@ -1,13 +1,19 @@
 import React from "react";
-import {List, ListItemButton, ListItemText, ListSubheader} from "@mui/material";
-import {useLocation, useNavigate} from "react-router-dom";
-import {useAppSelector} from "../../store/hooks";
+import {
+  List,
+  ListItemButton,
+  ListItemText,
+  ListSubheader,
+} from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../store/hooks";
 import { isAdmin } from "../../utilities/permissions";
-import {useTranslation} from "react-i18next";
-import { Roles } from 'smoelenboek-types';
+import { useTranslation } from "react-i18next";
+import { Roles } from "smoelenboek-types";
+import { useIsAnonymous } from "../../hooks/useIsAnonymous";
 
 interface DrawerItemsProps {
-  admin?: boolean
+  admin?: boolean;
 }
 
 interface DrawerItem {
@@ -16,7 +22,32 @@ interface DrawerItem {
   subheader?: boolean;
   subItems?: DrawerItem[];
   translateHeader?: boolean;
+  rank?: number; // Bigger the number the lower in the list
 }
+
+const publicItems: DrawerItem[] = [
+  {
+    title: "Activeiten", // TODO: Should translate this
+    subheader: false,
+    navigateTo: "home",
+    rank: 1,
+  },
+  {
+    title: "Protototo",
+    subheader: true,
+    subItems: [
+      {
+        title: "navigation.protototo.predict",
+        navigateTo: "protototo",
+      },
+      // {
+      //   title: "Leaderboards",
+      //   navigateTo: ""
+      // },
+    ],
+    rank: 4,
+  },
+];
 
 const defaultItems: DrawerItem[] = [
   {
@@ -25,64 +56,56 @@ const defaultItems: DrawerItem[] = [
     subItems: [
       {
         title: "navigation.teams.women",
-        navigateTo: "teams/female"
+        navigateTo: "teams/female",
       },
       {
         title: "navigation.teams.men",
-        navigateTo: "teams/male"
+        navigateTo: "teams/male",
       },
-    ]
+    ],
+    rank: 2,
   },
   {
     title: "navigation.committees",
     subheader: false,
-    navigateTo: "committees"
-  },
-  {
-    title: "Protototo",
-    subheader: true,
-    subItems: [
-      {
-        title: "navigation.protototo.predict",
-        navigateTo: "protototo"
-      },
-      // {
-      //   title: "Leaderboards",
-      //   navigateTo: ""
-      // },
-    ]
+    navigateTo: "committees",
+    rank: 3,
   },
   {
     title: "navigation.documents",
-    navigateTo: "documents/"
+    navigateTo: "documents/",
+		rank: 4,
   },
   {
     title: "Sponsorhengel",
-    navigateTo: "sponsorhengel"
+    navigateTo: "sponsorhengel",
+		rank: 5,
   },
   {
-    title: 'navigation.vcp',
-    navigateTo: "vcp"
-  }
+    title: "navigation.vcp",
+    navigateTo: "vcp",
+		rank: 6,
+  },
 ];
 
-const adminDefaultItem: DrawerItem =  {
-      title: "navigation.administration",
-      subheader: true,
-      translateHeader: true,
-      subItems: [
-        {
-          title: "Dashboard",
-          navigateTo: "dashboard/"
-        }
-      ]
-    };
+const adminDefaultItem: DrawerItem = {
+  title: "navigation.administration",
+  subheader: true,
+  translateHeader: true,
+  subItems: [
+    {
+      title: "Dashboard",
+      navigateTo: "dashboard/",
+    },
+  ],
+	rank: Infinity
+};
 
 const adminItems: DrawerItem[] = [
   {
     title: "dashboard.goBack",
     translateHeader: true,
-    navigateTo: '/teams/female'
+    navigateTo: "/teams/female",
   },
   {
     title: "dashboard.form.header",
@@ -91,9 +114,9 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.form.createForm",
-        navigateTo: "form/create"
-      }
-    ]
+        navigateTo: "form/create",
+      },
+    ],
   },
   {
     title: "dashboard.season.header",
@@ -102,13 +125,13 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.season.seasons",
-        navigateTo: "seasons/"
+        navigateTo: "seasons/",
       },
       {
         title: "dashboard.season.createSeason",
-        navigateTo: "seasons/add"
-      }
-    ]
+        navigateTo: "seasons/add",
+      },
+    ],
   },
   {
     title: "dashboard.user.header",
@@ -117,13 +140,13 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.user.users",
-        navigateTo: "users/"
+        navigateTo: "users/",
       },
       {
         title: "dashboard.user.createUser",
-        navigateTo: "users/add"
-      }
-    ]
+        navigateTo: "users/add",
+      },
+    ],
   },
   {
     title: "dashboard.team.header",
@@ -132,13 +155,13 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.team.teams",
-        navigateTo: "teams/"
+        navigateTo: "teams/",
       },
       {
         title: "dashboard.team.createTeam",
-        navigateTo: "teams/add"
-      }
-    ]
+        navigateTo: "teams/add",
+      },
+    ],
   },
   {
     title: "dashboard.committee.header",
@@ -147,13 +170,13 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.committee.committees",
-        navigateTo: 'committees/'
+        navigateTo: "committees/",
       },
       {
         title: "dashboard.committee.createCommittee",
-        navigateTo: "committees/add"
-      }
-    ]
+        navigateTo: "committees/add",
+      },
+    ],
   },
   {
     title: "dashboard.protototo.header",
@@ -162,13 +185,13 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.protototo.seasons",
-        navigateTo: 'protototo/'
+        navigateTo: "protototo/",
       },
       {
         title: "dashboard.protototo.createSeason",
-        navigateTo: 'protototo/season'
-      }
-    ]
+        navigateTo: "protototo/season",
+      },
+    ],
   },
   {
     title: "dashboard.documents.header",
@@ -177,73 +200,90 @@ const adminItems: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.documents.categories",
-        navigateTo: 'documents/'
+        navigateTo: "documents/",
       },
       {
         title: "dashboard.documents.createCategory",
-        navigateTo: 'documents/category'
-      }
-    ]
-  }
-]
+        navigateTo: "documents/category",
+      },
+    ],
+  },
+];
 
 const DrawerItemComponent: React.FC<DrawerItem> = (props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   if (props.subheader) {
-    return <ListSubheader>
-      {props.translateHeader ? t(props.title) : props.title}
-    </ListSubheader>
+    return (
+      <ListSubheader>
+        {props.translateHeader ? t(props.title) : props.title}
+      </ListSubheader>
+    );
   }
 
   function onClick() {
     if (props.navigateTo) {
-      navigate(props.navigateTo)
+      navigate(props.navigateTo);
     }
   }
 
-  return <ListItemButton onClick={() => onClick()}>
-    <ListItemText primary={t(props.title)}/>
-  </ListItemButton>
-}
+  return (
+    <ListItemButton onClick={() => onClick()}>
+      <ListItemText primary={t(props.title)} />
+    </ListItemButton>
+  );
+};
 
 export const DrawerItems: React.FC<DrawerItemsProps> = () => {
-  const roles = useAppSelector(state => state.auth.roles);
+  const roles = useAppSelector((state) => state.auth.roles);
+	const isAnonymous = useIsAnonymous();
 
-  const [items, setItems] = React.useState<DrawerItem[]>(defaultItems);
+  const [items, setItems] = React.useState<DrawerItem[]>(publicItems);
 
   const location = useLocation();
 
-  React.useEffect(() => {
-    console.log('roles', roles);
-		if (!roles) {
+  React.useEffect(() => { 
+    if (!roles) {
       return;
     }
 
-    if ((roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) && !items.includes(adminDefaultItem) && !location.pathname.includes("dashboard")) {
-      setItems([...items, adminDefaultItem]);
+		let newItems: DrawerItem[] = [...publicItems];
+
+		if (!isAnonymous) {
+			newItems = [...newItems, ...defaultItems]	
+		}
+
+    if (
+      (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) &&
+      !items.includes(adminDefaultItem) &&
+      !location.pathname.includes("dashboard")
+    ) {
+      newItems = [...newItems, adminDefaultItem];
     }
-  }, [items, location.pathname, roles])
+
+		setItems(newItems.sort((a, b) => (a.rank ?? -1) - (b.rank ?? -1)));
+  }, [location.pathname, roles, isAnonymous]);
 
   React.useEffect(() => {
     if (location.pathname.includes("dashboard")) {
       setItems(adminItems);
     }
-  }, [location.pathname])
+  }, [location.pathname]);
 
   return (
     <List>
       {items.map((item) => (
         <>
-          <DrawerItemComponent {...item}/>
-          {item.subItems && item.subItems.map((subItem) => (
-            <List sx={{pl: 4}} disablePadding>
-              <DrawerItemComponent {...subItem} />
-            </List>
-          ))}
+          <DrawerItemComponent {...item} />
+          {item.subItems &&
+            item.subItems.map((subItem) => (
+              <List sx={{ pl: 4 }} disablePadding>
+                <DrawerItemComponent {...subItem} />
+              </List>
+            ))}
         </>
       ))}
     </List>
-  )
-}
+  );
+};
