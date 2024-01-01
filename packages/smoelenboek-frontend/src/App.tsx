@@ -59,6 +59,8 @@ import { ResetPassword } from "./auth/ResetPassword.tsx";
 import { ApplicationError } from "./screens/errors/ApplicationError.tsx";
 import { Guard } from "./components/auth/Guard.tsx";
 import { AUTHENTICATED } from "./components/auth/RolesConstants.ts";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 const router = createBrowserRouter([
   {
@@ -72,15 +74,27 @@ const router = createBrowserRouter([
       },
       {
         path: "teams/:type",
-        element: <Guard roles={AUTHENTICATED}><Teams /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <Teams />
+          </Guard>
+        ),
       },
       {
         path: "teams/info/:id",
-        element: <Guard roles={AUTHENTICATED}><TeamsInfo /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <TeamsInfo />
+          </Guard>
+        ),
       },
       {
         path: "profile/:id",
-        element: <Guard roles={AUTHENTICATED}><Profile /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <Profile />
+          </Guard>
+        ),
       },
       {
         path: "protototo/",
@@ -88,43 +102,83 @@ const router = createBrowserRouter([
       },
       {
         path: "documents/",
-        element: <Guard roles={AUTHENTICATED}><Categories /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <Categories />
+          </Guard>
+        ),
       },
       {
         path: `documents/files/:id`,
-        element: <Guard roles={AUTHENTICATED}><Files /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <Files />
+          </Guard>
+        ),
       },
       {
         path: "settings",
-        element: <Guard roles={AUTHENTICATED}><Settings /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <Settings />
+          </Guard>
+        ),
       },
       {
         path: "settings/password",
-        element: <Guard roles={AUTHENTICATED}><ChangePassword /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <ChangePassword />
+          </Guard>
+        ),
       },
       {
         path: "settings/information",
-        element: <Guard roles={AUTHENTICATED}><PersonalInformation /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <PersonalInformation />
+          </Guard>
+        ),
       },
       {
         path: "settings/picture",
-        element: <Guard roles={AUTHENTICATED}><ChangeProfilePicture /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <ChangeProfilePicture />
+          </Guard>
+        ),
       },
       {
         path: "sponsorhengel",
-        element: <Guard roles={AUTHENTICATED}><SponsorHengel /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <SponsorHengel />
+          </Guard>
+        ),
       },
       {
         path: "vcp",
-        element: <Guard roles={AUTHENTICATED}><VCP /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <VCP />
+          </Guard>
+        ),
       },
       {
         path: "committees/",
-        element: <Guard roles={AUTHENTICATED}><Committees /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <Committees />
+          </Guard>
+        ),
       },
       {
         path: "committees/info/:id",
-        element: <Guard roles={AUTHENTICATED}><CommitteeInfo /></Guard>,
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <CommitteeInfo />
+          </Guard>
+        ),
       },
     ],
   },
@@ -276,7 +330,9 @@ function App() {
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale="nl">
             <SnackbarProvider>
-              <RouterProvider router={router} />
+              <DndProvider backend={HTML5Backend}>
+                <RouterProvider router={router} />
+              </DndProvider>
             </SnackbarProvider>
           </LocalizationProvider>
         </ThemeProvider>
