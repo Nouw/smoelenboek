@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Form = void 0;
 const typeorm_1 = require("typeorm");
+const Activity_1 = require("./Activity");
+const FormQuestion_1 = require("./FormQuestion");
 let Form = exports.Form = class Form {
 };
 __decorate([
@@ -20,30 +22,19 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Form.prototype, "name", void 0);
+], Form.prototype, "title", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "json", nullable: true }),
-    __metadata("design:type", Object)
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", String)
 ], Form.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "timestamp" }),
-    __metadata("design:type", Date)
-], Form.prototype, "registrationOpen", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "timestamp" }),
-    __metadata("design:type", Date)
-], Form.prototype, "registrationClosed", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "blob", transformer: {
-            to: (value) => Buffer.from(JSON.stringify(value)),
-            from: (value) => JSON.parse(value.toString())
-        } }),
+    (0, typeorm_1.OneToOne)(() => Activity_1.Activity, activity => activity.form),
     __metadata("design:type", Object)
-], Form.prototype, "formItem", void 0);
+], Form.prototype, "activity", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], Form.prototype, "sheetLink", void 0);
+    (0, typeorm_1.OneToMany)(() => FormQuestion_1.FormQuestion, question => question.form, { cascade: true }),
+    __metadata("design:type", Object)
+], Form.prototype, "questions", void 0);
 exports.Form = Form = __decorate([
     (0, typeorm_1.Entity)()
 ], Form);

@@ -65,6 +65,14 @@
             "required": "Required"
           }
         },
+				"activity": {
+					"openRegistration": "Open registration",
+					"closeRegistration": "Close registration",
+					"public": "Public",
+					"enterDescription": "Enter description",
+					"title": "Title",
+					"location": "Location"
+				},
         "season": {
           "header": "Season management",
           "seasons": "Seasons",

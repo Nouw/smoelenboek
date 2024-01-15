@@ -89,6 +89,5 @@ export class User {
     	predictions!: Relation<ProtototoPredictions[]>;
 
     @ManyToMany(() => Activity)
-    @JoinTable()
     	activities: Relation<Activity[]>;
 }

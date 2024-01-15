@@ -1,15 +1,15 @@
 import { Relation } from "typeorm";
 import { User } from "./User";
+import { Form } from "./Form";
 export declare class Activity {
     id: number;
-    name: string;
-    location: string;
+    title: string;
     description: string;
+    location: string;
     date: Date;
-    registrationEnd: Date;
     registrationOpen: Date;
+    registrationClosed: Date;
     max: number;
-    forms: string;
-    formId: string;
+    form: Relation<Form>;
     users: Relation<User[]>;
 }

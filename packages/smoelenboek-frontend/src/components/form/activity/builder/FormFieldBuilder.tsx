@@ -23,6 +23,7 @@ import { Delete } from "@mui/icons-material";
 import { FormTextField } from "./Text/FormTextField.tsx";
 import { FormOptionFieldBuilder } from "./FormOptionFieldBuilder.tsx";
 import { Item } from "../../../list/DraggableList.tsx";
+import {array, boolean, mixed, object, string} from "yup";
 
 interface FormFieldBuilderProps {
   name: string;
@@ -37,6 +38,16 @@ export const selectTypes = createLabelValueArray(
 
 export type SelectType = typeof selectTypes[number]["value"];
 
+export const formQuestionSchema =  array().of(
+  object().shape({
+    title: string().required(),
+    description: string(),
+    required: boolean().default(() => false),
+    paragraph: boolean(),
+    type: mixed<SelectType>().oneOf(selectTypes.map((x) => x.value)),
+    items: array<Item>().nullable(),
+  }));
+
 export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
   const { t } = useTranslation();
 
@@ -44,8 +55,13 @@ export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
   const [typeFieldProps] = useField(`${name}.type`)
   const [requiredFieldProps, , requiredHelpers] = useField(`${name}.required`);
   const [paragraphFieldProps, , paragraphHelpers] = useField(`${name}.paragraph`);
+  const [, ,itemsHelpers] = useField(`${name}.items`);
 
 	const [options, setOptions] = React.useState<Item[]>([]);
+
+  React.useEffect(() => {
+    itemsHelpers.setValue(options);
+  }, [options])
 
   return (
         <Card>

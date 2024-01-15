@@ -3816,6 +3816,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/domhandler@npm:^2.4.0, @types/domhandler@npm:^2.4.3":
+  version: 2.4.5
+  resolution: "@types/domhandler@npm:2.4.5"
+  checksum: 0dd551361c0ec4e8736a6bcb142ca3c9eedd9b8076cded263c555c0e4adef9b07230dc85b7c94e5cd72e9796ea2533c00e4bcf97d5e06bc10e32367429985ff1
+  languageName: node
+  linkType: hard
+
+"@types/domutils@npm:*":
+  version: 1.7.8
+  resolution: "@types/domutils@npm:1.7.8"
+  dependencies:
+    "@types/domhandler": ^2.4.0
+  checksum: ac97a3c2baf6c7ec93a3e54a30e36363dc4acaaf76b36e8b7dc5a06d626f48ce1d4beb9cd9767c1ce745825b78296528b60a128627c324c66eaec6616dc2ea42
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.4
   resolution: "@types/eslint-scope@npm:3.7.4"
@@ -3897,6 +3913,18 @@ __metadata:
   version: 6.1.0
   resolution: "@types/html-minifier-terser@npm:6.1.0"
   checksum: eb843f6a8d662d44fb18ec61041117734c6aae77aa38df1be3b4712e8e50ffaa35f1e1c92fdd0fde14a5675fecf457abcd0d15a01fae7506c91926176967f452
+  languageName: node
+  linkType: hard
+
+"@types/htmlparser2@npm:*":
+  version: 3.10.7
+  resolution: "@types/htmlparser2@npm:3.10.7"
+  dependencies:
+    "@types/domhandler": ^2.4.3
+    "@types/domutils": "*"
+    "@types/node": "*"
+    domhandler: ^2.4.0
+  checksum: 74fbd402f554ac529cc7ff1aedbdc05eabd13694a636ae91cf5842c7fe8d1a0c4253c9400b957203f01d8564615771296d22f85132be894f71eb4254dd81adb6
   languageName: node
   linkType: hard
 
@@ -4107,6 +4135,16 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: e02ea908289a7ad26053308248d2b87f6aeafd73d0e2de2a3d435947bcea0422599016ffd1c3e38ff36c42f5e1c87c7417f05b0a157e48649e4a02f21727d54f
+  languageName: node
+  linkType: hard
+
+"@types/react-html-parser@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "@types/react-html-parser@npm:2.0.6"
+  dependencies:
+    "@types/htmlparser2": "*"
+    "@types/react": "*"
+  checksum: 6c7568c55313be6e79370ac82bf35d78925d81535492716be50ddd7eb8c1a9f9c25223bc731843cb679155b74a53111d2136dbd0aac31ccb83a43167f46d53d6
   languageName: node
   linkType: hard
 
@@ -7432,7 +7470,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domelementtype@npm:1":
+"domelementtype@npm:1, domelementtype@npm:^1.3.1":
   version: 1.3.1
   resolution: "domelementtype@npm:1.3.1"
   checksum: 7893da40218ae2106ec6ffc146b17f203487a52f5228b032ea7aa470e41dfe03e1bd762d0ee0139e792195efda765434b04b43cddcf63207b098f6ae44b36ad6
@@ -7455,6 +7493,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"domhandler@npm:^2.3.0, domhandler@npm:^2.4.0":
+  version: 2.4.2
+  resolution: "domhandler@npm:2.4.2"
+  dependencies:
+    domelementtype: 1
+  checksum: 49bd70c9c784f845cd047e1dfb3611bd10891c05719acfc93f01fc726a419ed09fbe0b69f9064392d556a63fffc5a02010856cedae9368f4817146d95a97011f
+  languageName: node
+  linkType: hard
+
 "domhandler@npm:^3.3.0":
   version: 3.3.0
   resolution: "domhandler@npm:3.3.0"
@@ -7473,7 +7520,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domutils@npm:^1.7.0":
+"domutils@npm:^1.5.1, domutils@npm:^1.7.0":
   version: 1.7.0
   resolution: "domutils@npm:1.7.0"
   dependencies:
@@ -7666,6 +7713,13 @@ __metadata:
     graceful-fs: ^4.2.4
     tapable: ^2.2.0
   checksum: fbd8cdc9263be71cc737aa8a7d6c57b43d6aa38f6cc75dde6fcd3598a130cc465f979d2f4d01bb3bf475acb43817749c79f8eef9be048683602ca91ab52e4f11
+  languageName: node
+  linkType: hard
+
+"entities@npm:^1.1.1":
+  version: 1.1.2
+  resolution: "entities@npm:1.1.2"
+  checksum: d537b02799bdd4784ffd714d000597ed168727bddf4885da887c5a491d735739029a00794f1998abbf35f3f6aeda32ef5c15010dca1817d401903a501b6d3e05
   languageName: node
   linkType: hard
 
@@ -9633,6 +9687,20 @@ __metadata:
   peerDependencies:
     webpack: ^5.20.0
   checksum: ccf685195739c372ad641bbd0c9100a847904f34eedc7aff3ece7856cd6c78fd3746d2d615af1bb71e5727993fe711b89e9b744f033ed3fde646540bf5d5e954
+  languageName: node
+  linkType: hard
+
+"htmlparser2@npm:^3.9.0":
+  version: 3.10.1
+  resolution: "htmlparser2@npm:3.10.1"
+  dependencies:
+    domelementtype: ^1.3.1
+    domhandler: ^2.3.0
+    domutils: ^1.5.1
+    entities: ^1.1.1
+    inherits: ^2.0.1
+    readable-stream: ^3.1.1
+  checksum: 6875f7dd875aa10be17d9b130e3738cd8ed4010b1f2edaf4442c82dfafe9d9336b155870dcc39f38843cbf7fef5e4fcfdf0c4c1fd4db3a1b91a1e0ee8f6c3475
   languageName: node
   linkType: hard
 
@@ -16063,6 +16131,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-html-parser@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "react-html-parser@npm:2.0.2"
+  dependencies:
+    htmlparser2: ^3.9.0
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0 || ^16.0.0-0
+  checksum: 2e6bf4cd90b07667de5771eec7738155c3df39114b28df4a117722b17412015aa9115fd2cb76ca959fd364909de70ebc6032f13ae0fec16d888c792fbaa2226c
+  languageName: node
+  linkType: hard
+
 "react-i18next@npm:^13.1.2":
   version: 13.2.2
   resolution: "react-i18next@npm:13.2.2"
@@ -17306,6 +17385,7 @@ __metadata:
     "@testing-library/user-event": ^13.2.1
     "@types/react": ^18.2.15
     "@types/react-dom": ^18.2.7
+    "@types/react-html-parser": ^2.0.6
     "@typescript-eslint/eslint-plugin": ^6.0.0
     "@typescript-eslint/parser": ^6.0.0
     "@vitejs/plugin-react": ^4.0.3
@@ -17324,6 +17404,7 @@ __metadata:
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dom: ^18.2.0
+    react-html-parser: ^2.0.2
     react-i18next: ^13.1.2
     react-lazyload: ^3.2.0
     react-pdf: ^7.3.3

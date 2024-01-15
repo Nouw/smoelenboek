@@ -7,7 +7,6 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScreenWrapper } from "./components/navigation/ScreenWrapper";
 import { Home } from "./screens/Home";
 import { Teams } from "./screens/teams/Teams";
@@ -61,6 +60,7 @@ import { Guard } from "./components/auth/Guard.tsx";
 import { AUTHENTICATED } from "./components/auth/RolesConstants.ts";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import {SignUp} from "./screens/activities/SignUp.tsx";
 
 const router = createBrowserRouter([
   {
@@ -180,6 +180,14 @@ const router = createBrowserRouter([
           </Guard>
         ),
       },
+      {
+        path: "activity/:id",
+        element: (
+          <Guard roles={[]}>
+            <SignUp />
+          </Guard>
+        )
+      }
     ],
   },
   {

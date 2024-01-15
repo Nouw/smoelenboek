@@ -19,6 +19,7 @@ import SeasonController from "./Controllers/SeasonController";
 import ProtototoController from "./Controllers/ProtototoController";
 import JobController from "./Controllers/JobController";
 import TeamPhotoQueue from "./Queues/TeamPhotoQueue";
+import ActivityController from "./Controllers/ActivityController";
 
 
 dotenv.config();
@@ -26,6 +27,7 @@ dotenv.config();
 const app: Express = express();
 
 const controllers: Type[] = [
+	ActivityController,
 	AuthController,
 	CommitteeController,
 	DocumentController,
@@ -34,13 +36,13 @@ const controllers: Type[] = [
 	UserController,
 	SeasonController,
 	ProtototoController,
-    JobController,
+	JobController,
 ];
 
 const corsAllowed = [
 	"http://localhost:3000",
-  'https://smoelenboek.usvprotos.nl',
-  "http://127.0.0.1:4173/"
+	"https://smoelenboek.usvprotos.nl",
+	"http://127.0.0.1:4173/"
 ];
 
 const middlewares = [
@@ -76,8 +78,8 @@ async function run() {
 
 	logger.info(`Server is running on port: ${port}`);
 
-    // TeamPhotoQueue.empty();
-    // logger.info('Cleaned job queue for TeamPhotoQueue');
+	// TeamPhotoQueue.empty();
+	// logger.info('Cleaned job queue for TeamPhotoQueue');
 }
 
 run();

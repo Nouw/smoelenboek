@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
-import { isAdmin } from "../../utilities/permissions";
 import { useTranslation } from "react-i18next";
 import { Roles } from "smoelenboek-types";
 import { useIsAnonymous } from "../../hooks/useIsAnonymous";
@@ -117,6 +116,17 @@ const adminItems: DrawerItem[] = [
         navigateTo: "form/create",
       },
     ],
+  },
+  {
+    title: "Activity",
+    subheader: true,
+    translateHeader: false,
+    subItems: [
+      {
+        title: "Create Activity",
+        navigateTo: "activity/"
+      }
+    ]
   },
   {
     title: "dashboard.season.header",
@@ -243,7 +253,7 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
 
   const location = useLocation();
 
-  React.useEffect(() => { 
+  React.useEffect(() => {
     if (!roles) {
       return;
     }
@@ -251,7 +261,7 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
 		let newItems: DrawerItem[] = [...publicItems];
 
 		if (!isAnonymous) {
-			newItems = [...newItems, ...defaultItems]	
+			newItems = [...newItems, ...defaultItems]
 		}
 
     if (

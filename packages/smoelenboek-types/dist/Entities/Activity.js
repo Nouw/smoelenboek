@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Activity = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
+const Form_1 = require("./Form");
 let Activity = exports.Activity = class Activity {
 };
 __decorate([
@@ -21,15 +22,15 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Activity.prototype, "name", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Activity.prototype, "location", void 0);
+], Activity.prototype, "title", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true, type: "text" }),
     __metadata("design:type", String)
 ], Activity.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Activity.prototype, "location", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "timestamp" }),
     __metadata("design:type", Date)
@@ -37,23 +38,20 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ type: "timestamp" }),
     __metadata("design:type", Date)
-], Activity.prototype, "registrationEnd", void 0);
+], Activity.prototype, "registrationOpen", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "timestamp" }),
     __metadata("design:type", Date)
-], Activity.prototype, "registrationOpen", void 0);
+], Activity.prototype, "registrationClosed", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: 0 }),
     __metadata("design:type", Number)
 ], Activity.prototype, "max", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true, type: "text" }),
-    __metadata("design:type", String)
-], Activity.prototype, "forms", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true, type: "text" }),
-    __metadata("design:type", String)
-], Activity.prototype, "formId", void 0);
+    (0, typeorm_1.OneToOne)(() => Form_1.Form, form => form.activity, { cascade: true }),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Object)
+], Activity.prototype, "form", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => User_1.User, user => user.activities),
     (0, typeorm_1.JoinTable)(),

@@ -1,5 +1,5 @@
 import {Box, Button, Checkbox, Radio, TextField, Typography} from "@mui/material";
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { OptionFieldBuilderWrapper } from "./OptionFieldBuilderWrapper.tsx";
 import { Add } from "@mui/icons-material";
 import { DraggableList, Item } from "../../../list/DraggableList.tsx";
@@ -20,7 +20,7 @@ export const FormOptionFieldBuilder: React.FC<FormOptionFieldBuilderProps> = (
 ) => {
   const [options, setOptions] = React.useState<Item[]>(
     baseOptions.length < 1
-      ? [{ id: 1, label: "Optie 1" }, { id: 2, label: "Optie 2" }]
+      ? [{ key: 1, label: "Optie 1" }, { key: 2, label: "Optie 2" }]
       : baseOptions,
   );
 
@@ -33,7 +33,7 @@ export const FormOptionFieldBuilder: React.FC<FormOptionFieldBuilderProps> = (
 	function addOption() {
     setOptions(
       (prevState) => [...prevState, {
-        id: prevState.length + 1,
+        key: prevState.length + 1,
         label: `Optie ${prevState.length}`,
       }]
     );
@@ -54,11 +54,19 @@ export const FormOptionFieldBuilder: React.FC<FormOptionFieldBuilderProps> = (
 			onDelete = () => removeOption(index);
 		}
 
+		const onChangeEvent = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+			setOptions((prevState) => {
+				const tempState = prevState;
+				tempState[index].label = e.target.value
+				return [...tempState];
+			});
+		}
+
 		return <OptionFieldBuilderWrapper onDelete={onDelete}>
       {type === "select" && <Checkbox disabled /> }
       {type === "choice" && <Radio disabled /> }
       {type === "dropdown" && <Typography>{index + 1}.</Typography>}
-			<TextField variant="standard" value={item.label}/>
+			<TextField variant="standard" value={item.label} onChange={(e) => onChangeEvent(e)}/>
 		</OptionFieldBuilderWrapper>
 	}
 

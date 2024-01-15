@@ -15,6 +15,7 @@ export const Permissions = {
   "activity.edit": Roles.BOARD,
   "season.edit": Roles.BOARD,
   "user.edit": Roles.BOARD,
+  "activity.create": Roles.BOARD,
 };
 
 export type PermissionName = keyof typeof Permissions;

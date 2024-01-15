@@ -52,7 +52,7 @@ export default class AuthController {
 
 		const { currentPassword, newPassword } = matchedData(req);
 
-		const user = await Database.manager.findOne(User, { select: { id: true, password: true }, where: { id : req.user.id } });
+		const user: Partial<User> = await Database.manager.findOne(User, { select: { id: true, password: true }, where: { id : req.user.id } });
 
 		const match = await bcrypt.compare(currentPassword, user.password);
 
@@ -79,7 +79,7 @@ export default class AuthController {
 
 		const { email } = matchedData(req);
 
-		const user = await Database.manager.findOneBy(User, { email });
+		const user: Partial<User> = await Database.manager.findOneBy(User, { email });
 
 		if (user) {
 			const newPassword = this.userService.generatePassword();

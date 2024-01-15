@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { SerializedLexicalNode } from "lexical";
+import {Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
 import {FormItem} from "../FormItem";
+import {Activity} from "./Activity";
+import {FormQuestion} from "./FormQuestion";
 
 @Entity()
 export class Form {
@@ -8,23 +9,14 @@ export class Form {
 		id: string;
 
 	@Column()
-		name: string;
+		title: string;
 
-	@Column({ type: "json", nullable: true })
-		description?: SerializedLexicalNode;
+	@Column({ type: "text", nullable: true })
+		description?: string;
 
-	@Column({ type: "timestamp" })
-		registrationOpen: Date;
+  @OneToOne(() => Activity, activity => activity.form)
+    activity: Relation<Activity>;
 
-	@Column({ type: "timestamp" })
-		registrationClosed: Date;
-
-	@Column({ type: "blob", transformer: {
-		to: (value: FormItem) => Buffer.from(JSON.stringify(value)),
-		from: (value: Buffer) => JSON.parse(value.toString())
-	} })
-		formItem: FormItem;
-
-	@Column({ nullable: true })
-		sheetLink?: string;
+  @OneToMany(() => FormQuestion, question => question.form, { cascade: true })
+    questions: Relation<FormQuestion[]>;
 }

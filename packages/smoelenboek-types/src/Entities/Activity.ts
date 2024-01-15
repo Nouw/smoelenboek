@@ -1,5 +1,16 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Relation
+} from "typeorm";
 import { User } from "./User";
+import {Form} from "./Form";
 
 @Entity()
 export class Activity {
@@ -7,33 +18,32 @@ export class Activity {
   	id: number;
 
   @Column()
-  	name: string;
+  	title: string;
+
+  @Column({ nullable: true, type: "text" })
+  description: string;
 
   @Column()
   	location: string;
-
-  @Column({ nullable: true, type: "text" })
-  	description: string;
 
   @Column({ type: "timestamp" })
   	date: Date;
 
   @Column({ type: "timestamp" })
-  	registrationEnd: Date;
+  	registrationOpen: Date;
 
   @Column({ type: "timestamp" })
-  	registrationOpen: Date;
+    registrationClosed: Date;
 
   @Column({ default: 0 })
   	max: number;
 
-  @Column({ nullable: true, type: "text" })
-  	forms: string;
-
-  @Column({ nullable: true, type: "text" })
-  	formId: string;
+  @OneToOne(() => Form, form => form.activity)
+  @JoinColumn()
+    form: Relation<Form>;
 
   @ManyToMany(() => User, user => user.activities)
   @JoinTable()
   	users: Relation<User[]>;
+
 }

@@ -114,7 +114,6 @@ __decorate([
 ], User.prototype, "predictions", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => Activity_1.Activity),
-    (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Object)
 ], User.prototype, "activities", void 0);
 exports.User = User = __decorate([

@@ -9,7 +9,7 @@ interface DraggableListProps {
 }
 
 export interface Item {
-  id: string | number;
+  key: string | number;
   label: string;
 }
 
@@ -32,9 +32,9 @@ export const DraggableList: React.FC<DraggableListProps> = (
   const renderItem = useCallback((item: Item, index: number) => {
     return (
       <DraggableListItem
-        key={item.id}
+        key={item.key}
         index={index}
-        id={item.id}
+        id={item.key}
         moveItem={moveItem}
       >
         {renderListItem(item, index)}

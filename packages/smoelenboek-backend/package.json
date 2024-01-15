@@ -19,7 +19,8 @@
     "start": "node ./dist/index.js",
     "start:dev": "yarn run ts-node --swc ./src/index.ts --inspect",
     "deploy": "./bin/deploy.sh",
-    "execute": "ts-node ./src/Cli.ts"
+    "execute": "ts-node ./src/Cli.ts",
+    "schema:sync": "yarn typeorm -d ./src/Database.ts schema:sync"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.2.0",

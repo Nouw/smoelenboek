@@ -1,11 +1,10 @@
-import { SerializedLexicalNode } from "lexical";
-import { FormItem } from "../FormItem";
+import { Relation } from "typeorm";
+import { Activity } from "./Activity";
+import { FormQuestion } from "./FormQuestion";
 export declare class Form {
     id: string;
-    name: string;
-    description?: SerializedLexicalNode;
-    registrationOpen: Date;
-    registrationClosed: Date;
-    formItem: FormItem;
-    sheetLink?: string;
+    title: string;
+    description?: string;
+    activity: Relation<Activity>;
+    questions: Relation<FormQuestion[]>;
 }
