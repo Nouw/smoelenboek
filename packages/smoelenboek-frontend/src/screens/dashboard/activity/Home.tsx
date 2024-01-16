@@ -1,6 +1,5 @@
 import React from "react";
-import {Create} from "../../dashboard/activity/Create.tsx";
-import {Box, Typography} from "@mui/material";
+import {Box} from "@mui/material";
 
 interface HomeProps {
 
@@ -8,6 +7,6 @@ interface HomeProps {
 
 export const Home: React.FC<HomeProps> = () => {
   return <Box>
-    <Create/>
+
   </Box>
 }

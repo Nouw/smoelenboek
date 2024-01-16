@@ -13,7 +13,6 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
   const [titleFieldProps, , titleFieldHelpers] = useField(`${name}.title`);
   const [descriptionFieldProps, , descriptionFieldHelpers] = useField(`${name}.description`)
   const [locationFieldProps, , locationFieldHelpers] = useField(`${name}.location`);
-  const [publicFieldProps, , publicFieldHelpers] = useField(`${name}.public`);
   const [openRegistrationFieldProps, , openRegistrationFieldHelpers] = useField(`${name}.registrationOpen`);
   const [closeRegistrationFieldProps, , closeRegistrationFieldHelpers] = useField(`${name}.registrationClosed`);
   const [maxFieldProps, , maxFieldHelpers] = useField(`${name}.max`);
@@ -27,17 +26,6 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
               <StyledTextInput value={descriptionFieldProps.value ?? ""} onChange={(value) => descriptionFieldHelpers.setValue(value)} height={200} />
               <TextField label="Location" fullWidth value={locationFieldProps.value} onChange={(e) => locationFieldHelpers.setValue(e.target.value)} />
               <TextField label="Maximum" fullWidth value={maxFieldProps.value} onChange={(e) => maxFieldHelpers.setValue(e.target.value)} type="number" />
-              <FormControlLabel
-                control={
-                  <Switch
-                    value={publicFieldProps.value} onChange={(_event, checked) => publicFieldHelpers.setValue(checked)}
-                  />
-                }
-                label={"Public"}
-                color="primary"
-                labelPlacement="start"
-                sx={{ mr: "auto" }}
-              />
               <Field name="date">
                 {({form: { touched, errors,  }}) => (
                   <DateTimePicker

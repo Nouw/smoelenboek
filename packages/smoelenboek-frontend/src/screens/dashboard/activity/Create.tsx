@@ -8,6 +8,7 @@ import {formQuestionSchema} from "../../../components/form/activity/builder/Form
 import {CreateActivityForm} from "../../../components/form/activity/builder/CreateActivityForm.tsx";
 import {useCreateActivityMutation} from "../../../api/endpoints/activity.ts";
 import {Activity, Form} from "smoelenboek-types";
+import {ActivitySettings} from "../../../components/form/activity/ActivitySettings.tsx";
 
 interface CreateProps {
 
@@ -43,7 +44,7 @@ export const Create: React.FC<CreateProps> = () => {
   const steps: StepProperties[] = [
     {label: 'Create Activity', optional: false, component: <CreateActivity name="activity"/>},
     {label: 'Create Form', optional: true, component: <CreateActivityForm name="form"/>},
-    {label: 'Settings', optional: false, component: null},
+    {label: 'Settings', optional: false, component: <ActivitySettings name="activity"/>},
   ];
 
   const initialValues: FormValues = {

@@ -2,6 +2,8 @@ export { FormItem } from "./FormItem";
 export { FormQuestion } from "./Entities/FormQuestion";
 export { FormQuestionItem } from "./Entities/FormQuestionItem";
 export { Action } from "./Action";
+export { FormAnswer } from "./Entities/FormAnswer";
+export { FormAnswerValue } from "./Entities/FormAnswerValue";
 
 export { ChoiceOption } from "./QuestionTypes/ChoiceOption";
 export { ChoiceQuestion } from "./QuestionTypes/ChoiceQuestion";

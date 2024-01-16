@@ -5,7 +5,7 @@ import {
 	Category,
 	Committee,
 	File,
-	Form,
+	Form, FormAnswer, FormAnswerValue,
 	FormQuestion,
 	FormQuestionItem,
 	Photo,
@@ -39,7 +39,7 @@ export const Database = new DataSource({
 	entities:  [
 		Activity, Category, Committee, File, Form, Photo, Photobook, ProtototoMatch, ProtototoPredictionResults,
 		ProtototoPredictions, ProtototoPredictionsExternal, ProtototoResults, ProtototoSeason, Role, Season, Team, User,
-		UserCommitteeSeason, UserTeamSeason, FormQuestion, FormQuestionItem
+		UserCommitteeSeason, UserTeamSeason, FormQuestion, FormQuestionItem, FormAnswer, FormAnswerValue
 	],
 	subscribers: [root + "/Subscribers/**/*." + extension],
 	migrations: [root + "/Migrations/**/*." + extension],

@@ -1,9 +1,13 @@
 import { Controller, Get, Post, Request, Response } from "@decorators/express";
-import { Activity, Form, FormQuestion, FormQuestionItem } from "smoelenboek-types";
+import { Activity, Form, FormAnswer, FormAnswerValue, FormQuestion, FormQuestionItem } from "smoelenboek-types";
 import { Database } from "../Database";
 import { Authenticated, Guard } from "../Middlewares/AuthMiddleware";
 import { matchedData, param } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
+
+type FormRegistration = {
+  [key: string]: string | string[]
+}
 
 @Controller("/activity")
 export default class ActivityController {
@@ -30,11 +34,9 @@ export default class ActivityController {
   @Get("/form/:id", [param("id").exists()])
   async getForm(@Request() req, @Response() res) {
   	const { id } = matchedData(req);
-
   	const form: Form = await Database.manager.findOne(Form, { where: { id }, relations: { questions: true } });
 
   	for (const key in form.questions) {
-  		console.log(key);
   		const question = form.questions[key];
 
   		if (question.type === "text") {
@@ -81,6 +83,37 @@ export default class ActivityController {
   	}
 
   	await Database.manager.save(activity);
+
+  	res.json(ResponseData.build("OK", null));
+  }
+
+  @Post("/register/:id")
+  async postRegistration(@Request() req, @Response() res) {
+  	const data: FormRegistration = req.body;
+  	console.log(data);
+  	const answer = new FormAnswer();
+  	answer.values = [];
+
+  	for (const key in data) {
+  		const storeAnswerValue = async (key: string, formValue: string) => {
+  			const value = new FormAnswerValue();
+  			value.question = await Database.manager.findOneBy(FormQuestion, { id: key });
+  			value.value = formValue;
+  			value.answer = answer;
+
+  			return value;
+  		};
+
+  		if (data[key] instanceof Array) {
+  			for (const value of data[key]) {
+  				answer.values.push(await storeAnswerValue(key, value));
+  			}
+  		} else {
+  			answer.values.push(await storeAnswerValue(key, data[key] as string));
+  		}
+  	}
+
+  	await Database.manager.save(answer);
 
   	res.json(ResponseData.build("OK", null));
   }

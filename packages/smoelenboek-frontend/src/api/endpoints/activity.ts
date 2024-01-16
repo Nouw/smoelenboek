@@ -6,6 +6,13 @@ interface PostActivityRequest {
   form: Partial<Form>;
 }
 
+interface PostRegistrationRequest {
+  id: string;
+  data: {
+    [key: string]: string | string[];
+  }
+}
+
 export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']}).injectEndpoints({
   endpoints: builder => ({
     createActivity: builder.mutation<string, PostActivityRequest>({
@@ -35,6 +42,13 @@ export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']
         url: `activity/form/${id}`,
         method: 'GET'
       })
+    }),
+    postRegistration: builder.mutation<Response<null>, PostRegistrationRequest>({
+      query: (data) => ({
+        url: `activity/register/${data.id}`,
+        method: 'POST',
+        body: data.data,
+      })
     })
   })
 });
@@ -43,5 +57,6 @@ export const {
   useCreateActivityMutation,
   useGetActivitiesQuery,
   useGetActivityQuery,
-  useLazyGetFormQuery
+  useLazyGetFormQuery,
+  usePostRegistrationMutation
 } = activityApiSlice;

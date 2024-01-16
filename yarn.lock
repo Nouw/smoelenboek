@@ -3816,22 +3816,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/domhandler@npm:^2.4.0, @types/domhandler@npm:^2.4.3":
-  version: 2.4.5
-  resolution: "@types/domhandler@npm:2.4.5"
-  checksum: 0dd551361c0ec4e8736a6bcb142ca3c9eedd9b8076cded263c555c0e4adef9b07230dc85b7c94e5cd72e9796ea2533c00e4bcf97d5e06bc10e32367429985ff1
-  languageName: node
-  linkType: hard
-
-"@types/domutils@npm:*":
-  version: 1.7.8
-  resolution: "@types/domutils@npm:1.7.8"
-  dependencies:
-    "@types/domhandler": ^2.4.0
-  checksum: ac97a3c2baf6c7ec93a3e54a30e36363dc4acaaf76b36e8b7dc5a06d626f48ce1d4beb9cd9767c1ce745825b78296528b60a128627c324c66eaec6616dc2ea42
-  languageName: node
-  linkType: hard
-
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.4
   resolution: "@types/eslint-scope@npm:3.7.4"
@@ -3913,18 +3897,6 @@ __metadata:
   version: 6.1.0
   resolution: "@types/html-minifier-terser@npm:6.1.0"
   checksum: eb843f6a8d662d44fb18ec61041117734c6aae77aa38df1be3b4712e8e50ffaa35f1e1c92fdd0fde14a5675fecf457abcd0d15a01fae7506c91926176967f452
-  languageName: node
-  linkType: hard
-
-"@types/htmlparser2@npm:*":
-  version: 3.10.7
-  resolution: "@types/htmlparser2@npm:3.10.7"
-  dependencies:
-    "@types/domhandler": ^2.4.3
-    "@types/domutils": "*"
-    "@types/node": "*"
-    domhandler: ^2.4.0
-  checksum: 74fbd402f554ac529cc7ff1aedbdc05eabd13694a636ae91cf5842c7fe8d1a0c4253c9400b957203f01d8564615771296d22f85132be894f71eb4254dd81adb6
   languageName: node
   linkType: hard
 
@@ -4135,16 +4107,6 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: e02ea908289a7ad26053308248d2b87f6aeafd73d0e2de2a3d435947bcea0422599016ffd1c3e38ff36c42f5e1c87c7417f05b0a157e48649e4a02f21727d54f
-  languageName: node
-  linkType: hard
-
-"@types/react-html-parser@npm:^2.0.6":
-  version: 2.0.6
-  resolution: "@types/react-html-parser@npm:2.0.6"
-  dependencies:
-    "@types/htmlparser2": "*"
-    "@types/react": "*"
-  checksum: 6c7568c55313be6e79370ac82bf35d78925d81535492716be50ddd7eb8c1a9f9c25223bc731843cb679155b74a53111d2136dbd0aac31ccb83a43167f46d53d6
   languageName: node
   linkType: hard
 
@@ -7493,7 +7455,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domhandler@npm:^2.3.0, domhandler@npm:^2.4.0":
+"domhandler@npm:^2.3.0":
   version: 2.4.2
   resolution: "domhandler@npm:2.4.2"
   dependencies:
@@ -17385,7 +17347,6 @@ __metadata:
     "@testing-library/user-event": ^13.2.1
     "@types/react": ^18.2.15
     "@types/react-dom": ^18.2.7
-    "@types/react-html-parser": ^2.0.6
     "@typescript-eslint/eslint-plugin": ^6.0.0
     "@typescript-eslint/parser": ^6.0.0
     "@vitejs/plugin-react": ^4.0.3

@@ -2,7 +2,7 @@ import {Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation} f
 import {FormItem} from "../FormItem";
 import {Activity} from "./Activity";
 import {FormQuestion} from "./FormQuestion";
-
+//TODO: Add some way to order the form
 @Entity()
 export class Form {
 	@PrimaryGeneratedColumn("uuid")
@@ -14,7 +14,10 @@ export class Form {
 	@Column({ type: "text", nullable: true })
 		description?: string;
 
-  @OneToOne(() => Activity, activity => activity.form)
+  @Column({ type: "text", nullable: true })
+    sheetId?: string;
+
+  @OneToOne(() => Activity, activity => activity.form, )
     activity: Relation<Activity>;
 
   @OneToMany(() => FormQuestion, question => question.form, { cascade: true })

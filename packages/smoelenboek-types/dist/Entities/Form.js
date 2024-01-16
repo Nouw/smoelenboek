@@ -13,6 +13,7 @@ exports.Form = void 0;
 const typeorm_1 = require("typeorm");
 const Activity_1 = require("./Activity");
 const FormQuestion_1 = require("./FormQuestion");
+//TODO: Add some way to order the form
 let Form = exports.Form = class Form {
 };
 __decorate([
@@ -27,6 +28,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], Form.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", String)
+], Form.prototype, "sheetId", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => Activity_1.Activity, activity => activity.form),
     __metadata("design:type", Object)

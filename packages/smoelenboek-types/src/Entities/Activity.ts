@@ -38,7 +38,7 @@ export class Activity {
   @Column({ default: 0 })
   	max: number;
 
-  @OneToOne(() => Form, form => form.activity)
+  @OneToOne(() => Form, form => form.activity, { cascade: true })
   @JoinColumn()
     form: Relation<Form>;
 

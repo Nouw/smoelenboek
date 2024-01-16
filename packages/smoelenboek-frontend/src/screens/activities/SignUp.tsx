@@ -1,5 +1,5 @@
 import React from "react";
-import {useGetActivityQuery, useLazyGetFormQuery} from "../../api/endpoints/activity.ts";
+import {useGetActivityQuery, useLazyGetFormQuery, usePostRegistrationMutation} from "../../api/endpoints/activity.ts";
 import {useParams} from "react-router-dom";
 import {Loading} from "../../components/Loading.tsx";
 import {Button, Card, CardContent, Divider, Paper, Stack, Typography} from "@mui/material";
@@ -9,9 +9,15 @@ import {FormTextField} from "../../components/form/activity/input/FormTextField.
 import {FormChoiceField} from "../../components/form/activity/input/FormChoiceField.tsx";
 import {FormSelectField} from "../../components/form/activity/input/FormSelectField.tsx";
 import {Formik, FormikProps} from "formik";
+import {FormQuestion} from "smoelenboek-types";
+import {LoadingButton} from "@mui/lab";
 
 interface SignUpProps {
 
+}
+
+type FormValues = {
+  [key: string]: string | string[];
 }
 
 export const SignUp: React.FC<SignUpProps> = () => {
@@ -19,6 +25,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
   const {data, isLoading} = useGetActivityQuery(parseInt(params.id ?? ""));
   const [trigger, {data: formResponse, isLoading: isFormLoading}] = useLazyGetFormQuery();
+  const [triggerRegistration] = usePostRegistrationMutation();
 
   React.useEffect(() => {
     if (data?.data.form.id) {
@@ -33,6 +40,16 @@ export const SignUp: React.FC<SignUpProps> = () => {
   const activity = data.data;
   const form = formResponse?.data;
 
+  async function submit(values: FormValues, setSubmitting: (value: boolean) => void) {
+    try {
+      await triggerRegistration({ id: params.id as string, data: values });
+      setSubmitting(false);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+
   return (
     <Stack spacing={3}>
       <Info activity={activity}/>
@@ -44,12 +61,12 @@ export const SignUp: React.FC<SignUpProps> = () => {
 
             <Divider sx={{ m: 2 }} />
 
-            <Formik initialValues={{}} onSubmit={(values) => console.log(values)}>
+            <Formik<FormValues> initialValues={{}} onSubmit={(values, { setSubmitting }) => submit(values, setSubmitting)}>
               {(props: FormikProps<NonNullable<unknown>>) => (
                 <form noValidate onSubmit={props.handleSubmit}>
                   <Stack spacing={2}>
 
-                    {form.questions.map((question) => {
+                    {form.questions.map((question: FormQuestion) => {
                       if (question.type === "text") {
                         return <FormTextField question={question}/>
                       }
@@ -66,7 +83,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                     })}
 
                     <Paper elevation={2}>
-                      <Button type="submit">Inschrijven</Button>
+                      <LoadingButton type="submit" loading={props.isSubmitting}>Inschrijven</LoadingButton>
                     </Paper>
                   </Stack>
 

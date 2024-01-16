@@ -107,24 +107,17 @@ const adminItems: DrawerItem[] = [
     navigateTo: "/teams/female",
   },
   {
-    title: "dashboard.form.header",
-    subheader: true,
-    translateHeader: true,
-    subItems: [
-      {
-        title: "dashboard.form.createForm",
-        navigateTo: "form/create",
-      },
-    ],
-  },
-  {
     title: "Activity",
     subheader: true,
     translateHeader: false,
     subItems: [
       {
         title: "Create Activity",
-        navigateTo: "activity/"
+        navigateTo: "activity/create"
+      },
+      {
+        title: "Activities",
+        "navigateTo": "activity/"
       }
     ]
   },

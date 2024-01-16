@@ -14,7 +14,6 @@ import { Info as TeamsInfo } from "./screens/teams/Info";
 import { Profile } from "./screens/Profile";
 import { AdminRoute } from "./components/auth/AdminRoute";
 import { Home as ActivityHome } from "./screens/dashboard/activity/Home";
-import { Create as FormCreate } from "./screens/dashboard/activity/form/Create";
 import { Home as Categories } from "./screens/documents/Home";
 import { Home as Seasons } from "./screens/dashboard/season/Home";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -60,7 +59,8 @@ import { Guard } from "./components/auth/Guard.tsx";
 import { AUTHENTICATED } from "./components/auth/RolesConstants.ts";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import {SignUp} from "./screens/activities/SignUp.tsx";
+import { SignUp } from "./screens/activities/SignUp.tsx";
+import { Create as ActivityCreate } from "./screens/dashboard/activity/Create";
 
 const router = createBrowserRouter([
   {
@@ -200,11 +200,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "activity/",
-        element: <ActivityHome />,
+        element: <ActivityHome/>
       },
       {
-        path: "form/create",
-        element: <FormCreate />,
+        path: "activity/create",
+        element: <ActivityCreate />,
       },
       {
         path: "seasons/",
