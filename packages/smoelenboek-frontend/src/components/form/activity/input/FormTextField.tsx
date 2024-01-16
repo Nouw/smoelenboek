@@ -23,6 +23,6 @@ export const FormTextField: React.FC<FormTextFieldProps> = ({ question }) => {
   const [props, meta , helpers] = useField({ name: question.id, validate});
 
   return (
-      <TextField value={props.value} error={meta.touched && Boolean(meta.error)} helperText={meta.touched && meta.error} onChange={(e) =>  helpers.setValue(e.target.value)} fullWidth  multiline={question.paragraph} rows={question.paragraph ? 4 : 1} label={question.title} />
+      <TextField value={props.value} error={Boolean(meta.error)} helperText={meta.touched && meta.error} required={question.required} onChange={(e) =>  helpers.setValue(e.target.value)} fullWidth  multiline={question.paragraph} rows={question.paragraph ? 4 : 1} label={question.title} />
   )
 }
