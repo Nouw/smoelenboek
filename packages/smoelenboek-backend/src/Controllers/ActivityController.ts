@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Request, Response } from "@decorators/express";
+import { Controller, Get, Next, Post, Request, Response } from "@decorators/express";
 import { Activity, Form, FormAnswer, FormAnswerValue, FormQuestion, FormQuestionItem } from "smoelenboek-types";
 import { Database } from "../Database";
-import { Authenticated, Guard } from "../Middlewares/AuthMiddleware";
+import { Authenticated, AuthenticatedAnonymous, Guard } from "../Middlewares/AuthMiddleware";
 import { matchedData, param } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
+import { RequestWithAnonymous } from "../Utilities/RequestE";
+import { FindOptionsWhere } from "typeorm";
 
 type FormRegistration = {
   [key: string]: string | string[]
@@ -87,12 +89,29 @@ export default class ActivityController {
   	res.json(ResponseData.build("OK", null));
   }
 
-  @Post("/register/:id")
-  async postRegistration(@Request() req, @Response() res) {
+  @AuthenticatedAnonymous()
+  @Post("/register/:id", [param("id").exists()])
+  async postRegistration(@Request() req: RequestWithAnonymous, @Response() res) {
+  	const { formId } = matchedData(req);
+
+  	const form = await Database.manager.findOneBy(Form, { id: formId });
+
+  	if (!form) {
+  		res.json(ResponseData.build("FAILED", null, "Could not find form"));
+  		return;
+  	}
+
   	const data: FormRegistration = req.body;
   	console.log(data);
   	const answer = new FormAnswer();
+  	answer.form = form;
   	answer.values = [];
+
+  	if (req.email) {
+  		answer.email = req.email;
+  	} else {
+  		answer.user = req.user;
+  	}
 
   	for (const key in data) {
   		const storeAnswerValue = async (key: string, formValue: string) => {
@@ -116,5 +135,39 @@ export default class ActivityController {
   	await Database.manager.save(answer);
 
   	res.json(ResponseData.build("OK", null));
+  }
+
+  @AuthenticatedAnonymous()
+  @Get("/response/:id", [param("id").exists()])
+  async getResponse(@Request() req: RequestWithAnonymous, @Response() res, @Next() next) {
+  	const { id } = matchedData(req);
+  	const where: FindOptionsWhere<FormAnswer> = { form: { id } };
+
+  	if (req.email) {
+  		where.email = req.email;
+  	} else if (req.user) {
+  		where.user = req.user;
+  	} else {
+  		next(new Error("No identification found in request!"));
+  	}
+
+  	const formAnswer = await Database.manager.findOneBy(FormAnswer, where);
+
+  	if (!formAnswer) {
+  		res.json(ResponseData.build("OK", null));
+  		return;
+  	}
+
+  	const answers = await Database.manager.find(FormAnswerValue, {
+  		select: {
+  			question: {
+  				id: true
+  			}
+  		},
+  		where: { answer: formAnswer },
+  		relations: { question: true }
+  	});
+
+  	res.json(ResponseData.build("OK", answers));
   }
 }

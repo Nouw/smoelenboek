@@ -1,6 +1,7 @@
-import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
 import {User} from "./User";
 import {FormAnswerValue} from "./FormAnswerValue";
+import {Form} from "./Form";
 
 @Entity()
 export class FormAnswer {
@@ -8,14 +9,15 @@ export class FormAnswer {
     id: string;
 
   @Column({ type: "text", nullable: true })
-    firstName?: string;
-
-  @Column({ type: "text", nullable: true })
-    lastName?: string;
+    email?: string;
 
   @OneToOne(() => User)
   @JoinColumn()
     user?: Relation<User>;
+
+  @ManyToOne(() => Form)
+  @JoinColumn([{ name: 'form_id', referencedColumnName: 'id' }])
+    form: Relation<Form>;
 
   @OneToMany(() => FormAnswerValue, formAnswerData => formAnswerData.answer, { cascade: true })
     values: Relation<FormAnswerValue[]>;

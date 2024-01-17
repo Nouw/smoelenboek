@@ -2,8 +2,10 @@ import { attachMiddleware } from "@decorators/express";
 import AuthService from "../Services/AuthService";
 import { Database } from "../Database";
 import { PermissionName, Permissions, Role, Roles, User } from "smoelenboek-types";
-import { RequestE } from "../Utilities/RequestE";
+import { RequestE, RequestWithAnonymous } from "../Utilities/RequestE";
 import { RolesHierarchy } from "smoelenboek-types";
+import { NextFunction } from "express";
+import { isEmail } from "../Utilities/Middleware";
 /**
  * @param fail set to false if no error should be thrown
  * @constructor
@@ -15,44 +17,8 @@ export function Authenticated(fail = true) {
 		descriptor: PropertyDescriptor,
 	) {
 		attachMiddleware(target, propertyKey, async (req: RequestE, res, next) => {
-			const authService = new AuthService();
-
-			const authToken = req.headers.authorization;
-
-			if (!authToken) {
-				if (!fail) {
-					return next();
-				}
-
-				return next(new Error("No auth token provider!"));
-			}
-
-			try {
-				const decodedToken = authService.decodeToken(authToken);
-
-				if (Date.now() >= decodedToken.exp * 1000) {
-					return next(new Error("Auth token has expired!"));
-				}
-
-				const user = await Database
-					.createQueryBuilder(User, "u")
-					.leftJoinAndSelect("u.roles", "r")	
-					.where("u.id = :id", { id: decodedToken.id })
-					.andWhere("u.email = :email", { email: decodedToken.email })
-					.getOne();
-
-				if (!user && fail) {
-					return next(new Error("User not found!"));
-				}
-
-				req.user = user;
-
-				return next();
-			} catch (e) {
-				console.error(e);
-
-				next(e);
-			}
+			req.user = await authenticateUser(req.headers.authorization, next);
+			return;
 		});
 	};
 }
@@ -81,6 +47,68 @@ export function Guard(requiredPermission: PermissionName) {
 			}
 		});
 	};
+}
+
+export function AuthenticatedAnonymous(fail = true)  {
+	return function (
+		target: any,
+		propertyKey: string,
+		descriptor: PropertyDescriptor,
+	) {
+		attachMiddleware(target, propertyKey, async (req: RequestWithAnonymous, res, next) => {
+			const token = req.headers.authorization;
+			console.log(token);
+			if (isEmail(token)) {
+				req.email = token;
+			} else {
+				const user = await authenticateUser(token, next);
+				req.user = user;
+			}
+
+			next();
+		});
+	};
+}
+
+async function authenticateUser(authToken: string, next: NextFunction): Promise<User> {
+	const authService = new AuthService();
+
+	if (!authToken) {
+		if (!fail) {
+			next();
+			return;
+		}
+
+		next(new Error("No auth token provider!"));
+		return;
+	}
+
+	try {
+		const decodedToken = authService.decodeToken(authToken);
+
+		if (Date.now() >= decodedToken.exp * 1000) {
+			next(new Error("Auth token has expired!"));
+			return;
+		}
+
+		const user = await Database
+			.createQueryBuilder(User, "u")
+			.leftJoinAndSelect("u.roles", "r")
+			.where("u.id = :id", { id: decodedToken.id })
+			.andWhere("u.email = :email", { email: decodedToken.email })
+			.getOne();
+
+		if (!user && fail) {
+			next(new Error("User not found!"));
+			return;
+		}
+
+		return user;
+	} catch (e) {
+		console.error(e);
+
+		next(e);
+	}
 }
 
 export function IsAdmin(user: User) {
