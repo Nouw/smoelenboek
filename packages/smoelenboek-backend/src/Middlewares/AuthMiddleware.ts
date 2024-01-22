@@ -17,8 +17,8 @@ export function Authenticated(fail = true) {
 		descriptor: PropertyDescriptor,
 	) {
 		attachMiddleware(target, propertyKey, async (req: RequestE, res, next) => {
-			req.user = await authenticateUser(req.headers.authorization, next);
-			return;
+			req.user = await authenticateUser(req.headers.authorization, next, fail);
+			next();
 		});
 	};
 }
@@ -39,7 +39,7 @@ export function Guard(requiredPermission: PermissionName) {
 
 				RolesHierarchy.get(role.role).forEach((childRole: Roles) => userRoles.add(childRole));
 			}
-
+			console.log(requiredRole);
 			if (requiredRole.some((r) => userRoles.has(r))) {
 				next();
 			} else {
@@ -70,7 +70,7 @@ export function AuthenticatedAnonymous(fail = true)  {
 	};
 }
 
-async function authenticateUser(authToken: string, next: NextFunction): Promise<User> {
+async function authenticateUser(authToken: string, next: NextFunction, fail = true): Promise<User> {
 	const authService = new AuthService();
 
 	if (!authToken) {
