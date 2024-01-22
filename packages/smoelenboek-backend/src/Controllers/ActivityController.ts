@@ -2,10 +2,12 @@ import { Controller, Get, Next, Post, Request, Response } from "@decorators/expr
 import { Activity, Form, FormAnswer, FormAnswerValue, FormQuestion, FormQuestionItem } from "smoelenboek-types";
 import { Database } from "../Database";
 import { Authenticated, AuthenticatedAnonymous, Guard } from "../Middlewares/AuthMiddleware";
-import { matchedData, param } from "express-validator";
+import { body, matchedData, param, validationResult } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
 import { RequestWithAnonymous } from "../Utilities/RequestE";
 import { FindOptionsWhere } from "typeorm";
+import { GoogleSpreadsheet } from "google-spreadsheet";
+import { serviceAccountAuth } from "../Utilities/Google";
 
 type FormRegistration = {
   [key: string]: string | string[]
@@ -169,5 +171,39 @@ export default class ActivityController {
   	});
 
   	res.json(ResponseData.build("OK", answers));
+  }
+
+  @Authenticated()
+  @Guard("activity.create")
+  @Post("/form/sheet/:formId", [param("formId").exists()])
+  async createForm(@Request() req, @Response() res, @Next() next) {
+  	const errors = validationResult(req);
+
+  	if (!errors.isEmpty()) {
+  		next(new Error(errors.array()[0].msg));
+  		return;
+  	}
+
+  	const { id } = matchedData(req);
+
+  	const form = await Database.manager.findOne(Form, { relations: { activity: true }, where: { id } });
+
+  	if (form.sheetId !== undefined) {
+  		next(new Error("This form already has a sheet linked to it!"));
+  		return;
+  	}
+
+  	if (!form) {
+  		next(new Error(`Could not find form with id: ${id}`));
+  		return;
+  	}
+
+  	const doc = await GoogleSpreadsheet.createNewSpreadsheetDocument(serviceAccountAuth, { title: form.activity.title });
+
+  	await doc.setPublicAccessLevel("writer");
+
+  	form.sheetId = doc.spreadsheetId;
+
+  	res.json(ResponseData.build("OK", { sheetId: doc.spreadsheetId }, "Created google sheet!"));
   }
 }

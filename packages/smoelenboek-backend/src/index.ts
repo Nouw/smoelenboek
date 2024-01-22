@@ -11,14 +11,12 @@ import { Container } from "@decorators/di";
 import { Database } from "./Database";
 import CommitteeController from "./Controllers/CommitteeController";
 import DocumentController from "./Controllers/DocumentController";
-import FormController from "./Controllers/FormController";
 import cors from "cors";
 import TeamController from "./Controllers/TeamController";
 import UserController from "./Controllers/UserController";
 import SeasonController from "./Controllers/SeasonController";
 import ProtototoController from "./Controllers/ProtototoController";
 import JobController from "./Controllers/JobController";
-import TeamPhotoQueue from "./Queues/TeamPhotoQueue";
 import ActivityController from "./Controllers/ActivityController";
 
 
@@ -31,7 +29,6 @@ const controllers: Type[] = [
 	AuthController,
 	CommitteeController,
 	DocumentController,
-	FormController,
 	TeamController,
 	UserController,
 	SeasonController,

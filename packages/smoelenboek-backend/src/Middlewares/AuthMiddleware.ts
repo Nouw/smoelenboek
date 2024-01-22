@@ -39,8 +39,8 @@ export function Guard(requiredPermission: PermissionName) {
 
 				RolesHierarchy.get(role.role).forEach((childRole: Roles) => userRoles.add(childRole));
 			}
-			console.log(requiredRole);
-			if (requiredRole.some((r) => userRoles.has(r))) {
+
+			if (userRoles.has(requiredRole)) {
 				next();
 			} else {
 				next(new Error("User does not have required permissions!"));
@@ -57,11 +57,11 @@ export function AuthenticatedAnonymous(fail = true)  {
 	) {
 		attachMiddleware(target, propertyKey, async (req: RequestWithAnonymous, res, next) => {
 			const token = req.headers.authorization;
-			console.log(token);
+
 			if (isEmail(token)) {
 				req.email = token;
 			} else {
-				const user = await authenticateUser(token, next);
+				const user = await authenticateUser(token, next, fail);
 				req.user = user;
 			}
 

@@ -5442,6 +5442,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.4.0":
+  version: 1.6.5
+  resolution: "axios@npm:1.6.5"
+  dependencies:
+    follow-redirects: ^1.15.4
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: e28d67b2d9134cb4608c44d8068b0678cfdccc652742e619006f27264a30c7aba13b2cd19c6f1f52ae195b5232734925928fb192d5c85feea7edd2f273df206d
+  languageName: node
+  linkType: hard
+
 "axios@npm:^1.6.0":
   version: 1.6.1
   resolution: "axios@npm:1.6.1"
@@ -8870,6 +8881,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"follow-redirects@npm:^1.15.4":
+  version: 1.15.5
+  resolution: "follow-redirects@npm:1.15.5"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: 5ca49b5ce6f44338cbfc3546823357e7a70813cecc9b7b768158a1d32c1e62e7407c944402a918ea8c38ae2e78266312d617dc68783fac502cbb55e1047b34ec
+  languageName: node
+  linkType: hard
+
 "for-each@npm:^0.3.3":
   version: 0.3.3
   resolution: "for-each@npm:0.3.3"
@@ -9434,6 +9455,21 @@ __metadata:
   bin:
     gp12-pem: build/src/bin/gp12-pem.js
   checksum: 59a5026331ea67455672e83770da29f09d979f02e06cb2227ea5916f8cca437887c2d3869f2602a686dc84437886ae9d2ac010780803cbe8e5f161c2d02d8efd
+  languageName: node
+  linkType: hard
+
+"google-spreadsheet@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "google-spreadsheet@npm:4.1.1"
+  dependencies:
+    axios: ^1.4.0
+    lodash: ^4.17.21
+  peerDependencies:
+    google-auth-library: ^8.8.0 || ^9.0.0
+  peerDependenciesMeta:
+    google-auth-library:
+      optional: true
+  checksum: 273ed0c150f69e8a11a1ea4bf621c8c608debbbd9b470e55f270adb241e1a29ead5aff258bea9d7c70081b76d64c851b48726dfaf7c08d22789b4af8722fc571
   languageName: node
   linkType: hard
 
@@ -17347,6 +17383,7 @@ __metadata:
     express: ^4.18.2
     express-validator: ^7.0.1
     google-auth-library: ^8.8.0
+    google-spreadsheet: ^4.1.1
     jsonwebtoken: ^9.0.0
     lexical: ^0.11.1
     mailgen: ^2.0.27
