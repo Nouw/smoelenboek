@@ -1,5 +1,5 @@
 import {API, Response} from "../API.ts";
-import {Activity, Form} from "smoelenboek-types";
+import {Activity, Form, FormAnswer} from "smoelenboek-types";
 
 interface PostActivityRequest {
   activity: Partial<Activity>
@@ -49,6 +49,18 @@ export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']
         method: 'POST',
         body: data.data,
       })
+    }),
+    postFormSheet: builder.mutation<Response<{ sheetId: string }>, string>({
+      query: (id) => ({
+        url: `activity/form/sheet/${id}`,
+        method: 'POST',
+      })
+    }),
+    getFormResponses: builder.query<Response<FormAnswer[]>, string>({
+      query: (id) => ({
+        url: `activity/responses/${id}`,
+        method: 'GET'
+      })
     })
   })
 });
@@ -58,5 +70,7 @@ export const {
   useGetActivitiesQuery,
   useGetActivityQuery,
   useLazyGetFormQuery,
-  usePostRegistrationMutation
+  usePostRegistrationMutation,
+  usePostFormSheetMutation,
+  useLazyGetFormResponsesQuery,
 } = activityApiSlice;

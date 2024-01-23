@@ -188,13 +188,13 @@ export default class ActivityController {
 
   	const form = await Database.manager.findOne(Form, { relations: { activity: true }, where: { id } });
 
-  	if (form.sheetId !== undefined) {
-  		next(new Error("This form already has a sheet linked to it!"));
+  	if (!form) {
+  		next(new Error(`Could not find form with id: ${id}`));
   		return;
   	}
 
-  	if (!form) {
-  		next(new Error(`Could not find form with id: ${id}`));
+  	if (form.sheetId !== null) {
+  		next(new Error("This form already has a sheet linked to it!"));
   		return;
   	}
 
@@ -204,6 +204,34 @@ export default class ActivityController {
 
   	form.sheetId = doc.spreadsheetId;
 
+  	await Database.manager.save(form);
+
   	res.json(ResponseData.build("OK", { sheetId: doc.spreadsheetId }, "Created google sheet!"));
+  }
+
+  @Authenticated()
+  @Guard("activity.create")
+  @Get("/responses/:id", [param("id").exists()])
+  async getActivityResponses(@Request() req, @Response() res, @Next() next) {
+  	const errors = validationResult(req);
+
+  	if (!errors.isEmpty()) {
+  		next(new Error(errors.array()[0].msg));
+  		return;
+  	}
+
+  	const { id } = matchedData(req);
+
+  	const responses = await Database.manager.find(FormAnswer, {
+  		select: {
+  			user: {
+  				firstName: true,
+  				lastName: true,
+  				email: true
+  			}
+  		}, relations: { user: true, values: true }, where: { form: { id } }
+  	});
+
+  	res.json(ResponseData.build("OK", responses));
   }
 }
