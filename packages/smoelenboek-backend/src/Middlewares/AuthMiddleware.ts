@@ -10,96 +10,96 @@ import { User } from "smoelenboek-types";
  * @constructor
  */
 export function Authenticated(fail = true) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    attachMiddleware(target, propertyKey, async (req: RequestE, res, next) => {
-      const authService = new AuthService();
+	return function (
+		target: any,
+		propertyKey: string,
+		descriptor: PropertyDescriptor,
+	) {
+		attachMiddleware(target, propertyKey, async (req: RequestE, res, next) => {
+			const authService = new AuthService();
 
-      const authToken = req.headers.authorization;
+			const authToken = req.headers.authorization;
 
-      if (!authToken) {
-        if (!fail) {
-          return next();
-        }
+			if (!authToken) {
+				if (!fail) {
+					return next();
+				}
 
-        return next(new Error("No auth token provider!"));
-      }
+				return next(new Error("No auth token provider!"));
+			}
 
-      try {
-        const decodedToken = authService.decodeToken(authToken);
+			try {
+				const decodedToken = authService.decodeToken(authToken);
 
-        if (Date.now() >= decodedToken.exp * 1000) {
-          return next(new Error("Auth token has expired!"));
-        }
+				if (Date.now() >= decodedToken.exp * 1000) {
+					return next(new Error("Auth token has expired!"));
+				}
 
-        const user = await Database
-          .createQueryBuilder(User, "u")
-          .innerJoinAndSelect("u.roles", "r")
-          .innerJoinAndSelect("r.permissions", "p")
-          .where("u.id = :id", { id: decodedToken.id })
-          .andWhere("u.email = :email", { email: decodedToken.email })
-          .getOne();
+				const user = await Database
+					.createQueryBuilder(User, "u")
+					.innerJoinAndSelect("u.roles", "r")
+					.innerJoinAndSelect("r.permissions", "p")
+					.where("u.id = :id", { id: decodedToken.id })
+					.andWhere("u.email = :email", { email: decodedToken.email })
+					.getOne();
 
-        if (!user && fail) {
-          return next(new Error("User not found!"));
-        }
+				if (!user && fail) {
+					return next(new Error("User not found!"));
+				}
 
-        req.user = user;
+				req.user = user;
 
-        return next();
-      } catch (e) {
-        console.error(e);
+				return next();
+			} catch (e) {
+				console.error(e);
 
-        next(e);
-      }
-    });
-  };
+				next(e);
+			}
+		});
+	};
 }
 
 export function Guard(requiredPermissions: string[]) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    attachMiddleware(target, propertyKey, (req: RequestE, res, next) => {
-      let permissions = [];
+	return function (
+		target: any,
+		propertyKey: string,
+		descriptor: PropertyDescriptor,
+	) {
+		attachMiddleware(target, propertyKey, (req: RequestE, res, next) => {
+			let permissions = [];
 
-      for (const role of req.user.roles) {
-        const names = role.permissions.map((permission) => permission.name);
+			for (const role of req.user.roles) {
+				const names = role.permissions.map((permission) => permission.name);
 
-        if (names.includes("ALL")) {
-          next();
-          return;
-        }
+				if (names.includes("ALL")) {
+					next();
+					return;
+				}
 
-        permissions = [...permissions, ...names];
-      }
+				permissions = [...permissions, ...names];
+			}
 
-      if (requiredPermissions.every((val) => permissions.includes(val))) {
-        next();
-      } else {
-        next(new Error("User does not have required permissions!"));
-      }
-    });
-  };
+			if (requiredPermissions.every((val) => permissions.includes(val))) {
+				next();
+			} else {
+				next(new Error("User does not have required permissions!"));
+			}
+		});
+	};
 }
 
 export function IsAdmin(user: User) {
-  if (!user.roles) {
-    return false;
-  }
+	if (!user.roles) {
+		return false;
+	}
 
-  for (const role of user.roles) {
-    const names = role.permissions.map((permission) => permission.name);
+	for (const role of user.roles) {
+		const names = role.permissions.map((permission) => permission.name);
 
-    if (names.includes("ALL") || role.name === "ADMIN") {
-      return true;
-    }
-  }
+		if (names.includes("ALL") || role.name === "ADMIN") {
+			return true;
+		}
+	}
 
-  return false;
+	return false;
 }

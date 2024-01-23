@@ -24,7 +24,7 @@ export default class DocumentController {
 	@Get("/", [query("raw").toBoolean()])
 	async getCategories(@Request() req: RequestE, @Response() res) {
 		const { raw } = matchedData(req);
-    
+
 		const categories = await Database.manager.find(Category, { order: { pinned: "DESC" } });
 
 		if (raw) {
@@ -37,16 +37,20 @@ export default class DocumentController {
 
 		const data = {};
 
-		for (const season of seasons) { 
-      if (moment(season.endDate).isBefore(req.user.joinDate) && !IsAdmin(req.user)) {
-        continue;
-      }
+		for (const season of seasons) {
+			if (moment(season.endDate).isBefore(req.user.joinDate) && !IsAdmin(req.user)) {
+				continue;
+			}
 
 			data[season.name] = { categories: [], ...season };
 		}
 
 		for (const category of categories) {
 			const season = seasons.find((a) => moment(a.startDate).isBefore(category.created) && moment(a.endDate).isAfter(category.created));
+			// Skip because the user does not have access to the season
+			if (data[season.name] === undefined) {
+				continue;
+			}
 
 			data[season.name].categories.push({ id: category.id, name: category.name });
 		}
@@ -75,8 +79,8 @@ export default class DocumentController {
 		const fileEntities = [];
 
 		for (const file of files) {
-			const folder = crypto.createHash('md5').update(category.name).digest('hex'); 
-      const filename = await this.oracle.upload(file, folder, category.type === "documents");
+			const folder = crypto.createHash("md5").update(category.name).digest("hex");
+			const filename = await this.oracle.upload(file, folder, category.type === "documents");
 
 			fileEntities.push({
 				path: `${folder}/${filename}`,
@@ -149,7 +153,7 @@ export default class DocumentController {
 			return;
 		}
 
-		if (name) { 
+		if (name) {
 			// TODO: Check error handling?
 			await this.oracle.renameFolder(category.name, name);
 			category.name = name;
