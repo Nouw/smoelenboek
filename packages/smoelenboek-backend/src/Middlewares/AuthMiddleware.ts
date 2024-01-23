@@ -3,7 +3,6 @@ import AuthService from "../Services/AuthService";
 import { Database } from "../Database";
 import { User } from "smoelenboek-types";
 import { RequestE } from "../Utilities/RequestE";
-import { User } from "smoelenboek-types";
 
 /**
  * @param fail set to false if no error should be thrown
