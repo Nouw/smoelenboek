@@ -117,7 +117,7 @@ export function IsAdmin(user: User) {
 	}
 
 	for (const role of user.roles) {
-		if (role.name === Roles.ADMIN) {
+		if (role.role === Roles.ADMIN) {
 			return true;
 		}
 	}

@@ -1,20 +1,43 @@
-import { Controller, Get, Next, Post, Request, Response } from "@decorators/express";
-import { Activity, Form, FormAnswer, FormAnswerValue, FormQuestion, FormQuestionItem } from "smoelenboek-types";
+import {
+	Controller,
+	Get,
+	Next,
+	Post,
+	Request,
+	Response,
+} from "@decorators/express";
+import {
+	Activity,
+	Form,
+	FormAnswer,
+	FormAnswerValue,
+	FormQuestion,
+	FormQuestionItem,
+} from "smoelenboek-types";
 import { Database } from "../Database";
-import { Authenticated, AuthenticatedAnonymous, Guard } from "../Middlewares/AuthMiddleware";
+import {
+	Authenticated,
+	AuthenticatedAnonymous,
+	Guard,
+} from "../Middlewares/AuthMiddleware";
 import { body, matchedData, param, validationResult } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
 import { RequestWithAnonymous } from "../Utilities/RequestE";
 import { FindOptionsWhere } from "typeorm";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { serviceAccountAuth } from "../Utilities/Google";
+import ActivityService from "../Services/ActivityService";
+import GoogleSpreadsheetService from "../Services/GoogleSpreadsheetService";
 
-type FormRegistration = {
-  [key: string]: string | string[]
-}
+export type FormRegistration = {
+  [key: string]: string | string[];
+};
 
 @Controller("/activity")
 export default class ActivityController {
+	private readonly activityServer = new ActivityService();
+	private readonly spreadsheetService = new GoogleSpreadsheetService();
+
   @Get("/")
 	async getActivities(@Request() req, @Response() res) {
 		const activities = await Database.manager.find(Activity, {});
@@ -27,9 +50,10 @@ export default class ActivityController {
   	const { id } = matchedData(req);
 
   	const activity = await Database.manager.findOne(Activity, {
-  		where: { id }, relations: {
+  		where: { id },
+  		relations: {
   			form: true,
-  		}
+  		},
   	});
 
   	res.json(ResponseData.build("OK", activity));
@@ -38,7 +62,10 @@ export default class ActivityController {
   @Get("/form/:id", [param("id").exists()])
   async getForm(@Request() req, @Response() res) {
   	const { id } = matchedData(req);
-  	const form: Form = await Database.manager.findOne(Form, { where: { id }, relations: { questions: true } });
+  	const form: Form = await Database.manager.findOne(Form, {
+  		where: { id },
+  		relations: { questions: true },
+  	});
 
   	for (const key in form.questions) {
   		const question = form.questions[key];
@@ -47,7 +74,9 @@ export default class ActivityController {
   			continue;
   		}
 
-  		const items = await Database.manager.find(FormQuestionItem, { where: { question } });
+  		const items = await Database.manager.find(FormQuestionItem, {
+  			where: { question },
+  		});
 
   		form.questions[key].items = items;
   	}
@@ -93,10 +122,14 @@ export default class ActivityController {
 
   @AuthenticatedAnonymous()
   @Post("/register/:id", [param("id").exists()])
-  async postRegistration(@Request() req: RequestWithAnonymous, @Response() res) {
+  async postRegistration(
+    @Request() req: RequestWithAnonymous,
+    @Response() res
+  ) {
+  	debugger;
   	const { formId } = matchedData(req);
 
-  	const form = await Database.manager.findOneBy(Form, { id: formId });
+  	const form = await Database.manager.findOne(Form, { where: { id: formId }, relations: { questions: true } });
 
   	if (!form) {
   		res.json(ResponseData.build("FAILED", null, "Could not find form"));
@@ -104,7 +137,6 @@ export default class ActivityController {
   	}
 
   	const data: FormRegistration = req.body;
-  	console.log(data);
   	const answer = new FormAnswer();
   	answer.form = form;
   	answer.values = [];
@@ -118,7 +150,7 @@ export default class ActivityController {
   	for (const key in data) {
   		const storeAnswerValue = async (key: string, formValue: string) => {
   			const value = new FormAnswerValue();
-  			value.question = await Database.manager.findOneBy(FormQuestion, { id: key });
+  			value.question = form.questions.find((q) => q.id === key)!;
   			value.value = formValue;
   			value.answer = answer;
 
@@ -133,6 +165,9 @@ export default class ActivityController {
   			answer.values.push(await storeAnswerValue(key, data[key] as string));
   		}
   	}
+  	if (form.sheetId) {
+  		await this.activityServer.addRegistrationToSheet(form, answer);
+  	}
 
   	await Database.manager.save(answer);
 
@@ -141,7 +176,11 @@ export default class ActivityController {
 
   @AuthenticatedAnonymous()
   @Get("/response/:id", [param("id").exists()])
-  async getResponse(@Request() req: RequestWithAnonymous, @Response() res, @Next() next) {
+  async getResponse(
+    @Request() req: RequestWithAnonymous,
+    @Response() res,
+    @Next() next
+  ) {
   	const { id } = matchedData(req);
   	const where: FindOptionsWhere<FormAnswer> = { form: { id } };
 
@@ -163,11 +202,11 @@ export default class ActivityController {
   	const answers = await Database.manager.find(FormAnswerValue, {
   		select: {
   			question: {
-  				id: true
-  			}
+  				id: true,
+  			},
   		},
   		where: { answer: formAnswer },
-  		relations: { question: true }
+  		relations: { question: true },
   	});
 
   	res.json(ResponseData.build("OK", answers));
@@ -186,7 +225,10 @@ export default class ActivityController {
 
   	const { id } = matchedData(req);
 
-  	const form = await Database.manager.findOne(Form, { relations: { activity: true }, where: { id } });
+  	const form = await Database.manager.findOne(Form, {
+  		relations: { activity: true, questions: true },
+  		where: { id },
+  	});
 
   	if (!form) {
   		next(new Error(`Could not find form with id: ${id}`));
@@ -198,15 +240,26 @@ export default class ActivityController {
   		return;
   	}
 
-  	const doc = await GoogleSpreadsheet.createNewSpreadsheetDocument(serviceAccountAuth, { title: form.activity.title });
-
+  	const doc = await GoogleSpreadsheet.createNewSpreadsheetDocument(
+  		serviceAccountAuth,
+  		{ title: form.activity.title }
+  	);
   	await doc.setPublicAccessLevel("writer");
+
+  	await this.spreadsheetService.setNameOfDefaultSheet(doc);
+  	await this.spreadsheetService.setSheetHeaders(form, doc);
 
   	form.sheetId = doc.spreadsheetId;
 
   	await Database.manager.save(form);
 
-  	res.json(ResponseData.build("OK", { sheetId: doc.spreadsheetId }, "Created google sheet!"));
+  	res.json(
+  		ResponseData.build(
+  			"OK",
+  			{ sheetId: doc.spreadsheetId },
+  			"Created google sheet!"
+  		)
+  	);
   }
 
   @Authenticated()
@@ -227,11 +280,23 @@ export default class ActivityController {
   			user: {
   				firstName: true,
   				lastName: true,
-  				email: true
-  			}
-  		}, relations: { user: true, values: true }, where: { form: { id } }
+  				email: true,
+  			},
+  		},
+  		relations: { user: true, values: true },
+  		where: { form: { id } },
   	});
 
   	res.json(ResponseData.build("OK", responses));
+  }
+
+  @Post("/delete/sheet/:id", [param("id").exists()])
+  async deleteSpreadSheet(@Request() req, @Response() res) {
+  	const { id } = matchedData(req);
+
+  	const doc = await new GoogleSpreadsheet(id, serviceAccountAuth);
+  	await doc.delete();
+
+  	res.json("Deleted sheet!");
   }
 }

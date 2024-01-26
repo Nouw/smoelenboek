@@ -1,5 +1,7 @@
 import { JWT } from "google-auth-library";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import creds from "../../google_service_account.json";
 
 const SCOPES = [

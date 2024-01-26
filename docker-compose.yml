@@ -1,6 +1,6 @@
 version: '3'
 
-services: 
+services:
   database:
     container_name: smoelenboek-mysql
     image: mysql
@@ -16,12 +16,14 @@ services:
       - 3307:3306
     volumes:
       - db-data:/var/lib/mysql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - smoelenboek
   backend:
     container_name: smoelenboek-backend
     restart: always
-    image: node:20 
+    image: node:20
     working_dir: /app
     volumes:
       - .:/app
@@ -33,7 +35,7 @@ services:
     ports:
       - 8080:8080
     networks:
-        - smoelenboek 
+        - smoelenboek
     extra_hosts:
       - "host.docker.internal:host-gateway"
   frontend:
@@ -43,7 +45,7 @@ services:
     working_dir: /app
     command: ./bin/run_frontend_dev.sh
     volumes:
-      - .:/app 
+      - .:/app
       - /app/node_modules
     depends_on:
       - backend

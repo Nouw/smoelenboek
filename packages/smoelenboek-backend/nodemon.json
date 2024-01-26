@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": "ts,json",
   "ignore": ["src/**/*.spec.ts"],
-  "exec": "yarn run ts-node --swc ./src/index.ts --inspect"
+  "exec": "SWCRC=true node -r @swc-node/register --inspect=0.0.0.0 src/index.ts"
 }

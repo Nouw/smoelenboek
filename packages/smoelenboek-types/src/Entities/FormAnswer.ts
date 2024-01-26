@@ -1,4 +1,14 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Relation
+} from "typeorm";
 import {User} from "./User";
 import {FormAnswerValue} from "./FormAnswerValue";
 import {Form} from "./Form";
@@ -21,4 +31,7 @@ export class FormAnswer {
 
   @OneToMany(() => FormAnswerValue, formAnswerData => formAnswerData.answer, { cascade: true })
     values: Relation<FormAnswerValue[]>;
+
+  @CreateDateColumn()
+    created: Date;
 }

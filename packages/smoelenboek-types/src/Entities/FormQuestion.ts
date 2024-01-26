@@ -19,6 +19,9 @@ export class FormQuestion {
   @Column({ nullable: true })
     paragraph?: boolean;
 
+  @Column()
+    key: number;
+
   @OneToMany(() => FormQuestionItem, (item) => item, { cascade: true } )
   @JoinTable()
     items: Relation<FormQuestionItem[]>;
