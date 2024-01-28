@@ -25,7 +25,7 @@ export const Add: React.FC<AddProps> = () => {
 
   const [createSeason] = useAddProtototoSeasonMutation();
 
-  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+  { }
   async function submit(values: { [p: string]: any; setSubmitting: (isSubmitting: boolean) => void }) {
     try {
       const res = await createSeason({ startDate: values.startDate, endDate: values.endDate, tikkie: values.tikkie}).unwrap();

@@ -2,7 +2,7 @@ import {API, Response} from "../API";
 import {User} from "smoelenboek-types";
 
 interface GetProfileResponse extends User {
-  // eslint-disable-next-line
+   
   seasons: any // TODO: Add type for this
 }
 

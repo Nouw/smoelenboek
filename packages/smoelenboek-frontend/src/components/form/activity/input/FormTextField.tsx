@@ -1,7 +1,7 @@
 import React from "react";
 import {TextField} from "@mui/material";
 import {FormQuestion} from "smoelenboek-types";
-import {Field, useField} from "formik";
+import {useField} from "formik";
 
 interface FormTextFieldProps {
   question: FormQuestion

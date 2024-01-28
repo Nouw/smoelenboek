@@ -14,7 +14,7 @@ const initialState: AuthState = {
   language: 'nl',
   accessToken: undefined,
   refreshToken: undefined,
-  roles: [],
+  roles: [Roles.ANONYMOUS],
 }
 
 const authSlice = createSlice({

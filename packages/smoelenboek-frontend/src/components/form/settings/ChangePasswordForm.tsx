@@ -31,7 +31,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
       await trigger({ newPassword: values.newPassword, currentPassword: values.currentPassword}).unwrap();
 
       snackbar.openSnackbar(t("message.settings.success"), Severity.SUCCESS);
-      // eslint-disable-next-line
+       
     } catch (e: any) {
       console.error(e);
 

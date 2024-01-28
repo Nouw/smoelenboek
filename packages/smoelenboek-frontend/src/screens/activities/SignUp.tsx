@@ -2,7 +2,7 @@ import React from "react";
 import {useGetActivityQuery, useLazyGetFormQuery, usePostRegistrationMutation} from "../../api/endpoints/activity.ts";
 import {useParams} from "react-router-dom";
 import {Loading} from "../../components/Loading.tsx";
-import {Box, Button, Card, CardContent, Divider, Paper, Stack, Typography} from "@mui/material";
+import {Box, Card, CardContent, Divider, Paper, Stack, Typography} from "@mui/material";
 import {Info} from "../../components/activity/Info.tsx";
 import ReactHtmlParser from "react-html-parser";
 import {FormTextField} from "../../components/form/activity/input/FormTextField.tsx";

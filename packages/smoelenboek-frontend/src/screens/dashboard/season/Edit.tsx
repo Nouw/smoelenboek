@@ -44,7 +44,7 @@ export const Edit: React.FC<EditProps> = () => {
     }
   }, [dispatch, getSeasons, season])
 
-  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+  { }
   async function submit(values: { [p: string]: any; setSubmitting: (isSubmitting: boolean) => void }) {
     try {
       const res = await putSeason({ id: params.id ?? -1, endDate: values.endDate, startDate: values.startDate}).unwrap();

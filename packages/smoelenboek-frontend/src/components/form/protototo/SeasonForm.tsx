@@ -12,10 +12,10 @@ export interface SeasonFormValues extends FormikValues {
 }
 
 type SeasonFormProps<T> = {
-  // eslint-disable-next-line
+   
   schema: Yup.ObjectSchema<any>,
   initialValues: T
-  // eslint-disable-next-line
+   
   submit: (values: { [p: string]: any; setSubmitting: (isSubmitting: boolean) => void }) => void,
   heading?: string,
   fields?: (props: FormikProps<T>) => JSX.Element[] | JSX.Element,

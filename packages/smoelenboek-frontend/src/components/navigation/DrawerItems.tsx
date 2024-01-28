@@ -117,7 +117,7 @@ const adminItems: DrawerItem[] = [
       },
       {
         title: "Activities",
-        "navigateTo": "activity/"
+        navigateTo: "activity/"
       }
     ]
   },
@@ -247,15 +247,11 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
   const location = useLocation();
 
   React.useEffect(() => {
-    if (!roles) {
+    if (isAnonymous) {
       return;
     }
 
-		let newItems: DrawerItem[] = [...publicItems];
-
-		if (!isAnonymous) {
-			newItems = [...newItems, ...defaultItems]
-		}
+		let newItems: DrawerItem[] = [...publicItems, ...defaultItems]
 
     if (
       (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) &&

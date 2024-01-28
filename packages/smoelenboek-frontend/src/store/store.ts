@@ -1,17 +1,10 @@
 import {
   combineReducers,
   configureStore,
-  getDefaultMiddleware,
 } from "@reduxjs/toolkit";
 import authSlice from "./feature/auth.slice";
 import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
   persistReducer,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { API } from "../api/API";
@@ -40,10 +33,10 @@ export const store = configureStore({
   reducer: reducers,
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({
-      serializableCheck: false, 
-    }),	
-		API.middleware,	
-  ], 
+      serializableCheck: false,
+    }),
+		API.middleware,
+  ],
 });
 
 export type AppDispatch = typeof store.dispatch;

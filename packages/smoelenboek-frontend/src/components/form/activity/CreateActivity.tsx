@@ -1,6 +1,8 @@
+
+
 import React from "react";
-import {Field, useField} from "formik";
-import {Card, CardContent, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
+import {Field, useField, FormikErrors, FormikTouched} from "formik";
+import {Card, CardContent, Stack, TextField} from "@mui/material";
 import {StyledTextInput} from "../StyledTextInput.tsx";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
 import moment from "moment";
@@ -27,7 +29,7 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
               <TextField label="Location" fullWidth value={locationFieldProps.value} onChange={(e) => locationFieldHelpers.setValue(e.target.value)} />
               <TextField label="Maximum" fullWidth value={maxFieldProps.value} onChange={(e) => maxFieldHelpers.setValue(e.target.value)} type="number" />
               <Field name="date">
-                {({form: { touched, errors,  }}) => (
+                {({form: { touched, errors,  }} : {form: { touched: FormikTouched<any>, errors: FormikErrors<any>}}) => (
                   <DateTimePicker
                     label={"date"}
                     format="HH:mm DD-MM-YYYY"
@@ -37,8 +39,9 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                       textField: {
                         variant: 'outlined',
                         error: touched.startDate && Boolean(errors.startDate),
-                        helperText: <p>{errors.startDate}</p> }
-                    }}
+                        helperText:(errors.startDate && typeof errors.startDate === 'string') ? <p>{errors.startDate}</p> : null
+                      }}
+                    }
                     viewRenderers={{
                       // hours: renderTimeViewClock,
                       // minutes: renderTimeViewClock,
@@ -47,8 +50,8 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                   />
                 )}
               </Field>
-              <Field name="openRegistration">
-                {({form: { touched, errors,  }}) => (
+              <Field name="registrationOpen">
+                {({form: { touched, errors,  }} : {form: { touched: FormikTouched<any>, errors: FormikErrors<any>}}) => (
                   <DateTimePicker
                     label={"openRegistration"}
                     format="HH:mm DD-MM-YYYY"
@@ -57,8 +60,8 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                     slotProps={{
                       textField: {
                         variant: 'outlined',
-                        error: touched.startDate && Boolean(errors.startDate),
-                        helperText: <p>{errors.startDate}</p> }
+                        error: touched.registrationOpen && Boolean(errors.registrationOpen),
+                        helperText:(errors.registrationOpen && typeof errors.registrationOpen === 'string') ? <p>{errors.registrationOpen}</p> : null }
                     }}
                     viewRenderers={{
                       // hours: renderTimeViewClock,
@@ -68,8 +71,8 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                   />
                 )}
               </Field>
-              <Field name="closeRegistration">
-                {({form: { touched, errors,  }}) => (
+              <Field name="registrationClosed">
+                {({form: { touched, errors,  }} : {form: { touched: FormikTouched<any>, errors: FormikErrors<any>}}) => (
                   <DateTimePicker
                     label={"closeRegistration"}
                     format="HH:mm DD-MM-YYYY"
@@ -78,8 +81,8 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                     slotProps={{
                       textField: {
                         variant: 'outlined',
-                        error: touched.startDate && Boolean(errors.startDate),
-                        helperText: <p>{errors.startDate}</p> }
+                        error: touched.registrationClosed && Boolean(errors.registrationClosed),
+                        helperText: (errors.registrationClosed && typeof errors.registrationClosed === 'string') ? <p>{errors.registrationClosed}</p> : null }
                     }}
                     viewRenderers={{
                       // hours: renderTimeViewClock,

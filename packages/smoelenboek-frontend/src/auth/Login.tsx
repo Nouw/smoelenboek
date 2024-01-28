@@ -20,7 +20,6 @@ import {useLoginMutation} from "../api/endpoints/auth";
 import {useTranslation} from "react-i18next";
 import GB from "../assets/gb.svg";
 import NL from "../assets/nl.svg";
-import {Roles, RolesHierarchy} from 'smoelenboek-types';
 
 interface LoginProps {
 

@@ -1,5 +1,5 @@
 import React from "react";
-import {Box, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import {useGetActivitiesQuery} from "../../../api/endpoints/activity.ts";
 import {Loading} from "../../../components/Loading.tsx";
 import {Options} from "../../../components/dashboard/Options.tsx";
