@@ -10,7 +10,8 @@ interface PostRegistrationRequest {
   id: string;
   data: {
     [key: string]: string | string[];
-  }
+  },
+  anonymous?: boolean;
 }
 
 export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']}).injectEndpoints({
@@ -48,6 +49,16 @@ export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']
         url: `activity/register/${data.id}`,
         method: 'POST',
         body: data.data,
+				prepareHeaders: (headers: Headers) => {
+					if (!data.anonymous) {
+						return headers;
+					}
+
+					headers.set("Authorization", "Hello world!")
+
+					return headers;
+				}	
+
       })
     }),
     postFormSheet: builder.mutation<Response<{ sheetId: string }>, string>({

@@ -20,7 +20,7 @@ import {
 	AuthenticatedAnonymous,
 	Guard,
 } from "../Middlewares/AuthMiddleware";
-import { body, matchedData, param, validationResult } from "express-validator";
+import { matchedData, param, validationResult } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
 import { RequestWithAnonymous } from "../Utilities/RequestE";
 import { FindOptionsWhere } from "typeorm";
@@ -38,9 +38,16 @@ export default class ActivityController {
 	private readonly activityServer = new ActivityService();
 	private readonly spreadsheetService = new GoogleSpreadsheetService();
 
+  @AuthenticatedAnonymous(false)
   @Get("/")
-	async getActivities(@Request() req, @Response() res) {
-		const activities = await Database.manager.find(Activity, {});
+	async getActivities(@Request() req: RequestWithAnonymous, @Response() res) {
+		const where: FindOptionsWhere<Activity> = {};
+
+		if (!req.user) {
+			where.public = true;
+		}
+
+		const activities = await Database.manager.find(Activity, { where });
 
 		res.json(ResponseData.build("OK", activities));
 	}
@@ -120,13 +127,12 @@ export default class ActivityController {
   	res.json(ResponseData.build("OK", null));
   }
 
-  @AuthenticatedAnonymous()
+  @AuthenticatedAnonymous(false)
   @Post("/register/:id", [param("id").exists()])
   async postRegistration(
     @Request() req: RequestWithAnonymous,
     @Response() res
   ) {
-  	debugger;
   	const { formId } = matchedData(req);
 
   	const form = await Database.manager.findOne(Form, { where: { id: formId }, relations: { questions: true } });

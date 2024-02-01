@@ -25,8 +25,20 @@ export default class ActivityService {
 			return 0;
 		});
 
+		console.log(formAnswer);
+
 		for (const question of form.questions) {
-			const answer = formAnswer.values.find((a) => a.question.id === question.id);
+			if (!question) {
+				continue;
+			}
+
+			const answer = formAnswer.values.find((a) => {
+				if (a.question === undefined) {
+					return false;
+				}
+
+				return a.question?.id === question.id;
+			});
 
 			if (answer) {
 				row.push(answer.value);

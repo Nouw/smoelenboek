@@ -11,6 +11,8 @@ import {FormSelectField} from "../../components/form/activity/input/FormSelectFi
 import {Formik, FormikProps} from "formik";
 import {FormQuestion} from "smoelenboek-types";
 import {LoadingButton} from "@mui/lab";
+import {useIsAnonymous} from "../../hooks/useIsAnonymous.ts";
+import {ContactInfo} from "../../components/activity/ContactInfo.tsx";
 
 interface SignUpProps {
 
@@ -22,6 +24,7 @@ type FormValues = {
 
 export const SignUp: React.FC<SignUpProps> = () => {
   const params = useParams();
+  const isAnonymous = useIsAnonymous();
 
   const {data, isLoading} = useGetActivityQuery(parseInt(params.id ?? ""));
   const [trigger, {data: formResponse}] = useLazyGetFormQuery();
@@ -63,6 +66,8 @@ export const SignUp: React.FC<SignUpProps> = () => {
                   <Typography variant="body1">{ReactHtmlParser(form.description ?? "")}</Typography>
                   <Divider sx={{m: 2}}/>
                   <Stack spacing={2}>
+                    {isAnonymous && activity.public && <ContactInfo />}
+
                     {form.questions.map((question: FormQuestion) => {
                       if (question.type === "text") {
                         return <FormTextField question={question}/>

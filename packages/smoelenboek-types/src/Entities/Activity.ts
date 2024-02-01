@@ -21,7 +21,7 @@ export class Activity {
   	title: string;
 
   @Column({ nullable: true, type: "text" })
-  description: string;
+    description: string;
 
   @Column()
   	location: string;
@@ -37,6 +37,9 @@ export class Activity {
 
   @Column({ default: 0 })
   	max: number;
+
+  @Column({ default: false })
+    public: boolean;
 
   @OneToOne(() => Form, form => form.activity, { cascade: true })
   @JoinColumn()

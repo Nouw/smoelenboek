@@ -10,6 +10,7 @@ export declare class Activity {
     registrationOpen: Date;
     registrationClosed: Date;
     max: number;
+    public: boolean;
     form: Relation<Form>;
     users: Relation<User[]>;
 }

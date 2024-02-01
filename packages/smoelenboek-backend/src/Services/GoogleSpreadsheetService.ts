@@ -17,7 +17,7 @@ export default class GoogleSpreadsheetService {
 
 		const sheet = await spreadsheet.sheetsByTitle["Form Answers"];
 		// TODO: Probably should add translations or smth
-		await sheet.setHeaderRow(["Created", ...form.questions.map((q) => q.title)]);
+		await sheet.setHeaderRow(["Created", "Name", "Email", ...form.questions.map((q) => q.title)]);
 
 		return;
 	}
