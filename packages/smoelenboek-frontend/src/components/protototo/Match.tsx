@@ -1,5 +1,5 @@
 import React from "react";
-import {ProtototoPredictions, ProtototoPredictionsExternal} from "smoelenboek-types";
+import { ProtototoPredictions, ProtototoPredictionsExternal } from "smoelenboek-types";
 import {
   Button,
   Card,
@@ -12,13 +12,13 @@ import {
   Stack,
   Typography
 } from "@mui/material";
-import {Formik, FormikProps} from "formik";
+import { Formik, FormikProps } from "formik";
 import moment from "moment";
-import {LoadingButton} from "@mui/lab";
-import {usePostProtototoBetMutation, usePostProtototoResultMutation} from "../../api/endpoints/protototo";
-import {SnackbarContext} from "../../providers/SnackbarContext";
-import {Severity} from "../../providers/SnackbarProvider";
-import {useTranslation} from "react-i18next";
+import { LoadingButton } from "@mui/lab";
+import { usePostProtototoBetMutation, usePostProtototoResultMutation } from "../../api/endpoints/protototo";
+import { SnackbarContext } from "../../providers/SnackbarContext";
+import { Severity } from "../../providers/SnackbarProvider";
+import { useTranslation } from "react-i18next";
 
 interface MatchProps {
   home: string;
@@ -46,8 +46,10 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     setOne: previousBet?.setOne ?? true,
     setTwo: previousBet?.setTwo ?? true,
     setThree: previousBet?.setThree ?? true,
-    setFour: gender == "female" ? previousBet?.setFour ?? true : true,
-    setFive: previousBet?.setFive ?? undefined,
+    //setFour: gender == "female" ? previousBet?.setFour ?? true : true, //< volgens mij is dit niet nodig?
+    setFour: previousBet?.setFour ?? true,
+    //setFive: previousBet?.setFive ?? undefined, //< volgens mij is defineren als undefined niet nodig?
+    setFive: previousBet?.setFive ?? true
   }
 
   const snackbar = React.useContext(SnackbarContext);
@@ -64,53 +66,24 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
 
   React.useEffect(() => {
     if (!formValues) return;
-
-    if (gender == 'male') {
-      if (
-        (!formValues.setOne && formValues.setTwo  && formValues.setThree ) ||
-        (formValues.setOne  && !formValues.setTwo && formValues.setThree) ||
-        (formValues.setOne  && formValues.setTwo && !formValues.setThree) ||
-        (formValues.setOne  && !formValues.setTwo && !formValues.setThree) ||
-        (!formValues.setOne  && formValues.setTwo && !formValues.setThree) ||
-        (!formValues.setOne  && !formValues.setTwo && formValues.setThree)
+    setSetFourVisible(true);
+    let setVier: boolean = true;
+    if (gender == 'male') { //veranderen naar teamrank = eredivisie of topdivisie of superdivisie
+      if ( //Kan dit nog cleaner?
+        [formValues.setOne, formValues.setTwo, formValues.setThree].filter(Boolean).length !== 1 &&
+        [formValues.setOne, formValues.setTwo, formValues.setThree].filter(Boolean).length !== 2
       ) {
-        setSetFourVisible(true);
-
-        if (
-          (!formValues.setOne && !formValues.setTwo && formValues.setThree && formValues.setFour) ||
-          (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
-          (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-          (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-          (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
-          (formValues.setOne && formValues.setTwo && !formValues.setThree && !formValues.setFour) ||
-          (formValues.setOne && !formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-          (formValues.setOne && !formValues.setTwo && !formValues.setThree && formValues.setFour)
-        ) {
-          setSetFiveVisible(true);
-          formRef.current?.setFieldValue("setFive", true);
-        } else {
-          setSetFiveVisible(false);
-        }
-      } else {
         setSetFourVisible(false);
+        setVier = false
       }
-    } else if (gender == 'female') {
-      setSetFourVisible(true);
-
-      if (
-        (!formValues.setOne && !formValues.setTwo && formValues.setThree && formValues.setFour) ||
-        (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
-        (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-        (!formValues.setOne && formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-        (!formValues.setOne && formValues.setTwo && !formValues.setThree && formValues.setFour) ||
-        (formValues.setOne && formValues.setTwo && !formValues.setThree && !formValues.setFour) ||
-        (formValues.setOne && !formValues.setTwo && formValues.setThree && !formValues.setFour) ||
-        (formValues.setOne && !formValues.setTwo && !formValues.setThree && formValues.setFour)
-      ) {
-        setSetFiveVisible(true);
-      } else {
-        setSetFiveVisible(false);
-      }
+    }
+    if (
+      [formValues.setOne, formValues.setTwo, formValues.setThree, formValues.setFour].filter(Boolean).length === 2
+      && setVier
+    ) {
+      setSetFiveVisible(true);
+    } else {
+      setSetFiveVisible(false);
     }
   }, [formValues, gender])
 
@@ -126,12 +99,12 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     }
   }, [setFourVisible, setFiveVisible, formRef])
 
-  async function submit(values: FormValues & { setSubmitting: (submitting: boolean) => void}) {
+  async function submit(values: FormValues & { setSubmitting: (submitting: boolean) => void }) {
     try {
       if (result) {
         await resultTrigger({ id: matchId, ...values });
       } else {
-        await trigger({id: matchId, ...values, firstName, lastName, email});
+        await trigger({ id: matchId, ...values, firstName, lastName, email });
       }
 
       snackbar.openSnackbar(t("protototo.submitMessage"), Severity.SUCCESS);
@@ -147,63 +120,63 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     <CardHeader title={`${home} vs ${away}`} />
     <CardContent>
       <Formik<FormValues> innerRef={formRef} initialValues={initialValues} onSubmit={(values, { setSubmitting }) => {
-        submit({...values, setSubmitting})
+        submit({ ...values, setSubmitting })
       }}
       >
         {(props: FormikProps<FormValues>) => {
           setFormValues(props.values)
           return <form onSubmit={props.handleSubmit} noValidate>
             <List>
-            <ListItem>
-              <ListItemText>Set 1</ListItemText>
-              <Stack direction="row" gap={4}>
-                <Button variant={props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", true, true)}>{t("protototo.win")}</Button>
-                <Button variant={!props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", false, true)}>{t("protototo.lose")}</Button>
-              </Stack>
-            </ListItem>
-            <Divider/>
-            <ListItem>
-              <ListItemText>Set 2</ListItemText>
-              <Stack direction="row" gap={4}>
-                <Button variant={props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", true, true)}>{t("protototo.win")}</Button>
-                <Button variant={!props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", false, true)}>{t("protototo.lose")}</Button>
-              </Stack>
-            </ListItem>
-            <Divider/>
-            <ListItem>
-              <ListItemText>Set 3</ListItemText>
-              <Stack direction="row" gap={4}>
-                <Button variant={props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", true, true)}>{t("protototo.win")}</Button>
-                <Button variant={!props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", false, true)}>{t("protototo.lose")}</Button>
-              </Stack>
-            </ListItem>
-            {setFourVisible && (
-             <>
-               <Divider/>
-               <ListItem>
-                 <ListItemText>Set 4</ListItemText>
-                 <Stack direction="row" gap={4}>
-                   <Button variant={props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", true, true)}>{t("protototo.win")}</Button>
-                   <Button variant={!props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", false, true)}>{t("protototo.lose")}</Button>
-                 </Stack>
-               </ListItem>
-             </>
-            )}
-            {setFiveVisible && (
-              <>
-                <Divider/>
-                <ListItem>
-                  <ListItemText>Set 5</ListItemText>
-                  <Stack direction="row" gap={4}>
-                    <Button variant={props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", true, true)}>{t("protototo.win")}</Button>
-                    <Button variant={!props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", false, true)}>{t("protototo.lose")}</Button>
-                  </Stack>
-                </ListItem>
-              </>
-            )}
-          </List>
+              <ListItem>
+                <ListItemText>Set 1</ListItemText>
+                <Stack direction="row" gap={4}>
+                  <Button variant={props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", true, true)}>{t("protototo.win")}</Button>
+                  <Button variant={!props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", false, true)}>{t("protototo.lose")}</Button>
+                </Stack>
+              </ListItem>
+              <Divider />
+              <ListItem>
+                <ListItemText>Set 2</ListItemText>
+                <Stack direction="row" gap={4}>
+                  <Button variant={props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", true, true)}>{t("protototo.win")}</Button>
+                  <Button variant={!props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", false, true)}>{t("protototo.lose")}</Button>
+                </Stack>
+              </ListItem>
+              <Divider />
+              <ListItem>
+                <ListItemText>Set 3</ListItemText>
+                <Stack direction="row" gap={4}>
+                  <Button variant={props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", true, true)}>{t("protototo.win")}</Button>
+                  <Button variant={!props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", false, true)}>{t("protototo.lose")}</Button>
+                </Stack>
+              </ListItem>
+              {setFourVisible && (
+                <>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText>Set 4</ListItemText>
+                    <Stack direction="row" gap={4}>
+                      <Button variant={props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", true, true)}>{t("protototo.win")}</Button>
+                      <Button variant={!props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", false, true)}>{t("protototo.lose")}</Button>
+                    </Stack>
+                  </ListItem>
+                </>
+              )}
+              {setFiveVisible && (
+                <>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText>Set 5</ListItemText>
+                    <Stack direction="row" gap={4}>
+                      <Button variant={props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", true, true)}>{t("protototo.win")}</Button>
+                      <Button variant={!props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", false, true)}>{t("protototo.lose")}</Button>
+                    </Stack>
+                  </ListItem>
+                </>
+              )}
+            </List>
             <Stack direction="row">
-              <Typography variant="caption" sx={{marginLeft: 2}}>
+              <Typography variant="caption" sx={{ marginLeft: 2 }}>
                 {moment(date).fromNow(true)}
               </Typography>
               <LoadingButton type="submit" loading={props.isSubmitting} sx={{ marginLeft: "auto" }}>{t("submit")}</LoadingButton>

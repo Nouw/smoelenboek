@@ -13,8 +13,9 @@ exports.Activity = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const Form_1 = require("./Form");
-let Activity = exports.Activity = class Activity {
+let Activity = class Activity {
 };
+exports.Activity = Activity;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

@@ -12,8 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Photobook = void 0;
 const typeorm_1 = require("typeorm");
 const Photo_1 = require("./Photo");
-let Photobook = exports.Photobook = class Photobook {
+let Photobook = class Photobook {
 };
+exports.Photobook = Photobook;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
