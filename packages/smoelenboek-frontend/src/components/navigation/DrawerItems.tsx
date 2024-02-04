@@ -254,13 +254,12 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
 		let newItems: DrawerItem[] = [...publicItems, ...defaultItems]
 
     if (
-      (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) &&
-      !items.includes(adminDefaultItem) &&
+      (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) && 
       !location.pathname.includes("dashboard")
     ) {
       newItems = [...newItems, adminDefaultItem];
     }
-
+		
 		setItems(newItems.sort((a, b) => (a.rank ?? -1) - (b.rank ?? -1)));
   }, [location.pathname, roles, isAnonymous]);
 
@@ -268,7 +267,7 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
     if (location.pathname.includes("dashboard")) {
       setItems(adminItems);
     }
-  }, [location.pathname]);
+  }, [location.pathname]);	
 
   return (
     <List>
