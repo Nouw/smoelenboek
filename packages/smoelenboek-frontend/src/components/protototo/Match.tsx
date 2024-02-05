@@ -68,7 +68,13 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     if (!formValues) return;
     setSetFourVisible(true);
     let setVier: boolean = true;
-    if (gender == 'male') { //veranderen naar teamrank = eredivisie of topdivisie of superdivisie
+
+    /*
+    Below code is irrelevant since there is no difference between male/female. This needs to be updated to the team rank.
+    Currently there plays no team high enough and the fourth set always needs to be shown.
+    */
+
+    /*if (gender == 'male') { //veranderen naar teamrank = eredivisie of topdivisie of superdivisie
       if ( //Kan dit nog cleaner?
         [formValues.setOne, formValues.setTwo, formValues.setThree].filter(Boolean).length !== 1 &&
         [formValues.setOne, formValues.setTwo, formValues.setThree].filter(Boolean).length !== 2
@@ -76,7 +82,8 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
         setSetFourVisible(false);
         setVier = false
       }
-    }
+    }*/
+
     if (
       [formValues.setOne, formValues.setTwo, formValues.setThree, formValues.setFour].filter(Boolean).length === 2
       && setVier
