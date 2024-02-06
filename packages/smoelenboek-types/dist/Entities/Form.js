@@ -14,8 +14,9 @@ const typeorm_1 = require("typeorm");
 const Activity_1 = require("./Activity");
 const FormQuestion_1 = require("./FormQuestion");
 //TODO: Add some way to order the form
-let Form = exports.Form = class Form {
+let Form = class Form {
 };
+exports.Form = Form;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)

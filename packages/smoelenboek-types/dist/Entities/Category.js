@@ -17,8 +17,9 @@ var CategoryType;
     CategoryType["CATEGORY_TYPE_DOCUMENTS"] = "documents";
     CategoryType["CATEGORY_TYPE_PHOTOS"] = "photos";
 })(CategoryType || (exports.CategoryType = CategoryType = {}));
-let Category = exports.Category = class Category {
+let Category = class Category {
 };
+exports.Category = Category;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
