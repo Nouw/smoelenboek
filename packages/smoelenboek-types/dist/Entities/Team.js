@@ -13,8 +13,9 @@ exports.Team = void 0;
 const typeorm_1 = require("typeorm");
 const Team_1 = require("../Enums/Team");
 const UserTeamSeason_1 = require("./UserTeamSeason");
-let Team = exports.Team = class Team {
+let Team = class Team {
 };
+exports.Team = Team;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
