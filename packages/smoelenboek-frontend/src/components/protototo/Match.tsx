@@ -46,9 +46,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
     setOne: previousBet?.setOne ?? true,
     setTwo: previousBet?.setTwo ?? true,
     setThree: previousBet?.setThree ?? true,
-    //setFour: gender == "female" ? previousBet?.setFour ?? true : true, //< volgens mij is dit niet nodig?
     setFour: previousBet?.setFour ?? true,
-    //setFive: previousBet?.setFive ?? undefined, //< volgens mij is defineren als undefined niet nodig?
     setFive: previousBet?.setFive ?? true
   }
 
@@ -67,26 +65,12 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
   React.useEffect(() => {
     if (!formValues) return;
     setSetFourVisible(true);
-    let setVier: boolean = true;
-
-    /*
-    Below code is irrelevant since there is no difference between male/female. This needs to be updated to the team rank.
-    Currently there plays no team high enough and the fourth set always needs to be shown.
-    */
-
-    /*if (gender == 'male') { //veranderen naar teamrank = eredivisie of topdivisie of superdivisie
-      if ( //Kan dit nog cleaner?
-        [formValues.setOne, formValues.setTwo, formValues.setThree].filter(Boolean).length !== 1 &&
-        [formValues.setOne, formValues.setTwo, formValues.setThree].filter(Boolean).length !== 2
-      ) {
-        setSetFourVisible(false);
-        setVier = false
-      }
-    }*/
+    let setFour: boolean = true;
+   
 
     if (
       [formValues.setOne, formValues.setTwo, formValues.setThree, formValues.setFour].filter(Boolean).length === 2
-      && setVier
+      && setFour
     ) {
       setSetFiveVisible(true);
     } else {
