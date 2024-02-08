@@ -115,10 +115,10 @@ export const Files: React.FC<FilesProps> = () => {
                   <Modal open={visible} style={{ height: "100vh", width: "100vw", backgroundColor: "#000", display:'flex',alignItems:'center',justifyContent:'center'}}>
                     <>
                         <IconButton onClick={() => download(selected!.path.split("/")[1], `${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${selected!.path}`)} style={{ position: "absolute", top: 5, left: 5}}>
-                            <Download/>
+                            <Download color="primary"/>
                         </IconButton>
                         <IconButton onClick={() => setVisible(false)} style={{ position: "absolute", top: 5, right: 5}}>
-                            <Close/>
+                            <Close color="primary"/>
                         </IconButton>
                       <IconButton onClick={() => backward()} style={{ position: "absolute", left: 5, zIndex: 2}}>
                           <ArrowBackIos fontSize="large" color="primary"/>
