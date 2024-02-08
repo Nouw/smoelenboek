@@ -20,12 +20,12 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["settings"]);
   const dispatch = useAppDispatch();
   const language = useAppSelector((state) => state.auth.language);
   const navigate = useNavigate();
 
-  async function changeLanguage(value: string) {
+  function changeLanguage(value: string) {
     dispatch(setLanguage(value));
   }
 
@@ -33,34 +33,34 @@ export const Home: React.FC<HomeProps> = () => {
     <Stack gap={5}>
       <Card>
         <CardContent>
-          <List  subheader={
+          <List subheader={
             <ListSubheader
               component="div"
               id="nested-list-subheader">
-              {t("settings.settings")}
+              {t("settings")}
             </ListSubheader>
           }
           >
             <ListItemButton onClick={() => navigate("password")}>
-              <ListItemText primary={t("settings.changePassword")}/>
+              <ListItemText primary={t("change-password")}/>
             </ListItemButton>
             <ListItemButton onClick={() => navigate("information")}>
-              <ListItemText primary={t("settings.updateInformation")}/>
+              <ListItemText primary={t("update-information")}/>
             </ListItemButton>
             <ListItemButton onClick={() => navigate("picture")}>
-              <ListItemText primary={t("settings.changeProfilePicture")}/>
+              <ListItemText primary={t("change-profile-picture")}/>
             </ListItemButton>
           </List>
           <List subheader={
             <ListSubheader
               component="div"
               id="nested-list-subheader">
-              {t("settings.otherSettings")}
+              {t("other-settings")}
             </ListSubheader>
           }>
             <ListItem>
               <Stack direction="row" alignItems="center" width="100%">
-                <Typography variant="body1">{t("settings.language")}</Typography>
+                <Typography variant="body1">{t("language")}</Typography>
                 <Box sx={{ marginLeft: 'auto' }}>
                   <Select value={language} onChange={(event) => changeLanguage(event.target.value)}>
                     <MenuItem value={"nl"}>NL</MenuItem>

@@ -1,0 +1,19 @@
+{
+  "teams": {
+    "women": "Women",
+    "men": "Men"
+  },
+  "protototo": {
+    "predict": "Predict"
+  },
+  "documents": "Documents",
+  "administration": "Administration",
+  "vcp": "Confidential contact person",
+  "committees": "Committees",
+  "dashboard": {
+    "go-back": "Back to smoelenboek",
+    "headers": {
+      "season-management": "Season management"
+    }
+  }
+}

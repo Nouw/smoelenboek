@@ -1,0 +1,18 @@
+{
+  "header": "Form management",
+  "create-form": "Create form",
+  "title": "Form title",
+  "question": {
+    "add-question": "Add question",
+    "type": "Type",
+    "text": "Text",
+    "choice": "Choice",
+    "select": "Select",
+    "answer": "Your answer",
+    "question": "Question",
+    "paragraph": "Paragraph",
+    "required": "Required"
+  },
+  "field-required": "This field is required!",
+	"avg": "I agree to the processing of my personal data by USV Protos"
+}

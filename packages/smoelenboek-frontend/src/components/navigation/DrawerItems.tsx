@@ -36,7 +36,7 @@ const publicItems: DrawerItem[] = [
     subheader: true,
     subItems: [
       {
-        title: "navigation.protototo.predict",
+        title: "protototo.predict",
         navigateTo: "protototo",
       },
       // {
@@ -54,24 +54,24 @@ const defaultItems: DrawerItem[] = [
     subheader: true,
     subItems: [
       {
-        title: "navigation.teams.women",
+        title: "teams.women",
         navigateTo: "teams/female",
       },
       {
-        title: "navigation.teams.men",
+        title: "teams.men",
         navigateTo: "teams/male",
       },
     ],
     rank: 2,
   },
   {
-    title: "navigation.committees",
+    title: "committees",
     subheader: false,
     navigateTo: "committees",
     rank: 3,
   },
   {
-    title: "navigation.documents",
+    title: "documents",
     navigateTo: "documents/",
 		rank: 4,
   },
@@ -81,14 +81,14 @@ const defaultItems: DrawerItem[] = [
 		rank: 5,
   },
   {
-    title: "navigation.vcp",
+    title: "vcp",
     navigateTo: "vcp",
 		rank: 6,
   },
 ];
 
 const adminDefaultItem: DrawerItem = {
-  title: "navigation.administration",
+  title: "administration",
   subheader: true,
   translateHeader: true,
   subItems: [
@@ -102,7 +102,7 @@ const adminDefaultItem: DrawerItem = {
 
 const adminItems: DrawerItem[] = [
   {
-    title: "dashboard.goBack",
+    title: "dashboard.go-back",
     translateHeader: true,
     navigateTo: "/teams/female",
   },
@@ -122,7 +122,7 @@ const adminItems: DrawerItem[] = [
     ]
   },
   {
-    title: "dashboard.season.header",
+    title: "dashboard.season-header",
     subheader: true,
     translateHeader: true,
     subItems: [

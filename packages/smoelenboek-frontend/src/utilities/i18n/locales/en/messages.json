@@ -1,0 +1,67 @@
+{
+  "season": {
+    "create": "Created season!",
+    "delete": "Deleted season!",
+    "update": "Updated season!"
+  },
+  "user": {
+    "delete": "Deleted user!",
+    "create": "Created user!",
+    "update": "Updated user!"
+  },
+  "teams": {
+    "delete": "Deleted team!",
+    "create": "Created team!",
+    "update": "Updated team!",
+    "already-part": "is already part of the team!",
+    "added": "Added",
+    "to-team": "to team!",
+    "remove-player": "Removed player from team!",
+    "role-update": "Role updated!",
+    "sync-photo": "Started syncing team photos"
+  },
+  "committee": {
+    "delete": "Deleted committee!",
+    "create": "Created committee!",
+    "update": "Updated committee!",
+    "added": "Added",
+    "to-committee": "to committee!",
+    "already-part": "is already part of the committee!",
+    "role-update": "Role updated!",
+    "remove-user": "Removed user from committee!"
+  },
+  "protototo": {
+    "season": {
+      "delete": "Deleted season!",
+      "create": "Created season!",
+      "update": "Updated season!"
+    },
+    "match": {
+      "delete": "Deleted match!",
+      "create": "Created match!",
+      "update": "Updated match!"
+    },
+    "submit-message": "Successfully send bet!"
+  },
+  "documents": {
+    "create": "Created category!",
+    "update": "Updated category!",
+    "delete": "Deleted category!"
+  },
+  "settings": {
+    "success": "Password updated!",
+    "information-updated": "Updated information!",
+    "profile-picture": "Updated profile picture!"
+  },
+  "auth": {
+    "required": {
+      "password": "Password is required",
+      "email": "Email is required"
+    }
+  },
+  "tikkie": "I hereby confirm that I have paid the above tikkie and am participating in the ProtoToto",
+  "error": {
+    "something": "Something went wrong trying to load this page...",
+    "info": "If you believe this is an error, please send a message to WebCie"
+  }
+}

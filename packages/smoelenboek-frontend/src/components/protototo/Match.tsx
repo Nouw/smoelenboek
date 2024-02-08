@@ -51,7 +51,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
   }
 
   const snackbar = React.useContext(SnackbarContext);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["protototo", "messages", "error"]);
 
   const formRef = React.createRef<FormikProps<FormValues>>();
 
@@ -98,10 +98,10 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
         await trigger({ id: matchId, ...values, firstName, lastName, email });
       }
 
-      snackbar.openSnackbar(t("protototo.submitMessage"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:protototo.submit-message"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
 
     values.setSubmitting(false);
@@ -121,24 +121,24 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
               <ListItem>
                 <ListItemText>Set 1</ListItemText>
                 <Stack direction="row" gap={4}>
-                  <Button variant={props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", true, true)}>{t("protototo.win")}</Button>
-                  <Button variant={!props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", false, true)}>{t("protototo.lose")}</Button>
+                  <Button variant={props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", true, true)}>{t("protototo:win")}</Button>
+                  <Button variant={!props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", false, true)}>{t("protototo:lose")}</Button>
                 </Stack>
               </ListItem>
               <Divider />
               <ListItem>
                 <ListItemText>Set 2</ListItemText>
                 <Stack direction="row" gap={4}>
-                  <Button variant={props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", true, true)}>{t("protototo.win")}</Button>
-                  <Button variant={!props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", false, true)}>{t("protototo.lose")}</Button>
+                  <Button variant={props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", true, true)}>{t("protototo:win")}</Button>
+                  <Button variant={!props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", false, true)}>{t("protototo:lose")}</Button>
                 </Stack>
               </ListItem>
               <Divider />
               <ListItem>
                 <ListItemText>Set 3</ListItemText>
                 <Stack direction="row" gap={4}>
-                  <Button variant={props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", true, true)}>{t("protototo.win")}</Button>
-                  <Button variant={!props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", false, true)}>{t("protototo.lose")}</Button>
+                  <Button variant={props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", true, true)}>{t("protototo:win")}</Button>
+                  <Button variant={!props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", false, true)}>{t("protototo:lose")}</Button>
                 </Stack>
               </ListItem>
               {setFourVisible && (
@@ -147,8 +147,8 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
                   <ListItem>
                     <ListItemText>Set 4</ListItemText>
                     <Stack direction="row" gap={4}>
-                      <Button variant={props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", true, true)}>{t("protototo.win")}</Button>
-                      <Button variant={!props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", false, true)}>{t("protototo.lose")}</Button>
+                      <Button variant={props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", true, true)}>{t("protototo:win")}</Button>
+                      <Button variant={!props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", false, true)}>{t("protototo:lose")}</Button>
                     </Stack>
                   </ListItem>
                 </>
@@ -159,8 +159,8 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
                   <ListItem>
                     <ListItemText>Set 5</ListItemText>
                     <Stack direction="row" gap={4}>
-                      <Button variant={props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", true, true)}>{t("protototo.win")}</Button>
-                      <Button variant={!props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", false, true)}>{t("protototo.lose")}</Button>
+                      <Button variant={props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", true, true)}>{t("protototo:win")}</Button>
+                      <Button variant={!props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", false, true)}>{t("protototo:lose")}</Button>
                     </Stack>
                   </ListItem>
                 </>
@@ -170,7 +170,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
               <Typography variant="caption" sx={{ marginLeft: 2 }}>
                 {moment(date).fromNow(true)}
               </Typography>
-              <LoadingButton type="submit" loading={props.isSubmitting} sx={{ marginLeft: "auto" }}>{t("submit")}</LoadingButton>
+              <LoadingButton type="submit" loading={props.isSubmitting} sx={{ marginLeft: "auto" }}>{t("common:submit")}</LoadingButton>
             </Stack>
           </form>
         }}

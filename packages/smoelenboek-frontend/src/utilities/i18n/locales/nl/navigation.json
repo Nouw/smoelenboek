@@ -1,0 +1,20 @@
+{
+  "teams": {
+    "women": "Vrouwen",
+    "men": "Mannen"
+  },
+  "protototo": {
+    "predict": "Voorspellen"
+  },
+  "documents": "Documenten",
+  "administration": "Administratie",
+  "vcp": "Vertrouwenscontactpersoon",
+  "committees": "Commissies",
+  "dashboard": {
+    "go-back": "Terug naar smoelenboek",
+    "headers": {
+      "season-management": "Seizoenbeheer"
+    }
+  }
+}
+

@@ -1,0 +1,20 @@
+{
+  "header": "Protototo management",
+  "seasons": "Seasons",
+  "create-season": "Add season",
+  "delete-season": "Delete season",
+  "id": "Id",
+  "start": "Start",
+  "end": "End",
+  "options": "Options",
+  "tikkie": "Tikkie",
+  "play-date": "Play date",
+  "home": "Home",
+  "away": "Away",
+  "delete-match": "Delete match",
+  "predictions-alert": "This also deletes all predictions",
+  "update-match": "Update match",
+  "win": "Win",
+  "lose": "Lose", 
+  "details": "Details"
+}

@@ -1,0 +1,21 @@
+{
+  "header": "Protototo-beheer",
+  "seasons": "Seizoenen",
+  "create-season": "Seizoen toevoegen",
+  "delete-season": "Seizoen verwijderen",
+  "id": "Id",
+  "start": "Start",
+  "end": "Einde",
+  "options": "Opties",
+  "tikkie": "Tikkie",
+  "play-date": "Speeldatum",
+  "home": "Thuis",
+  "away": "Uit",
+  "delete-match": "Wedstrijd verwijderen",
+  "predictions-alert": "Dit verwijdert ook alle voorspellingen",
+  "update-match": "Wedstrijd bijwerken",
+  "win": "Winnen",
+  "lose": "Verliezen",
+  "details": "Details"
+}
+
