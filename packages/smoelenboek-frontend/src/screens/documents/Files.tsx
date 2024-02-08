@@ -1,5 +1,5 @@
 import React from "react";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import {useDocumentsGetFilesQuery} from "../../api/endpoints/documents";
 import {
   Card,
@@ -21,6 +21,7 @@ interface FilesProps {
 
 export const Files: React.FC<FilesProps> = () => {
   const params = useParams();
+  const navigate = useNavigate();
 
   const { data, isLoading} = useDocumentsGetFilesQuery(parseInt(params.id ?? '0'));
 
@@ -38,6 +39,11 @@ export const Files: React.FC<FilesProps> = () => {
   function changeSelected(value: File) {
     setSelected(value);
     setVisible(true);
+  }
+
+  window.onpopstate = () => {
+    setVisible(false);
+    navigate(`files/${category.id}`);
   }
 
   const category: Category = data.data[0];
