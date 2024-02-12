@@ -28,6 +28,22 @@ export const Files: React.FC<FilesProps> = () => {
   const [selected, setSelected] = React.useState<File>();
   const [visible, setVisible] = React.useState<boolean>(false);
 
+  React.useEffect(() => {
+    const listener = () => {
+      console.log("Geluisterd");
+      console.log(`/documents/files/${category.id ?? undefined}`);
+      setVisible(false);
+      navigate(`/documents/files/${category.id ?? undefined}`);
+    }
+
+    window.addEventListener("popstate", listener);
+    console.log("Listener toegevoegd");
+    return () => {
+      console.log("Listener verwijderd");
+      window.removeEventListener("popstate", listener);
+    }
+  },[]);
+
   if (isLoading || !data) {
     return <CircularProgress/>
   }
@@ -42,8 +58,9 @@ export const Files: React.FC<FilesProps> = () => {
   }
 
   window.onpopstate = () => {
-    setVisible(false);
-    navigate(`files/${category.id}`);
+    console.log("Slechte methode");
+    //setVisible(false);
+    //navigate(`files/${category.id}`)
   }
 
   const category: Category = data.data[0];
