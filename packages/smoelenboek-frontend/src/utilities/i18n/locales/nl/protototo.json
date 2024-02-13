@@ -14,8 +14,15 @@
   "delete-match": "Wedstrijd verwijderen",
   "predictions-alert": "Dit verwijdert ook alle voorspellingen",
   "update-match": "Wedstrijd bijwerken",
+  "add-match": "Wedstrijd toevoegen",
   "win": "Winnen",
   "lose": "Verliezen",
-  "details": "Details"
+  "details": "Details",
+  "set": {
+    "one": "Set 1",
+    "two": "Set 2",
+    "three": "Set 3",
+    "four": "Set 4",
+    "five": "Set 5"
+  }
 }
-

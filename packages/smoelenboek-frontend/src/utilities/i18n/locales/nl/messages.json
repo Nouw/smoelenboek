@@ -57,11 +57,11 @@
     "required": {
       "password": "Wachtwoord is vereist",
       "email": "E-mail is vereist"
+    },
+    "valid": {
+      "email": "Voer een geldig e-mailadres in"
     }
   },
   "tikkie": "Hierbij bevestig ik dat ik de bovenstaande tikkie heb betaald en deelneem aan de ProtoToto",
-  "error": {
-    "something": "Er is iets misgegaan bij het laden van deze pagina...",
-    "info": "Als u denkt dat dit een fout is, stuur dan een bericht naar WebCie"
-  }
+  "pay-tikkie": "Tikkie betalen" 
 }

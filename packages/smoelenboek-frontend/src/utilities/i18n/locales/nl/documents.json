@@ -4,6 +4,9 @@
   "create-category": "Categorie toevoegen",
   "update-category": "Categorie bijwerken",
   "delete-files": "Bestanden verwijderen",
-  "files": "bestanden"
+  "files": "bestanden",
+  "types": {
+    "photos": "Photos",
+    "documents": "Documents"
+  } 
 }
-

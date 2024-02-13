@@ -14,7 +14,7 @@ interface AddProps {
 export const Add: React.FC<AddProps> = () => {
   const snackbar = React.useContext(SnackbarContext);
   const params = useParams();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["error", "messages"]);
 
   const [trigger] = usePostProtototoMatchMutation();
 
@@ -22,10 +22,10 @@ export const Add: React.FC<AddProps> = () => {
     try {
       await trigger({...values, seasonId: parseInt(params.id ?? "0")} as unknown as PostProtototoMatch).unwrap();
 
-      snackbar.openSnackbar(t("message.protototo.match.create"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:protototo.match.create"), Severity.SUCCESS)
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
 
     values.setSubmitting(false);

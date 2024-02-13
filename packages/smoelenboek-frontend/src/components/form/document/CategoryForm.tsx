@@ -32,7 +32,7 @@ export interface FormValues {
 //
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({ initialValues, title, submit }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "documents"]);
 
   return (
     <Card>
@@ -47,7 +47,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialValues, title
               <Stack spacing={2}>
                 <TextField
                   id="name"
-                  label={t("dashboard.documents.name")}
+                  label={t("common:name")}
                   value={props.values.name}
                   onChange={props.handleChange}
                   error={props.touched.name && Boolean(props.errors.name)}
@@ -61,13 +61,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialValues, title
                       <InputLabel id="type-picker">Type</InputLabel>
                       <Select
                         labelId="type-picker"
-                        label="Type"
+                        label={t("common:type")}
                         value={props.values.type}
                         onChange={(value) => props.setFieldValue("type", value.target.value)}
                         fullWidth
                       >
-                        <MenuItem value="photos">Photos</MenuItem>
-                        <MenuItem value="documents">Documents</MenuItem>
+                        <MenuItem value="photos">{t("documents:types.photos")}</MenuItem>
+                        <MenuItem value="documents">{t("documents:types.documents")}</MenuItem>
                       </Select>
                       {touched.gender && Boolean(errors.type) &&
                           <FormHelperText>{errors.type}</FormHelperText>
@@ -77,7 +77,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialValues, title
                 </Field>
                 <Box>
                   <LoadingButton type="submit" loading={props.isSubmitting}>
-                    <span>{t("save")}</span>
+                    <span>{t("common:save")}</span>
                   </LoadingButton>
                 </Box>
               </Stack>

@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 //#region NL translations
 import nl_common from "./locales/nl/common.json";
-import nl_activity from "./locales/nl/common.json";
+import nl_activity from "./locales/nl/activity.json";
 import nl_auth from "./locales/nl/auth.json";
 import nl_committee from "./locales/nl/committee.json";
 import nl_documents from "./locales/nl/documents.json";
@@ -24,7 +24,7 @@ import nl_user from "./locales/nl/user.json";
 
 //#region EN translations
 import en_common from "./locales/en/common.json";
-import en_activity from "./locales/en/common.json";
+import en_activity from "./locales/en/activity.json";
 import en_auth from "./locales/en/auth.json";
 import en_committee from "./locales/en/committee.json";
 import en_documents from "./locales/en/documents.json";

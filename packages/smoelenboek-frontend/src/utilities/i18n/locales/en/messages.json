@@ -57,9 +57,13 @@
     "required": {
       "password": "Password is required",
       "email": "Email is required"
+    },
+    "valid": {
+      "email": "Please enter a valid email address"
     }
   },
   "tikkie": "I hereby confirm that I have paid the above tikkie and am participating in the ProtoToto",
+  "pay-tikkie": "Pay Tikkie",
   "error": {
     "something": "Something went wrong trying to load this page...",
     "info": "If you believe this is an error, please send a message to WebCie"

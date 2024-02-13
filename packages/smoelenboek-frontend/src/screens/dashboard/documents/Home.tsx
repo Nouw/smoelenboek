@@ -31,7 +31,7 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "error", "messages", "options"]);
   const snackbar = React.useContext(SnackbarContext);
 
   const [getCategories, { isLoading }] = useLazyDocumentsCategoriesQuery();
@@ -69,10 +69,10 @@ export const Home: React.FC<HomeProps> = () => {
       setSelected(-1);
       setVisible(false);
 
-      snackbar.openSnackbar(t("message.documents.delete"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:documents.delete"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR)
     }
   }
 
@@ -87,10 +87,10 @@ export const Home: React.FC<HomeProps> = () => {
           <TableHead>
             <TableRow>
               <TableCell>
-                {t("dashboard.documents.name")}
+                {t("common:name")}
               </TableCell>
               <TableCell align="right">
-                {t("dashboard.options.options")}
+                {t("options:options")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -106,7 +106,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Edit fontSize="small"/>
                       </ListItemIcon>
-                      {t("dashboard.options.edit")}
+                      {t("options:edit")}
                     </MenuItem>
                     <MenuItem onClick={() => {
                       setVisible(true);
@@ -115,7 +115,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Delete fontSize="small"/>
                       </ListItemIcon>
-                      {t("dashboard.options.remove")}
+                      {t("options:remove")}
                     </MenuItem>
                   </Options>
                 </TableCell>
@@ -125,15 +125,15 @@ export const Home: React.FC<HomeProps> = () => {
         </Table>
       </TableContainer>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>Delete category?</DialogTitle>
+        <DialogTitle>{t("documents:delete-category")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && (
-            <DialogContentText>Are you sure you want to delete category {categories[selected]?.name}?</DialogContentText>
+            <DialogContentText>{t("common:confirmation")} {categories[selected]?.name}?</DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVisible(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => deleteCategory()}>Delete</Button>
+          <Button onClick={() => setVisible(false)}>{t("common:cancel")}</Button>
+          <Button variant="contained" onClick={() => deleteCategory()}>{t("common:delete")}</Button>
         </DialogActions>
       </Dialog>
     </>

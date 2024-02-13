@@ -14,7 +14,7 @@ interface AddProps {
 export const Add: React.FC<AddProps> = () => {
   const dispatch = useAppDispatch();
   const snackbar = React.useContext(SnackbarContext);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["documents", "error", ]);
 
   const [createCategoryApi] = useDocumentsCreateCategoryMutation();
 
@@ -23,14 +23,14 @@ export const Add: React.FC<AddProps> = () => {
       const res = await createCategoryApi({ name: values.name, type: values.type}).unwrap();
 
       dispatch(addCategories([res.data]));
-      snackbar.openSnackbar(t("message.documents.create"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("documents:create-category"), Severity.SUCCESS);
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
   }
 
-  return <CategoryForm initialValues={{name: "", type: "photos"}} submit={submit} title={t("dashboard.documents.createCategory")}/>
+  return <CategoryForm initialValues={{name: "", type: "photos"}} submit={submit} title={t("documents:create-category")}/>
 }

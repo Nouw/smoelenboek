@@ -7,6 +7,9 @@
   "save": "Opslaan",
   "email-request": "Wachtwoord reset verzoek is verstuurd!",
 	"name": "Naam",
-	"upload": "Upload"
+	"upload": "Upload",
+  "back": "Terug",
+  "email": "Email",
+  "type": "Type"
 }
 

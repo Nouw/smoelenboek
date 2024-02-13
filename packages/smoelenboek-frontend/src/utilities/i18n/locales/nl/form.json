@@ -14,6 +14,9 @@
     "required": "Vereist"
   },
   "field-required": "Dit veld is verplicht!",
-	"avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos"
+	"avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
+  "valid": {
+    "email": "Voer een geldig e-mailadres in"
+  }
 }
 

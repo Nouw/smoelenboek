@@ -20,7 +20,7 @@ import { useIsAnonymous } from "../../hooks/useIsAnonymous";
 interface AppBarRightWidgetProps {}
 
 export const AppBarRightWidget: React.FC<AppBarRightWidgetProps> = () => {
-  const { i18n } = useTranslation();
+  const { t } = useTranslation(["menu"]);
 
   const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
   const id = useAppSelector((state) => state.auth.id);
@@ -107,7 +107,7 @@ export const AppBarRightWidget: React.FC<AppBarRightWidgetProps> = () => {
             navigate(`/profile/${id ?? 1}`);
           }}
         >
-          {i18n.t("menu.profile")}
+          {t("profile")}
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -115,7 +115,7 @@ export const AppBarRightWidget: React.FC<AppBarRightWidgetProps> = () => {
             navigate(`/settings`);
           }}
         >
-          {i18n.t("settings.settings")}
+          {t("settings")}
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -123,7 +123,7 @@ export const AppBarRightWidget: React.FC<AppBarRightWidgetProps> = () => {
             dispatch(logout(undefined));
           }}
         >
-          {i18n.t("menu.logout")}
+          {t("logout")}
         </MenuItem>
       </Menu>
     </>

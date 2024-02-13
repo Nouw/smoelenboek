@@ -8,6 +8,7 @@ import {
 import {Loading} from "../../../components/Loading.tsx";
 import {Box, Button, Card, CardContent, Stack, Typography} from "@mui/material";
 import {AddToDriveOutlined, FileOpenOutlined} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 interface InfoProps {
 
@@ -15,6 +16,7 @@ interface InfoProps {
 
 export const Info: React.FC<InfoProps> = () => {
   const { id } = useParams();
+	const { t } = useTranslation(["activity"]);
 
   const { isLoading, data, refetch } = useGetActivityQuery(parseInt(id ?? "-1"));
   const [trigger] = usePostFormSheetMutation();
@@ -53,14 +55,13 @@ export const Info: React.FC<InfoProps> = () => {
         <CardContent>
           <Stack direction="row" alignItems="center">
             <Typography variant="h4">
-              Responses {!responses ? 0 : (responses.length)}
+							{t("responses")} {!responses ? 0 : (responses.length)}
             </Typography>
               {activity.form.sheetId ? (
-                <Button onClick={() => window.open(`https://docs.google.com/spreadsheets/d/${activity.form.sheetId}`)} startIcon={<FileOpenOutlined/>} sx={{ ml: 'auto' }}>Open Sheets</Button>
+                <Button onClick={() => window.open(`https://docs.google.com/spreadsheets/d/${activity.form.sheetId}`)} startIcon={<FileOpenOutlined/>} sx={{ ml: 'auto' }}>{t("open-sheets")}</Button>
               ) : (
-                <Button onClick={() => linkToSheet()} sx={{ ml: 'auto' }} startIcon={<AddToDriveOutlined />}>Link response to Sheets</Button>
+                <Button onClick={() => linkToSheet()} sx={{ ml: 'auto' }} startIcon={<AddToDriveOutlined />}>{t("link-responses-to-sheets")}</Button>
               )}
-
           </Stack>
         </CardContent>
       </Card>

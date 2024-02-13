@@ -45,7 +45,7 @@ export const Home: React.FC<HomeProps> = () => {
   const snackbar = React.useContext(SnackbarContext);
   const seasons = useAppSelector(protototoSeasonSelector.selectAll);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["messages", "error", "options", "protototo"]);
 
   const [getSeasons] = useProtototoSeasonsMutation();
   const [removeSeasonApi] = useRemoveProtototoSeasonMutation();
@@ -75,12 +75,12 @@ export const Home: React.FC<HomeProps> = () => {
       dispatch(removeSeasonState(id));
 
       snackbar.openSnackbar(
-        t("message.protototo.season.delete"),
+        t("messages:protototo.season.delete"),
         Severity.SUCCESS,
       );
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
 		setVisible(false);
   }
@@ -96,16 +96,16 @@ export const Home: React.FC<HomeProps> = () => {
           <TableHead>
             <TableRow>
               <TableCell>
-                {t("dashboard.protototo.id")}
+                {t("protototo:id")}
               </TableCell>
               <TableCell>
-                {t("dashboard.protototo.start")}
+                {t("protototo:start")}
               </TableCell>
               <TableCell>
-                {t("dashboard.protototo.end")}
+                {t("protototo:end")}
               </TableCell>
               <TableCell align="right">
-                {t("dashboard.protototo.options")}
+                {t("options:options")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -121,7 +121,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Edit fontSize="small" />
                       </ListItemIcon>
-                      {t("dashboard.options.edit")}
+                      {t("options:edit")}
                     </MenuItem>
                     <MenuItem
                       onClick={() => navigate(`season/${season.id}/matches`)}
@@ -129,7 +129,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Add fontSize="small" />
                       </ListItemIcon>
-                      {t("dashboard.options.addMatch")}
+                      {t("options:add-match")}
                     </MenuItem>
                     <MenuItem onClick={() => {
 											setSelected(key);
@@ -138,13 +138,13 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Delete fontSize="small" />
                       </ListItemIcon>
-                      {t("dashboard.options.remove")}
+                      {t("options:remove")}
                     </MenuItem>
                     <MenuItem onClick={() => exportPlayers(season.id)}>
                       <ListItemIcon>
                         <Download fontSize="small" />
                       </ListItemIcon>
-                      {t("dashboard.options.exportParticipants")}
+                      {t("options:export-participants")}
                     </MenuItem>
                   </Options>
                 </TableCell>
@@ -154,20 +154,20 @@ export const Home: React.FC<HomeProps> = () => {
         </Table>
       </TableContainer>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>{t("dashboard.protototo.deleteSeason")}?</DialogTitle>
+        <DialogTitle>{t("protototo:delete-season")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && seasons[selected] !== undefined && (
             <DialogContentText>
-              {t("confirmation")}: {" "}
+              {t("common:confirmation")}: {" "}
               {moment(seasons[selected].start).format(FORMAT)} -{" "}
               {moment(seasons[selected].end).format(FORMAT)}?
             </DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVisible(false)}>{t("cancel")}</Button>
+          <Button onClick={() => setVisible(false)}>{t("common:cancel")}</Button>
           <Button variant="contained" onClick={() => removeSeason(seasons[selected].id)}>
-            {t("remove")}
+            {t("common:remove")}
           </Button>
         </DialogActions>
       </Dialog>

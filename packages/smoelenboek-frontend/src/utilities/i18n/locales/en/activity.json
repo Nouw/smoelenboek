@@ -4,5 +4,14 @@
   "public": "Public",
   "enter-description": "Enter description",
   "title": "Title",
-  "location": "Location"
+  "location": "Location",
+  "create-activity": "Create activity",
+  "maximum": "Maximum",
+  "date": "Date",
+  "registration-open": "Registration open",
+  "registration-closed": "Registration Closed",
+  "open-for-external": "Put this on true if this acitivity is also open to external people",
+  "responses": "Responses",
+  "open-sheets": "Open Sheets",
+  "link-responses-to-sheets": "Link responses to Sheets"
 }

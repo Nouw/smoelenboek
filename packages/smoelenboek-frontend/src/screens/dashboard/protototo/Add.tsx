@@ -21,21 +21,20 @@ interface FormValues extends SeasonFormValues {
 export const Add: React.FC<AddProps> = () => {
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "error", "options", "messages"]);
 
   const [createSeason] = useAddProtototoSeasonMutation();
-
-  { }
+ 
   async function submit(values: { [p: string]: any; setSubmitting: (isSubmitting: boolean) => void }) {
     try {
       const res = await createSeason({ startDate: values.startDate, endDate: values.endDate, tikkie: values.tikkie}).unwrap();
 
       dispatch(addSeasons([res.data]));
-      snackbar.openSnackbar(t("message.protototo.season.create"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:protototo.season.create"), Severity.SUCCESS)
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
   }
@@ -47,7 +46,7 @@ export const Add: React.FC<AddProps> = () => {
     fields={(props) => (
       <TextField
         id="tikkie"
-        label={t("dashboard.protototo.tikkie")}
+        label={t("protototo:tikkie")}
         value={props.values.tikkie}
         onChange={props.handleChange}
         error={props.touched.tikkie && Boolean(props.errors.tikkie)}

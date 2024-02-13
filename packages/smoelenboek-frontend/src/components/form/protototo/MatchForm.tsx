@@ -39,7 +39,7 @@ export interface FormValues {
 // })
 
 export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, title }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "protototo"]);
 
   return (
     <Card>
@@ -59,7 +59,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, tit
                   {/* @ts-ignore */}
                   {({form: { touched, errors }}) => (
                     <DateTimePicker
-                      label={t("dashboard.protototo.playDate")}
+                      label={t("protototo:play-date")}
                       format="HH:mm DD-MM-YYYY"
                       value={props.values.playDate}
                       onChange={(value) => props.setFieldValue("playDate", value, true)}
@@ -80,7 +80,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, tit
                 </Field>
                 <TextField
                   id="homeTeam"
-                  label={`${t("dashboard.protototo.home")} team`}
+                  label={`${t("protototo:home")} team`}
                   value={props.values.homeTeam}
                   onChange={props.handleChange}
                   error={props.touched.homeTeam && Boolean(props.errors.homeTeam)}
@@ -88,7 +88,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, tit
                 />
                 <TextField
                   id="awayTeam"
-                  label={`${t("dashboard.protototo.away")} team`}
+                  label={`${t("protototo:away")} team`}
                   value={props.values.awayTeam}
                   onChange={props.handleChange}
                   error={props.touched.awayTeam && Boolean(props.errors.awayTeam)}
@@ -102,7 +102,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, tit
                       <InputLabel id="type-picker">Type</InputLabel>
                       <Select
                         labelId="type-picker"
-                        label="Type"
+                        label={t("common:type")}
                         value={props.values.gender}
                         onChange={(value) => props.setFieldValue("gender", value.target.value)}
                         fullWidth
@@ -118,7 +118,7 @@ export const MatchForm: React.FC<MatchFormProps> = ({ initialValues, submit, tit
                 </Field>
                 <Box>
                   <LoadingButton type="submit" loading={props.isSubmitting}>
-                    <span>{t("save")}</span>
+                    <span>{t("common:save")}</span>
                   </LoadingButton>
                 </Box>
               </Stack>

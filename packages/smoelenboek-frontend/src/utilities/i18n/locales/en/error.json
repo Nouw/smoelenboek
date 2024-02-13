@@ -1,3 +1,6 @@
 {
-  "error-message": "Something went wrong :("
+  "error-message": "Something went wrong :(",
+  "no-protototo-season": "There is no active protototo season",
+  "default-error-header": "Something went wrong loading this page",
+  "contact": "If you think this is an error, please send a message to WebCie"
 }

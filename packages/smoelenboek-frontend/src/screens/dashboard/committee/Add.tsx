@@ -7,7 +7,7 @@ interface AddProps {
 }
 
 export const Add: React.FC<AddProps> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("committee");
 
-  return <CommitteeForm method="post" message={t("message.committee.create")} />
+  return <CommitteeForm method="post" message={t("create-committee")} />
 }

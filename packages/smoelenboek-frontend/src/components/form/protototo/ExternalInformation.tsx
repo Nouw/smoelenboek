@@ -30,17 +30,17 @@ export interface FormValues {
 }
 
 export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie, submit }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "form", "protototo", "user", "message"]);
 
   const schema = Yup.object({
-    email: Yup.string().required(t("protototo.form.required")).email('Please enter a valid email address'),
-    acceptAVG: Yup.boolean().oneOf([true], t("protototo.form.required")),
-    firstName: Yup.string().required(t("protototo.form.required")),
-    lastName: Yup.string().required(t("protototo.form.required")),
+		email: Yup.string().required(t("form:field-required")).email(t("messages:valid.email")),
+    acceptAVG: Yup.boolean().oneOf([true], t("form:field-required")),
+    firstName: Yup.string().required(t("form:field-required")),
+    lastName: Yup.string().required(t("form:field-required")),
     showTikkie: Yup.boolean(),
     tikkie: Yup.boolean().when("showTikkie", (showTikkie, schema) => {
       if (showTikkie) {
-        return schema.required(t("protototo.form.required"))
+        return schema.required(t("form:field-required"))
       }
 
       return schema;
@@ -59,10 +59,10 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
     {(props: FormikProps<FormValues>) => (
       <form onSubmit={props.handleSubmit} noValidate>
         <Stack spacing={2}>
-          <Typography variant="h4" textAlign="center">{t("protototo.details")}</Typography>
+          <Typography variant="h4" textAlign="center">{t("protototo:details")}</Typography>
           <TextField
             id="firstName"
-            label={t("dashboard.user.firstName")}
+            label={t("user:first-name")}
             type="text"
             value={props.values.firstName}
             onChange={props.handleChange}
@@ -71,7 +71,7 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
           />
           <TextField
             id="lastName"
-            label={t("dashboard.user.lastName")}
+            label={t("user:last-name")}
             type="text"
             value={props.values.lastName}
             onChange={props.handleChange}
@@ -80,7 +80,7 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
           />
           <TextField
             id="email"
-            label={t("email")}
+            label={t("user:email")}
             type="email"
             value={props.values.email}
             onChange={props.handleChange}
@@ -89,16 +89,16 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
           />
           <FormGroup>
             <FormControl required error={Boolean(props.errors.acceptAVG)}>
-              <FormControlLabel control={<Checkbox id="acceptAVG" checked={props.values.acceptAVG} onChange={props.handleChange}/>} label={t("message.avg")}/>
+              <FormControlLabel control={<Checkbox id="acceptAVG" checked={props.values.acceptAVG} onChange={props.handleChange}/>} label={t("form:avg")}/>
                 <FormHelperText>{props.errors.acceptAVG}</FormHelperText>
             </FormControl>
 
             {tikkie && (
               <>
                 <FormControl required error={Boolean(props.errors.tikkie)}>
-                  <Button sx={{ mr: 'auto', my: 2, backgroundColor: '#413f80'}} variant="contained" onClick={() => window.open(tikkie, '_blank')?.focus()}>Tikkie betalen</Button>
+                  <Button sx={{ mr: 'auto', my: 2, backgroundColor: '#413f80'}} variant="contained" onClick={() => window.open(tikkie, '_blank')?.focus()}>{t("message:pay-tikkie")}</Button>
                   <FormControlLabel control={<Checkbox id="tikkie" checked={props.values.tikkie} onChange={(_event,checked) => props.setFieldValue("tikkie", checked)}/>}
-                                    label={t("message.tikkie")}/>
+                                    label={t("message:tikkie")}/>
                     <FormHelperText>{props.errors.tikkie}</FormHelperText>
                 </FormControl>
 
@@ -107,7 +107,7 @@ export const ExternalInformation: React.FC<ExternalInformationProps> = ({ tikkie
           </FormGroup>
           <Box>
             <LoadingButton type="submit" loading={props.isSubmitting}>
-              <span>{t("submit")}</span>
+              <span>{t("common:submit")}</span>
             </LoadingButton>
           </Box>
         </Stack>

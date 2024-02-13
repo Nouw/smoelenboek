@@ -119,7 +119,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
           return <form onSubmit={props.handleSubmit} noValidate>
             <List>
               <ListItem>
-                <ListItemText>Set 1</ListItemText>
+                <ListItemText>{t("protototo:set.one")}</ListItemText>
                 <Stack direction="row" gap={4}>
                   <Button variant={props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", true, true)}>{t("protototo:win")}</Button>
                   <Button variant={!props.values.setOne ? "contained" : "outlined"} onClick={() => props.setFieldValue("setOne", false, true)}>{t("protototo:lose")}</Button>
@@ -127,7 +127,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
               </ListItem>
               <Divider />
               <ListItem>
-                <ListItemText>Set 2</ListItemText>
+                <ListItemText>{t("protototo:set.two")}</ListItemText>
                 <Stack direction="row" gap={4}>
                   <Button variant={props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", true, true)}>{t("protototo:win")}</Button>
                   <Button variant={!props.values.setTwo ? "contained" : "outlined"} onClick={() => props.setFieldValue("setTwo", false, true)}>{t("protototo:lose")}</Button>
@@ -135,7 +135,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
               </ListItem>
               <Divider />
               <ListItem>
-                <ListItemText>Set 3</ListItemText>
+                <ListItemText>{t("protototo:set.three")}</ListItemText>
                 <Stack direction="row" gap={4}>
                   <Button variant={props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", true, true)}>{t("protototo:win")}</Button>
                   <Button variant={!props.values.setThree ? "contained" : "outlined"} onClick={() => props.setFieldValue("setThree", false, true)}>{t("protototo:lose")}</Button>
@@ -145,7 +145,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
                 <>
                   <Divider />
                   <ListItem>
-                    <ListItemText>Set 4</ListItemText>
+                    <ListItemText>{t("protototo:set.four")}</ListItemText>
                     <Stack direction="row" gap={4}>
                       <Button variant={props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", true, true)}>{t("protototo:win")}</Button>
                       <Button variant={!props.values.setFour ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFour", false, true)}>{t("protototo:lose")}</Button>
@@ -157,7 +157,7 @@ export const Match: React.FC<MatchProps> = ({ home, away, date, matchId, gender,
                 <>
                   <Divider />
                   <ListItem>
-                    <ListItemText>Set 5</ListItemText>
+                    <ListItemText>{t("protototo:set.five")}</ListItemText>
                     <Stack direction="row" gap={4}>
                       <Button variant={props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", true, true)}>{t("protototo:win")}</Button>
                       <Button variant={!props.values.setFive ? "contained" : "outlined"} onClick={() => props.setFieldValue("setFive", false, true)}>{t("protototo:lose")}</Button>

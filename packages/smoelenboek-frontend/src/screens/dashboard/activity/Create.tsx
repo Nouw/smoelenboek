@@ -9,6 +9,7 @@ import {CreateActivityForm} from "../../../components/form/activity/builder/Crea
 import {useCreateActivityMutation} from "../../../api/endpoints/activity.ts";
 import {Activity, Form} from "smoelenboek-types";
 import {ActivitySettings} from "../../../components/form/activity/ActivitySettings.tsx";
+import { useTranslation } from "react-i18next";
 
 interface CreateProps {
 
@@ -41,10 +42,12 @@ const schema = object({
 type FormValues = InferType<typeof schema>;
 
 export const Create: React.FC<CreateProps> = () => {
-  const steps: StepProperties[] = [
-    {label: 'Create Activity', optional: false, component: <CreateActivity name="activity"/>},
-    {label: 'Create Form', optional: true, component: <CreateActivityForm name="form"/>},
-    {label: 'Settings', optional: false, component: <ActivitySettings name="activity"/>},
+  const { t } = useTranslation(["common", "activity", "form", "settings"]);
+
+	const steps: StepProperties[] = [
+    {label: t("activity:create-activity"), optional: false, component: <CreateActivity name="activity"/>},
+    {label: t("form:create-form"), optional: true, component: <CreateActivityForm name="form"/>},
+    {label: t("settings:settings"), optional: false, component: <ActivitySettings name="activity"/>},
   ];
 
   const initialValues: FormValues = {
@@ -111,13 +114,13 @@ export const Create: React.FC<CreateProps> = () => {
                   onClick={handleBack}
                   sx={{mr: 1}}
                 >
-                  Back
+									{t("common:back")}
                 </Button>
                 <Box sx={{flex: '1 1 auto'}}/>
                 {activeStep < steps.length - 1 ? (
                   <Button onClick={handleNext}>Next</Button>
                 ) : (
-                  <LoadingButton type="submit" loading={props.isSubmitting}>Submit</LoadingButton>
+                  <LoadingButton type="submit" loading={props.isSubmitting}>{t("common:submit")}</LoadingButton>
                 )}
               </Box>
             </Box>

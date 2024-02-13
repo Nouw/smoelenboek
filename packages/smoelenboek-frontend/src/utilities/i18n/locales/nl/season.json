@@ -2,5 +2,6 @@
   "seasons": "Seizoenen",
   "create-season": "Seizoen toevoegen",
   "start-date": "Start datum",
-  "end-date": "Eind datum"
+  "end-date": "Eind datum",
+  "delete-season": "Seizoen verwijderen"
 }

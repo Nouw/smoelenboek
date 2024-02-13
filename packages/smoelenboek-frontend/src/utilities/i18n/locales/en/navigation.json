@@ -13,7 +13,25 @@
   "dashboard": {
     "go-back": "Back to smoelenboek",
     "headers": {
-      "season-management": "Season management"
-    }
-  }
+      "season-management": "Season management",
+      "user-management": "User management",
+      "team-management": "Team management",
+      "committee-management": "Committee management",
+      "protototo-management": "Protototo management",
+      "documents-management": "Document management",
+      "activity-management": "Activity management"
+    },
+    "seasons": "Seasons",
+    "add-season": "Add season",
+    "users": "Users",
+    "add-user": "Add user",
+    "teams": "Teams",
+    "add-team": "Add team",
+    "add-committee": "Add committee",
+    "categories": "Categories",
+    "add-category": "Add category",
+    "add-activity": "Add activity",
+    "activities": "Activities"
+  },
+  "activities": "Activities"
 }

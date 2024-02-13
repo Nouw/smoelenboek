@@ -3,7 +3,11 @@
   "categories": "Categories",
   "create-category": "Add category",
   "update-category": "Update category",
-  "name": "Name",
   "delete-files": "Delete files",
-  "files": "files"
+  "delete-category": "Delete category",
+  "files": "files",
+  "types": {
+    "photos": "Photos",
+    "documents": "Documents"
+  }
 }

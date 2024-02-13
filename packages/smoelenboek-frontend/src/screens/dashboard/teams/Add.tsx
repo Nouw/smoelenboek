@@ -7,7 +7,7 @@ interface AddProps {
 }
 
 export const Add: React.FC<AddProps> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["messages"]);
 
-  return <TeamForm method="post" message={t("message.teams.create")}/>
+  return <TeamForm method="post" message={t("messages:teams.create")}/>
 }

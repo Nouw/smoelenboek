@@ -69,7 +69,7 @@ export interface Seasons {
 
 export const Profile: React.FC<ProfileProps> = () => {
   const { id } = useParams();
-  const i18n = useTranslation();
+  const { t } = useTranslation(["user"]);
 
   const [user, setUser] = React.useState<User>();
   const [seasons, setSeasons] = React.useState<Seasons[]>([]);
@@ -144,7 +144,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <Mail color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("email")}
+                primary={t("email")}
                 secondary={user?.email ?? ""}
               />
             </ListItem>
@@ -153,7 +153,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <Phone color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("phoneNumber")}
+                primary={t("phone-number")}
                 secondary={user?.phoneNumber ?? ""}
               />
             </ListItem>
@@ -162,7 +162,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <CakeOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("birthdate")}
+                primary={t("birthdate")}
                 secondary={moment(user?.birthDate).format(
                   "D-MM-YYYY",
                 ) ?? ""}
@@ -173,7 +173,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <SportsVolleyball color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("bondNumber")}
+                primary={t("bond-number")}
                 secondary={user?.bondNumber ?? ""}
               />
             </ListItem>
@@ -182,7 +182,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <Add color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("registrationDate")}
+                primary={t("registration-date")}
                 secondary={moment(user?.joinDate).format(
                   "D-MM-YYYY",
                 ) ?? ""}
@@ -193,7 +193,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <Numbers color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("backNumber")}
+                primary={t("back-number")}
                 secondary={user?.backNumber ?? ""}
               />
             </ListItem>
@@ -202,13 +202,13 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <SportsIcon color="primary" />
               </ListItemIcon>
               <ListItemText
-                primary={i18n.t("refereeLicense")}
+                primary={t("referee-license")}
                 secondary={user?.refereeLicense ?? "Geen"}
               />
             </ListItem>
           </List>
           <List
-            subheader={<ListSubheader>{i18n.t("activities")}</ListSubheader>}
+            subheader={<ListSubheader>{t("activities")}</ListSubheader>}
             sx={{ bgcolor: "background.paper" }}
           >
             {seasons.map((season) => <Season

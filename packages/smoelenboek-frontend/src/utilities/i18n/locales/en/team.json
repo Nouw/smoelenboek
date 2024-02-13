@@ -9,5 +9,6 @@
   "league": "League",
   "add-player": "Add player",
   "role": "Role",
-  "add-user": "Add user to team"
+  "add-user": "Add user to team",
+  "sync-photos": "Sync photos"
 }

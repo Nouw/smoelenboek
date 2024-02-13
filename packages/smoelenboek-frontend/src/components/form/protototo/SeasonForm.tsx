@@ -22,7 +22,7 @@ type SeasonFormProps<T> = {
 }
 
 export const SeasonForm = <T extends SeasonFormValues,>({ schema, initialValues, submit, heading, fields } : SeasonFormProps<T>) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "season"]);
 
   return (
     <Card>
@@ -43,7 +43,7 @@ export const SeasonForm = <T extends SeasonFormValues,>({ schema, initialValues,
                    {/*@ts-ignore*/}
                   {({form: { touched, errors,  }}) => (
                     <DateTimePicker
-                      label={t("dashboard.season.startDate")}
+                      label={t("season:start-date")}
                       format="HH:mm DD-MM-YYYY"
                       value={props.values.startDate}
                       onChange={(value) => props.setFieldValue("startDate", value, true)}
@@ -67,7 +67,7 @@ export const SeasonForm = <T extends SeasonFormValues,>({ schema, initialValues,
                   {({form: { touched, errors }}) => (
                     <>
                       <DateTimePicker
-                        label={t("dashboard.season.endDate")}
+                        label={t("season:end-date")}
                         format="HH:mm DD-MM-YYYY"
                         value={props.values.endDate}
                         onChange={(value) => props.setFieldValue("endDate", value, true)}
@@ -94,7 +94,7 @@ export const SeasonForm = <T extends SeasonFormValues,>({ schema, initialValues,
                 </>
                 <Box>
                   <LoadingButton type="submit" loading={props.isSubmitting}>
-                    <span>Save</span>
+                    <span>{t("common:save")}</span>
                   </LoadingButton>
                 </Box>
               </Stack>

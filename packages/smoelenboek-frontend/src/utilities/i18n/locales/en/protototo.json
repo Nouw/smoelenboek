@@ -14,7 +14,15 @@
   "delete-match": "Delete match",
   "predictions-alert": "This also deletes all predictions",
   "update-match": "Update match",
+  "add-match": "Add match",
   "win": "Win",
   "lose": "Lose", 
-  "details": "Details"
+  "details": "Details",
+  "set": {
+    "one": "Set 1",
+    "two": "Set 2",
+    "three": "Set 3",
+    "four": "Set 4",
+    "five": "Set 5"
+  }
 }

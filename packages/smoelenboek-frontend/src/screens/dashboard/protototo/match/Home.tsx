@@ -67,32 +67,32 @@ export const Home: React.FC<HomeProps> = () => {
 
       dispatch(removeMatchState(match.id));
 
-      snackbar.openSnackbar(t("message.protototo.match.delete"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:protototo.match.delete"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR)
     }
   }
 
   return (
       <Card>
         <CardContent>
-          <Button onClick={() => navigate('add')}>Add Match</Button>
+          <Button onClick={() => navigate('add')}>{t("protototo:add-match")}</Button>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>
-                    {t("dashboard.protototo.playDate")}
+                    {t("protototo:play-date")}
                   </TableCell>
                   <TableCell>
-                    {t("dashboard.protototo.home")}
+                    {t("protototo:home")}
                   </TableCell>
                   <TableCell>
-                    {t("dashboard.protototo.away")}
+                    {t("protototo:away")}
                   </TableCell>
                   <TableCell align="right">
-                    {t("dashboard.protototo.options")}
+                    {t("options:options")}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -108,13 +108,13 @@ export const Home: React.FC<HomeProps> = () => {
                           <ListItemIcon>
                             <Edit fontSize="small"/>
                           </ListItemIcon>
-                          {t("dashboard.options.edit")}
+                          {t("options:edit")}
                         </MenuItem>
                         <MenuItem onClick={() => navigate(`/dashboard/protototo/season/${params.id}/matches/result/${match.id}`)}>
                           <ListItemIcon>
                             <Flag fontSize="small"/>
                           </ListItemIcon>
-                          Resultaat invoeren
+												 {t("options:insert-result")} 
                         </MenuItem>
                         <MenuItem onClick={() => {
                           setSelected(key);
@@ -123,7 +123,7 @@ export const Home: React.FC<HomeProps> = () => {
                           <ListItemIcon>
                             <Delete fontSize="small"/>
                           </ListItemIcon>
-                          {t("dashboard.options.remove")}
+                          {t("options.remove")}
                         </MenuItem>
                       </Options>
                     </TableCell>
@@ -135,13 +135,13 @@ export const Home: React.FC<HomeProps> = () => {
         </CardContent>
 
         <Dialog open={visible} onClose={() => setVisible(false)}>
-          <DialogTitle>{t("dashboard.protototo.deleteMatch")}?</DialogTitle>
+          <DialogTitle>{t("protototo:delete-match")}?</DialogTitle>
           <DialogContent>
             {selected >= 0 && matches[selected] !== undefined && (
               <>
-                <DialogContentText>${t("confirmation")} {matches[selected].homeTeam} vs {matches[selected].awayTeam}?</DialogContentText>
+                <DialogContentText>${t("common:confirmation")} {matches[selected].homeTeam} vs {matches[selected].awayTeam}?</DialogContentText>
                 <br/>
-                <DialogContentText fontWeight="bold">${t("dashboard.protototo.predictionsAlert")}!</DialogContentText>
+                <DialogContentText fontWeight="bold">${t("protototo:predictions-alert")}!</DialogContentText>
               </>
             )}
           </DialogContent>

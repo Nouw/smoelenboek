@@ -3,5 +3,6 @@
   "edit": "Edit",
   "remove": "Delete",
   "add-match": "Add match",
-  "export-participants": "Export participants"
+  "export-participants": "Export participants",
+  "insert-result": "Add result"
 }

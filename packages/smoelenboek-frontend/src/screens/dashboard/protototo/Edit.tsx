@@ -23,7 +23,7 @@ export const Edit: React.FC<EditProps> = () => {
   const params = useParams();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t }  = useTranslation();
+  const { t }  = useTranslation(["messages", "error", "protototo"]);
 
   const season = useAppSelector(state => protototoSeasonSelector.selectById(state, parseInt(params.id as string)));
 
@@ -51,11 +51,11 @@ export const Edit: React.FC<EditProps> = () => {
 
       dispatch(updateSeasons([res.data]));
 
-      snackbar.openSnackbar(t("message.protototo.season.update"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:protototo.season.update"), Severity.SUCCESS)
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
   }
@@ -71,7 +71,7 @@ export const Edit: React.FC<EditProps> = () => {
     fields={(props) => (
       <TextField
         id="tikkie"
-        label={t("dashboard.protototo.tikkie")}
+        label={t("protototo:tikkie")}
         value={props.values.tikkie}
         onChange={props.handleChange}
         error={props.touched.tikkie && Boolean(props.errors.tikkie)}

@@ -7,5 +7,8 @@
   "save": "Save",
   "email-request": "Send email password reset request!",
 	"name": "Name",
-	"upload": "Upload"
+	"upload": "Upload",
+  "back": "Back",
+  "email": "Email",
+  "type": "Type"
 }

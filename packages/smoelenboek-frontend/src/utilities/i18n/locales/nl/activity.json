@@ -4,6 +4,15 @@
   "public": "Openbaar",
   "enter-description": "Voer beschrijving in",
   "title": "Titel",
-  "location": "Locatie"
+  "location": "Locatie",
+  "create-activity": "Activiteit aanmaken",
+  "maximum": "Maximum",
+  "date": "Datum",
+  "registration-open": "Inschrijven open",
+  "registration-closed": "Inschrijving gesloten",
+  "open-for-external": "Zet dit op true als deze acitiviteit ook open is voor externe",
+  "responses": "Antwoorden",
+  "open-sheets": "Open Sheets",
+  "link-responses-to-sheets": "Link inschrijven aan Sheets"
 }
 

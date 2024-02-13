@@ -13,8 +13,25 @@
   "dashboard": {
     "go-back": "Terug naar smoelenboek",
     "headers": {
-      "season-management": "Seizoenbeheer"
-    }
-  }
+      "season-management": "Seizoenbeheer",
+      "user-management": "Ledenbeheer",
+      "team-management": "Teambeheer",
+      "committee-management": "Commissiesbeheer",
+      "protototo-management": "Protototobeheer",
+      "documents-management": "Documentenbeheer",
+      "activity-management": "Activiteitenbeheer"
+    },
+    "seasons": "Seizoenen",
+    "add-season": "Seizoen toevoegen",
+    "users": "Leden",
+    "add-user": "Lid toevoegen",
+    "teams": "Teams",
+    "add-team": "Team toevoegen",
+    "add-committee": "Commissie toevoegen",
+    "categories": "Categorieën",
+    "add-category": "Categorie toevoegen",
+    "add-activity": "Activiteit toevoegen",
+    "activities": "Activiteiten"
+  },
+  "activities": "Activiteiten"
 }
-

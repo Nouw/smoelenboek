@@ -40,12 +40,12 @@ interface FormValues {
 //   league: Yup.string().required(),
 //   gender: Yup.string()
 // })
-
+// TODO: Rework this shit, because this can be generic
 export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, league, gender }) => {
   const snackbar = React.useContext(SnackbarContext);
   const params = useParams();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "team", "messages", "error", "navigation"]);
 
   const [updateTeamApi] = useUpdateTeamMutation();
   const [createTeamApi] = useCreateTeamMutation();
@@ -66,7 +66,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, leagu
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar('Something went wrong :(', Severity.ERROR);
+      snackbar.openSnackbar("error:error-message", Severity.ERROR);
       values.setSubmitting(false);
     }
   }
@@ -86,7 +86,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, leagu
               <Stack spacing={2}>
                 <TextField
                   id="name"
-                  label={t("dashboard.team.name")}
+                  label={t("common:name")}
                   value={props.values.name}
                   onChange={props.handleChange}
                   error={props.touched.name && Boolean(props.errors.name)}
@@ -97,10 +97,10 @@ export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, leagu
                   {/* @ts-ignore */}
                   {({form: { touched, errors }}) => (
                     <FormControl fullWidth>
-                      <InputLabel id="rank-picker">{t("dashboard.team.league")}</InputLabel>
+                      <InputLabel id="rank-picker">{t("team:league")}</InputLabel>
                       <Select
                         labelId="rank-picker"
-                        label="league"
+                        label={t("team:league")}
                         value={props.values.league}
                         onChange={(value) => props.setFieldValue("league", value.target.value)}
                         fullWidth
@@ -130,13 +130,13 @@ export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, leagu
                       <InputLabel id="gender-picker">Type</InputLabel>
                       <Select
                         labelId="gender-picker"
-                        label="Type"
+                        label={t("common:type")}
                         value={props.values.gender}
                         onChange={(value) => props.setFieldValue("gender", value.target.value)}
                         fullWidth
                       >
-                        <MenuItem value="male">{t("navigation.teams.men")}</MenuItem>
-                        <MenuItem value="female">{t("navigation.teams.women")}</MenuItem>
+                        <MenuItem value="male">{t("navigation:teams.men")}</MenuItem>
+                        <MenuItem value="female">{t("navigation:teams.women")}</MenuItem>
 
                       </Select>
                       {touched.gender && Boolean(errors.gender) &&
@@ -147,7 +147,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({ method, message, name, leagu
                 </Field>
                 <Box>
                   <LoadingButton type="submit" loading={props.isSubmitting}>
-                    <span>{t("save")}</span>
+                    <span>{t("common:save")}</span>
                   </LoadingButton>
                 </Box>
               </Stack>

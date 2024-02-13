@@ -49,7 +49,7 @@ export const formQuestionSchema =  array().of(
   }));
 
 export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["form"]);
 
   const [titleFieldProps] = useField(`${name}.title`);
   const [typeFieldProps] = useField(`${name}.type`)
@@ -69,12 +69,12 @@ export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
             <Stack direction="row" gap={2} useFlexGap flexWrap="wrap">
               <TextField
                 {...titleFieldProps}
-                label={t("dashboard.form.question.question")}
+                label={t("form:question.question")}
                 sx={{ flex: 0.7 }}
               />
               <FormControl sx={{ flex: 0.3 }}>
                 <InputLabel id="question-type">
-                  {t("dashboard.form.question.type")}
+                  {t("form:question.type")}
                 </InputLabel>
                 <Select<SelectType>
                   {...typeFieldProps}
@@ -82,13 +82,13 @@ export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
                   label="Type"
                 >
                   <MenuItem value="text">
-                    {t("dashboard.form.question.text")}
+                    {t("form:question.text")}
                   </MenuItem>
                   <MenuItem value="choice">
-                    {t("dashboard.form.question.choice")}
+                    {t("form:question.choice")}
                   </MenuItem>
                   <MenuItem value="select">
-                    {t("dashboard.form.question.select")}
+                    {t("form:question.select")}
                   </MenuItem>
                   <MenuItem value="dropdown">
                     Dropdown
@@ -114,7 +114,7 @@ export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
                       control={
                         <Switch value={paragraphFieldProps.value} onChange={(_event, checked) => paragraphHelpers.setValue(checked)}/>
                       }
-                      label={t("dashboard.form.question.paragraph")}
+                      label={t("form:question.paragraph")}
                       color="primary"
                       labelPlacement="start"
                     />
@@ -125,7 +125,7 @@ export const FormFieldBuilder: React.FC<FormFieldBuilderProps> = ({ name }) => {
                         value={requiredFieldProps.value} onChange={(_event, checked) => requiredHelpers.setValue(checked)}
                       />
                     }
-                    label={t("dashboard.form.question.required")}
+                    label={t("form:question.required")}
                     color="primary"
                     labelPlacement="start"
                   />

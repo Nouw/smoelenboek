@@ -7,7 +7,7 @@ interface AddProps {
 }
 
 export const Add: React.FC<AddProps> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["user"]);
 
-  return <UserForm method="post" message={t("message.user.create")}/>
+  return <UserForm method="post" message={t("user:create-user")}/>
 }

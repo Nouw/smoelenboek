@@ -1,3 +1,6 @@
 {
-  "error-message": "Er is iets mis gegaan :("
+  "error-message": "Er is iets mis gegaan :(",
+  "no-protototo-season": "Er is geen actief protototo seizoen",
+  "default-error-header": "Er is iets misgegaan bij het laden van deze pagina",
+  "contact": "Als u denkt dat dit een fout is, stuur dan een bericht naar WebCie"
 }

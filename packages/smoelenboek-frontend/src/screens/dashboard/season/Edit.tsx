@@ -21,7 +21,7 @@ export const Edit: React.FC<EditProps> = () => {
   const dispatch = useAppDispatch();
   const seasons = useAppSelector(state => state.season.seasons);
   const season = seasons.entities[params.id ?? -1];
-  const { t } = useTranslation();
+  const { t } = useTranslation(["messages", "error"]);
 
   const [getSeasons] = useSeasonsMutation();
   const [putSeason] = useUpdateMutation()
@@ -43,19 +43,18 @@ export const Edit: React.FC<EditProps> = () => {
       getData();
     }
   }, [dispatch, getSeasons, season])
-
-  { }
+ 
   async function submit(values: { [p: string]: any; setSubmitting: (isSubmitting: boolean) => void }) {
     try {
       const res = await putSeason({ id: params.id ?? -1, endDate: values.endDate, startDate: values.startDate}).unwrap();
 
       dispatch(updateSeasons([res.data]));
 
-      snackbar.openSnackbar(t("message.season.update"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:season.update"), Severity.SUCCESS)
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
 

@@ -13,7 +13,7 @@ interface EditProps {
 
 export const Edit: React.FC<EditProps> = () => {
   const params = useParams();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["user"]);
   const dispatch = useAppDispatch();
   const members = useAppSelector(state => state.members.members);
   const member = members.entities[params.id ?? -1];
@@ -39,5 +39,5 @@ export const Edit: React.FC<EditProps> = () => {
     return <CircularProgress/>
   }
 
-  return <UserForm method="put" message={t("message.user.update")} baseValues={member as unknown as FormValues} admin />
+  return <UserForm method="put" message={t("user:update-user")} baseValues={member as unknown as FormValues} admin />
 }
