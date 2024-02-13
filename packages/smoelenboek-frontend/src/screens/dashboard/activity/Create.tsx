@@ -1,6 +1,6 @@
 import React from "react";
 import {Box, Button, Paper, Step, StepLabel, Stepper} from "@mui/material";
-import {CreateActivity} from "../../../components/form/activity/CreateActivity.tsx";
+import {CreateActivity, activity} from "../../../components/form/activity/CreateActivity.tsx";
 import {Formik, FormikProps} from "formik";
 import {boolean, date, InferType, number, object, string} from "yup";
 import {LoadingButton} from "@mui/lab";
@@ -22,16 +22,7 @@ interface StepProperties {
 }
 
 const schema = object({
-  activity: object({
-    title: string().required(),
-    description: string().nullable(),
-    location: string().nullable(),
-    public: boolean().default(() => true),
-    registrationOpen: date(),
-    registrationClosed: date(),
-    max: number().nullable(),
-    date: date().required(),
-  }),
+  activity,
   form: object({
     title: string().required(),
     description: string().required(),
