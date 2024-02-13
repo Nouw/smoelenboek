@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 export const ApplicationError: React.FC<any> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["error", "navigation"]);
 
   const error = useRouteError();
   const navigate = useNavigate();
@@ -31,15 +31,15 @@ export const ApplicationError: React.FC<any> = () => {
               Error
             </Typography>
             <Typography gutterBottom>
-              {t('message.error.something')}
+              {t("error:default-error-header")}
               <br/>
-              {t('message.error.info')}
+              {t("error:contact")}
             </Typography>
             <Button
               variant="contained"
               onClick={() => navigate(-1)} 
             >
-              {t('dashboard.goBack')}
+              {t('navigation:dashboard.go-back')}
             </Button>
           </Stack>
         </CardContent>

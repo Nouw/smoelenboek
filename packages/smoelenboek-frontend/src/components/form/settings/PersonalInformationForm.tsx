@@ -36,7 +36,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
     streetName: ""
   }
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "user", "messages", "error"]);
   const snackbar = React.useContext(SnackbarContext);
 
   const id = useAppSelector(state => state.auth.id);
@@ -53,10 +53,10 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
     try {
       await trigger({ user: {...values as unknown as User, id}, admin: false} as unknown as PutUserRequest).unwrap();
 
-      snackbar.openSnackbar(t("message.settings.informationUpdated"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:information-updated"), Severity.SUCCESS)
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
 
     values.setSubmitting(false);
@@ -73,7 +73,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
           <Stack spacing={2}>
             <TextField
               id="email"
-              label={t("email")}
+              label={t("user:email")}
               type="email"
               value={props.values.email}
               onChange={props.handleChange}
@@ -82,7 +82,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="phoneNumber"
-              label={t("phoneNumber")}
+              label={t("user:phone-number")}
               value={props.values.phoneNumber}
               onChange={props.handleChange}
               error={props.touched.phoneNumber && Boolean(props.errors.phoneNumber)}
@@ -90,7 +90,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="streetName"
-              label={t("dashboard.user.streetName")}
+              label={t("user:street-name")}
               value={props.values.streetName}
               onChange={props.handleChange}
               error={props.touched.streetName && Boolean(props.errors.streetName)}
@@ -98,7 +98,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="houseNumber"
-              label={t("dashboard.user.houseNumber")}
+              label={t("user:house-number")}
               value={props.values.houseNumber}
               onChange={props.handleChange}
               error={props.touched.houseNumber && Boolean(props.errors.houseNumber)}
@@ -106,7 +106,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="postcode"
-              label={t("dashboard.user.postcode")}
+              label={t("user:postcode")}
               value={props.values.postcode}
               onChange={props.handleChange}
               error={props.touched.postcode && Boolean(props.errors.postcode)}
@@ -114,7 +114,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="city"
-              label={t("dashboard.user.city")}
+              label={t("user:city")}
               value={props.values.city}
               onChange={props.handleChange}
               error={props.touched.city && Boolean(props.errors.city)}
@@ -122,7 +122,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="bankaccountNumber"
-              label={t("dashboard.user.IBAN")}
+              label={t("user:IBAN")}
               value={props.values.bankaccountNumber}
               onChange={props.handleChange}
               error={props.touched.bankaccountNumber && Boolean(props.errors.bankaccountNumber)}
@@ -130,7 +130,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <TextField
               id="backNumber"
-              label={t("backNumber")}
+              label={t("user:back-number")}
               type="number"
               value={props.values.backNumber}
               onChange={props.handleChange}
@@ -139,7 +139,7 @@ export const PersonalInformationForm: React.FC<PersonalInformationFormProps> = (
             />
             <Box>
               <LoadingButton type="submit" loading={props.isSubmitting}>
-                <span>{t("save")}</span>
+                <span>{t("common:save")}</span>
               </LoadingButton>
             </Box>
           </Stack>

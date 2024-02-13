@@ -11,7 +11,7 @@ interface CreateActivityFormProps {
 }
 
 export const CreateActivityForm: React.FC<CreateActivityFormProps> = ({ name }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["form"]);
 
   const [titleFieldProps, , titleFieldHelpers] = useField(`${name}.title`);
   const [descriptionFieldProps, , descriptionFieldHelpers] = useField(`${name}.description`);
@@ -20,7 +20,7 @@ export const CreateActivityForm: React.FC<CreateActivityFormProps> = ({ name }) 
   return (
     <>
       <Stack spacing={1}>
-        <TextField value={titleFieldProps.value} label={t("dashboard.form.title")} fullWidth
+        <TextField value={titleFieldProps.value} label={t("form:title")} fullWidth
                    onChange={(e) => titleFieldHelpers.setValue(e.target.value)}/>
         <StyledTextInput value={descriptionFieldProps.value ?? ""} height={200} toolbar
                          onChange={(value) => descriptionFieldHelpers.setValue(value)}/>
@@ -40,7 +40,7 @@ export const CreateActivityForm: React.FC<CreateActivityFormProps> = ({ name }) 
                     startIcon={<Add/>}
                     onClick={() => arrayProps.push({type: "text"})}
                   >
-                    {t("dashboard.form.question.addQuestion")}
+                    {t("form:question.add-question")}
                   </Button>
                 </Box>
               </CardContent>

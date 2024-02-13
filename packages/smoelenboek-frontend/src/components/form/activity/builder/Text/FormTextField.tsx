@@ -7,9 +7,9 @@ type FormTextFieldProps = {
 } & TextFieldProps
 
 export const FormTextField: React.FC<FormTextFieldProps> = (props) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["form"]);
 
 	return (
-    <TextField {...props} fullWidth placeholder={t("dashboard.form.question.answer")} multiline={props.paragraph} rows={props.paragraph ? 4 : 1} />
+    <TextField {...props} fullWidth placeholder={t("question.answer")} multiline={props.paragraph} rows={props.paragraph ? 4 : 1} />
   );
 };

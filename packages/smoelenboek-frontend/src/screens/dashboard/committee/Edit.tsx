@@ -47,7 +47,7 @@ export const Edit: React.FC<EditProps> = () => {
   const params = useParams();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "committee", "error", "messages"]);
 
   const [getCommittee] = useLazyGetCommitteeQuery();
   const [addMember] = useAddMemberToCommitteeMutation();
@@ -77,7 +77,7 @@ export const Edit: React.FC<EditProps> = () => {
       if (committee.members.findIndex((x) => x.id === value.id) >= 0) {
         snackbar.openSnackbar(
           `${value.firstName} ${value.lastName} ${t(
-            "message.committee.alreadyPart"
+            "messages:committee.already-part"
           )}`
         );
       }
@@ -91,14 +91,14 @@ export const Edit: React.FC<EditProps> = () => {
       dispatch(addMemberToCommittee(res.data));
 
       snackbar.openSnackbar(
-        `${t("message.committee.added")} ${value.firstName} ${
+        `${t("committee:added")} ${value.firstName} ${
           value.lastName
-        } ${t("message.committee.toCommittee")}`,
+        } ${t("message:committee.to-committee")}`,
         Severity.SUCCESS
       );
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
 
@@ -108,12 +108,12 @@ export const Edit: React.FC<EditProps> = () => {
 
       dispatch(updateMemberState({ key: index, data: res.data }));
       snackbar.openSnackbar(
-        t("message.committee.roleUpdate"),
+        t("messages:committee.role-update"),
         Severity.SUCCESS
       );
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
 
@@ -123,12 +123,12 @@ export const Edit: React.FC<EditProps> = () => {
 
       dispatch(removeMemberFromCommittee(member.id));
       snackbar.openSnackbar(
-        t("message.committee.removeUser"),
+        t("messages:committee.remove-user"),
         Severity.SUCCESS
       );
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
 
@@ -141,7 +141,7 @@ export const Edit: React.FC<EditProps> = () => {
       <Stack spacing={2}>
         <CommitteeForm
           method="put"
-          message={t("message.committee.update")}
+          message={t("messages:committee.update")}
           name={committee.committee.name}
           email={committee.committee.email}
         />
@@ -149,14 +149,14 @@ export const Edit: React.FC<EditProps> = () => {
           <CardContent>
             <Button variant="contained" onClick={() => setVisible(true)}>
               <Add />
-              {t("dashboard.committee.addMember")}
+              {t("committee:add-member")}
             </Button>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t("dashboard.committee.name")}</TableCell>
-                    <TableCell>{t("dashboard.committee.role")}</TableCell>
+                    <TableCell>{t("committee:name")}</TableCell>
+                    <TableCell>{t("committee:role")}</TableCell>
                     <TableCell>{t("remove")}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -187,7 +187,7 @@ export const Edit: React.FC<EditProps> = () => {
         </Card>
       </Stack>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>{t("dashboard.committee.addUser")}</DialogTitle>
+        <DialogTitle>{t("committee:add-member")}</DialogTitle>
         <DialogContent style={{ width: 400, height: 200 }}>
           <SearchUser onSelect={addUser} />
         </DialogContent>

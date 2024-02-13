@@ -1,14 +1,16 @@
 import React from "react";
 import {FormControl, FormControlLabel, FormGroup, FormHelperText, Stack, Switch} from "@mui/material";
 import {useField} from "formik";
+import { useTranslation } from "react-i18next";
 
 interface ActivitySettingsProps {
   name: string;
 }
 
 export const ActivitySettings: React.FC<ActivitySettingsProps> = ({ name }) => {
-  const [publicFieldProps, , publicFieldHelpers] = useField(`${name}.public`);
-  const [responseFieldProps, , responseFieldHelpers] = useField(`${name}.response`);
+  const { t } = useTranslation(["activity"]);
+
+	const [publicFieldProps, , publicFieldHelpers] = useField(`${name}.public`);
 
   return (
     <Stack>
@@ -21,30 +23,15 @@ export const ActivitySettings: React.FC<ActivitySettingsProps> = ({ name }) => {
                 sx={{ ml: 'auto' }}
               />
             }
-            label={"Public"}
+            label={t("public")}
             color="primary"
             labelPlacement="start"
           />
           <FormHelperText>
-            Zet dit op true als deze acitiviteit ook open is voor externe
-          </FormHelperText>
+						{t("open-for-external")}  
+					</FormHelperText>
         </FormGroup>
-      </FormControl>
-      <FormControl>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                value={responseFieldProps.value} onChange={(_event, checked) => responseFieldHelpers.setValue(checked)}
-                sx={{ ml: 'auto' }}
-              />
-            }
-            label="Verstuur een kopie van de antwoorden via email"
-            color="primary"
-            labelPlacement="start"
-          />
-        </FormGroup>
-      </FormControl>
+      </FormControl> 
     </Stack>
   )
 }

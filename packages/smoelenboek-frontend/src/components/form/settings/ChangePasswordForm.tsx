@@ -18,7 +18,7 @@ interface FormValues {
 }
 
 export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["settings", "common", "error"]);
   const snackbar = React.useContext(SnackbarContext);
 
   const [trigger] = useChangePasswordMutation()
@@ -38,7 +38,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
       if (e.data?.message) {
         snackbar.openSnackbar(e.data.message, Severity.ERROR);
       } else {
-        snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+        snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       }
     }
 
@@ -54,7 +54,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
           <Stack spacing={2}>
             <TextField
               id="currentPassword"
-              label={t("settings.currentPassword")}
+              label={t("settings:current-password")}
               value={props.values.currentPassword}
               onChange={props.handleChange}
               error={props.touched.currentPassword && Boolean(props.errors.currentPassword)}
@@ -70,7 +70,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
             />
             <TextField
               id="newPassword"
-              label={t("settings.newPassword")}
+              label={t("settings:new-password")}
               value={props.values.newPassword}
               onChange={props.handleChange}
               error={props.touched.newPassword && Boolean(props.errors.newPassword)}
@@ -86,7 +86,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
             />
             <Box>
               <LoadingButton type="submit" loading={props.isSubmitting}>
-                <span>{t("save")}</span>
+                <span>{t("common:save")}</span>
               </LoadingButton>
             </Box>
           </Stack>

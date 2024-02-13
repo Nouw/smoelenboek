@@ -13,7 +13,7 @@ interface ChangeProfilePictureProps {
 
 export const ChangeProfilePicture: React.FC<ChangeProfilePictureProps> = () => {
   const id = useAppSelector(state => state.auth.id);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["settings", "error", "messages", "upload"]);
 
   const snackbar = React.useContext(SnackbarContext);
 
@@ -58,10 +58,10 @@ export const ChangeProfilePicture: React.FC<ChangeProfilePictureProps> = () => {
 
         document.dispatchEvent(new Event("profilePictureUpdate"));
 
-        snackbar.openSnackbar('Profilefoto geupdate!', Severity.SUCCESS);
+        snackbar.openSnackbar(t("messages:settings.profile-picture"), Severity.SUCCESS);
       } catch (e) {
         console.error(e);
-        snackbar.openSnackbar(t("errorMessage", Severity.ERROR));
+        snackbar.openSnackbar(t("error:error-message", Severity.ERROR));
       }
     }
   }
@@ -78,7 +78,7 @@ export const ChangeProfilePicture: React.FC<ChangeProfilePictureProps> = () => {
             sx={{width: 200, height: 200, marginLeft: "auto", marginRight: "auto"}}
           />
           <Button startIcon={<UploadFile/>} variant="contained" onClick={() => profilePicture()}>
-            Upload
+						{t("common:upload")}
           </Button>
           <input type='file' id='file' ref={inputFile} onChange={() => upload()} style={{display: 'none'}}/>
         </Stack>

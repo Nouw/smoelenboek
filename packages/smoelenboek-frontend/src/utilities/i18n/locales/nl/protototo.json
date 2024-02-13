@@ -1,0 +1,28 @@
+{
+  "header": "Protototo-beheer",
+  "seasons": "Seizoenen",
+  "create-season": "Seizoen toevoegen",
+  "delete-season": "Seizoen verwijderen",
+  "id": "Id",
+  "start": "Start",
+  "end": "Einde",
+  "options": "Opties",
+  "tikkie": "Tikkie",
+  "play-date": "Speeldatum",
+  "home": "Thuis",
+  "away": "Uit",
+  "delete-match": "Wedstrijd verwijderen",
+  "predictions-alert": "Dit verwijdert ook alle voorspellingen",
+  "update-match": "Wedstrijd bijwerken",
+  "add-match": "Wedstrijd toevoegen",
+  "win": "Winnen",
+  "lose": "Verliezen",
+  "details": "Details",
+  "set": {
+    "one": "Set 1",
+    "two": "Set 2",
+    "three": "Set 3",
+    "four": "Set 4",
+    "five": "Set 5"
+  }
+}

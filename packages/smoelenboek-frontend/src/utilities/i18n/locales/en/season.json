@@ -1,0 +1,8 @@
+{ 
+  "seasons": "Seasons",
+  "create-season": "Create season",
+  "name": "Name",
+  "start-date": "Start date",
+  "end-date": "End date",
+  "delete-season": "Delete season"
+}

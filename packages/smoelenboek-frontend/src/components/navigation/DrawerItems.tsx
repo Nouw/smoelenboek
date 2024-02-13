@@ -26,7 +26,7 @@ interface DrawerItem {
 
 const publicItems: DrawerItem[] = [
   {
-    title: "Activeiten", // TODO: Should translate this
+    title: "activities", // TODO: Should translate this
     subheader: false,
     navigateTo: "home",
     rank: 1,
@@ -36,7 +36,7 @@ const publicItems: DrawerItem[] = [
     subheader: true,
     subItems: [
       {
-        title: "navigation.protototo.predict",
+        title: "protototo.predict",
         navigateTo: "protototo",
       },
       // {
@@ -54,24 +54,24 @@ const defaultItems: DrawerItem[] = [
     subheader: true,
     subItems: [
       {
-        title: "navigation.teams.women",
+        title: "teams.women",
         navigateTo: "teams/female",
       },
       {
-        title: "navigation.teams.men",
+        title: "teams.men",
         navigateTo: "teams/male",
       },
     ],
     rank: 2,
   },
   {
-    title: "navigation.committees",
+    title: "committees",
     subheader: false,
     navigateTo: "committees",
     rank: 3,
   },
   {
-    title: "navigation.documents",
+    title: "documents",
     navigateTo: "documents/",
 		rank: 4,
   },
@@ -81,14 +81,14 @@ const defaultItems: DrawerItem[] = [
 		rank: 5,
   },
   {
-    title: "navigation.vcp",
+    title: "vcp",
     navigateTo: "vcp",
 		rank: 6,
   },
 ];
 
 const adminDefaultItem: DrawerItem = {
-  title: "navigation.administration",
+  title: "administration",
   subheader: true,
   translateHeader: true,
   subItems: [
@@ -102,111 +102,111 @@ const adminDefaultItem: DrawerItem = {
 
 const adminItems: DrawerItem[] = [
   {
-    title: "dashboard.goBack",
+    title: "dashboard.go-back",
     translateHeader: true,
     navigateTo: "/teams/female",
   },
   {
-    title: "Activity",
+    title: "dashboard.headers.activity-management",
     subheader: true,
-    translateHeader: false,
+    translateHeader: true,
     subItems: [
       {
-        title: "Create Activity",
+        title: "dashboard.add-activity",
         navigateTo: "activity/create"
       },
       {
-        title: "Activities",
+        title: "activities",
         navigateTo: "activity/"
       }
     ]
   },
   {
-    title: "dashboard.season.header",
+    title: "dashboard.headers.season-management",
     subheader: true,
     translateHeader: true,
     subItems: [
       {
-        title: "dashboard.season.seasons",
+        title: "dashboard.seasons",
         navigateTo: "seasons/",
       },
       {
-        title: "dashboard.season.createSeason",
+        title: "dashboard.add-season",
         navigateTo: "seasons/add",
       },
     ],
   },
   {
-    title: "dashboard.user.header",
+    title: "dashboard.headers.user-management",
     subheader: true,
     translateHeader: true,
     subItems: [
       {
-        title: "dashboard.user.users",
+        title: "dashboard.users",
         navigateTo: "users/",
       },
       {
-        title: "dashboard.user.createUser",
+        title: "dashboard.add-user",
         navigateTo: "users/add",
       },
     ],
   },
   {
-    title: "dashboard.team.header",
+    title: "dashboard.headers.team-management",
     subheader: true,
     translateHeader: true,
     subItems: [
       {
-        title: "dashboard.team.teams",
+        title: "dashboard.teams",
         navigateTo: "teams/",
       },
       {
-        title: "dashboard.team.createTeam",
+        title: "dashboard.add-team",
         navigateTo: "teams/add",
       },
     ],
   },
   {
-    title: "dashboard.committee.header",
+    title: "dashboard.headers.committee-management",
     subheader: true,
     translateHeader: true,
     subItems: [
       {
-        title: "dashboard.committee.committees",
+        title: "committees",
         navigateTo: "committees/",
       },
       {
-        title: "dashboard.committee.createCommittee",
+        title: "dashboard.add-committee",
         navigateTo: "committees/add",
       },
     ],
   },
   {
-    title: "dashboard.protototo.header",
+    title: "dashboard.headers.protototo-management",
     subheader: true,
     translateHeader: true,
     subItems: [
       {
-        title: "dashboard.protototo.seasons",
+        title: "dashboard.seasons",
         navigateTo: "protototo/",
       },
       {
-        title: "dashboard.protototo.createSeason",
+        title: "dashboard.add-season",
         navigateTo: "protototo/season",
       },
     ],
   },
   {
-    title: "dashboard.documents.header",
+    title: "dashboard.headers.documents-management",
     subheader: true,
     translateHeader: true,
     subItems: [
       {
-        title: "dashboard.documents.categories",
+        title: "dashboard.categories",
         navigateTo: "documents/",
       },
       {
-        title: "dashboard.documents.createCategory",
+        title: "dashboard.add-category",
         navigateTo: "documents/category",
       },
     ],
@@ -215,7 +215,7 @@ const adminItems: DrawerItem[] = [
 
 const DrawerItemComponent: React.FC<DrawerItem> = (props) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation("navigation");
 
   if (props.subheader) {
     return (
@@ -254,13 +254,12 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
 		let newItems: DrawerItem[] = [...publicItems, ...defaultItems]
 
     if (
-      (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) &&
-      !items.includes(adminDefaultItem) &&
+      (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) && 
       !location.pathname.includes("dashboard")
     ) {
       newItems = [...newItems, adminDefaultItem];
     }
-
+		
 		setItems(newItems.sort((a, b) => (a.rank ?? -1) - (b.rank ?? -1)));
   }, [location.pathname, roles, isAnonymous]);
 
@@ -268,7 +267,7 @@ export const DrawerItems: React.FC<DrawerItemsProps> = () => {
     if (location.pathname.includes("dashboard")) {
       setItems(adminItems);
     }
-  }, [location.pathname]);
+  }, [location.pathname]);	
 
   return (
     <List>

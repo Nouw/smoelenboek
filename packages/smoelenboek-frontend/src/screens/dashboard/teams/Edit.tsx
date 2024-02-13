@@ -53,7 +53,7 @@ export const Edit: React.FC<EditProps> = () => {
   const params = useParams();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "error", "messages"]);
 
   const [getTeamInfo] = useTeamInfoMutation();
   const [addPlayerToTeamApi] = useAddPlayerToTeamMutation();
@@ -84,7 +84,7 @@ export const Edit: React.FC<EditProps> = () => {
   async function addUser(value: User) {
     if (members) {
       if (members.findIndex((x) => x.id === value.id) >= 0) {
-        snackbar.openSnackbar(`${value.firstName} ${value.lastName} ${t("message.teams.alreadyPart")}`);
+        snackbar.openSnackbar(`${value.firstName} ${value.lastName} ${t("messages:teams.already-part")}`);
         return
       }
     }
@@ -93,10 +93,10 @@ export const Edit: React.FC<EditProps> = () => {
       const res = await addPlayerToTeamApi({id: parseInt(params.id as string), userId: value.id}).unwrap();
 
       dispatch(addPlayerToTeam(res.data));
-      snackbar.openSnackbar(`${t("message.teams.added")} ${value.firstName} ${value.lastName} ${t("message.teams.toTeam")}`, Severity.SUCCESS);
+      snackbar.openSnackbar(`${t("messages:teams.added")} ${value.firstName} ${value.lastName} ${t("messages:teams.toTeam")}`, Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR)
     }
   }
 
@@ -105,10 +105,10 @@ export const Edit: React.FC<EditProps> = () => {
       await removePlayerFromTeamApi(player.id);
 
       dispatch(removePlayerFromTeam(index));
-      snackbar.openSnackbar(t("message.teams.removePlayer"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:teams.removePlayer"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
 
@@ -117,10 +117,10 @@ export const Edit: React.FC<EditProps> = () => {
       const res = await updatePlayerApi({ id, role}).unwrap();
       console.log(res);
       dispatch(updatePlayerState({data: res.data, key: index}));
-      snackbar.openSnackbar(t("message.teams.roleUpdate"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:teams.roleUpdate"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
 
@@ -131,25 +131,25 @@ export const Edit: React.FC<EditProps> = () => {
   return (
     <>
       <Stack spacing={2}>
-        <TeamForm method="put" message={t("message.teams.update")} name={info.name} league={info.rank} gender={info.gender} />
+        <TeamForm method="put" message={t("messages:teams.update")} name={info.name} league={info.rank} gender={info.gender} />
         <Card>
           <CardContent>
             <Button variant="contained" onClick={() => setVisible(true)}>
               <Add/>
-              {t("dashboard.team.addPlayer")}
+              {t("team:add-user")}
             </Button>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell>
-                      {t("dashboard.team.name")}
+                      {t("team:name")}
                     </TableCell>
                     <TableCell>
-                      {t("dashboard.team.role")}
+                      {t("team:role")}
                     </TableCell>
                     <TableCell align="right">
-                      {t("remove")}
+                      {t("common:remove")}
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -174,12 +174,12 @@ export const Edit: React.FC<EditProps> = () => {
         </Card>
       </Stack>
       <Dialog open={visible} onClose={() => setVisible(false)} >
-        <DialogTitle>{t("dashboard.team.addUser")}</DialogTitle>
+        <DialogTitle>{t("team:add-user")}</DialogTitle>
         <DialogContent style={{width: 400, height: 200}}>
           <SearchUser onSelect={addUser}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVisible(false)}>{t("close")}</Button>
+          <Button onClick={() => setVisible(false)}>{t("common:close")}</Button>
         </DialogActions>
       </Dialog>
     </>

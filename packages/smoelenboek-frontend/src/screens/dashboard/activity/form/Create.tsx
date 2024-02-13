@@ -38,7 +38,7 @@ const schema = object({
 })
 
 export const Create: React.FC<CreateProps> = () => {
-  const {t} = useTranslation();
+  const {t} = useTranslation(["common", "form"]);
 
   type FormValues = InferType<typeof schema>;
 
@@ -51,14 +51,14 @@ export const Create: React.FC<CreateProps> = () => {
           <Stack spacing={2}>
             <Paper elevation={2}>
               <LoadingButton type="submit" loading={props.isSubmitting}>
-                <span>{t("save")}</span>
+                <span>{t("common:save")}</span>
               </LoadingButton>
             </Paper>
               <Card>
-                <CardHeader title={t("dashboard.form.createForm")}/>
+                <CardHeader title={t("form:create-form")}/>
                 <CardContent>
                   <Stack spacing={1}>
-                    <TextField value={props.values.title} label={t("dashboard.form.title")} fullWidth
+                    <TextField value={props.values.title} label={t("form:title")} fullWidth
                                onChange={(e) => props.setFieldValue('title', e.target.value)}/>
                     <StyledTextInput value={props.values.description ?? ""} height={200} toolbar
                                      onChange={(value) => props.setFieldValue("description", value)}/>
@@ -77,7 +77,7 @@ export const Create: React.FC<CreateProps> = () => {
                           startIcon={<Add/>}
                           onClick={() => arrayProps.push({type: "text"})}
                         >
-                          {t("dashboard.form.question.addQuestion")}
+                          {t("form:question.add-question")}
                         </Button>
                       </Box>
                     </CardContent>

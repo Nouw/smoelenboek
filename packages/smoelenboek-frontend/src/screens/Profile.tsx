@@ -1,35 +1,36 @@
 import React from "react";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Avatar,
   Box,
   Card,
-  CardContent, CircularProgress,
+  CardContent,
+  CircularProgress,
   Divider,
   List,
   ListItem,
   ListItemIcon,
-  ListItemText, ListSubheader,
+  ListItemText,
+  ListSubheader,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
-import SportsIcon from '@mui/icons-material/Sports';
-import FmdGoodIcon from '@mui/icons-material/FmdGood';
-import Mail from '@mui/icons-material/Mail';
+import SportsIcon from "@mui/icons-material/Sports";
+import FmdGoodIcon from "@mui/icons-material/FmdGood";
+import Mail from "@mui/icons-material/Mail";
 import {
   Add,
   CakeOutlined,
   Numbers,
   Phone,
   SportsVolleyball,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 import moment from "moment";
-import {Season} from "../components/profile/Season";
-import {useTranslation} from "react-i18next";
-import {useLazyGetUserProfileQuery} from "../api/endpoints/user";
+import { Season } from "../components/profile/Season";
+import { useTranslation } from "react-i18next";
+import { useLazyGetUserProfileQuery } from "../api/endpoints/user";
 
 interface ProfileProps {
-
 }
 
 interface User {
@@ -50,7 +51,7 @@ interface User {
   streetName: string;
   seasons: Seasons;
   profilePicture?: string;
-  refereeLicense?: string
+  refereeLicense?: string;
 }
 
 interface CommitteeTeam {
@@ -68,9 +69,9 @@ export interface Seasons {
 
 export const Profile: React.FC<ProfileProps> = () => {
   const { id } = useParams();
-  const i18n = useTranslation();
+  const { t } = useTranslation(["user"]);
 
-  const [user, setUser] = React.useState<User>()
+  const [user, setUser] = React.useState<User>();
   const [seasons, setSeasons] = React.useState<Seasons[]>([]);
 
   const [trigger] = useLazyGetUserProfileQuery();
@@ -96,116 +97,127 @@ export const Profile: React.FC<ProfileProps> = () => {
       } catch (e) {
         console.error(e);
       }
-    }
+    };
 
-    getData()
-  }, [id, trigger])
+    getData();
+  }, [id, trigger]);
 
   if (!user) {
-    return <CircularProgress/>
+    return <CircularProgress />;
   }
 
-  return <Box>
-    <Card>
-      <CardContent>
-        <Stack spacing={2} justifyContent="center" alignItems="center">
-          <Avatar
-            src={`${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${user?.profilePicture}`}
-            variant="square"
-            sx={{width: 200, height: 200}}
-          />
-          <Typography variant="h5" textAlign="center">{user?.firstName} {user?.lastName}</Typography>
-          <Typography
-            variant="h6"
-            className="text-center"
-            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${user?.streetName} ${user?.houseNumber}`)}`)}
-            color="primary"
-            style={{cursor: "pointer"}}
-            textAlign="center"
+  return (
+    <Box>
+      <Card>
+        <CardContent>
+          <Stack spacing={2} justifyContent="center" alignItems="center">
+            <Avatar
+              src={`${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${user?.profilePicture}`}
+              variant="square"
+              sx={{ width: 200, height: 200 }}
+            />
+            <Typography variant="h5" textAlign="center">
+              {user?.firstName} {user?.lastName}
+            </Typography>
+            <Typography
+              variant="h6"
+              className="text-center"
+              onClick={() =>
+                window.open(
+                  `https://www.google.com/maps/search/?api=1&query=${
+                    encodeURIComponent(
+                      `${user?.streetName} ${user?.houseNumber}`,
+                    )
+                  }`,
+                )}
+              color="primary"
+              style={{ cursor: "pointer" }}
+              textAlign="center"
+            >
+              <FmdGoodIcon /> {user?.streetName} {user?.houseNumber}
+            </Typography>
+          </Stack>
+          <Divider />
+          <List>
+            <ListItem>
+              <ListItemIcon>
+                <Mail color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("email")}
+                secondary={user?.email ?? ""}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <Phone color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("phone-number")}
+                secondary={user?.phoneNumber ?? ""}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <CakeOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("birthdate")}
+                secondary={moment(user?.birthDate).format(
+                  "D-MM-YYYY",
+                ) ?? ""}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <SportsVolleyball color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("bond-number")}
+                secondary={user?.bondNumber ?? ""}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <Add color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("registration-date")}
+                secondary={moment(user?.joinDate).format(
+                  "D-MM-YYYY",
+                ) ?? ""}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <Numbers color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("back-number")}
+                secondary={user?.backNumber ?? ""}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <SportsIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={t("referee-license")}
+                secondary={user?.refereeLicense ?? "Geen"}
+              />
+            </ListItem>
+          </List>
+          <List
+            subheader={<ListSubheader>{t("activities")}</ListSubheader>}
+            sx={{ bgcolor: "background.paper" }}
           >
-            <FmdGoodIcon /> {user?.streetName} {user?.houseNumber}
-          </Typography>
-        </Stack>
-        <Divider />
-        <List>
-          <ListItem>
-            <ListItemIcon>
-              <Mail color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("email")}
-              secondary={user?.email ?? ''}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <Phone color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("phoneNumber")}
-              secondary={user?.phoneNumber ?? ''}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <CakeOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("birthdate")}
-              secondary={
-                moment(user?.birthDate).format(
-                  'D-MM-YYYY',
-                ) ?? ''
-              }
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <SportsVolleyball color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("bondNumber")}
-              secondary={user?.bondNumber ?? ''}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <Add color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("registrationDate")}
-              secondary={
-                moment(user?.joinDate).format(
-                  'D-MM-YYYY',
-                ) ?? ''
-              }
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <Numbers color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("backNumber")}
-              secondary={user?.backNumber ?? ''}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <SportsIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={i18n.t("refereeLicense")}
-              secondary={user?.refereeLicense ?? 'Geen'}
-            />
-          </ListItem>
-        </List>
-        <List subheader={<ListSubheader>{i18n.t("activities")}</ListSubheader>} sx={{bgcolor: 'background.paper'}}>
-          {seasons.map((season) => (
-            <Season key={season.id} season={season}/>
-          ))}
-        </List>
-      </CardContent>
-    </Card>
-  </Box>
-}
+            {seasons.map((season) => <Season
+              key={season.id}
+              season={season}
+            />)}
+          </List>
+        </CardContent>
+      </Card>
+    </Box>
+  );
+};

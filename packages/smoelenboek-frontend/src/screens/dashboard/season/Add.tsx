@@ -16,7 +16,7 @@ interface AddProps {
 export const Add: React.FC<AddProps> = () => {
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "error", "messages"]);
 
   const [createSeason] = useCreateMutation();
 
@@ -26,11 +26,11 @@ export const Add: React.FC<AddProps> = () => {
       const res = await createSeason({ startDate: values.startDate, endDate: values.endDate}).unwrap();
 
       dispatch(addSeasons([res.data]));
-      snackbar.openSnackbar(t("message.season.create"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:season.create"), Severity.SUCCESS)
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
   }

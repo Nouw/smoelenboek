@@ -1,0 +1,14 @@
+{
+  "players": "Players",
+  "coaches": "Coaches",
+  "header": "Team management",
+  "teams": "Teams",
+  "create-team": "Add team",
+  "name": "Name",
+  "delete-team": "Delete team",
+  "league": "League",
+  "add-player": "Add player",
+  "role": "Role",
+  "add-user": "Add user to team",
+  "sync-photos": "Sync photos"
+}

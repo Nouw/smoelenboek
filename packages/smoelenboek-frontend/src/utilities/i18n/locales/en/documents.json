@@ -1,0 +1,13 @@
+{
+  "header": "Documents management",
+  "categories": "Categories",
+  "create-category": "Add category",
+  "update-category": "Update category",
+  "delete-files": "Delete files",
+  "delete-category": "Delete category",
+  "files": "files",
+  "types": {
+    "photos": "Photos",
+    "documents": "Documents"
+  }
+}

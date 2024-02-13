@@ -18,7 +18,7 @@ export const Edit: React.FC<EditProps> = () => {
   const snackbar = React.useContext(SnackbarContext);
   const params = useParams();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["error", "messages", "protototo"]);
 
   const [getMatch] = useProtototoMatchMutation();
   const [updateMatchApi] = useUpdateProtototoMatchMutation();
@@ -46,11 +46,11 @@ export const Edit: React.FC<EditProps> = () => {
       const res = await updateMatchApi({ id: parseInt(params.matchId as string), homeTeam: values.homeTeam, awayTeam: values.awayTeam, gender: values.gender, playDate: values.playDate.toDate(), seasonId: parseInt(params.id ?? "0")}).unwrap();
       dispatch(updateMatches([res.data]));
 
-      snackbar.openSnackbar(t("message.protototo.match.update"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:protototo.match.update"), Severity.SUCCESS)
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
 
@@ -69,5 +69,5 @@ export const Edit: React.FC<EditProps> = () => {
     return <CircularProgress />
   }
 
-  return <MatchForm initialValues={{playDate: moment(match.playDate), homeTeam: match.homeTeam, awayTeam: match.awayTeam, gender: getGender(match.gender)}} submit={submit} title={t("dashboard.protototo.updateMatch")}/>
+  return <MatchForm initialValues={{playDate: moment(match.playDate), homeTeam: match.homeTeam, awayTeam: match.awayTeam, gender: getGender(match.gender)}} submit={submit} title={t("protototo:update-match")}/>
 }

@@ -52,7 +52,7 @@ export interface FormValues {
 
 
 export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues, admin }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "error", "user"]);
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
 
@@ -90,7 +90,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
 
@@ -107,12 +107,12 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
           }}>
           {(props: FormikProps<FormValues>) => (
             <form onSubmit={props.handleSubmit} noValidate>
-              <Typography variant="h4">{method === 'put' ? t("dashboard.user.updateUser") : t("dashboard.user.createUser")}</Typography>
+              <Typography variant="h4">{method === 'put' ? t("user:update-user") : t("user:create-user")}</Typography>
               <br/>
               <Stack spacing={2}>
                 <TextField
                   id="firstName"
-                  label={t("dashboard.user.firstName")}
+                  label={t("user:first-name")}
                   value={props.values.firstName}
                   onChange={props.handleChange}
                   error={props.touched.firstName && Boolean(props.errors.firstName)}
@@ -120,7 +120,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="lastName"
-                  label={t("dashboard.user.lastName")}
+                  label={t("user:last-name")}
                   value={props.values.lastName}
                   onChange={props.handleChange}
                   error={props.touched.lastName && Boolean(props.errors.lastName)}
@@ -128,7 +128,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="email"
-                  label={t("email")}
+                  label={t("user:email")}
                   type="email"
                   value={props.values.email}
                   onChange={props.handleChange}
@@ -137,7 +137,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="phoneNumber"
-                  label={t("phoneNumber")}
+                  label={t("user:phone-number")}
                   value={props.values.phoneNumber}
                   onChange={props.handleChange}
                   error={props.touched.phoneNumber && Boolean(props.errors.phoneNumber)}
@@ -145,7 +145,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="streetName"
-                  label={t("dashboard.user.streetName")}
+                  label={t("user:street-name")}
                   value={props.values.streetName}
                   onChange={props.handleChange}
                   error={props.touched.streetName && Boolean(props.errors.streetName)}
@@ -153,7 +153,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="houseNumber"
-                  label={t("dashboard.user.houseNumber")}
+                  label={t("user:house-number")}
                   value={props.values.houseNumber}
                   onChange={props.handleChange}
                   error={props.touched.houseNumber && Boolean(props.errors.houseNumber)}
@@ -161,7 +161,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="postcode"
-                  label={t("dashboard.user.postcode")}
+                  label={t("user:postcode")}
                   value={props.values.postcode}
                   onChange={props.handleChange}
                   error={props.touched.postcode && Boolean(props.errors.postcode)}
@@ -169,7 +169,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="city"
-                  label={t("dashboard.user.city")}
+                  label={t("user:city")}
                   value={props.values.city}
                   onChange={props.handleChange}
                   error={props.touched.city && Boolean(props.errors.city)}
@@ -177,7 +177,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="bankaccountNumber"
-                  label={t("dashboard.user.IBAN")}
+                  label={t("user:IBAN")}
                   value={props.values.bankaccountNumber}
                   onChange={props.handleChange}
                   error={props.touched.bankaccountNumber && Boolean(props.errors.bankaccountNumber)}
@@ -185,7 +185,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="bondNumber"
-                  label={t("bondNumber")}
+                  label={t("user:bond-number")}
                   value={props.values.bondNumber}
                   onChange={props.handleChange}
                   error={props.touched.bondNumber && Boolean(props.errors.bondNumber)}
@@ -193,7 +193,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 />
                 <TextField
                   id="backNumer"
-                  label={t("backNumber")}
+                  label={t("user:back-number")}
                   type="number"
                   value={props.values.backNumber}
                   onChange={props.handleChange}
@@ -206,7 +206,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                   {({form: { touched, errors }}) => (
                     <>
                       <DatePicker
-                        label={t("birthdate")}
+                        label={t("user:birthdate")}
                         format="DD-MM-YYYY"
                         value={moment(props.values.birthDate)}
                         onChange={(value) => props.setFieldValue("birthDate", value, true)}
@@ -222,7 +222,7 @@ export const UserForm: React.FC<UserFormProps> = ({ method, message, baseValues,
                 </Field>
                 <Box>
                   <LoadingButton type="submit" loading={props.isSubmitting}>
-                    <span>{t("save")}</span>
+                    <span>{t("common:save")}</span>
                   </LoadingButton>
                 </Box>
               </Stack>

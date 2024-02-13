@@ -31,7 +31,7 @@ export const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "messages", "error", "options"]);
 
   const [getCommittees] = useLazyCommitteesQuery();
   const [removeCommitteeApi] = useRemoveCommitteeMutation();
@@ -67,10 +67,10 @@ export const Home: React.FC<HomeProps> = () => {
 
       dispatch(removeCommitteeState(committee.id));
 
-      snackbar.openSnackbar(t("message.committee.delete"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("message:committee.delete"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR)
     }
   }
 
@@ -85,10 +85,10 @@ export const Home: React.FC<HomeProps> = () => {
           <TableHead>
             <TableRow>
               <TableCell>
-                {t("dashboard.committee.name")}
+                {t("committee:name")}
               </TableCell>
               <TableCell align="right">
-                {t("dashboard.committee.options")}
+                {t("options:options")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -102,7 +102,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Edit fontSize="small"/>
                       </ListItemIcon>
-                      {t("dashboard.options.edit")}
+                      {t("options:edit")}
                     </MenuItem>
                     <MenuItem onClick={() => {
                       setSelected(key);
@@ -111,7 +111,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Delete fontSize="small"/>
                       </ListItemIcon>
-                      {t("dashboard.options.delete")}
+                      {t("options:remove")}
                     </MenuItem>
                   </Options>
                 </TableCell>
@@ -121,15 +121,15 @@ export const Home: React.FC<HomeProps> = () => {
         </Table>
       </TableContainer>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>{t("dashboard.committee.deleteCommittee")}?</DialogTitle>
+        <DialogTitle>{t("committee:delete-committee")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && committees[selected] !== undefined && (
-            <DialogContentText>{t("dashboard.confirmation")} {committees[selected].name}?</DialogContentText>
+            <DialogContentText>{t("common:confirmation")} {committees[selected].name}?</DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVisible(false)}>{t("cancel")}</Button>
-          <Button variant="contained" onClick={() => removeCommittee()}>{t("remove")}</Button>
+          <Button onClick={() => setVisible(false)}>{t("common:cancel")}</Button>
+          <Button variant="contained" onClick={() => removeCommittee()}>{t("common:remove")}</Button>
         </DialogActions>
       </Dialog>
     </>

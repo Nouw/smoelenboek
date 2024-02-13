@@ -1,0 +1,22 @@
+{
+  "header": "Formulierbeheer",
+  "create-form": "Formulier aanmaken",
+  "title": "Formuliertitel",
+  "question": {
+    "add-question": "Vraag toevoegen",
+    "type": "Type",
+    "text": "Tekst",
+    "choice": "Keuze",
+    "select": "Selecteer",
+    "answer": "Jouw antwoord",
+    "question": "Vraag",
+    "paragraph": "Paragraaf",
+    "required": "Vereist"
+  },
+  "field-required": "Dit veld is verplicht!",
+	"avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
+  "valid": {
+    "email": "Voer een geldig e-mailadres in"
+  }
+}
+

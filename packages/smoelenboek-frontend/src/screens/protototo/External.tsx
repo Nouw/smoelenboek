@@ -6,6 +6,7 @@ import moment from "moment";
 import {Alert, AlertTitle, Box, Card, CardContent, Container} from "@mui/material";
 import {ExternalInformation, FormValues} from "../../components/form/protototo/ExternalInformation.tsx";
 import {ExternalMatches} from "../../components/protototo/ExternalMatches.tsx";
+import { useTranslation } from "react-i18next";
 
 interface ExternalProps {
 
@@ -17,7 +18,9 @@ enum Screen {
 }
 
 export const External: React.FC<ExternalProps> = () => {
-  const [firstName, setFirstname] = React.useState<string>("");
+  const { t } = useTranslation(["error"]);
+
+	const [firstName, setFirstname] = React.useState<string>("");
   const [lastName, setLastname] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [screen, setScreen] = React.useState<Screen>(Screen.INFO);
@@ -64,7 +67,7 @@ export const External: React.FC<ExternalProps> = () => {
         <Container>
           <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
-            Er is momenteel geen actief seizoen!
+						{t("error:no-protototo-season")}
           </Alert>
         </Container>
       </Box>

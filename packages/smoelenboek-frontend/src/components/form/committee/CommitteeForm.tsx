@@ -31,7 +31,7 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
   const params = useParams();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "error", "committee"]);
 
   const [createCommittee] = useCreateCommitteeMutation();
   const [updateCommittee] = useUpdateCommitteeMutation();
@@ -52,7 +52,7 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
   }
@@ -68,12 +68,12 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
         >
           {(props) => (
             <form onSubmit={props.handleSubmit} noValidate>
-              <Typography variant="h4">{method === 'put' ? t("dashboard.committee.updateCommittee") : t("dashboard.committee.createCommittee")}</Typography>
+              <Typography variant="h4">{method === 'put' ? t("committee:update-committee") : t("committee:create-committee")}</Typography>
               <br/>
               <Stack spacing={2}>
                 <TextField
                   id="name"
-                  label={t("dashboard.committee.name")}
+                  label={t("committee:name")}
                   value={props.values.name}
                   onChange={props.handleChange}
                   error={props.touched.name && Boolean(props.errors.name)}
@@ -81,7 +81,7 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
                 />
                 <TextField
                   id="email"
-                  label={t("email")}
+                  label={t("common:email")}
                   value={props.values.email}
                   onChange={props.handleChange}
                   error={props.touched.email && Boolean(props.errors.email)}
@@ -89,7 +89,7 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
                 />
                 <Box>
                   <LoadingButton type="submit" loading={props.isSubmitting}>
-                    <span>{t("save")}</span>
+                    <span>{t("common:save")}</span>
                   </LoadingButton>
                 </Box>
               </Stack>

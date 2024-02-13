@@ -33,7 +33,7 @@ export const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const members = useAppSelector(membersSelector.selectAll);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "options", "error", "messages"]);
 
   const [getMembers, { isLoading }] = useMembersMutation();
   const [removeMember] = useRemoveMemberMutation();
@@ -64,10 +64,10 @@ export const Home: React.FC<HomeProps> = () => {
       setSelected(-1);
       setVisible(false);
 
-      snackbar.openSnackbar(t("message.user.delete"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:user.delete"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR)
     }
   }
 
@@ -82,10 +82,10 @@ export const Home: React.FC<HomeProps> = () => {
           <TableHead>
             <TableRow>
               <TableCell>
-                {t("dashboard.user.name")}
+                {t("common:name")}
               </TableCell>
               <TableCell align="right">
-                {t("dashboard.options.options")}
+                {t("options:options")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -99,7 +99,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Edit fontSize="small"/>
                       </ListItemIcon>
-                      {t("dashboard.options.edit")}
+                      {t("options:edit")}
                     </MenuItem>
                     <MenuItem onClick={() => {
                       setSelected(key);
@@ -108,7 +108,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Delete fontSize="small"/>
                       </ListItemIcon>
-                      {t("dashboard.options.remove")}
+                      {t("options:remove")}
                     </MenuItem>
                   </Options>
                 </TableCell>
@@ -118,15 +118,15 @@ export const Home: React.FC<HomeProps> = () => {
         </Table>
       </TableContainer>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>{t("dashboard.user.deleteUser")}?</DialogTitle>
+        <DialogTitle>{t("user:delete-user")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && (
-            <DialogContentText>{t("confirmation")}{members[selected].firstName} {members[selected].lastName}?</DialogContentText>
+            <DialogContentText>{t("common:confirmation")}{members[selected].firstName} {members[selected].lastName}?</DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVisible(false)}>{t("cancel")}</Button>
-          <Button variant="contained" onClick={() => removeUser()}>{t("remove")}</Button>
+          <Button onClick={() => setVisible(false)}>{t("common:cancel")}</Button>
+          <Button variant="contained" onClick={() => removeUser()}>{t("common:remove")}</Button>
         </DialogActions>
       </Dialog>
     </>

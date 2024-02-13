@@ -43,7 +43,7 @@ export const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "team", "messages", "options", "error"]);
 
   const [getTeams, { isLoading }] = useTeamsMutation();
   const [removeTeamApi] = useRemoveTeamMutation();
@@ -85,10 +85,10 @@ export const Home: React.FC<HomeProps> = () => {
       setSelected(-1);
       setVisible(false);
 
-      snackbar.openSnackbar(t("message.teams.delete"), Severity.SUCCESS);
+      snackbar.openSnackbar(t("messages:teams.delete"), Severity.SUCCESS);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
 
@@ -96,10 +96,10 @@ export const Home: React.FC<HomeProps> = () => {
     try {
         await syncPhotosApi();
 
-        snackbar.openSnackbar(t("message.teams.syncPhoto"), Severity.SUCCESS);
+        snackbar.openSnackbar(t("messages:teams.sync-photo"), Severity.SUCCESS);
     } catch (e) {
         console.error(e);
-        snackbar.openSnackbar(t("errorMessage", Severity.ERROR));
+        snackbar.openSnackbar(t("error:error-message", Severity.ERROR));
     }
   }
 
@@ -112,17 +112,17 @@ export const Home: React.FC<HomeProps> = () => {
         startIcon={<Sync />} 
         loading={syncPhotosIsLoading}
       >
-        Sync Foto's
+				{t("team:sync-photos")}
       </LoadingButton>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>
-                {t("dashboard.team.name")}
+                {t("common:name")}
               </TableCell>
               <TableCell align="right">
-                {t("dashboard.options.options")}
+                {t("options:options")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -138,7 +138,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Edit fontSize="small" />
                       </ListItemIcon>
-                      {t("dashboard.options.edit")}
+                      {t("options:edit")}
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
@@ -149,7 +149,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Delete fontSize="small" />
                       </ListItemIcon>
-                      {t("dashboard.options.remove")}
+                      {t("options:remove")}
                     </MenuItem>
                   </Options>
                 </TableCell>
@@ -159,11 +159,11 @@ export const Home: React.FC<HomeProps> = () => {
         </Table>
       </TableContainer>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>{t("dashboard.team.deleteTeam")}?</DialogTitle>
+        <DialogTitle>{t("team:delete-team")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && (
             <DialogContentText>
-              {t("confirmation")} {teams[selected].name}?
+              {t("common:confirmation")} {teams[selected].name}?
             </DialogContentText>
           )}
         </DialogContent>

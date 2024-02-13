@@ -36,7 +36,7 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = () => {
     const navigate = useNavigate();
     const snackbar = React.useContext(SnackbarContext);
-    const { t } = useTranslation();
+    const { t } = useTranslation(["common", "options", "error", "messages", "season"]);
 
     const dispatch = useAppDispatch();
     const [getSeasons, { isLoading }] = useSeasonsMutation();
@@ -75,10 +75,10 @@ export const Home: React.FC<HomeProps> = () => {
         setSelected(-1);
         setVisible(false);
 
-        snackbar.openSnackbar(t("message.season.delete"), Severity.SUCCESS);
+        snackbar.openSnackbar(t("messages:season.delete"), Severity.SUCCESS);
       } catch (e) {
         console.error(e);
-        snackbar.openSnackbar(t("errorMessage"), Severity.ERROR)
+        snackbar.openSnackbar(t("error:error-message"), Severity.ERROR)
       }
     }
 
@@ -92,10 +92,10 @@ export const Home: React.FC<HomeProps> = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>{t("dashboard.season.name")}</TableCell>
-              <TableCell>{t("dashboard.season.startDate")}</TableCell>
-              <TableCell>{t("dashboard.season.endDate")}</TableCell>
-              <TableCell align="right">{t("dashboard.options.options")}</TableCell>
+              <TableCell>{t("season:name")}</TableCell>
+              <TableCell>{t("season:start-date")}</TableCell>
+              <TableCell>{t("season:end-date")}</TableCell>
+              <TableCell align="right">{t("options:options")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -110,7 +110,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Edit fontSize="small"/>
                       </ListItemIcon>
-                      Edit
+											{t("options:edit")}
                     </MenuItem>
                     <MenuItem onClick={() => {
                       setSelected(season.id);
@@ -119,7 +119,7 @@ export const Home: React.FC<HomeProps> = () => {
                       <ListItemIcon>
                         <Delete fontSize="small"/>
                       </ListItemIcon>
-                      Delete
+											{t("options:remove")}
                     </MenuItem>
                   </Options>
                 </TableCell>
@@ -129,15 +129,15 @@ export const Home: React.FC<HomeProps> = () => {
         </Table>
       </TableContainer>
       <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>Delete season?</DialogTitle>
+        <DialogTitle>{t("season:delete-season")}?</DialogTitle>
         <DialogContent>
           {selected >= 0 && (
-            <DialogContentText>Are you sure you want to delete season {seasons[selected]?.name}?</DialogContentText>
+            <DialogContentText>{t("common:confirmation")} {seasons[selected]?.name}?</DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVisible(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => deleteSeason()}>Delete</Button>
+          <Button onClick={() => setVisible(false)}>{t("common:cancel")}</Button>
+          <Button variant="contained" onClick={() => deleteSeason()}>{t("common:delete")}</Button>
         </DialogActions>
       </Dialog>
     </>);

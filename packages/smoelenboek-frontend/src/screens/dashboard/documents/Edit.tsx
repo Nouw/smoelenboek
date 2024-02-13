@@ -59,7 +59,7 @@ export const Edit: React.FC<EditProps> = () => {
   const params = useParams();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "documents", "error", "messages"]);
 
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
@@ -100,11 +100,11 @@ export const Edit: React.FC<EditProps> = () => {
       const res = await updateCategoryApi({ id: parseInt(params.id as string),  name: values.name, type: values.type}).unwrap();
       dispatch(updateCategory([res.data]));
 
-      snackbar.openSnackbar(t("message.documents.update"), Severity.SUCCESS)
+      snackbar.openSnackbar(t("messages:documents.update"), Severity.SUCCESS)
       values.setSubmitting(false);
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar(t("errorMessage"), Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
       values.setSubmitting(false);
     }
   }
@@ -251,7 +251,7 @@ export const Edit: React.FC<EditProps> = () => {
 
     } catch (e) {
       console.error(e);
-      snackbar.openSnackbar('Something went wrong :(', Severity.ERROR);
+      snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
 
     setSelected([]);
@@ -262,7 +262,7 @@ export const Edit: React.FC<EditProps> = () => {
     <>
       <Card>
         <CardContent>
-          <CategoryForm initialValues={{ name: category.name, type: category.type}} submit={categorySubmit} title={t("dashboard.documents.updateCategory")}/>
+          <CategoryForm initialValues={{ name: category.name, type: category.type}} submit={categorySubmit} title={t("documents:update-category")}/>
 
           <input
             id="file-upload"
@@ -277,10 +277,10 @@ export const Edit: React.FC<EditProps> = () => {
           <Stack direction="row" gap={2} marginY={3}>
             <LoadingButton loading={uploadLoading} variant="contained" onClick={() => upload.current?.click()}>
               <Upload />
-              Upload
+							{t("common:upload")}
             </LoadingButton>
             <Box marginLeft="auto">
-              <Button variant={selected.length > 0 ? "contained" : "outlined"} disabled={selected.length === 0} startIcon={<Delete/>} onClick={() => setVisible(true)}> {selected.length} {t("dashboard.documents.files")}</Button>
+              <Button variant={selected.length > 0 ? "contained" : "outlined"} disabled={selected.length === 0} startIcon={<Delete/>} onClick={() => setVisible(true)}> {selected.length} {t("documents:files")}</Button>
             </Box>
           </Stack>
 
@@ -310,16 +310,16 @@ export const Edit: React.FC<EditProps> = () => {
         </CardContent>
       </Card>
       <Dialog open={visible} onClose={() => setVisible(false)} >
-        <DialogTitle>{t("dashboard.documents.deleteFiles")}?</DialogTitle>
+        <DialogTitle>{t("documents:delete-files")}?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t("dashboard.documents.areYouSure")} {selected.length} {t("dashboard.documents.files")}?
+            {t("common:confirmation")} {selected.length} {t("documents:files")}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <DialogActions>
-            <Button onClick={() => setVisible(false)}>{t("cancel")}</Button>
-            <Button variant="contained" onClick={() => removeFiles()}>{t("remove")}</Button>
+            <Button onClick={() => setVisible(false)}>{t("common:cancel")}</Button>
+            <Button variant="contained" onClick={() => removeFiles()}>{t("common:remove")}</Button>
           </DialogActions>
         </DialogActions>
       </Dialog>
