@@ -1,5 +1,5 @@
 import React from "react";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import {useDocumentsGetFilesQuery} from "../../api/endpoints/documents";
 import {
   Card,
@@ -21,11 +21,28 @@ interface FilesProps {
 
 export const Files: React.FC<FilesProps> = () => {
   const params = useParams();
+  const navigate = useNavigate();
 
   const { data, isLoading} = useDocumentsGetFilesQuery(parseInt(params.id ?? '0'));
 
   const [selected, setSelected] = React.useState<File>();
   const [visible, setVisible] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const listener = () => {
+      console.log("Geluisterd");
+      console.log(`/documents/files/${category.id ?? undefined}`);
+      setVisible(false);
+      navigate(`/documents/files/${category.id ?? undefined}`);
+    }
+
+    window.addEventListener("popstate", listener);
+    console.log("Listener toegevoegd");
+    return () => {
+      console.log("Listener verwijderd");
+      window.removeEventListener("popstate", listener);
+    }
+  },[]);
 
   if (isLoading || !data) {
     return <CircularProgress/>
@@ -38,6 +55,12 @@ export const Files: React.FC<FilesProps> = () => {
   function changeSelected(value: File) {
     setSelected(value);
     setVisible(true);
+  }
+
+  window.onpopstate = () => {
+    console.log("Slechte methode");
+    //setVisible(false);
+    //navigate(`files/${category.id}`)
   }
 
   const category: Category = data.data[0];
@@ -115,10 +138,10 @@ export const Files: React.FC<FilesProps> = () => {
                   <Modal open={visible} style={{ height: "100vh", width: "100vw", backgroundColor: "#000", display:'flex',alignItems:'center',justifyContent:'center'}}>
                     <>
                         <IconButton onClick={() => download(selected!.path.split("/")[1], `${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${selected!.path}`)} style={{ position: "absolute", top: 5, left: 5}}>
-                            <Download/>
+                            <Download color="primary"/>
                         </IconButton>
                         <IconButton onClick={() => setVisible(false)} style={{ position: "absolute", top: 5, right: 5}}>
-                            <Close/>
+                            <Close color="primary"/>
                         </IconButton>
                       <IconButton onClick={() => backward()} style={{ position: "absolute", left: 5, zIndex: 2}}>
                           <ArrowBackIos fontSize="large" color="primary"/>
