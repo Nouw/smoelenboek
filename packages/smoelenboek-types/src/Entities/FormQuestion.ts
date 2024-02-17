@@ -22,7 +22,7 @@ export class FormQuestion {
   @Column()
     key: number;
 
-  @OneToMany(() => FormQuestionItem, (item) => item, { cascade: true } )
+  @OneToMany(() => FormQuestionItem, (item) => item, { cascade: true, onDelete: "CASCADE" })
   @JoinTable()
     items: Relation<FormQuestionItem[]>;
 

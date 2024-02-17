@@ -13,9 +13,8 @@ exports.ProtototoPredictionResults = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const ProtototoSeason_1 = require("./ProtototoSeason");
-let ProtototoPredictionResults = class ProtototoPredictionResults {
+let ProtototoPredictionResults = exports.ProtototoPredictionResults = class ProtototoPredictionResults {
 };
-exports.ProtototoPredictionResults = ProtototoPredictionResults;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

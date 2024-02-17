@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Committee = void 0;
 const typeorm_1 = require("typeorm");
 const UserCommitteeSeason_1 = require("./UserCommitteeSeason");
-let Committee = class Committee {
+let Committee = exports.Committee = class Committee {
 };
-exports.Committee = Committee;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

@@ -21,7 +21,7 @@ export class FormAnswer {
   @Column({ type: "text", nullable: true })
     email?: string;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn()
     user?: Relation<User>;
 
@@ -29,7 +29,7 @@ export class FormAnswer {
   @JoinColumn([{ name: 'form_id', referencedColumnName: 'id' }])
     form: Relation<Form>;
 
-  @OneToMany(() => FormAnswerValue, formAnswerData => formAnswerData.answer, { cascade: true })
+  @OneToMany(() => FormAnswerValue, formAnswerData => formAnswerData.answer, { cascade: true, onDelete: "CASCADE" })
     values: Relation<FormAnswerValue[]>;
 
   @CreateDateColumn()

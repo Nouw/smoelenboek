@@ -20,6 +20,7 @@ export const Home: React.FC<HomeProps> = () => {
   }
 
   return <Box>
+		<Stack spacing={2}>
     {data.data.map((activity) => (
       <Card>
         <CardContent>
@@ -34,5 +35,6 @@ export const Home: React.FC<HomeProps> = () => {
         </CardContent>
       </Card>
     ))}
+		</Stack>
   </Box>
 }

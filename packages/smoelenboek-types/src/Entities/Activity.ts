@@ -4,7 +4,6 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Relation
@@ -41,7 +40,7 @@ export class Activity {
   @Column({ default: false })
     public: boolean;
 
-  @OneToOne(() => Form, form => form.activity, { cascade: true })
+  @OneToOne(() => Form, form => form.activity, { cascade: true,	onDelete: "CASCADE" })
   @JoinColumn()
     form: Relation<Form>;
 

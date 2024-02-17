@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtototoResults = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoMatch_1 = require("./ProtototoMatch");
-let ProtototoResults = class ProtototoResults {
+let ProtototoResults = exports.ProtototoResults = class ProtototoResults {
 };
-exports.ProtototoResults = ProtototoResults;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

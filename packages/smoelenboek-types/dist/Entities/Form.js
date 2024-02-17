@@ -14,9 +14,9 @@ const typeorm_1 = require("typeorm");
 const Activity_1 = require("./Activity");
 const FormQuestion_1 = require("./FormQuestion");
 //TODO: Add some way to order the form
-let Form = class Form {
+//TODO: Make startup script to check if everything is cascaded, because TypeORM is a bit retarded with that.
+let Form = exports.Form = class Form {
 };
-exports.Form = Form;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
@@ -38,7 +38,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Form.prototype, "activity", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => FormQuestion_1.FormQuestion, question => question.form, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => FormQuestion_1.FormQuestion, question => question.form, { cascade: true, onDelete: "CASCADE" }),
     __metadata("design:type", Object)
 ], Form.prototype, "questions", void 0);
 exports.Form = Form = __decorate([

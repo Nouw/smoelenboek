@@ -13,9 +13,8 @@ exports.Activity = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const Form_1 = require("./Form");
-let Activity = class Activity {
+let Activity = exports.Activity = class Activity {
 };
-exports.Activity = Activity;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
@@ -53,7 +52,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Activity.prototype, "public", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => Form_1.Form, form => form.activity, { cascade: true }),
+    (0, typeorm_1.OneToOne)(() => Form_1.Form, form => form.activity, { cascade: true, onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Object)
 ], Activity.prototype, "form", void 0);

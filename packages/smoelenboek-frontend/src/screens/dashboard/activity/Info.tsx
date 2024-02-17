@@ -4,6 +4,7 @@ import {
   useGetActivityQuery,
   useLazyGetFormResponsesQuery,
   usePostFormSheetMutation,
+  useUpdateActivityMutation,
 } from "../../../api/endpoints/activity.ts";
 import { Loading } from "../../../components/Loading.tsx";
 import {
@@ -16,13 +17,14 @@ import {
 } from "@mui/material";
 import { AddToDriveOutlined, FileOpenOutlined } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import { InferType } from "yup";
 import {
   activity,
   CreateActivity,
 } from "../../../components/form/activity/CreateActivity.tsx";
 import { LoadingButton } from "@mui/lab";
+import { Activity } from "smoelenboek-types";
 
 interface InfoProps {
 }
@@ -39,6 +41,7 @@ export const Info: React.FC<InfoProps> = () => {
   const [trigger] = usePostFormSheetMutation();
   const [triggerResponses, { data: responsesData }] =
     useLazyGetFormResponsesQuery();
+	const [activityTrigger] = useUpdateActivityMutation();
 
   React.useEffect(() => {
     if (data?.data.form.id) {
@@ -61,6 +64,18 @@ export const Info: React.FC<InfoProps> = () => {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async function saveActivity(
+    values: FormValues, setSubmitting: (submitting: boolean) => void,
+  ) {
+		try {
+			await activityTrigger({ id: activity.id, activity: values as Activity });
+		} catch(e) {
+			console.error(e);
+		}
+
+		setSubmitting(false);
   }
 
   const activity = data.data;
@@ -100,22 +115,24 @@ export const Info: React.FC<InfoProps> = () => {
             </Stack>
           </CardContent>
         </Card>
-        <Card>
+        <Card elevation={2}>
           <CardContent>
-            <Typography variant="h5" component="div">Details</Typography>
+            <Typography variant="h5" component="div" py={2}>Details</Typography>
             <Formik<{ activity: FormValues }>
               initialValues={{ activity: data.data }}
-              onSubmit={() => console.log("submit")}
+              onSubmit={(values, { setSubmitting }) => {
+                saveActivity({ ...values.activity },  setSubmitting);
+              }}
             >
               {(props) => (
-                <form noValidate onSubmit={props.submitForm}>
+                <Form>
                   <CreateActivity name="activity" />
                   <Box mt={2}>
                     <LoadingButton type="submit" loading={props.isSubmitting}>
                       <span>{t("common:save")}</span>
                     </LoadingButton>
                   </Box>
-                </form>
+                </Form>
               )}
             </Formik>
           </CardContent>

@@ -72,7 +72,20 @@ export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']
         url: `activity/responses/${id}`,
         method: 'GET'
       })
-    })
+    }),
+		updateActivity: builder.mutation<Response<null>, { id: number, activity: Partial<Activity>}>({
+			query: ({ id, activity }) => ({
+				url: `activity/${id}`,
+				method: 'PUT',
+				body: activity				
+			}) 
+		}),
+		deleteActivity: builder.mutation<Response<null>, number>({
+			query: (id) => ({
+				url: `activity/${id}`,
+				method: 'DELETE',
+			})
+		})
   })
 });
 
@@ -84,4 +97,6 @@ export const {
   usePostRegistrationMutation,
   usePostFormSheetMutation,
   useLazyGetFormResponsesQuery,
+	useUpdateActivityMutation,
+	useDeleteActivityMutation,
 } = activityApiSlice;

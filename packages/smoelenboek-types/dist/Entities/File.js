@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.File = void 0;
 const typeorm_1 = require("typeorm");
 const Category_1 = require("./Category");
-let File = class File {
+let File = exports.File = class File {
 };
-exports.File = File;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

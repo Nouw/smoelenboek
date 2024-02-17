@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RolesHierarchy = exports.Roles = exports.Permissions = exports.TeamFunction = exports.Gender = exports.TeamRank = exports.UserTeamSeason = exports.UserCommitteeSeason = exports.User = exports.Team = exports.Season = exports.Role = exports.ProtototoSeason = exports.ProtototoResults = exports.ProtototoPredictionsExternal = exports.ProtototoPredictions = exports.ProtototoPredictionResults = exports.ProtototoMatch = exports.Photobook = exports.Photo = exports.Form = exports.File = exports.Committee = exports.Category = exports.Activity = exports.FormAnswerValue = exports.FormAnswer = exports.Action = exports.FormQuestionItem = exports.FormQuestion = void 0;
+exports.ERROR_CODES = exports.RolesHierarchy = exports.Roles = exports.Permissions = exports.TeamFunction = exports.Gender = exports.TeamRank = exports.UserTeamSeason = exports.UserCommitteeSeason = exports.User = exports.Team = exports.Season = exports.Role = exports.ProtototoSeason = exports.ProtototoResults = exports.ProtototoPredictionsExternal = exports.ProtototoPredictions = exports.ProtototoPredictionResults = exports.ProtototoMatch = exports.Photobook = exports.Photo = exports.Form = exports.File = exports.Committee = exports.Category = exports.Activity = exports.FormAnswerValue = exports.FormAnswer = exports.Action = exports.FormQuestionItem = exports.FormQuestion = void 0;
 var FormQuestion_1 = require("./Entities/FormQuestion");
 Object.defineProperty(exports, "FormQuestion", { enumerable: true, get: function () { return FormQuestion_1.FormQuestion; } });
 var FormQuestionItem_1 = require("./Entities/FormQuestionItem");
@@ -58,4 +58,6 @@ Object.defineProperty(exports, "Permissions", { enumerable: true, get: function 
 var Roles_1 = require("./Auth/Roles");
 Object.defineProperty(exports, "Roles", { enumerable: true, get: function () { return Roles_1.Roles; } });
 Object.defineProperty(exports, "RolesHierarchy", { enumerable: true, get: function () { return Roles_1.RolesHierarchy; } });
+var Codes_1 = require("./Error/Codes");
+Object.defineProperty(exports, "ERROR_CODES", { enumerable: true, get: function () { return Codes_1.ERROR_CODES; } });
 //# sourceMappingURL=index.js.map
