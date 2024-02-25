@@ -25,6 +25,10 @@ import { FormQuestion } from "smoelenboek-types";
 import { LoadingButton } from "@mui/lab";
 import { useIsAnonymous } from "../../hooks/useIsAnonymous.ts";
 import { ContactInfo } from "../../components/activity/ContactInfo.tsx";
+import { SnackbarContext } from "../../providers/SnackbarContext.ts";
+import { useTranslation } from "react-i18next";
+import { Severity } from "../../providers/SnackbarProvider.tsx";
+import log from "../../utilities/logger";
 
 interface SignUpProps {
 }
@@ -36,6 +40,8 @@ type FormValues = {
 export const SignUp: React.FC<SignUpProps> = () => {
   const params = useParams();
   const isAnonymous = useIsAnonymous();
+	const snackbar = React.useContext(SnackbarContext);
+	const { t } = useTranslation("messages");
 
   const { data, isLoading } = useGetActivityQuery(parseInt(params.id ?? ""));
   const [trigger, { data: formResponse }] = useLazyGetFormQuery();
@@ -61,8 +67,11 @@ export const SignUp: React.FC<SignUpProps> = () => {
     try {
       await triggerRegistration({ id: params.id as string, data: values });
       setSubmitting(false);
+			
+			snackbar.openSnackbar(t("activity.registration-success", { name: activity.title }), Severity.SUCCESS);
+			log.debug("Succesfully registered for activity");
     } catch (e) {
-      console.error(e);
+      log.error(e);
     }
   }
 

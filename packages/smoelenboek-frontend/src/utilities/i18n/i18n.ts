@@ -19,7 +19,7 @@ import nl_season from "./locales/nl/season.json";
 import nl_settings from "./locales/nl/settings.json";
 import nl_team from "./locales/nl/team.json";
 import nl_user from "./locales/nl/user.json";
-
+import nl_api from "./locales/nl/api.json";
 //#endregion
 
 //#region EN translations
@@ -40,6 +40,7 @@ import en_season from "./locales/en/season.json";
 import en_settings from "./locales/en/settings.json";
 import en_team from "./locales/en/team.json";
 import en_user from "./locales/en/user.json";
+import en_api from "./locales/en/api.json";
 //#endregion
 
 export const i8nDefaultNS = "common";
@@ -62,6 +63,7 @@ export const i8nResources = {
 		settings: en_settings,
 		team: en_team,
 		user: en_user,
+		api: en_api,
   },
   nl: {
     activity: nl_activity,
@@ -81,6 +83,7 @@ export const i8nResources = {
 		settings: nl_settings,
 		team: nl_team,
 		user: nl_user,
+		api: nl_api,
   },
 } as const;
 

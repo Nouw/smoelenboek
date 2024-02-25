@@ -16,3 +16,6 @@ export const updateActivityRules = [
   body("registrationClosed").toDate(),
 ];
 export const deleteActivityRules = [idExists];
+export const getPreviousResponse = [idExists];
+export const getActivityParticipants = [idExists];
+export const getFormSheetSync = [idExists];

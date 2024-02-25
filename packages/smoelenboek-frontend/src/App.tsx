@@ -61,7 +61,8 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { SignUp } from "./screens/activities/SignUp.tsx";
 import { Create as ActivityCreate } from "./screens/dashboard/activity/Create";
-import { Info as ActivityInfo } from "./screens/dashboard/activity/Info";
+import { Info as ActivityInfoDashboard } from "./screens/dashboard/activity/Info";
+import { Info as ActivityInfo } from "./screens/activities/Info";
 
 const router = createBrowserRouter([
   {
@@ -185,7 +186,7 @@ const router = createBrowserRouter([
         path: "activity/:id",
         element: (
           <Guard roles={[]}>
-            <SignUp />
+            <ActivityInfo />
           </Guard>
         )
       }
@@ -205,7 +206,7 @@ const router = createBrowserRouter([
       },
       {
         path: "activity/edit/:id",
-        element: <ActivityInfo/>
+        element: <ActivityInfoDashboard/>
       },
       {
         path: "activity/create",

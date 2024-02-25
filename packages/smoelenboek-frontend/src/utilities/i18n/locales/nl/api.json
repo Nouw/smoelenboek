@@ -1,0 +1,20 @@
+{
+  "entity-created": "Aangemaakt {{ name }}",
+  "entity-updated": "Bijgewerkt {{ name }}",
+  "entity-deleted": "Verwijderd {{ name }}",
+  "login-success": "Succesvol ingelogd",
+  "logout-success": "Succesvol uitgelogd",
+  "invalid-credentails": "Ongeldige inloggegevens",
+  "token-invalid": "Authenticatietoken is ongeldig",
+  "access-denied": "Toegang geweigerd",
+  "role-required": "U heeft niet de benodigde rechten voor toegang",
+  "resource-not-found": "Bron niet gevonden",
+  "action-not-allowed": "Actie niet toegestaan",
+  "entity-creation-failed": "Aanmaken van {{ name }} mislukt",
+  "entity-update-failed": "Bijwerken van {{ name }} mislukt",
+  "entity-deletion-failed": "Verwijderen van {{ name }} mislukt",
+  "entity-not-found": "{{ name }} niet gevonden",
+  "invalid-request-parameters": "Ongeldige verzoekparameters",
+  "invalid-payload-format": "Payload heeft onjuist formaat"
+}
+

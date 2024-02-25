@@ -21,6 +21,12 @@ export class FormAnswer {
   @Column({ type: "text", nullable: true })
     email?: string;
 
+	@Column({ type: "text", nullable: true })
+		firstName?: string;
+
+	@Column({ type: "text", nullable: true })
+		lastName?: string;
+
   @ManyToOne(() => User)
   @JoinColumn()
     user?: Relation<User>;

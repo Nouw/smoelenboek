@@ -4,6 +4,7 @@ import {
   useGetActivityQuery,
   useLazyGetFormResponsesQuery,
   usePostFormSheetMutation,
+  usePostFormSyncsheetMutation,
   useUpdateActivityMutation,
 } from "../../../api/endpoints/activity.ts";
 import { Loading } from "../../../components/Loading.tsx";
@@ -15,7 +16,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { AddToDriveOutlined, FileOpenOutlined } from "@mui/icons-material";
+import {
+  AddToDriveOutlined,
+  CloudSync,
+  FileOpenOutlined,
+} from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { Form, Formik } from "formik";
 import { InferType } from "yup";
@@ -41,7 +46,9 @@ export const Info: React.FC<InfoProps> = () => {
   const [trigger] = usePostFormSheetMutation();
   const [triggerResponses, { data: responsesData }] =
     useLazyGetFormResponsesQuery();
-	const [activityTrigger] = useUpdateActivityMutation();
+  const [activityTrigger] = useUpdateActivityMutation();
+  const [formSheetSyncTrigger, { isLoading: syncIsLoading }] =
+    usePostFormSyncsheetMutation();
 
   React.useEffect(() => {
     if (data?.data.form.id) {
@@ -67,15 +74,24 @@ export const Info: React.FC<InfoProps> = () => {
   }
 
   async function saveActivity(
-    values: FormValues, setSubmitting: (submitting: boolean) => void,
+    values: FormValues,
+    setSubmitting: (submitting: boolean) => void,
   ) {
-		try {
-			await activityTrigger({ id: activity.id, activity: values as Activity });
-		} catch(e) {
-			console.error(e);
-		}
+    try {
+      await activityTrigger({ id: activity.id, activity: values as Activity });
+    } catch (e) {
+      console.error(e);
+    }
 
-		setSubmitting(false);
+    setSubmitting(false);
+  }
+
+  async function syncSheet() {
+    try {
+      await formSheetSyncTrigger(activity.form.id);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   const activity = data.data;
@@ -90,28 +106,35 @@ export const Info: React.FC<InfoProps> = () => {
               <Typography variant="h5">
                 {t("activity:responses")} {!responses ? 0 : (responses.length)}
               </Typography>
-              {activity.form.sheetId
-                ? (
-                  <Button
-                    onClick={() =>
-                      window.open(
-                        `https://docs.google.com/spreadsheets/d/${activity.form.sheetId}`,
-                      )}
-                    startIcon={<FileOpenOutlined />}
-                    sx={{ ml: "auto" }}
-                  >
-                    {t("activity:open-sheets")}
-                  </Button>
-                )
-                : (
-                  <Button
-                    onClick={() => linkToSheet()}
-                    sx={{ ml: "auto" }}
-                    startIcon={<AddToDriveOutlined />}
-                  >
-                    {t("activity:link-responses-to-sheets")}
-                  </Button>
-                )}
+              <Stack direction="row" ml="auto" spacing={3}>
+                <LoadingButton
+                  startIcon={<CloudSync />}
+                  onClick={() => syncSheet()}
+                  loading={syncIsLoading}
+                >
+                  Sync Sheets
+                </LoadingButton>
+                {activity.form.sheetId
+                  ? (
+                    <Button
+                      onClick={() =>
+                        window.open(
+                          `https://docs.google.com/spreadsheets/d/${activity.form.sheetId}`,
+                        )}
+                      startIcon={<FileOpenOutlined />}
+                    >
+                      {t("activity:open-sheets")}
+                    </Button>
+                  )
+                  : (
+                    <Button
+                      onClick={() => linkToSheet()}
+                      startIcon={<AddToDriveOutlined />}
+                    >
+                      {t("activity:link-responses-to-sheets")}
+                    </Button>
+                  )}
+              </Stack>
             </Stack>
           </CardContent>
         </Card>
@@ -121,7 +144,7 @@ export const Info: React.FC<InfoProps> = () => {
             <Formik<{ activity: FormValues }>
               initialValues={{ activity: data.data }}
               onSubmit={(values, { setSubmitting }) => {
-                saveActivity({ ...values.activity },  setSubmitting);
+                saveActivity({ ...values.activity }, setSubmitting);
               }}
             >
               {(props) => (

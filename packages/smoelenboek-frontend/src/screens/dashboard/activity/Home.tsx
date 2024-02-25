@@ -22,34 +22,49 @@ import { Options } from "../../../components/dashboard/Options.tsx";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Delete, Edit } from "@mui/icons-material";
+import log from "../../../utilities/logger";
+import { SnackbarContext } from "../../../providers/SnackbarContext.ts";
+import { Severity } from "../../../providers/SnackbarProvider.tsx";
+
 
 interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
-  const { isLoading, data, refetch } = useGetActivitiesQuery(undefined);
-  const { t } = useTranslation(["common", "activity", "options"]);
+  const { isLoading, data, refetch } = useGetActivitiesQuery(undefined, { refetchOnMountOrArgChange: true });
+  const { t } = useTranslation(["common", "activity", "options", "api"]);
   const [visible, setVisible] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<number>(-1);
 
 	const [trigger] = useDeleteActivityMutation();
 
+	const snackbar = React.useContext(SnackbarContext); 	
+
   if (isLoading) {
     return <Loading />;
   }
 
-	if (data === undefined) {
+	if (data?.data === undefined) {
+		// TODO: show info page
+		log.debug("data is undefined, not showing activities");
 		return null;
 	}
 
 	async function removeActivity() {
+		if (!data?.data) {	
+			return;
+		}
+
 		try {
-			await trigger(data.data[selected].id);
+			const res = await trigger(data.data[selected].id).unwrap();
+
+			snackbar.openSnackbar(t(`api:${res.key}`, { name: data.data[selected].title }), Severity.SUCCESS);
 
 			await refetch();
 		} catch (e) {
-			console.error(e);
+			log.error(e);
+			snackbar.openSnackbar(t('api:entity-deletion-failed'))
 		}
 
 		setVisible(false);

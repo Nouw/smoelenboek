@@ -63,5 +63,8 @@
     }
   },
   "tikkie": "Hierbij bevestig ik dat ik de bovenstaande tikkie heb betaald en deelneem aan de ProtoToto",
-  "pay-tikkie": "Tikkie betalen" 
+  "pay-tikkie": "Tikkie betalen",
+  "activity": {
+    "registration-success": "Successvol geregistreerd voor {{ name }}"
+  }
 }

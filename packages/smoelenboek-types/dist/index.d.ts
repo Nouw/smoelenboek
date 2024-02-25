@@ -31,4 +31,5 @@ export { UserTeamSeason } from "./Entities/UserTeamSeason";
 export { TeamRank, Gender, TeamFunction } from "./Enums/Team";
 export { Permissions, PermissionName } from "./Auth/Permissions";
 export { Roles, RolesHierarchy } from "./Auth/Roles";
-export { ERROR_CODES } from "./Error/Codes";
+export { RESPONSE_CODES } from "./Error/Codes";
+export { ApiResponse } from "./Api/ApiResponse";

@@ -10,6 +10,7 @@ import {
 } from "@decorators/express";
 import {
   Activity,
+  ApiResponse,
   Form,
   FormAnswer,
   FormAnswerValue,
@@ -22,7 +23,7 @@ import {
   AuthenticatedAnonymous,
   Guard,
 } from "../Middlewares/AuthMiddleware";
-import { body, matchedData, param, validationResult } from "express-validator";
+import { matchedData, param } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
 import { RequestWithAnonymous } from "../Utilities/RequestE";
 import { FindOptionsWhere } from "typeorm";
@@ -30,9 +31,22 @@ import { GoogleSpreadsheet } from "google-spreadsheet";
 import { serviceAccountAuth } from "../Utilities/Google";
 import ActivityService from "../Services/ActivityService";
 import GoogleSpreadsheetService from "../Services/GoogleSpreadsheetService";
-import { createFormRules, deleteActivityRules, getActivityRules, getFormRules, getResponsesRules, registrationRules, responseRules, updateActivityRules } from "../Validation/ActivityRules";
+import {
+  createFormRules,
+  deleteActivityRules,
+  getActivityParticipants,
+  getActivityRules,
+  getFormRules,
+  getFormSheetSync,
+  getPreviousResponse,
+  getResponsesRules,
+  registrationRules,
+  responseRules,
+  updateActivityRules,
+} from "../Validation/ActivityRules";
 import { Validate } from "../Middlewares/ValidationMiddleware";
 import EntityService from "../Services/EntityService";
+import RegistrationService from "../Services/RegistrationService";
 
 export type FormRegistration = {
   [key: string]: string | string[];
@@ -43,17 +57,26 @@ export default class ActivityController {
   private readonly activityServer = new ActivityService();
   private readonly spreadsheetService = new GoogleSpreadsheetService();
   private readonly entityService = new EntityService();
+  private readonly registrationService = new RegistrationService();
 
   @AuthenticatedAnonymous(false)
   @Get("/")
   async getActivities(@Request() req: RequestWithAnonymous, @Response() res) {
-    const activities = await Database.manager.find(Activity, { where: { public: !req.user }});
+    const where: FindOptionsWhere<Activity> = {}; 
 
-    res.json(ResponseData.build("OK", activities));
+		if (!req.user) {
+			where.public = true;
+		}
+
+		const activities = await Database.manager.find(Activity, {
+      where,
+    });
+
+    new ApiResponse<Activity[]>(true, "ENTITY_RETRIEVED", activities).send(res);
   }
 
   @Get("/:id", getActivityRules)
-	@Validate()
+  @Validate()
   async getActivity(@Request() req, @Response() res) {
     const { id } = matchedData(req);
 
@@ -64,11 +87,11 @@ export default class ActivityController {
       },
     });
 
-    res.json(ResponseData.build("OK", activity));
+    new ApiResponse<Activity>(true, "ENTITY_RETRIEVED", activity).send(res);
   }
 
   @Get("/form/:id", getFormRules)
-	@Validate()
+  @Validate()
   async getForm(@Request() req, @Response() res) {
     const { id } = matchedData(req);
 
@@ -91,7 +114,7 @@ export default class ActivityController {
       form.questions[key].items = items;
     }
 
-    res.json(ResponseData.build("OK", form));
+    new ApiResponse<Form>(true, "ENTITY_RETRIEVED", form).send(res);
   }
 
   @Post("/")
@@ -124,67 +147,29 @@ export default class ActivityController {
 
       form.questions.push(formQuestion);
     }
-		console.log(activity);
+
     await Database.manager.save(activity);
 
-    res.json(ResponseData.build("OK", null));
+    new ApiResponse(true, "ENTITY_CREATED").send(res);
   }
 
   @AuthenticatedAnonymous(false)
   @Post("/register/:id", registrationRules)
-	@Validate()
+  @Validate()
   async postRegistration(
     @Request() req: RequestWithAnonymous,
     @Response() res,
   ) {
-    const { formId } = matchedData(req);
-
-    const form = await Database.manager.findOneOrFail(Form, {
-      where: { id: formId },
-      relations: { questions: true },
-    });
-
-    const data: FormRegistration = req.body;
-    const answer = new FormAnswer();
-    answer.form = form;
-    answer.values = [];
-
-    if (req.email) {
-      answer.email = req.email;
-    } else {
-      answer.user = req.user;
-    }
-
-    for (const key in data) {
-      const storeAnswerValue = async (key: string, formValue: string) => {
-        const value = new FormAnswerValue();
-        value.question = form.questions.find((q) => q.id === key)!;
-        value.value = formValue;
-        value.answer = answer;
-
-        return value;
-      };
-
-      if (data[key] instanceof Array) {
-        for (const value of data[key]) {
-          answer.values.push(await storeAnswerValue(key, value));
-        }
-      } else {
-        answer.values.push(await storeAnswerValue(key, data[key] as string));
-      }
-    }
-    if (form.sheetId) {
-      await this.activityServer.addRegistrationToSheet(form, answer);
-    }
-
-    await Database.manager.save(answer);
-
-    res.json(ResponseData.build("OK", null));
+    const { id: formId } = matchedData(req);
+		
+		await this.activityServer.registerForActivity(formId, req.body, req.user, req.email);
+    
+    new ApiResponse(true, "ENTITY_CREATED").send(res);
   }
 
   @AuthenticatedAnonymous()
   @Get("/response/:id", responseRules)
-	@Validate()
+  @Validate()
   async getResponse(
     @Request() req: RequestWithAnonymous,
     @Response() res,
@@ -201,7 +186,10 @@ export default class ActivityController {
       next(new Error("No identification found in request!"));
     }
 
-    const formAnswer = await Database.manager.findOneBy(FormAnswer, where);
+    const formAnswer = await Database.manager.findOneByOrFail(
+      FormAnswer,
+      where,
+    );
 
     if (!formAnswer) {
       res.json(ResponseData.build("OK", null));
@@ -218,14 +206,14 @@ export default class ActivityController {
       relations: { question: true },
     });
 
-    res.json(ResponseData.build("OK", answers));
+    new ApiResponse(true, "ENTITY_RETRIEVED", answers).send(res);
   }
 
   @Authenticated()
   @Guard("activity.create")
-  @Post("/form/sheet/:formId", createFormRules)
-	@Validate()
-  async createForm(@Request() req, @Response() res, @Next() next) { 
+  @Post("/form/sheet/:id", createFormRules)
+  @Validate()
+  async linkFormToSheet(@Request() req, @Response() res, @Next() next) {
     const { id } = matchedData(req);
 
     const form = await Database.manager.findOneOrFail(Form, {
@@ -237,13 +225,13 @@ export default class ActivityController {
       next(new Error("This form already has a sheet linked to it!"));
       return;
     }
-
-    const doc = await GoogleSpreadsheet.createNewSpreadsheetDocument(
+    
+		const doc = await GoogleSpreadsheet.createNewSpreadsheetDocument(
       serviceAccountAuth,
       { title: form.activity.title },
     );
-    
-		await doc.setPublicAccessLevel("writer");
+
+    await doc.setPublicAccessLevel("writer");
 
     await this.spreadsheetService.setNameOfDefaultSheet(doc);
     await this.spreadsheetService.setSheetHeaders(form, doc);
@@ -252,20 +240,16 @@ export default class ActivityController {
 
     await Database.manager.save(form);
 
-    res.json(
-      ResponseData.build(
-        "OK",
-        { sheetId: doc.spreadsheetId },
-        "Created google sheet!",
-      ),
-    );
+    new ApiResponse<{ sheetId: string }>(true, "ENTITY_CREATED", {
+      sheetId: doc.spreadsheetId,
+    }).send(res);
   }
 
   @Authenticated()
   @Guard("activity.create")
   @Get("/responses/:id", getResponsesRules)
-	@Validate()
-  async getActivityResponses(@Request() req, @Response() res) { 
+  @Validate()
+  async getActivityResponses(@Request() req, @Response() res) {
     const { id } = matchedData(req);
 
     const responses = await Database.manager.find(FormAnswer, {
@@ -280,14 +264,14 @@ export default class ActivityController {
       where: { form: { id } },
     });
 
-    res.json(ResponseData.build("OK", responses));
+    new ApiResponse<FormAnswer[]>(true, "ENTITY_RETRIEVED", responses).send(res);
   }
 
   @Authenticated()
   @Guard("activity.create")
   @Put("/:id", updateActivityRules)
   @Validate()
-  async updateActivity(@Request() req, @Response() res, @Next() next) {
+  async updateActivity(@Request() req, @Response() res) {
     const {
       id,
       location,
@@ -302,7 +286,7 @@ export default class ActivityController {
 
     let activity = await Database.manager.findOneByOrFail(Activity, { id });
 
-    activity = this.entityService.updateEntity<Activity>({ 
+    activity = this.entityService.updateEntity<Activity>({
       location,
       description,
       date,
@@ -315,11 +299,11 @@ export default class ActivityController {
 
     await Database.manager.save(activity);
 
-    res.json(ResponseData.build("OK", null, "Updated activity!"));
+    new ApiResponse(true, "UPDATED_ENTITY", activity).send(res);
   }
 
   @Delete("/:id", deleteActivityRules)
-	@Validate()
+  @Validate()
   async deleteActivity(@Request() req, @Response() res) {
     const { id } = matchedData(req);
 
@@ -327,22 +311,22 @@ export default class ActivityController {
       where: { id },
       relations: { form: true },
     });
-    
+
     if (activity.form?.sheetId !== null) {
       const doc = await new GoogleSpreadsheet(
         activity.form.sheetId,
         serviceAccountAuth,
       );
       await doc.delete();
-    }	
+    }
 
     await Database.manager.delete(Activity, id);
 
-		if (activity.form?.id) {
-			await Database.manager.delete(Form, activity.form.id);
-		}
+    if (activity.form?.id) {
+      await Database.manager.delete(Form, activity.form.id);
+    }
 
-    res.json(ResponseData.build("OK", null, "Deleted activity!"));
+    new ApiResponse(true, "ENTITY_DELETED").send(res);
   }
 
   @Post("/delete/sheet/:id", [param("id").exists()])
@@ -354,14 +338,68 @@ export default class ActivityController {
 
     res.json("Deleted sheet!");
   }
+  // TODO: activity should have an info button instead to make it easier :)
+  @AuthenticatedAnonymous()
+  @Get("/registrations/")
+  async getRegistrations(
+    @Request() req: RequestWithAnonymous,
+    @Response() res,
+  ) {
+    if (req.email) {
+      new ApiResponse(true, "ENTITY_RETRIEVED").send(res);
+    } else {
+      new ApiResponse(
+        true,
+        "ENTITY_RETRIEVED",
+        await this.registrationService.getUserRegistrations(req.user.id),
+      ).send(res);
+    }
+  }
 
-	@Post("/debug/:id", [param("id").exists()])
+  @AuthenticatedAnonymous()
+  @Get("/registration/:id", getPreviousResponse)
+  @Validate()
+  async getPreviousRegistration(
+    @Request() req: RequestWithAnonymous,
+    @Response() res,
+  ) {
+    const { id } = matchedData(req);
+
+    if (req.email) {
+      new ApiResponse(true, "ENTITY_RETRIEVED", await this.activityServer.getActivityRegistration(id, undefined, req.email)).send(res);
+    } else {
+      const registration = await this.activityServer.getActivityRegistration(
+        id,
+        req.user.id,
+      );
+
+      new ApiResponse(true, "ENTITY_RETRIEVED", registration).send(res);
+    }
+  }
+
+	@Authenticated()
+	@Get("/participants/:id", getActivityParticipants)
 	@Validate()
-	async debugEndpoint(@Request() req, @Response() res) {
+	async getParticipants(@Request() req, @Response() res) {
 		const { id } = matchedData(req);
 
-		await Database.manager.findOneByOrFail(Activity, { id });
-
-		res.json(ResponseData.build("OK", null, "failed or found/"))
+		new ApiResponse(true, "ENTITY_RETRIEVED", await this.activityServer.getParticipants(id)).send(res)
 	}
+
+	@Authenticated()
+	@Post("/form/sheet/sync/:id", getFormSheetSync)
+	@Validate()
+	async getSyncSheet(@Request() req, @Response() res) {
+		const { id } = matchedData(req);
+
+		await this.spreadsheetService.syncResponsesWithSheet(id);
+
+		new ApiResponse(true, "ENTITY_RETRIEVED").send(res);
+	}
+
+  @AuthenticatedAnonymous()
+  @Get("/debug/id")
+  async debugEndpoint(@Request() req, @Response() res) {
+		new ApiResponse(true, "ENTITY_RETRIEVED", await this.spreadsheetService.syncResponsesWithSheet("8cf78a8a-c107-4be3-9a54-06f782648f61")).send(res); 
+  }
 }

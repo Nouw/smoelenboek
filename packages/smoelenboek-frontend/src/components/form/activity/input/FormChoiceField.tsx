@@ -23,8 +23,8 @@ export const FormChoiceField: React.FC<FormChoiceFieldProps> = ({ question }) =>
   return (
     <FormControl required={question.required} error={Boolean(meta.error)}>
       <FormLabel component="legend">{ question.title }</FormLabel>
-      <RadioGroup value={props.value} onChange={(e) => helpers.setValue(e.target.value)}>
-        {question.items.map((item) => (
+      <RadioGroup value={props.value || ""} onChange={(e) => helpers.setValue(e.target.value)}>
+        {question.items.map((item: any) => (
           <FormControlLabel value={item.label} control={<Radio />} label={item.label}/>
         ))}
       </RadioGroup>

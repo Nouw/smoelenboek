@@ -8,7 +8,11 @@ const mutex = new Mutex();
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_APP_API_URL ?? "http://localhost:8080/",
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.accessToken;
+		if (headers.get('authorization') !== null) {
+			return headers;
+		}
+
+		const token = (getState() as RootState).auth.accessToken;
 
     if (token) {
       headers.set('authorization', token);
