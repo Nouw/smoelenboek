@@ -1,8 +1,9 @@
-import {API, Response} from "../API.ts";
-import {Activity, Form, FormAnswer} from "smoelenboek-types";
+import { ApiResponse } from "smoelenboek-types";
+import { API, Response } from "../API.ts";
+import { Activity, Form, FormAnswer } from "smoelenboek-types";
 
 interface PostActivityRequest {
-  activity: Partial<Activity>
+  activity: Partial<Activity>;
   form: Partial<Form>;
 }
 
@@ -10,70 +11,102 @@ interface PostRegistrationRequest {
   id: string;
   data: {
     [key: string]: string | string[];
-  },
+  };
   anonymous?: boolean;
 }
 
-export const activityApiSlice = API.enhanceEndpoints({ addTagTypes: ['Activity']}).injectEndpoints({
-  endpoints: builder => ({
-    createActivity: builder.mutation<string, PostActivityRequest>({
+export const activityApiSlice = API.enhanceEndpoints({
+  addTagTypes: ["Activity"],
+}).injectEndpoints({
+  endpoints: (builder) => ({
+    createActivity: builder.mutation<ApiResponse<null>, PostActivityRequest>({
       query: (data) => ({
-        url: 'activity/',
-        method: 'POST',
+        url: "activity/",
+        method: "POST",
         body: {
           activity: data.activity,
           form: data.form,
-        }
-      })
+        },
+      }),
     }),
-    getActivities: builder.query<Response<Activity[]>, undefined>({
+    getActivities: builder.query<ApiResponse<Activity[]>, undefined>({
       query: () => ({
-        url: 'activity/',
-        method: 'GET',
-      })
+        url: "activity/",
+        method: "GET",
+      }),
     }),
     getActivity: builder.query<Response<Activity>, number>({
       query: (id) => ({
         url: `activity/${id}`,
-        method: 'GET'
-      })
+        method: "GET",
+      }),
     }),
     getForm: builder.query<Response<Form>, string>({
       query: (id) => ({
         url: `activity/form/${id}`,
-        method: 'GET'
-      })
+        method: "GET",
+      }),
     }),
-    postRegistration: builder.mutation<Response<null>, PostRegistrationRequest>({
-      query: (data) => ({
-        url: `activity/register/${data.id}`,
-        method: 'POST',
-        body: data.data,
-				prepareHeaders: (headers: Headers) => {
-					if (!data.anonymous) {
-						return headers;
-					}
-
-					headers.set("Authorization", "Hello world!")
-
-					return headers;
-				}	
-
-      })
-    }),
+    postRegistration: builder.mutation<Response<null>, PostRegistrationRequest>(
+      {
+        query: (data) => ({
+          url: `activity/register/${data.id}`,
+          method: "POST",
+          body: data.data,
+					headers: data.anonymous ? { Authorization: data.data.email } : undefined,
+        }),
+      },
+    ),
     postFormSheet: builder.mutation<Response<{ sheetId: string }>, string>({
       query: (id) => ({
         url: `activity/form/sheet/${id}`,
-        method: 'POST',
-      })
+        method: "POST",
+      }),
     }),
     getFormResponses: builder.query<Response<FormAnswer[]>, string>({
       query: (id) => ({
         url: `activity/responses/${id}`,
-        method: 'GET'
-      })
-    })
-  })
+        method: "GET",
+      }),
+    }),
+    updateActivity: builder.mutation<
+      Response<null>,
+      { id: number; activity: Partial<Activity> }
+    >({
+      query: ({ id, activity }) => ({
+        url: `activity/${id}`,
+        method: "PUT",
+        body: activity,
+      }),
+    }),
+    deleteActivity: builder.mutation<ApiResponse<null>, number>({
+      query: (id) => ({
+        url: `activity/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    getRegistration: builder.query<ApiResponse<FormAnswer>, { id: string, email?: string }>({
+      query: ({ id, email }) => ({
+        url: `activity/registration/${id}`,
+        method: "GET",
+				headers: {
+					Authorization: email 
+				}	
+      }),
+    }),
+		getParticipants: builder.query<ApiResponse<FormAnswer[]>, number | string>({
+			query: (id) => ({
+				url: `activity/participants/${id}`,
+				method: "GET"
+			})
+		}),
+		postFormSyncsheet: builder.mutation<ApiResponse<null>, string>({
+			query: (id) => ({
+				url: `activity/form/sheet/sync/${id}`,
+				method: "POST"
+			})
+		})
+  }),
 });
 
 export const {
@@ -81,7 +114,13 @@ export const {
   useGetActivitiesQuery,
   useGetActivityQuery,
   useLazyGetFormQuery,
+  useGetFormQuery,
   usePostRegistrationMutation,
   usePostFormSheetMutation,
   useLazyGetFormResponsesQuery,
+  useUpdateActivityMutation,
+  useDeleteActivityMutation,
+	useLazyGetRegistrationQuery,
+	useGetParticipantsQuery,
+	usePostFormSyncsheetMutation,
 } = activityApiSlice;

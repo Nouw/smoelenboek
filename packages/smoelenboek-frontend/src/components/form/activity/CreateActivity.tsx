@@ -7,10 +7,22 @@ import {StyledTextInput} from "../StyledTextInput.tsx";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
+import { object, string, boolean, number, date } from "yup";
 
 interface CreateActivityProps {
   name: string;
 }
+
+export const activity = object({
+    title: string().required(),
+    description: string().nullable(),
+    location: string().nullable(),
+    public: boolean().default(() => true),
+    registrationOpen: date(),
+    registrationClosed: date(),
+    max: number().nullable(),
+    date: date().required(),
+});
 
 export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
 	const { t } = useTranslation(["common", "activity"]);

@@ -4,7 +4,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "license": "MIT",
-  "packageManager": "yarn@3.2.3",
+  "packageManager": "yarn@4.1.0",
   "scripts": {
     "compile": "rimraf dist && tsc --project ./",
     "deploy": "bin/deploy"
@@ -19,6 +19,7 @@
     "rimraf": "^5.0.1"
   },
   "dependencies": {
+    "@types/express": "^4.17.21",
     "typeorm": "^0.3.17"
   }
 }

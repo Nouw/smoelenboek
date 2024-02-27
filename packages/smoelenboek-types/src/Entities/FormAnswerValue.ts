@@ -10,11 +10,11 @@ export class FormAnswerValue {
   @Column({ type: "text" })
     value: string;
 
-  @ManyToOne(() => FormQuestion)
+  @ManyToOne(() => FormQuestion, { onDelete: "CASCADE" })
   @JoinColumn([{ name: 'question_id', referencedColumnName: 'id' }])
     question: Relation<FormQuestion>;
 
-  @ManyToOne(() => FormAnswer, formAnswer => formAnswer.values)
+  @ManyToOne(() => FormAnswer, formAnswer => formAnswer.values, { onDelete: "CASCADE" })
   @JoinColumn()
     answer: Relation<FormAnswer>;
 }

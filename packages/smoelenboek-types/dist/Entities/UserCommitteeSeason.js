@@ -14,9 +14,8 @@ const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const Committee_1 = require("./Committee");
 const Season_1 = require("./Season");
-let UserCommitteeSeason = class UserCommitteeSeason {
+let UserCommitteeSeason = exports.UserCommitteeSeason = class UserCommitteeSeason {
 };
-exports.UserCommitteeSeason = UserCommitteeSeason;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

@@ -1,6 +1,6 @@
 import React from "react";
 import {Box, Button, Paper, Step, StepLabel, Stepper} from "@mui/material";
-import {CreateActivity} from "../../../components/form/activity/CreateActivity.tsx";
+import {CreateActivity, activity} from "../../../components/form/activity/CreateActivity.tsx";
 import {Formik, FormikProps} from "formik";
 import {boolean, date, InferType, number, object, string} from "yup";
 import {LoadingButton} from "@mui/lab";
@@ -10,6 +10,9 @@ import {useCreateActivityMutation} from "../../../api/endpoints/activity.ts";
 import {Activity, Form} from "smoelenboek-types";
 import {ActivitySettings} from "../../../components/form/activity/ActivitySettings.tsx";
 import { useTranslation } from "react-i18next";
+import log from "../../../utilities/logger";
+import { SnackbarContext } from "../../../providers/SnackbarContext.ts";
+import { Severity } from "../../../providers/SnackbarProvider.tsx";
 
 interface CreateProps {
 
@@ -22,16 +25,7 @@ interface StepProperties {
 }
 
 const schema = object({
-  activity: object({
-    title: string().required(),
-    description: string().nullable(),
-    location: string().nullable(),
-    public: boolean().default(() => true),
-    registrationOpen: date(),
-    registrationClosed: date(),
-    max: number().nullable(),
-    date: date().required(),
-  }),
+  activity,
   form: object({
     title: string().required(),
     description: string().required(),
@@ -42,7 +36,8 @@ const schema = object({
 type FormValues = InferType<typeof schema>;
 
 export const Create: React.FC<CreateProps> = () => {
-  const { t } = useTranslation(["common", "activity", "form", "settings"]);
+  const { t } = useTranslation(["common", "activity", "form", "settings", "api"]);
+	const snackbar = React.useContext(SnackbarContext)
 
 	const steps: StepProperties[] = [
     {label: t("activity:create-activity"), optional: false, component: <CreateActivity name="activity"/>},
@@ -80,8 +75,16 @@ export const Create: React.FC<CreateProps> = () => {
   }
 
   async function submit(values: FormValues) {
-    const res = await trigger({ activity: values.activity as Partial<Activity>, form: values.form as Form }).unwrap();
-    console.log(res);
+    try {
+			const res = await trigger({ activity: values.activity as Partial<Activity>, form: values.form as Form }).unwrap();
+			
+			log.debug("Succesfully created activity entity!");
+			snackbar.openSnackbar(t(`api:${res.key}`, { name: values.activity.title }), Severity.SUCCESS);
+		} catch (e) {
+			log.error(e)
+			snackbar.openSnackbar(t("api:entity-creation-failed", { name: values.activity.title }))
+		}
+    
   }
 
   return (

@@ -38,7 +38,7 @@ export const CreateActivityForm: React.FC<CreateActivityFormProps> = ({ name }) 
                 <Box flex={1} textAlign="center">
                   <Button
                     startIcon={<Add/>}
-                    onClick={() => arrayProps.push({type: "text"})}
+                    onClick={() => arrayProps.push({type: "text", key: questionsFieldProps.value.length + 1})}
                   >
                     {t("form:question.add-question")}
                   </Button>

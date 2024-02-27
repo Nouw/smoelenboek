@@ -67,5 +67,8 @@
   "error": {
     "something": "Something went wrong trying to load this page...",
     "info": "If you believe this is an error, please send a message to WebCie"
+  },
+  "activity": {
+    "registration-success": "Successfully registerd for {{ name }}"
   }
 }

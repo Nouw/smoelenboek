@@ -1,0 +1,20 @@
+export const RESPONSE_CODES: Record<string, { key: string, status: number }> = {
+	ENTITY_CREATED: { key: 'entity-created', status: 201 },
+	ENTITY_UPDATED: { key: 'entity-updated', status: 200 },
+	ENTITY_DELETED: { key: 'entity-deleted', status: 200 },
+	ENTITY_RETRIEVED: { key: 'entity-retrieved', status: 200 },
+	LOGIN_SUCCESS: { key: 'login-success', status: 200 },
+	LOGOUT_SUCCESS: { key: 'logout-success', status: 200 },
+	INVALID_CREDENTIALS: { key: 'invalid-credentials', status: 401},
+	TOKEN_INVALID: { key: 'token-invalid', status: 401 },
+	ACCESS_DENIED: { key: 'access-denied', status: 403 },
+	ROLE_REQUIRED: { key: 'role-required', status: 403 },
+	RESOURCE_NOT_FOUND: { key: 'resource-not-found', status: 404 },
+	ACTION_NOT_ALLOWD: { key: 'action-not-allowed', status: 403 },
+	ENTITY_CREATION_FAILED: { key: 'entity-creation-failed', status: 500 },
+	ENTITY_UPDATE_FAILED: { key: 'entity-update-failed', status: 500 },
+	ENTITY_DELETION_FAILED: { key: 'entity-deleted-failed', status: 500 },
+	ENTITY_NOT_FOUND: { key: 'entity-not-found', status: 500 },
+	INVALID_REQUEST_PARAMETERS: { key: 'invalid-request-parameters', status: 400 },
+	INVALID_PAYLOAD_FORMAT: { key: 'invalid-payload-format', status: 400 }
+}

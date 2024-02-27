@@ -12,9 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProtototoPredictionsExternal = void 0;
 const typeorm_1 = require("typeorm");
 const ProtototoMatch_1 = require("./ProtototoMatch");
-let ProtototoPredictionsExternal = class ProtototoPredictionsExternal {
+let ProtototoPredictionsExternal = exports.ProtototoPredictionsExternal = class ProtototoPredictionsExternal {
 };
-exports.ProtototoPredictionsExternal = ProtototoPredictionsExternal;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)

@@ -1,8 +1,8 @@
 import {Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
-import {FormItem} from "../FormItem";
 import {Activity} from "./Activity";
 import {FormQuestion} from "./FormQuestion";
 //TODO: Add some way to order the form
+//TODO: Make startup script to check if everything is cascaded, because TypeORM is a bit retarded with that.
 @Entity()
 export class Form {
 	@PrimaryGeneratedColumn("uuid")
@@ -17,7 +17,7 @@ export class Form {
   @Column({ type: "text", nullable: true })
     sheetId?: string;
 
-  @OneToOne(() => Activity, activity => activity.form, )
+  @OneToOne(() => Activity, activity => activity.form, { onDelete: "CASCADE" })
     activity: Relation<Activity>;
 
   @OneToMany(() => FormQuestion, question => question.form, { cascade: true })

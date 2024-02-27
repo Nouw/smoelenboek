@@ -1,0 +1,19 @@
+{
+  "entity-created": "Created {{ name }}",
+  "entity-updated": "Updated {{ name }}",
+  "entity-deleted": "Removed {{ name }}",
+  "login-success": "Succesfully logged in",
+  "logout-success": "Succesfully logged out",
+  "invalid-credentails": "Invalid credentails",
+  "token-invalid": "Authentication token is invalid",
+  "access-denied": "Access denied",
+  "role-required": "You don't have the required permissions to access this",
+  "resource-not-found": "Resource not found",
+  "action-not-allowed": "Action not allowed",
+  "entity-creation-failed": "Failed to create {{ name }}",
+  "entity-update-failed": "Failed to update {{ name }}",
+  "entity-deletion-failed": "Failed to delete {{ name }}",
+  "entity-not-found": "Could not find {{ name }}",
+  "invalid-request-parameters": "Invalid request parameters",
+  "invalid-payload-format": "Payload has incorrect format" 
+}

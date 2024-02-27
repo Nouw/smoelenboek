@@ -21,11 +21,17 @@ export class FormAnswer {
   @Column({ type: "text", nullable: true })
     email?: string;
 
-  @OneToOne(() => User)
+	@Column({ type: "text", nullable: true })
+		firstName?: string;
+
+	@Column({ type: "text", nullable: true })
+		lastName?: string;
+
+  @ManyToOne(() => User)
   @JoinColumn()
     user?: Relation<User>;
 
-  @ManyToOne(() => Form)
+  @ManyToOne(() => Form, { onDelete: "CASCADE" })
   @JoinColumn([{ name: 'form_id', referencedColumnName: 'id' }])
     form: Relation<Form>;
 

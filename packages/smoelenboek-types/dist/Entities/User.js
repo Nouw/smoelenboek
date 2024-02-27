@@ -17,9 +17,8 @@ const UserCommitteeSeason_1 = require("./UserCommitteeSeason");
 const ProtototoPredictionResults_1 = require("./ProtototoPredictionResults");
 const ProtototoPredictions_1 = require("./ProtototoPredictions");
 const Activity_1 = require("./Activity");
-let User = class User {
+let User = exports.User = class User {
 };
-exports.User = User;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
