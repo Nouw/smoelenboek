@@ -17,9 +17,9 @@ export class Form {
   @Column({ type: "text", nullable: true })
     sheetId?: string;
 
-  @OneToOne(() => Activity, activity => activity.form)
+  @OneToOne(() => Activity, activity => activity.form, { onDelete: "CASCADE" })
     activity: Relation<Activity>;
 
-  @OneToMany(() => FormQuestion, question => question.form, { cascade: true, onDelete: "CASCADE" })
+  @OneToMany(() => FormQuestion, question => question.form, { cascade: true })
     questions: Relation<FormQuestion[]>;
 }

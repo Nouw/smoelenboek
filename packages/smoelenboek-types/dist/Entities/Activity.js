@@ -52,7 +52,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Activity.prototype, "public", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => Form_1.Form, form => form.activity, { cascade: true, onDelete: "CASCADE" }),
+    (0, typeorm_1.OneToOne)(() => Form_1.Form, form => form.activity, { cascade: true }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Object)
 ], Activity.prototype, "form", void 0);

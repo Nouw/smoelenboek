@@ -12,6 +12,6 @@ export class FormQuestionItem {
   @Column()
     key: number;
 
-  @ManyToOne(() => FormQuestion, (question) => question.items)
+  @ManyToOne(() => FormQuestion, (question) => question.items, { onDelete: "CASCADE" })
     question: Relation<FormQuestion>;
 }

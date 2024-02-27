@@ -31,11 +31,11 @@ export class FormAnswer {
   @JoinColumn()
     user?: Relation<User>;
 
-  @ManyToOne(() => Form)
+  @ManyToOne(() => Form, { onDelete: "CASCADE" })
   @JoinColumn([{ name: 'form_id', referencedColumnName: 'id' }])
     form: Relation<Form>;
 
-  @OneToMany(() => FormAnswerValue, formAnswerData => formAnswerData.answer, { cascade: true, onDelete: "CASCADE" })
+  @OneToMany(() => FormAnswerValue, formAnswerData => formAnswerData.answer, { cascade: true })
     values: Relation<FormAnswerValue[]>;
 
   @CreateDateColumn()

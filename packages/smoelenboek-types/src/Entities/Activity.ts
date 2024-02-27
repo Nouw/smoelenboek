@@ -40,7 +40,7 @@ export class Activity {
   @Column({ default: false })
     public: boolean;
 
-  @OneToOne(() => Form, form => form.activity, { cascade: true,	onDelete: "CASCADE" })
+  @OneToOne(() => Form, form => form.activity, { cascade: true })
   @JoinColumn()
     form: Relation<Form>;
 

@@ -34,11 +34,11 @@ __decorate([
     __metadata("design:type", String)
 ], Form.prototype, "sheetId", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => Activity_1.Activity, activity => activity.form),
+    (0, typeorm_1.OneToOne)(() => Activity_1.Activity, activity => activity.form, { onDelete: "CASCADE" }),
     __metadata("design:type", Object)
 ], Form.prototype, "activity", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => FormQuestion_1.FormQuestion, question => question.form, { cascade: true, onDelete: "CASCADE" }),
+    (0, typeorm_1.OneToMany)(() => FormQuestion_1.FormQuestion, question => question.form, { cascade: true }),
     __metadata("design:type", Object)
 ], Form.prototype, "questions", void 0);
 exports.Form = Form = __decorate([
