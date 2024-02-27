@@ -10,53 +10,12 @@ import { GoogleSpreadsheet } from "google-spreadsheet";
 import { serviceAccountAuth } from "../Utilities/Google";
 import moment from "moment";
 import { Database } from "../Database";
-import { idExists } from "../Validation/BaseRules";
 import { FormRegistration } from "../Controllers/ActivityController";
 import { IsNull, Not } from "typeorm";
+import GoogleSpreadsheetService from "./GoogleSpreadsheetService";
 
 export default class ActivityService {
-  async addRegistrationToSheet(form: Form, formAnswer: FormAnswer) {
-    const excel = await new GoogleSpreadsheet(form.sheetId, serviceAccountAuth);
-
-    await excel.loadInfo();
-
-    const sheet = excel.sheetsByIndex[0];
-    const row: string[] = [moment(new Date()).format("HH:mm:ss DD-MM-YYYY")];
-
-    form.questions.sort((a, b) => {
-      if (a.key < b.key) {
-        return -1;
-      }
-
-      if (a.key > b.key) {
-        return 0;
-      }
-
-      return 0;
-    });
-
-    for (const question of form.questions) {
-      if (!question) {
-        continue;
-      }
-
-      const answer = formAnswer.values.find((a) => {
-        if (a.question === undefined) {
-          return false;
-        }
-
-        return a.question?.id === question.id;
-      });
-
-      if (answer) {
-        row.push(answer.value);
-      } else {
-        row.push("");
-      }
-    }
-
-    await sheet.addRow(row);
-  }
+  private sheetsService = new GoogleSpreadsheetService();	
 
   async removeActivity(activity: Activity) {
     await Database.manager.transaction(async (manager) => {
@@ -93,9 +52,9 @@ export default class ActivityService {
     userId?: number,
     email?: string,
   ) {
-		const response = await this.getResponse(formId, userId, email);
-    
-		if (!response) {
+    const response = await this.getResponse(formId, userId, email);
+
+    if (!response) {
       return null;
     }
 
@@ -184,7 +143,7 @@ export default class ActivityService {
     }
 
     if (form.sheetId) {
-      await this.addRegistrationToSheet(form, answer);
+      await this.sheetsService.addSingleRegistration(answer);
     }
 
     await Database.manager.save(answer);
@@ -240,6 +199,6 @@ export default class ActivityService {
         .getOne();
     }
 
-		return response;
+    return response;
   }
 }

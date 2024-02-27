@@ -8,7 +8,7 @@ import { SnackbarContext } from "../../providers/SnackbarContext";
 import log from "../../utilities/logger";
 import { useTranslation } from "react-i18next";
 import { Severity } from "../../providers/SnackbarProvider";
-import { Formik, FormikProps, setIn } from "formik";
+import { Formik, FormikProps } from "formik";
 import { Stack } from "@mui/material";
 import { Loading } from "../Loading";
 import { FormTextField } from "../form/activity/input/FormTextField";

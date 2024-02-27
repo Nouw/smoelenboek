@@ -43,7 +43,7 @@ export const Info: React.FC<InfoProps> = () => {
   const { isLoading, data, refetch } = useGetActivityQuery(
     parseInt(id ?? "-1"),
   );
-  const [trigger] = usePostFormSheetMutation();
+  const [trigger, { isLoading: linkSheetLoading }] = usePostFormSheetMutation();
   const [triggerResponses, { data: responsesData }] =
     useLazyGetFormResponsesQuery();
   const [activityTrigger] = useUpdateActivityMutation();
@@ -107,13 +107,16 @@ export const Info: React.FC<InfoProps> = () => {
                 {t("activity:responses")} {!responses ? 0 : (responses.length)}
               </Typography>
               <Stack direction="row" ml="auto" spacing={3}>
-                <LoadingButton
-                  startIcon={<CloudSync />}
-                  onClick={() => syncSheet()}
-                  loading={syncIsLoading}
-                >
-                  Sync Sheets
-                </LoadingButton>
+                {activity.form.sheetId &&
+                  (
+                    <LoadingButton
+                      startIcon={<CloudSync />}
+                      onClick={() => syncSheet()}
+                      loading={syncIsLoading}
+                    >
+                      Sync Sheets
+                    </LoadingButton>
+                  )}
                 {activity.form.sheetId
                   ? (
                     <Button
@@ -127,12 +130,13 @@ export const Info: React.FC<InfoProps> = () => {
                     </Button>
                   )
                   : (
-                    <Button
+                    <LoadingButton
+											loading={linkSheetLoading}
                       onClick={() => linkToSheet()}
                       startIcon={<AddToDriveOutlined />}
                     >
                       {t("activity:link-responses-to-sheets")}
-                    </Button>
+                    </LoadingButton>
                   )}
               </Stack>
             </Stack>

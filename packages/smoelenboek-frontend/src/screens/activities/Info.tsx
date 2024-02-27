@@ -15,14 +15,11 @@ import ReactHtmlParser from "react-html-parser";
 import moment from "moment";
 import { SignUp } from "../../components/activity/SignUp";
 import { Participants } from "../../components/activity/Participants";
-import { useCookies } from "react-cookie";
 
 // TODO: Should add some event listener to send refresh event?
 export const Info: React.FC = () => {
   const params = useParams();
-	const [cookies] = useCookies([`protos-activity-${params.id}`])
-	console.log(cookies);
-  const { data, isLoading } = useGetActivityQuery(parseInt(params.id ?? ""));
+  const { data, isLoading } = useGetActivityQuery(parseInt(params.id ?? ""), { refetchOnMountOrArgChange: true });
 
   if (isLoading) {
     return <Loading />;

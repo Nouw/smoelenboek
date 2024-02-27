@@ -2,6 +2,7 @@ import { Form, FormAnswer } from "smoelenboek-types";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { Database } from "../Database";
 import { serviceAccountAuth } from "../Utilities/Google";
+import moment from "moment";
 
 export default class GoogleSpreadsheetService {
   async setNameOfDefaultSheet(spreadsheet: GoogleSpreadsheet) {
@@ -53,7 +54,7 @@ export default class GoogleSpreadsheetService {
         user: {
           firstName: true,
           lastName: true,
-					email: true,
+          email: true,
         },
         values: {
           value: true,
@@ -82,30 +83,70 @@ export default class GoogleSpreadsheetService {
     const rows = [];
 
     for (const answer of answers) {
-      let name: string;
-
-      if (answer.firstName) {
-        name = `${answer.firstName} ${answer.lastName}`;
-      } else {
-        name = `${answer.user.firstName} ${answer.user.lastName}`;
-      }
-
-      rows.push([
-        answer.created,
-        name,
-        answer.email ?? answer.user.email,
-        ...form.questions.map((question) => {
-          const value = answer.values.find((v) =>
-            v.question.id === question.id
-          );
-
-          return value?.value ?? "";
-        }),
-      ]);
+      rows.push(this.formatRow(form, answer));
     }
 
     await sheet.addRows(rows);
 
     return;
+  }
+
+  async addSingleRegistration(answer: FormAnswer) {
+    const form = await Database.manager.findOneOrFail(Form, {
+      select: {
+        questions: {
+          id: true,
+          title: true,
+        },
+      },
+      relations: {
+        questions: true,
+        activity: true,
+      },
+      where: { id: answer.form.id },
+    });
+
+    const spreadsheet = new GoogleSpreadsheet(
+      form.sheetId,
+      serviceAccountAuth,
+    );
+
+    await spreadsheet.loadInfo();
+
+    const sheet = spreadsheet.sheetsByTitle["Form Answers"];
+    const row = this.formatRow(form, answer);
+
+    return sheet.addRow(row);
+  }
+
+  private formatRow(form: Form, answer: FormAnswer): Array<any> {
+    let name: string;
+
+    if (answer.firstName) {
+      name = `${answer.firstName} ${answer.lastName}`;
+    } else {
+      name = `${answer.user.firstName} ${answer.user.lastName}`;
+    }
+
+    return [
+      moment(new Date()).format("HH:mm:ss DD-MM-YYYY"),
+      name,
+      answer.email ?? answer.user.email,
+      ...form.questions.sort((a, b) => {
+        if (a.key < b.key) {
+          return -1;
+        }
+
+        if (a.key > b.key) {
+          return 0;
+        }
+
+        return 0;
+      }).map((question) => {
+        const value = answer.values.find((v) => v.question.id === question.id);
+
+        return value?.value ?? "";
+      }),
+    ];
   }
 }

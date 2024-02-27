@@ -22,6 +22,8 @@ export const Participants: React.FC<ParticipantsProps> = ({ id }) => {
 	if (!data?.data) {
 		return null;
 	}
+	
+	console.log(data);
 
   return (
     <List
