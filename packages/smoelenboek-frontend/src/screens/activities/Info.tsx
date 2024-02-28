@@ -20,6 +20,7 @@ import { Participants } from "../../components/activity/Participants";
 export const Info: React.FC = () => {
   const params = useParams();
   const { data, isLoading } = useGetActivityQuery(parseInt(params.id ?? ""), { refetchOnMountOrArgChange: true });
+	const [refetchParticipants, setRefetchParticipants] = React.useState(false);
 
   if (isLoading) {
     return <Loading />;
@@ -42,7 +43,7 @@ export const Info: React.FC = () => {
               {ReactHtmlParser(activity.description)}
             </Typography>
             <Divider />
-            <Participants id={parseInt(params.id ?? "")} />
+            <Participants id={parseInt(params.id ?? "")} refetch={refetchParticipants} />
             {moment().isBefore(activity.registrationOpen) && (
               <Typography variant="h3" textAlign="center">
                 Inschrijvingen open{" "}
@@ -58,7 +59,7 @@ export const Info: React.FC = () => {
           <CardContent>
             <Stack spacing={1}>
               <Typography variant="h4">Inschrijf formulier</Typography>
-              <SignUp title={activity.title} formId={activity.form.id} />
+              <SignUp title={activity.title} formId={activity.form.id} onSubmit={() => setRefetchParticipants(!refetchParticipants)} />
             </Stack>
           </CardContent>
         </Card>

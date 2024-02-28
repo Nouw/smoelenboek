@@ -11,5 +11,5 @@ export abstract class Seeder {
     /**
      * Undo the previous run
     */
-    abstract revert(): Promise<void>
+    abstract revert(datebase?: DataSource): Promise<void>
 }

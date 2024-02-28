@@ -9,7 +9,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_ROOT_PASSWORD: test
       MYSQL_ROOT_HOST: '%'
-      MYSQL_DATABASE: smoelenboek
+      MYSQL_DATABASE: smoelenboek_beta
       MYSQL_USER: smoelenboek
       MYSQL_PASSWORD: smoelenboek
     ports:

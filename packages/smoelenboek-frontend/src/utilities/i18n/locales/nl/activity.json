@@ -13,6 +13,6 @@
   "open-for-external": "Zet dit op true als deze acitiviteit ook open is voor externe",
   "responses": "Antwoorden",
   "open-sheets": "Open Sheets",
-  "link-responses-to-sheets": "Link inschrijven aan Sheets"
+  "link-responses-to-sheets": "Link inschrijven aan Sheets",
+  "registration-success": "Succesvol ingeschreven voor {{ name }}"
 }
-

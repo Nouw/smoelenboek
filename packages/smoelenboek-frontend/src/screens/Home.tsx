@@ -14,10 +14,7 @@ import ReactHtmlParser from "react-html-parser";
 import { useNavigate } from "react-router-dom";
 import { Activity } from "smoelenboek-types";
 
-interface HomeProps {
-}
-
-export const Home: React.FC<HomeProps> = () => {
+export const Home: React.FC = () => {
   const navigate = useNavigate();
 
   const { data, isLoading } = useGetActivitiesQuery(undefined);
@@ -28,14 +25,7 @@ export const Home: React.FC<HomeProps> = () => {
 
   return (
     <Box>
-      <Stack spacing={2}>
-        <Button
-          onClick={() => {
-            throw new Error("Sentry test error");
-          }}
-        >
-          SENTRY
-        </Button>
+      <Stack spacing={2}> 
         {data.data?.map((activity: Activity) => (
           <Card>
             <CardContent>

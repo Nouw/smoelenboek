@@ -61,7 +61,6 @@ export const Login: React.FC<LoginProps> = () => {
       const res = await login(data).unwrap();
 
       dispatch(setCredentials(res.data));
-      console.log(res.data);
       dispatch(setRoles(res.data.roles));
 
       navigate('/')

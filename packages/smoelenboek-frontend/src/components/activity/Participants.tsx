@@ -10,10 +10,11 @@ import {
 
 interface ParticipantsProps {
   id: string | number;
+	refetch?: boolean;
 }
 
 export const Participants: React.FC<ParticipantsProps> = ({ id }) => {
-  const { data, isLoading } = useGetParticipantsQuery(id);
+  const { data, isLoading } = useGetParticipantsQuery(id, { refetchOnMountOrArgChange: true });
 
   if (isLoading) {
     return <Loading />;
@@ -23,8 +24,6 @@ export const Participants: React.FC<ParticipantsProps> = ({ id }) => {
 		return null;
 	}
 	
-	console.log(data);
-
   return (
     <List
       sx={{ maxHeight: 300, bgcolor: "background.paper" }}
