@@ -14,9 +14,10 @@
     "required": "Vereist"
   },
   "field-required": "Dit veld is verplicht!",
-	"avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
+  "avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
   "valid": {
     "email": "Voer een geldig e-mailadres in"
-  }
+  },
+  "registration-closed-after-open": "De sluitingsdatum van de registratie moet na de open datum liggen",
+  "date-after-registration-closed": "De datum moet vallen na sluiting van de registratie"
 }
-

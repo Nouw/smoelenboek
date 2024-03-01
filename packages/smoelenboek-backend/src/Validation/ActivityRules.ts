@@ -19,3 +19,8 @@ export const deleteActivityRules = [idExists];
 export const getPreviousResponse = [idExists];
 export const getActivityParticipants = [idExists];
 export const getFormSheetSync = [idExists];
+export const updateActivitySettingsRules = [
+  idExists,
+  body("public").toBoolean(),
+];
+export const deleteSheetLink = [idExists];

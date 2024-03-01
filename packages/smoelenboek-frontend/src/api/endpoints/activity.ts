@@ -70,7 +70,7 @@ export const activityApiSlice = API.enhanceEndpoints({
       }),
     }),
     updateActivity: builder.mutation<
-      Response<null>,
+      ApiResponse<null>,
       { id: number; activity: Partial<Activity> }
     >({
       query: ({ id, activity }) => ({
@@ -105,6 +105,27 @@ export const activityApiSlice = API.enhanceEndpoints({
 				url: `activity/form/sheet/sync/${id}`,
 				method: "POST"
 			})
+		}),
+		deleteResponse: builder.mutation<ApiResponse<null>, string>({
+			query: (id) => ({
+				url: `activity/response/${id}`,
+				method: "DELETE"
+			})
+		}),
+		updateActivitySettings: builder.mutation<ApiResponse<null>, Partial<Activity>>({
+			query: (activity) => ({
+				url: `activity/settings/${activity.id}`,
+				method: "PUT",
+				body: {
+					...activity,	
+				}
+			})
+		}),
+		deleteSelfResponse: builder.mutation<ApiResponse<null>, string>({
+			query: (id) => ({
+				url: `activity/response/${id}`,
+				method: "DELETE" // TODO: Should probably fix the headers??
+			})
 		})
   }),
 });
@@ -123,4 +144,8 @@ export const {
 	useLazyGetRegistrationQuery,
 	useGetParticipantsQuery,
 	usePostFormSyncsheetMutation,
+	useGetFormResponsesQuery,
+	useDeleteResponseMutation,
+	useUpdateActivitySettingsMutation,
+	useDeleteSelfResponseMutation,
 } = activityApiSlice;

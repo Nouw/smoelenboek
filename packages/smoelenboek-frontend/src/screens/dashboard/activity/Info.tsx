@@ -14,6 +14,8 @@ import {
   Card,
   CardContent,
   Stack,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
 import {
@@ -28,13 +30,23 @@ import {
   activity,
   CreateActivity,
 } from "../../../components/form/activity/CreateActivity.tsx";
-import { LoadingButton } from "@mui/lab";
+import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import { Activity } from "smoelenboek-types";
+import { Responses } from "../../../components/activity/dashboard/Responses.tsx";
+import { SettingsWrapper } from "../../../components/activity/dashboard/SettingsWrapper.tsx";
 
 interface InfoProps {
 }
 
 type FormValues = InferType<typeof activity>;
+
+//Don't know wtf this does, but it is needed for the tabs???
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 
 export const Info: React.FC<InfoProps> = () => {
   const { id } = useParams();
@@ -49,6 +61,8 @@ export const Info: React.FC<InfoProps> = () => {
   const [activityTrigger] = useUpdateActivityMutation();
   const [formSheetSyncTrigger, { isLoading: syncIsLoading }] =
     usePostFormSyncsheetMutation();
+
+  const [tabValue, setTabValue] = React.useState("0");
 
   React.useEffect(() => {
     if (data?.data.form.id) {
@@ -131,7 +145,7 @@ export const Info: React.FC<InfoProps> = () => {
                   )
                   : (
                     <LoadingButton
-											loading={linkSheetLoading}
+                      loading={linkSheetLoading}
                       onClick={() => linkToSheet()}
                       startIcon={<AddToDriveOutlined />}
                     >
@@ -144,24 +158,48 @@ export const Info: React.FC<InfoProps> = () => {
         </Card>
         <Card elevation={2}>
           <CardContent>
-            <Typography variant="h5" component="div" py={2}>Details</Typography>
-            <Formik<{ activity: FormValues }>
-              initialValues={{ activity: data.data }}
-              onSubmit={(values, { setSubmitting }) => {
-                saveActivity({ ...values.activity }, setSubmitting);
-              }}
-            >
-              {(props) => (
-                <Form>
-                  <CreateActivity name="activity" />
-                  <Box mt={2}>
-                    <LoadingButton type="submit" loading={props.isSubmitting}>
-                      <span>{t("common:save")}</span>
-                    </LoadingButton>
-                  </Box>
-                </Form>
-              )}
-            </Formik>
+            <TabContext value={tabValue}>
+              <Box sx={{ width: "100%" }}>
+                <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                  <Tabs
+                    value={tabValue}
+                    onChange={(_e, value) => setTabValue(value)}
+                  >
+                    <Tab label="Form" value="0" />
+                    <Tab label="Single Response" value="1"  />
+                    <Tab label="Settings" value="2" />
+                  </Tabs>
+                </Box>
+              </Box>
+              <TabPanel value="0"> 
+                <Formik<{ activity: FormValues }>
+                  initialValues={{ activity: data.data }}
+                  onSubmit={(values, { setSubmitting }) => {
+                    saveActivity({ ...values.activity }, setSubmitting);
+                  }}
+                >
+                  {(props) => (
+                    <Form>
+                      <CreateActivity name="activity" />
+                      <Box mt={2}>
+                        <LoadingButton
+                          type="submit"
+                          loading={props.isSubmitting}
+                        >
+                          <span>{t("common:save")}</span>
+                        </LoadingButton>
+                      </Box>
+                    </Form>
+                  )}
+                </Formik>
+              </TabPanel>
+							<TabPanel value="1">
+								<Responses formId={activity.form.id}/>
+							</TabPanel>
+							<TabPanel value="2">
+								<SettingsWrapper />
+							</TabPanel>
+            </TabContext>
           </CardContent>
         </Card>
       </Stack>

@@ -11,16 +11,17 @@ export const ActivitySettings: React.FC<ActivitySettingsProps> = ({ name }) => {
   const { t } = useTranslation(["activity"]);
 
 	const [publicFieldProps, , publicFieldHelpers] = useField(`${name}.public`);
-
-  return (
+  
+	return (
     <Stack>
       <FormControl>
         <FormGroup>
           <FormControlLabel
             control={
               <Switch
-                value={publicFieldProps.value} onChange={(_event, checked) => publicFieldHelpers.setValue(checked)}
-                sx={{ ml: 'auto' }}
+                checked={publicFieldProps.value} onChange={(_event, checked) => publicFieldHelpers.setValue(checked)}
+                inputProps={{ 'aria-label': 'controlled' }}
+								sx={{ ml: 'auto' }}
               />
             }
             label={t("public")}
