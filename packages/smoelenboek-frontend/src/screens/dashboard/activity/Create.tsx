@@ -161,7 +161,7 @@ export const Create: React.FC<{}> = () => {
                   </Button>
                   <Box sx={{ flex: "1 1 auto" }} />
                   {activeStep < steps.length - 1
-                    ? <Button onClick={() => handleNext(props)}>Next</Button>
+                    ? <Button onClick={() => handleNext(props)}>{t("common:next")}</Button>
                     : (
                       <LoadingButton type="submit" loading={props.isSubmitting}>
                         {t("common:submit")}
