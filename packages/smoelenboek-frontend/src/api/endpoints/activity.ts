@@ -15,6 +15,13 @@ interface PostRegistrationRequest {
   anonymous?: boolean;
 }
 
+interface GetRegistrationResponse {
+	question: {
+		id: string;
+	};
+	value: string;
+}
+
 export const activityApiSlice = API.enhanceEndpoints({
   addTagTypes: ["Activity"],
 }).injectEndpoints({
@@ -49,6 +56,7 @@ export const activityApiSlice = API.enhanceEndpoints({
     }),
     postRegistration: builder.mutation<Response<null>, PostRegistrationRequest>(
       {
+				// @ts-ignore really weird error gets thrown otherwise
         query: (data) => ({
           url: `activity/register/${data.id}`,
           method: "POST",
@@ -85,7 +93,7 @@ export const activityApiSlice = API.enhanceEndpoints({
         method: "DELETE",
       }),
     }),
-    getRegistration: builder.query<ApiResponse<FormAnswer>, { id: string, email?: string }>({
+    getRegistration: builder.query<ApiResponse<GetRegistrationResponse[]>, { id: string, email?: string }>({
       query: ({ id, email }) => ({
         url: `activity/registration/${id}`,
         method: "GET",

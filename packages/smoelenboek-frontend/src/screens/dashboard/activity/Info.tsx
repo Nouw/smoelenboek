@@ -40,14 +40,6 @@ interface InfoProps {
 
 type FormValues = InferType<typeof activity>;
 
-//Don't know wtf this does, but it is needed for the tabs???
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
 export const Info: React.FC<InfoProps> = () => {
   const { id } = useParams();
   const { t } = useTranslation(["common", "activity"]);

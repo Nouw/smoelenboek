@@ -1,5 +1,5 @@
 import React from "react";
-import { Field, FormikErrors, FormikTouched, useField } from "formik";
+import { Field, FormikErrors, useField } from "formik";
 import { Card, CardContent, Stack, TextField } from "@mui/material";
 import { StyledTextInput } from "../StyledTextInput.tsx";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -133,7 +133,7 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                     error: Boolean(errors.activity?.registrationOpen),
                     helperText:
                       (errors.activity?.registrationOpen && (
-                        <p>{errors.activity.registrationOpen}</p>
+                        <p>{t(`form:${errors.activity.registrationOpen}`)}</p>
                       )),
                   },
                 }}

@@ -9,7 +9,7 @@ interface SeasonProps {
 }
 
 export const Season: React.FC<SeasonProps> = (props) => {
-  const i18n = useTranslation();
+  const i18n = useTranslation("functions");
   const [open, setOpen] = React.useState<boolean>(false);
 
   return (
@@ -24,7 +24,7 @@ export const Season: React.FC<SeasonProps> = (props) => {
             <ListItem key={item.id} sx={{pl: 4}}>
               {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
               {/* @ts-ignore */}
-              <ListItemText primary={item.committee ? item.committee?.name : item.team?.name} secondary={i18n.t(`functions.${item.function}`)} />
+              <ListItemText primary={item.committee ? item.committee?.name : item.team?.name} secondary={i18n.t(`${item.function}`)} />
             </ListItem>
           ))}
         </List>

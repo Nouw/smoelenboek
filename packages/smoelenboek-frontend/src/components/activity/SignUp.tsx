@@ -52,7 +52,6 @@ export const SignUp: React.FC<SignUpProps> = ({ title, formId, onSubmit }) => {
   React.useEffect(() => {
     if (registrationData.data?.data) {
       const registration = registrationData.data.data;
-
       const formValues: FormValues = {};
 
       for (const value of registration) {

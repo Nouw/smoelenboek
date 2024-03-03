@@ -57,12 +57,13 @@ export function AuthenticatedAnonymous(fail = true)  {
 	) {
 		attachMiddleware(target, propertyKey, async (req: RequestWithAnonymous, res, next) => {
 			const token = req.headers.authorization;
+			console.log(token);
 			if (!fail && !token) {
 				next();
 				return;
 			}
-
-			if (isEmail(token)) {
+			
+				if (isEmail(token)) {
 				req.email = token;
 			} else {
 				const user = await authenticateUser(token, next, fail);
