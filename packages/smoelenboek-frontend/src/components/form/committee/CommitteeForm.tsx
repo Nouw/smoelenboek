@@ -1,17 +1,30 @@
 import React from "react";
-import {Box, Card, CardContent, Stack, TextField, Typography} from "@mui/material";
-import {Formik} from "formik";
-import {LoadingButton} from "@mui/lab";
-import {useParams} from "react-router-dom";
-import {SnackbarContext} from "../../../providers/SnackbarContext";
-import {Severity} from "../../../providers/SnackbarProvider";
-import {useCreateCommitteeMutation, useUpdateCommitteeMutation} from "../../../api/endpoints/committees";
-import {addCommittees, updateCommittees} from "../../../store/feature/committees.slice";
-import {useAppDispatch} from "../../../store/hooks";
-import {useTranslation} from "react-i18next";
+import {
+  Box,
+  Card,
+  CardContent,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Formik } from "formik";
+import { LoadingButton } from "@mui/lab";
+import { useParams } from "react-router-dom";
+import { SnackbarContext } from "../../../providers/SnackbarContext";
+import { Severity } from "../../../providers/SnackbarProvider";
+import {
+  useCreateCommitteeMutation,
+  useUpdateCommitteeMutation,
+} from "../../../api/endpoints/committees";
+import {
+  addCommittees,
+  updateCommittees,
+} from "../../../store/feature/committees.slice";
+import { useAppDispatch } from "../../../store/hooks";
+import { useTranslation } from "react-i18next";
 
 interface CommitteeFormProps {
-  method: 'put' | 'post';
+  method: "put" | "post";
   message: string;
   name?: string;
   email?: string;
@@ -27,7 +40,9 @@ interface FormValues {
 //   email: Yup.string().email()
 // })
 
-export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, name, email }) => {
+export const CommitteeForm: React.FC<CommitteeFormProps> = (
+  { method, message, name, email },
+) => {
   const params = useParams();
   const snackbar = React.useContext(SnackbarContext);
   const dispatch = useAppDispatch();
@@ -36,14 +51,23 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
   const [createCommittee] = useCreateCommitteeMutation();
   const [updateCommittee] = useUpdateCommitteeMutation();
 
-  async function submit(values: FormValues & { setSubmitting:(submitting: boolean) => void }) {
+  async function submit(
+    values: FormValues & { setSubmitting: (submitting: boolean) => void },
+  ) {
     try {
-      if (method === 'put') {
-        const res = await updateCommittee({ id: parseInt(params.id as string), name: values.name, email: values.email}).unwrap();
+      if (method === "put") {
+        const res = await updateCommittee({
+          id: parseInt(params.id as string),
+          name: values.name,
+          email: values.email,
+        }).unwrap();
 
-        dispatch(updateCommittees([res.data]))
+        dispatch(updateCommittees([res.data]));
       } else {
-        const res = await createCommittee({ name: values.name, email: values.email}).unwrap();
+        const res = await createCommittee({
+          name: values.name,
+          email: values.email,
+        }).unwrap();
 
         dispatch(addCommittees([res.data]));
       }
@@ -61,16 +85,20 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
     <Card>
       <CardContent>
         <Formik<FormValues>
-          initialValues={{ name: name ?? "", email: email ?? ""}}
+          initialValues={{ name: name ?? "", email: email ?? "" }}
           onSubmit={(values, { setSubmitting }) => {
-            submit({...values, setSubmitting})
+            submit({ ...values, setSubmitting });
           }}
         >
           {(props) => (
             <form onSubmit={props.handleSubmit} noValidate>
-              <Typography variant="h4">{method === 'put' ? t("committee:update-committee") : t("committee:create-committee")}</Typography>
-              <br/>
-              <Stack spacing={2}>
+              <Typography variant="h4">
+                {method === "put"
+                  ? t("committee:update-committee")
+                  : t("committee:create-committee")}
+              </Typography>
+              <br />
+              <Stack spacing={2}> 
                 <TextField
                   id="name"
                   label={t("committee:name")}
@@ -98,5 +126,5 @@ export const CommitteeForm: React.FC<CommitteeFormProps> = ({ method, message, n
         </Formik>
       </CardContent>
     </Card>
-  )
-}
+  );
+};

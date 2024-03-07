@@ -1,5 +1,5 @@
 import {API, Response} from "../API";
-import {Committee, UserCommitteeSeason} from "smoelenboek-types";
+import {ApiResponse, Committee, UserCommitteeSeason} from "smoelenboek-types";
 
 export interface GetCommitteeResponse {
   committee: Committee;
@@ -101,7 +101,14 @@ export const committeesApiSlice = API.enhanceEndpoints({addTagTypes: ['Committee
           email: data.email,
         }
       })
-    })
+    }),
+		updateCommitteePhoto: builder.mutation<ApiResponse<null>, { id: number, data: FormData }>({
+			query: ({ id, data }) => ({
+				url: `committee/${id}`,
+				method: "POST",
+				body: data,
+			})
+		})
   })
 });
 
@@ -116,4 +123,5 @@ export const {
   useUpdateMemberCommitteeMutation,
   useCreateCommitteeMutation,
   useUpdateCommitteeMutation,
+	useUpdateCommitteePhotoMutation,
 } = committeesApiSlice;

@@ -4,17 +4,24 @@ import { Authenticated, Guard } from "../Middlewares/AuthMiddleware";
 import CommitteeRepository from "../Repository/CommitteeRepository";
 import ResponseData from "../Utilities/ResponseData";
 import { body, matchedData, param, validationResult } from "express-validator";
-import { Committee, UserCommitteeSeason } from "smoelenboek-types";
+import { ApiResponse, Committee, UserCommitteeSeason } from "smoelenboek-types";
 import { Database } from "../Database";
 import { NextFunction } from "express";
 import UserRepository from "../Repository/UserRepository";
 import SeasonRepository from "../Repository/SeasonRepository";
+import multer from "multer";
+import { uploadPhoto } from "../Validation/CommitteeRules";
+import { Validate } from "../Middlewares/ValidationMiddleware";
+import Oracle from "../Utilities/Oracle";
+
+const oracleUpload = multer({ storage: multer.memoryStorage() });
 
 @Controller("/committee")
 export default class CommitteeController {
 	private committeeRepository = new CommitteeRepository();
 	private userRepository = new UserRepository();
 	private seasonRepository = new SeasonRepository();
+	private oracle = new Oracle();
 
 	@Get("/", [])
 	async get(@Request() req: RequestE, @Response() res) {
@@ -169,6 +176,26 @@ export default class CommitteeController {
 		await Database.manager.save(userCommittee);
 
 		res.json(ResponseData.build("OK", userCommittee, "Successfully updated user!"));
+	}
+
+	@Authenticated()
+	@Guard("committee.edit")
+	@Validate()
+	@Post("/:id", uploadPhoto)
+	async updatePhoto(@Request() req, @Response() res) {
+		const { id } = matchedData(req);
+
+		const comittee = await Database.manager.findOneByOrFail(Committee, { id });
+
+		const file = req.file;
+
+		const fileName = await this.oracle.upload(file, "committee"); 
+
+		comittee.image = `committee/${fileName}`;
+
+		await Database.manager.save(comittee);
+
+		new ApiResponse(true, "ENTITY_UPDATED").send(res);
 	}
 }
 

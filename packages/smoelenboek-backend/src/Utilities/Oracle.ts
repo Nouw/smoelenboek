@@ -6,8 +6,11 @@ import {
 } from "oci-sdk";
 import { Readable } from "stream";
 import logger from "./Logger";
+import multer from "multer";
 
 // LOG.logger = logger;
+
+export const oracleUpload = multer({ storage: multer.memoryStorage() });
 
 export default class Oracle {
   public static namespaceName = process.env.ORACLE_NAMESPACE;

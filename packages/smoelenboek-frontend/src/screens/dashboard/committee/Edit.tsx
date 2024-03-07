@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { CommitteeForm } from "../../../components/form/committee/CommitteeForm";
-import { Add, Delete } from "@mui/icons-material";
+import { Add, Delete, Upload, Visibility } from "@mui/icons-material";
 import { SelectRole } from "../../../components/form/committee/SelectRole";
 import { SearchUser, User } from "../../../components/SearchUser";
 import { Severity } from "../../../providers/SnackbarProvider";
@@ -31,6 +31,7 @@ import {
   useLazyGetCommitteeQuery,
   useRemoveMemberFromCommitteeMutation,
   useUpdateMemberCommitteeMutation,
+	useUpdateCommitteePhotoMutation,
 } from "../../../api/endpoints/committees";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
@@ -53,10 +54,13 @@ export const Edit: React.FC<EditProps> = () => {
   const [addMember] = useAddMemberToCommitteeMutation();
   const [removeMemberApi] = useRemoveMemberFromCommitteeMutation();
   const [updateMemberApi] = useUpdateMemberCommitteeMutation();
+	const [updatePhotoApi] = useUpdateCommitteePhotoMutation();
 
   const committee = useAppSelector((state) => state.committees.committeeInfo);
 
   const [visible, setVisible] = React.useState<boolean>(false);
+
+	const photoInputRef = React.createRef<HTMLInputElement>();
 
   React.useEffect(() => {
     const getData = async () => {
@@ -76,9 +80,11 @@ export const Edit: React.FC<EditProps> = () => {
     if (committee?.members !== undefined) {
       if (committee.members.findIndex((x) => x.id === value.id) >= 0) {
         snackbar.openSnackbar(
-          `${value.firstName} ${value.lastName} ${t(
-            "messages:committee.already-part"
-          )}`
+          `${value.firstName} ${value.lastName} ${
+            t(
+              "messages:committee.already-part",
+            )
+          }`,
         );
       }
     }
@@ -91,10 +97,10 @@ export const Edit: React.FC<EditProps> = () => {
       dispatch(addMemberToCommittee(res.data));
 
       snackbar.openSnackbar(
-        `${t("committee:added")} ${value.firstName} ${
-          value.lastName
-        } ${t("message:committee.to-committee")}`,
-        Severity.SUCCESS
+        `${t("committee:added")} ${value.firstName} ${value.lastName} ${
+          t("message:committee.to-committee")
+        }`,
+        Severity.SUCCESS,
       );
     } catch (e) {
       console.error(e);
@@ -109,7 +115,7 @@ export const Edit: React.FC<EditProps> = () => {
       dispatch(updateMemberState({ key: index, data: res.data }));
       snackbar.openSnackbar(
         t("messages:committee.role-update"),
-        Severity.SUCCESS
+        Severity.SUCCESS,
       );
     } catch (e) {
       console.error(e);
@@ -124,13 +130,35 @@ export const Edit: React.FC<EditProps> = () => {
       dispatch(removeMemberFromCommittee(member.id));
       snackbar.openSnackbar(
         t("messages:committee.remove-user"),
-        Severity.SUCCESS
+        Severity.SUCCESS,
       );
     } catch (e) {
       console.error(e);
       snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
     }
   }
+
+	async function uploadPhoto() {
+		const file = photoInputRef.current?.files?.[0];	
+
+		if (!file) {
+			return;
+		}
+
+		try {
+			const form = new FormData();
+			form.set("photo", file);
+
+			const res = await updatePhotoApi({ id: parseInt(params.id as string), data: form }).unwrap();
+
+			snackbar.openSnackbar(t(`api:${res.key}`, { name: committee?.committee.name }), Severity.SUCCESS);
+
+			
+		} catch (e) {
+			console.error(e);
+			snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
+		}
+	}
 
   if (committee === undefined) {
     return <CircularProgress />;
@@ -145,6 +173,25 @@ export const Edit: React.FC<EditProps> = () => {
           name={committee.committee.name}
           email={committee.committee.email}
         />
+
+        <Card>
+          <CardContent>
+            <Stack direction="row" spacing={3}>
+							<input ref={photoInputRef} type="file" accept="image/*" onChange={uploadPhoto} style={{ display: "none" }} />
+              <Button
+                variant="contained"
+                onClick={() => window.open(`/committees/info/${params.id}`)}
+                startIcon={<Visibility />}
+              >
+								{t("committee:view-photo")}
+              </Button>
+              <Button variant="contained" startIcon={<Upload />} onClick={() => photoInputRef.current?.click()}>
+								{t("committee:update-photo")}
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardContent>
             <Button variant="contained" onClick={() => setVisible(true)}>
@@ -170,7 +217,8 @@ export const Edit: React.FC<EditProps> = () => {
                         <SelectRole
                           id={member.id}
                           role={member.function}
-                          onUpdate={(p) => updateMember(member, index, p)}
+                          onUpdate={(p) =>
+                            updateMember(member, index, p)}
                         />
                       </TableCell>
                       <TableCell>
