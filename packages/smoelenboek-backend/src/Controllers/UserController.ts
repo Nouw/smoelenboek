@@ -361,5 +361,14 @@ export default class UserController {
 	async getProfilePicture(@Request() req: RequestE, @Response() res) {
 		res.json(ResponseData.build("OK", req.user.profilePicture));
 	}
+
+	@Authenticated()
+	@Guard("user.edit")
+	@Get("/export/excel")
+	async getExport(@Response() res) {
+		const path = await this.userService.exportToExcel();
+
+		res.download(path);
+	}
 }
 

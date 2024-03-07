@@ -20,5 +20,6 @@
   "registration-date": "Registration date",
   "back-number": "Back number",
   "referee-license": "Referee license",
-  "activities": "Seasonal participation"
+  "activities": "Seasonal participation",
+  "export-to-excel": "Export to Excel"
 }

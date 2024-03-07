@@ -6,5 +6,5 @@
 !.yarn/versions
 
 public/team
-
+public/temp
 google_service_account.json

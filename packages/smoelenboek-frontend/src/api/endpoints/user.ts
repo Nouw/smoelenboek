@@ -19,11 +19,19 @@ export const userApiSlice = API.enhanceEndpoints({ addTagTypes: ['User']}).injec
         url: `user/search?name=${args}`,
         method: 'GET'
       })
-    })
+    }),
+		getExport: builder.query<Blob, null>({
+			query: () => ({
+				url: `user/export/excel`,
+				method: 'GET',
+				responseHandler: (response) => response.blob()
+			})	
+		})
   })
 })
 
 export const {
   useLazyGetUserProfileQuery,
-  useLazyGetSearchQuery
+  useLazyGetSearchQuery,
+	useLazyGetExportQuery
 } = userApiSlice;
