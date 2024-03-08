@@ -62,8 +62,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { Create as ActivityCreate } from "./screens/dashboard/activity/Create";
 import { Info as ActivityInfoDashboard } from "./screens/dashboard/activity/Info";
 import { Info as ActivityInfo } from "./screens/activities/Info";
+import { wrapCreateBrowserRouter } from "@sentry/react";
 
-const router = createBrowserRouter([
+const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
+
+const router = sentryWrappedBrowserRouter([
   {
     path: "/",
     errorElement: <ApplicationError />,
