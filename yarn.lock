@@ -4354,6 +4354,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-lazy-load-image-component@npm:^1":
+  version: 1.6.3
+  resolution: "@types/react-lazy-load-image-component@npm:1.6.3"
+  dependencies:
+    "@types/react": "npm:*"
+    csstype: "npm:^3.0.2"
+  checksum: 10/ccad5b7c5d801cae2bf34f2d9528d6e0dd615f4c675d6092ce9ab9296d43e8df171e99d65ca28897f98345c42c0bb37f3a69f4891f4be81af26eaae02c4f2031
+  languageName: node
+  linkType: hard
+
 "@types/react-transition-group@npm:^4.4.10, @types/react-transition-group@npm:^4.4.8":
   version: 4.4.10
   resolution: "@types/react-transition-group@npm:4.4.10"
@@ -12471,6 +12481,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.throttle@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "lodash.throttle@npm:4.1.1"
+  checksum: 10/9be9fb2ffd686c20543167883305542f4564062a5f712a40e8c6f2f0d9fd8254a6e9d801c2470b1b24e0cdf2ae83c1277b55aa0fb4799a2db6daf545f53820e1
+  languageName: node
+  linkType: hard
+
 "lodash.union@npm:^4.6.0":
   version: 4.6.0
   resolution: "lodash.union@npm:4.6.0"
@@ -16997,6 +17014,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-lazy-load-image-component@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "react-lazy-load-image-component@npm:1.6.0"
+  dependencies:
+    lodash.debounce: "npm:^4.0.8"
+    lodash.throttle: "npm:^4.1.1"
+  peerDependencies:
+    react: ^15.x.x || ^16.x.x || ^17.x.x || ^18.x.x
+    react-dom: ^15.x.x || ^16.x.x || ^17.x.x || ^18.x.x
+  checksum: 10/1da26caf885b93cdf6843c729444bd7451dee545d3505b836ecc3c67534982c3d1a942f8e60e04246580dee43dd68b43445636c7e93d2bfdb5942e70ebe5fe96
+  languageName: node
+  linkType: hard
+
 "react-lazyload@npm:^3.2.0":
   version: 3.2.0
   resolution: "react-lazyload@npm:3.2.0"
@@ -18296,6 +18326,7 @@ __metadata:
     "@testing-library/user-event": "npm:^13.2.1"
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
+    "@types/react-lazy-load-image-component": "npm:^1"
     "@typescript-eslint/eslint-plugin": "npm:^6.0.0"
     "@typescript-eslint/parser": "npm:^6.0.0"
     "@vitejs/plugin-react": "npm:^4.0.3"
@@ -18318,6 +18349,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-html-parser: "npm:^2.0.2"
     react-i18next: "npm:^13.1.2"
+    react-lazy-load-image-component: "npm:^1.6.0"
     react-lazyload: "npm:^3.2.0"
     react-pdf: "npm:^7.3.3"
     react-quill: "npm:^2.0.0"
