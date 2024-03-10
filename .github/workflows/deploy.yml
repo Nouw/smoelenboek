@@ -3,7 +3,7 @@ name: Deploy to Beta-VPS
 on:
   push:
     branches:
-      - feature/ci-cd
+      - early-access 
 
 jobs:
   deploy:
