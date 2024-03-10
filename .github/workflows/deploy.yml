@@ -27,5 +27,5 @@ jobs:
         key: ${{ secrets.BETA_VPS_KEY }}
         script: |
           cd /home/fabio/smoelenboek 
-          docker-compose down
-          docker-compose up -d --build
+          docker compose down
+          docker compose up -d --build
