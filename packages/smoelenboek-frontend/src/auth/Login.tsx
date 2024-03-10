@@ -33,7 +33,7 @@ interface FormValues {
 
 
 export const Login: React.FC<LoginProps> = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["user", "common"]);
 
   const language = useAppSelector((state) => state.auth.language);
 
@@ -98,7 +98,7 @@ export const Login: React.FC<LoginProps> = () => {
                     <Stack spacing={2}>
                       <TextField
                         id="email"
-                        label={t("email")}
+                        label={t("user:email")}
                         type="email"
                         value={props.values.email}
                         onChange={props.handleChange}
@@ -107,7 +107,7 @@ export const Login: React.FC<LoginProps> = () => {
                       />
                       <TextField
                         id="password"
-                        label={t("password")}
+                        label={t("user:password")}
                         type={showPassword ? "text" : "password"}
                         value={props.values.password}
                         error={props.touched.password && Boolean(props.errors.password)}
@@ -123,11 +123,11 @@ export const Login: React.FC<LoginProps> = () => {
                       />
                       <Link href="/password/reset">
                         <Typography variant="caption" color={theme => theme.palette.primary.main}>
-                          {t("auth.forgotPassword")}?
+                          {t("user:forgot-password")}?
                         </Typography>
                       </Link>
                       <LoadingButton type="submit" loading={props.isSubmitting || isLoading}>
-                        <span>{t("submit")}</span>
+                        <span>{t("common:submit")}</span>
                       </LoadingButton>
                     </Stack>
                   </form>

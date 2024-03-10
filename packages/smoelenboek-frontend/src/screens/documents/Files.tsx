@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useDocumentsGetFilesQuery } from "../../api/endpoints/documents";
-import { Card, CardContent, CircularProgress, List } from "@mui/material";
+import { Card, CardContent, CircularProgress } from "@mui/material";
 import { Category } from "smoelenboek-types";
 import { CategoryType } from "smoelenboek-types/dist/Entities/Category";
 import { Documents } from "../../components/documents/Documents";
