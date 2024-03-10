@@ -22,9 +22,9 @@ jobs:
     - name: Deploy using Docker Compoes
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_VPS_KEY }}
+        host: ${{ secrets.BETA_VPS_HOST }}
+        username: ${{ secrets.BETA_VPS_USERNAME }}
+        key: ${{ secrets.BETA_VPS_KEY }}
         script: |
           cd /home/fabio/smoelenboek 
           docker-compose down
