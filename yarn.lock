@@ -11883,7 +11883,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":
+"loose-envify@npm:^1.0.0, loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
   dependencies:
@@ -14681,17 +14681,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfjs-dist@npm:3.6.172":
-  version: 3.6.172
-  resolution: "pdfjs-dist@npm:3.6.172"
+"pdfjs-dist@npm:3.11.174":
+  version: 3.11.174
+  resolution: "pdfjs-dist@npm:3.11.174"
   dependencies:
     canvas: ^2.11.2
     path2d-polyfill: ^2.0.1
-    web-streams-polyfill: ^3.2.1
   dependenciesMeta:
     canvas:
       optional: true
-  checksum: 496a98e3a65ddc92ad6a0913e2afd7d9894fa4246c40589ea98c5846ea3ee24e3f292ea58f80340990765ebeadc5951d046279b18f57ec58d1791e67fe6cf52d
+    path2d-polyfill:
+      optional: true
+  checksum: 62f5a64ca0b2dbc855701ebf9a65c3e48c3c9aa5d64c50eb42bb9ff50a326f3eddab7f2a134ef0398398b1ccff9d842935b9f31358c9103bdc71406632d1a7fa
   languageName: node
   linkType: hard
 
@@ -16081,18 +16082,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-pdf@npm:^7.3.3":
-  version: 7.3.3
-  resolution: "react-pdf@npm:7.3.3"
+"react-pdf@npm:^7.7.3":
+  version: 7.7.3
+  resolution: "react-pdf@npm:7.7.3"
   dependencies:
     clsx: ^2.0.0
+    dequal: ^2.0.3
     make-cancellable-promise: ^1.3.1
     make-event-props: ^1.6.0
     merge-refs: ^1.2.1
-    pdfjs-dist: 3.6.172
+    pdfjs-dist: 3.11.174
     prop-types: ^15.6.2
     tiny-invariant: ^1.0.0
-    tiny-warning: ^1.0.0
+    warning: ^4.0.0
   peerDependencies:
     "@types/react": ^16.8.0 || ^17.0.0 || ^18.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -16100,7 +16102,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 472712275ba76bccc4e17fd217a31835780a43a900572ae4b7ebd064926fd19a0d86da2e0691d8f4f452fd1475e14569da6ddfd687bbae366ccb18a7a069129b
+  checksum: c8fba8ca542275ec7f284fd43b2dc0bca01fe20fa9d1684ff8b95ea1ba2537f3b2bb48ddd43aa68b6972857ce3a309e2ccf63790c8d3541135d3f186fc9ea335
   languageName: node
   linkType: hard
 
@@ -17292,7 +17294,7 @@ __metadata:
     react-dom: ^18.2.0
     react-i18next: ^13.1.2
     react-lazyload: ^3.2.0
-    react-pdf: ^7.3.3
+    react-pdf: ^7.7.3
     react-quill: ^2.0.0
     react-redux: ^8.0.7
     react-router-dom: ^6.12.1
@@ -18198,7 +18200,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-warning@npm:^1.0.0, tiny-warning@npm:^1.0.2":
+"tiny-warning@npm:^1.0.2":
   version: 1.0.3
   resolution: "tiny-warning@npm:1.0.3"
   checksum: da62c4acac565902f0624b123eed6dd3509bc9a8d30c06e017104bedcf5d35810da8ff72864400ad19c5c7806fc0a8323c68baf3e326af7cb7d969f846100d71
@@ -19048,6 +19050,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"warning@npm:^4.0.0":
+  version: 4.0.3
+  resolution: "warning@npm:4.0.3"
+  dependencies:
+    loose-envify: ^1.0.0
+  checksum: 4f2cb6a9575e4faf71ddad9ad1ae7a00d0a75d24521c193fa464f30e6b04027bd97aa5d9546b0e13d3a150ab402eda216d59c1d0f2d6ca60124d96cd40dfa35c
+  languageName: node
+  linkType: hard
+
 "watchpack@npm:^2.4.0":
   version: 2.4.0
   resolution: "watchpack@npm:2.4.0"
@@ -19078,13 +19089,6 @@ __metadata:
     node-fetch: ^2.6.0
     valid-data-url: ^3.0.0
   checksum: 17d9e53a6e5f07361abc584b6bb2bb8470978be580f8b5cdcab5998507ffccf5fb645616d3fe1550965d2db497f4a5cdc1ea1460c9cf464de315751962708ecc
-  languageName: node
-  linkType: hard
-
-"web-streams-polyfill@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "web-streams-polyfill@npm:3.2.1"
-  checksum: b119c78574b6d65935e35098c2afdcd752b84268e18746606af149e3c424e15621b6f1ff0b42b2676dc012fc4f0d313f964b41a4b5031e525faa03997457da02
   languageName: node
   linkType: hard
 
