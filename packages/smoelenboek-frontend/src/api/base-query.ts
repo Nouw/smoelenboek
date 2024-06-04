@@ -15,7 +15,7 @@ const baseQuery = fetchBaseQuery({
 		const token = (getState() as RootState).auth.accessToken;
 
     if (token) {
-      headers.set('authorization', token);
+      headers.set('authorization', `Bearer ${token}`);
     }
 
     return headers;
@@ -38,7 +38,7 @@ export const baseQueryReauth: BaseQueryFn<
         const state = api.getState() as AuthState;
 
         const refreshResult = await baseQuery({url: 'auth/refresh', body: { refreshToken: state.refreshToken }}, api, extraOptions);
-
+        
         if (refreshResult.data) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore

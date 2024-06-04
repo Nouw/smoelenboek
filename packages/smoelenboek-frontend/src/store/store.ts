@@ -14,6 +14,7 @@ import TeamsSlice from "./feature/teams.slice";
 import CommitteesSlice from "./feature/committees.slice";
 import ProtototoSlice from "./feature/protototo.slice";
 import DocumentsSlice from "./feature/documents.slice";
+import ActivitySlice from "./feature/activity.slice";
 
 const reducers = combineReducers({
   [API.reducerPath]: API.reducer,
@@ -27,6 +28,7 @@ const reducers = combineReducers({
   committees: CommitteesSlice,
   protototo: ProtototoSlice,
   documents: DocumentsSlice,
+  activity: ActivitySlice,
 });
 
 export const store = configureStore({

@@ -1,5 +1,5 @@
 import { Database } from "../Database";
-import { Committee, UserCommitteeSeason } from "smoelenboek-types";
+import { Committee, User, UserCommitteeSeason } from "smoelenboek-types";
 import SeasonRepository from "./SeasonRepository";
 
 export default class CommitteeRepository {
@@ -28,4 +28,14 @@ export default class CommitteeRepository {
 	async getCommitteeById(id: string | number) {
 		return Database.manager.findOne(Committee, { where: { id: typeof id == "string" ? parseInt(id) : id } });
 	}
+
+  async getCommitteesForUser(user: User) {
+    const season = await this.seasonRepository.getCurrentSeason();
+    return Database.manager.createQueryBuilder(UserCommitteeSeason, "ucs")
+      .select(["ucs", "c"])
+      .innerJoin("ucs.committee", "c")
+      .where("ucs.user.id = :userId", { userId: user.id })
+      .andWhere("ucs.season.id = :seasonId", { seasonId: season.id })
+      .getMany(); 
+  }
 }

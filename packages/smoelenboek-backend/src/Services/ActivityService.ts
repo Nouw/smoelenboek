@@ -23,7 +23,7 @@ export default class ActivityService {
         const questions = await manager.find(FormQuestion, {
           relations: { items: true },
         });
-        console.log(questions, activity.form);
+
         for (const question of questions) {
           for (const item of question.items) {
             await manager.remove(item);
@@ -108,8 +108,8 @@ export default class ActivityService {
 
     if (email) {
       answer.email = email;
-      answer.firstName = data.firstName;
-      answer.lastName = data.lastName;
+      answer.firstName = data.firstName as string;
+      answer.lastName = data.lastName as string;
     } else {
       answer.user = user;
     }

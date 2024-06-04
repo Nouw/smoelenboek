@@ -10,6 +10,8 @@ import { useAppSelector } from "../../store/hooks";
 import { useTranslation } from "react-i18next";
 import { Roles } from "smoelenboek-types";
 import { useIsAnonymous } from "../../hooks/useIsAnonymous";
+import { useLazyGetManagedActivitiesQuery } from "../../api/endpoints/activity";
+import { getIn } from "formik";
 
 interface DrawerItemsProps {
   admin?: boolean;
@@ -73,17 +75,17 @@ const defaultItems: DrawerItem[] = [
   {
     title: "documents",
     navigateTo: "documents/",
-		rank: 4,
+    rank: 4,
   },
   {
     title: "Sponsorhengel",
     navigateTo: "sponsorhengel",
-		rank: 5,
+    rank: 5,
   },
   {
     title: "vcp",
     navigateTo: "vcp",
-		rank: 6,
+    rank: 6,
   },
 ];
 
@@ -97,7 +99,7 @@ const adminDefaultItem: DrawerItem = {
       navigateTo: "dashboard/",
     },
   ],
-	rank: Infinity
+  rank: Infinity
 };
 
 const adminItems: DrawerItem[] = [
@@ -240,34 +242,57 @@ const DrawerItemComponent: React.FC<DrawerItem> = (props) => {
 
 export const DrawerItems: React.FC<DrawerItemsProps> = () => {
   const roles = useAppSelector((state) => state.auth.roles);
-	const isAnonymous = useIsAnonymous();
+  const isAnonymous = useIsAnonymous();
+  const [trigger] = useLazyGetManagedActivitiesQuery();
 
   const [items, setItems] = React.useState<DrawerItem[]>(publicItems);
 
   const location = useLocation();
 
   React.useEffect(() => {
-    if (isAnonymous) {
-      return;
+    const getItems = async () => {
+      if (isAnonymous || location.pathname.includes("dashboard")) {
+        return;
+      }
+
+      let newItems: DrawerItem[] = [...publicItems, ...defaultItems]
+
+      if (!isAnonymous) {
+        newItems = [...newItems, await getManagedActivities()];
+      }
+
+      if (
+        (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) &&
+        !location.pathname.includes("dashboard")
+      ) {
+        newItems = [...newItems, adminDefaultItem];
+      }
+
+      setItems(newItems.sort((a, b) => (a.rank ?? -1) - (b.rank ?? -1)));
     }
 
-		let newItems: DrawerItem[] = [...publicItems, ...defaultItems]
-
-    if (
-      (roles.includes(Roles.ADMIN) || roles.includes(Roles.BOARD)) && 
-      !location.pathname.includes("dashboard")
-    ) {
-      newItems = [...newItems, adminDefaultItem];
-    }
-		
-		setItems(newItems.sort((a, b) => (a.rank ?? -1) - (b.rank ?? -1)));
+    getItems();
   }, [location.pathname, roles, isAnonymous]);
 
   React.useEffect(() => {
     if (location.pathname.includes("dashboard")) {
       setItems(adminItems);
     }
-  }, [location.pathname]);	
+  }, [location.pathname]);
+
+  async function getManagedActivities(): Promise<DrawerItem> {
+    const res = await trigger(null);
+
+    return {
+      title: "Activiteiten beheer",
+      subheader: true,
+      rank: Infinity,
+      subItems: res.data?.data?.map((activity) => ({
+        title: activity.title,
+        navigateTo: `activity/info/${activity.id}`
+      }))
+    }
+  }
 
   return (
     <List>

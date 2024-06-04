@@ -13,6 +13,7 @@ exports.Activity = void 0;
 const typeorm_1 = require("typeorm");
 const User_1 = require("./User");
 const Form_1 = require("./Form");
+const Committee_1 = require("./Committee");
 let Activity = exports.Activity = class Activity {
 };
 __decorate([
@@ -51,6 +52,11 @@ __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], Activity.prototype, "public", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => Committee_1.Committee),
+    (0, typeorm_1.JoinColumn)([{ name: "committe_id", referencedColumnName: "id" }]),
+    __metadata("design:type", Committee_1.Committee)
+], Activity.prototype, "commitee", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => Form_1.Form, form => form.activity, { cascade: true }),
     (0, typeorm_1.JoinColumn)(),

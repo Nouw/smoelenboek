@@ -63,6 +63,7 @@ import { Create as ActivityCreate } from "./screens/dashboard/activity/Create";
 import { Info as ActivityInfoDashboard } from "./screens/dashboard/activity/Info";
 import { Info as ActivityInfo } from "./screens/activities/Info";
 import { wrapCreateBrowserRouter } from "@sentry/react";
+import { Dashboard as ActivityDashboard } from "./screens/activities/Dashboard";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 
@@ -189,6 +190,14 @@ const router = sentryWrappedBrowserRouter([
         element: (
           <Guard roles={[]}>
             <ActivityInfo />
+          </Guard>
+        )
+      },
+      {
+        path: "activity/info/:id",
+        element: (
+          <Guard roles={AUTHENTICATED}>
+            <ActivityDashboard />
           </Guard>
         )
       }

@@ -11,6 +11,7 @@ import {
 import {
   Activity,
   ApiResponse,
+  Committee,
   Form,
   FormAnswer,
   FormAnswerValue,
@@ -22,10 +23,12 @@ import {
   Authenticated,
   AuthenticatedAnonymous,
   Guard,
+  IsAdmin,
+  isBoard,
 } from "../Middlewares/AuthMiddleware";
 import { matchedData } from "express-validator";
 import ResponseData from "../Utilities/ResponseData";
-import { RequestWithAnonymous } from "../Utilities/RequestE";
+import { RequestE, RequestWithAnonymous } from "../Utilities/RequestE";
 import { FindOptionsWhere } from "typeorm";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { serviceAccountAuth } from "../Utilities/Google";
@@ -34,6 +37,7 @@ import GoogleSpreadsheetService from "../Services/GoogleSpreadsheetService";
 import {
   createFormRules,
   deleteActivityRules,
+  deleteRegistration,
   deleteSheetLink,
   getActivityParticipants,
   getActivityRules,
@@ -56,7 +60,7 @@ export type FormRegistration = {
 
 @Controller("/activity")
 export default class ActivityController {
-  private readonly activityServer = new ActivityService();
+  private readonly activityService = new ActivityService();
   private readonly spreadsheetService = new GoogleSpreadsheetService();
   private readonly entityService = new EntityService();
   private readonly registrationService = new RegistrationService();
@@ -65,7 +69,7 @@ export default class ActivityController {
   @Get("/")
   async getActivities(@Request() req: RequestWithAnonymous, @Response() res) {
     const where: FindOptionsWhere<Activity> = {};
-
+    
     if (!req.user) {
       where.public = true;
     }
@@ -80,6 +84,7 @@ export default class ActivityController {
     new ApiResponse<Activity[]>(true, "ENTITY_RETRIEVED", activities).send(res);
   }
 
+  @AuthenticatedAnonymous(false)
   @Validate()
   @Get("/:id", getActivityRules)
   async getActivity(@Request() req, @Response() res) {
@@ -89,16 +94,30 @@ export default class ActivityController {
       where: { id },
       relations: {
         form: true,
+        commitee: true,
       },
     });
+     
+    if (!req.user && !activity.public) {
+      new ApiResponse<Activity>(false, "ACCESS_DENIED").send(res);
+      return
+    }
 
     new ApiResponse<Activity>(true, "ENTITY_RETRIEVED", activity).send(res);
   }
-
+  
+  @AuthenticatedAnonymous(false)
   @Validate()
   @Get("/form/:id", getFormRules)
   async getForm(@Request() req, @Response() res) {
     const { id } = matchedData(req);
+    // Prevent anonymous users from seeing the form
+    const activity = await Database.manager.findOne(Activity, { where: { form: { id } }});
+    
+    if (!activity.public && !req.user) {
+      new ApiResponse<Form>(false, "ACCESS_DENIED").send(res);
+      return 
+    }
 
     const form: Form = await Database.manager.findOne(Form, {
       where: { id },
@@ -131,7 +150,7 @@ export default class ActivityController {
   ) {
     const { id: formId } = matchedData(req);
 
-    await this.activityServer.registerForActivity(
+    await this.activityService.registerForActivity(
       formId,
       req.body,
       req.user,
@@ -147,8 +166,10 @@ export default class ActivityController {
   async postActivity(@Request() req, @Response() res) {
     const activityBody: Activity = req.body.activity;
     const formBody: Form = req.body.form;
-
+    
+    const committee = await Database.manager.findOneOrFail(Committee, { where: { id: req.body.committee }})
     const activity = Database.manager.create(Activity, activityBody);
+    activity.commitee = committee;
     const form = Database.manager.create(Form, formBody);
     // Remove all the questions, because this fucks with the questionId in the db
     form.questions = [];
@@ -417,14 +438,14 @@ export default class ActivityController {
       new ApiResponse(
         true,
         "ENTITY_RETRIEVED",
-        await this.activityServer.getActivityRegistration(
+        await this.activityService.getActivityRegistration(
           id,
           undefined,
           req.email,
         ),
       ).send(res);
     } else {
-      const registration = await this.activityServer.getActivityRegistration(
+      const registration = await this.activityService.getActivityRegistration(
         id,
         req.user.id,
       );
@@ -435,7 +456,7 @@ export default class ActivityController {
 
 	@AuthenticatedAnonymous()
   @Validate()
-  @Delete("/registration/:id") // TODO: Add rules  
+  @Delete("/registration/:id", deleteRegistration) // TODO: Add rules  
   async deleteRegistration(
     @Request() req: RequestWithAnonymous,
     @Response res,
@@ -456,7 +477,7 @@ export default class ActivityController {
     new ApiResponse(
       true,
       "ENTITY_RETRIEVED",
-      await this.activityServer.getParticipants(id),
+      await this.activityService.getParticipants(id),
     ).send(res);
   }
 
@@ -469,6 +490,26 @@ export default class ActivityController {
     await this.spreadsheetService.syncResponsesWithSheet(id);
 
     new ApiResponse(true, "ENTITY_RETRIEVED").send(res);
+  }
+ 
+  @Authenticated()
+  @Get("/managed/list")
+  async getManagedActivities(@Request() req: RequestE, @Response() res) {
+    let query = Database.manager.createQueryBuilder(Activity, "a")
+      .select("a")
+      .innerJoin("a.commitee", "c")
+      .innerJoin("c.userCommitteeSeason", "ucs")
+      .innerJoin("ucs.user", "u")
+      .where("ucs.seasonId = :seasonId", { seasonId: 21 }) // TODO: Get current season
+      .andWhere("u.id = :userId", { userId: req.user.id }) 
+    
+    if (!IsAdmin(req.user) && !isBoard(req.user)) {
+      query = query.andWhere("c.id = ucs.committee.id")
+    }
+    
+    const activities = await query.getMany();
+
+    new ApiResponse(true, "ENTITY_RETRIEVED", activities).send(res);
   }
 
   @AuthenticatedAnonymous(false)

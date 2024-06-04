@@ -7,6 +7,7 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { boolean, date, number, object, string } from "yup";
 import { FormValues } from "../../../screens/dashboard/activity/Create.tsx";
+import { CommitteeSelector } from "./CommitteeSelector.tsx";
 
 interface CreateActivityProps {
   name: string;
@@ -29,6 +30,7 @@ export const activity = object({
     (registrationClosed, schema) =>
       registrationClosed && (schema.min(registrationClosed, "date-after-registration-closed")),
   ),
+  committee: number().required()
 });
 
 export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
@@ -51,6 +53,7 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
     useField(`${name}.registrationClosed`);
   const [maxFieldProps, , maxFieldHelpers] = useField(`${name}.max`);
   const [dateFieldProps, , dateFieldHelpers] = useField(`${name}.date`);
+  const [committeeFieldsProps, , committeeFieldHelpers] = useField(`${name}.committee`);
 
   return (
     <Card>
@@ -181,7 +184,8 @@ export const CreateActivity: React.FC<CreateActivityProps> = ({ name }) => {
                 />
               );
             }}
-          </Field>
+          </Field> 
+          <CommitteeSelector value={committeeFieldsProps.value} onChange={(v: number) => committeeFieldHelpers.setValue(v)} />
         </Stack>
       </CardContent>
     </Card>
