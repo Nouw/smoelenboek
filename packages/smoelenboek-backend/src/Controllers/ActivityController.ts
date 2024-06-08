@@ -459,7 +459,7 @@ export default class ActivityController {
   @Delete("/registration/:id", deleteRegistration) // TODO: Add rules  
   async deleteRegistration(
     @Request() req: RequestWithAnonymous,
-    @Response res,
+    @Response() res,
   ) {
     const { id } = matchedData(req);
 

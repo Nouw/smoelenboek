@@ -126,7 +126,7 @@ export default class AuthController {
   }
 
   @Get("/debug", [passport.authenticate("oauth2")])
-  async debugAuth(@Request req, @Response res) {
+  async debugAuth(@Request() req, @Response() res) {
     console.log(req);
     res.json("Succesfull?");
   }
