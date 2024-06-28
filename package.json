@@ -3,6 +3,9 @@
   "version": "4.0.8",
   "packageManager": "yarn@4.1.0",
   "private": true,
+  "scrips": {
+    "build:backend": "yarn workspace smoelenboek-backend compile"
+  },
   "workspaces": [
     "packages/*"
   ],

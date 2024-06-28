@@ -1,4 +1,4 @@
-#BASE
+#DEv
 version: '3'
 
 services:
@@ -29,7 +29,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - ${DOCKER_OCI_CONFIG_PATH}:/root/.oci
+      - ${OCI_CONFIG_PATH}:/root/.oci
     command: ./bin/run_backend_dev.sh
     depends_on:
       - database

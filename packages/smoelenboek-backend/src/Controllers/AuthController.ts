@@ -123,11 +123,5 @@ export default class AuthController {
 
     await Database.manager.save(role);
     res.json("Added role!");
-  }
-
-  @Get("/debug", [passport.authenticate("oauth2")])
-  async debugAuth(@Request() req, @Response() res) {
-    console.log(req);
-    res.json("Succesfull?");
-  }
+  } 
 }
