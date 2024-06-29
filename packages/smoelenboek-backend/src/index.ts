@@ -1,6 +1,5 @@
 import express, { Express } from "express";
 import { attachControllers } from "@decorators/express";
-import dotenv from "dotenv";
 import logger from "./Utilities/Logger";
 import { json, urlencoded } from "body-parser";
 import AuthController from "./Controllers/AuthController";
@@ -18,9 +17,6 @@ import SeasonController from "./Controllers/SeasonController";
 import ProtototoController from "./Controllers/ProtototoController";
 import JobController from "./Controllers/JobController";
 import ActivityController from "./Controllers/ActivityController";
-
-
-dotenv.config();
 
 const app: Express = express();
 
