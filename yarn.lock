@@ -17691,9 +17691,6 @@ __metadata:
     uuid: "npm:^9.0.0"
     winston: "npm:^3.8.2"
     yargs: "npm:^17.7.2"
-  dependenciesMeta:
-    ts-node@10.9.1:
-      unplugged: true
   languageName: unknown
   linkType: soft
 
