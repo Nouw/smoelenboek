@@ -56,7 +56,7 @@ export const StyledTextInput: React.FC<StyledTextInputProps> = (props) => {
         value={props.value}
         onChange={onChange}
         modules={modules}
-        style={{height: props.height, backgroundColor: theme.palette.background.default, color: '#fff'}}
+        style={{height: props.height, backgroundColor: theme.palette.background.default, color: theme.palette.text.primary }}
       />
       {toolbar && (
         <Stack direction="row" mt={1}>

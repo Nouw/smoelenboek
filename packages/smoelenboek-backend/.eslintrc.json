@@ -17,11 +17,7 @@
     "plugins": [
         "@typescript-eslint"
     ],
-    "rules": {
-        "indent": [
-            "error",
-            "tab"
-        ],
+    "rules": { 
         "linebreak-style": [
             "error",
             "unix"

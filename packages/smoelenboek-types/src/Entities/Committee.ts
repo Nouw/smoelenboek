@@ -20,6 +20,5 @@ export class Committee {
     	email!: string;
 
     @OneToMany(() => UserCommitteeSeason, userCommittee => userCommittee.committee)
-    	userCommitteeSeason!: Relation<UserCommitteeSeason>;
-
+    	userCommitteeSeason!: Relation<UserCommitteeSeason>; 
 }

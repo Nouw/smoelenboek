@@ -4,12 +4,14 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   Relation
 } from "typeorm";
 import { User } from "./User";
 import {Form} from "./Form";
+import { Committee } from "./Committee";
 
 @Entity()
 export class Activity {
@@ -39,6 +41,10 @@ export class Activity {
 
   @Column({ default: false })
     public: boolean;
+ 
+  @ManyToOne(() => Committee)
+  @JoinColumn([{ name: "committe_id", referencedColumnName: "id" }])
+    commitee: Committee;
 
   @OneToOne(() => Form, form => form.activity, { cascade: true })
   @JoinColumn()

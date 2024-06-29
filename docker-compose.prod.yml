@@ -1,10 +1,7 @@
-version: '3'
-
 services:
   database:
     container_name: smoelenboek-mysql
     image: mysql
-    restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_ROOT_PASSWORD: test
@@ -22,25 +19,24 @@ services:
       - smoelenboek
   backend:
     container_name: smoelenboek-backend
-    restart: always
-    image: node:20
-    working_dir: /app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - "linux/amd64"
+        - "linux/arm64"
     volumes:
-      - .:/app
-      - /app/node_modules
-      - ${OCI_CONFIG_PATH}:/root/.oci
-    command: ./bin/run_backend_dev.sh
+      - ${DOCKER_OCI_CONFIG_PATH}:/root/.oci
     depends_on:
       - database
     ports:
-      - 8080:8080
+      - ${DOCKER_BACKEND_PORT:-8080}:8080
     networks:
-        - smoelenboek
+      - smoelenboek
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"  
   frontend:
     container_name: smoelenboek-frontend
-    restart: always
     image: node:20-alpine
     working_dir: /app
     command: ./bin/run_frontend_dev.sh

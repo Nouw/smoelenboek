@@ -7,7 +7,7 @@ export default class ApiResponse<T> {
 	readonly status: number;
 	readonly key: string;
 
-	constructor(success: boolean, resCode: keyof RESPONSE_CODES, data?: T) {
+	constructor(success: boolean, resCode: keyof typeof RESPONSE_CODES, data?: T) {
 		this.success = success;
 		this.status = RESPONSE_CODES[resCode].status;
 		this.key = RESPONSE_CODES[resCode].key;

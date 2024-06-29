@@ -84,7 +84,7 @@ export const Info: React.FC<InfoProps> = () => {
     setSubmitting: (submitting: boolean) => void,
   ) {
     try {
-      await activityTrigger({ id: activity.id, activity: values as Activity });
+      await activityTrigger({ id: activity.id, activity: values as unknown as Activity });
     } catch (e) {
       console.error(e);
     }
@@ -165,7 +165,7 @@ export const Info: React.FC<InfoProps> = () => {
               </Box>
               <TabPanel value="0"> 
                 <Formik<{ activity: FormValues }>
-                  initialValues={{ activity: data.data }}
+                  initialValues={{ activity: { ...data.data, committee: data.data.commitee.id } }}
                   onSubmit={(values, { setSubmitting }) => {
                     saveActivity({ ...values.activity }, setSubmitting);
                   }}

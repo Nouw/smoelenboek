@@ -12,6 +12,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "incremental": true,
+    "skipLibCheck": true,
     "paths": {
       "@/*": [
         "./*"

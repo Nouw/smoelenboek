@@ -24,3 +24,4 @@ export const updateActivitySettingsRules = [
   body("public").toBoolean(),
 ];
 export const deleteSheetLink = [idExists];
+export const deleteRegistration = [idExists];

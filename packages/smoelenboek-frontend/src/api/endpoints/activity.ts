@@ -116,7 +116,7 @@ export const activityApiSlice = API.enhanceEndpoints({
 		}),
 		deleteResponse: builder.mutation<ApiResponse<null>, string>({
 			query: (id) => ({
-				url: `activity/response/${id}`,
+				url: `activity/registration/${id}`,
 				method: "DELETE"
 			})
 		}),
@@ -134,7 +134,13 @@ export const activityApiSlice = API.enhanceEndpoints({
 				url: `activity/response/${id}`,
 				method: "DELETE" // TODO: Should probably fix the headers??
 			})
-		})
+		}),
+    getManagedActivities: builder.query<ApiResponse<Activity[]>, null>({
+      query: () => ({
+        url: "activity/managed/list",
+        method: "GET"
+      })
+    })
   }),
 });
 
@@ -156,4 +162,5 @@ export const {
 	useDeleteResponseMutation,
 	useUpdateActivitySettingsMutation,
 	useDeleteSelfResponseMutation,
+  useLazyGetManagedActivitiesQuery,
 } = activityApiSlice;

@@ -2,6 +2,51 @@ import { Role, User } from "smoelenboek-types";
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import { Database } from "../Database";
+import passport from "passport";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import OAuth2Strategy, { VerifyCallback } from "passport-oauth2";
+import { Request, Response } from "express";
+
+const encryptionKey = process.env.ENCRYPTION_KEY ?? "secret";
+
+// #region passport strategies
+const opts = { jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), secretOrKey: encryptionKey };
+
+passport.use(new JwtStrategy(opts, async (payload, cb) => {
+  try {
+    const user = await Database.manager.findOne(User, {
+      where: {
+        email: payload.email, id: payload.id
+      },
+      relations: {
+        roles: true
+      }
+    });
+
+    // Throw some error if no user can be found with the given email
+    if (!user) {
+      return cb(null, false);
+    }
+
+    return cb(null, user);
+
+  } catch (e) {
+    return cb(e);
+  }
+}));
+
+passport.use(new OAuth2Strategy({
+  authorizationURL: "https://login.deploy.nevobo.nl/oauth/v2/auth",
+  tokenURL: "https://login.deploy.nevobo.nl/oauth/v2/token",
+  clientID: "smoelenboek",
+  clientSecret: "secret"
+}, (accessToken: string, refreshToken: string, cb: VerifyCallback) => {
+  console.log(accessToken, refreshToken);
+  cb(null, null);
+}));
+// TODO: Add integration for NeVoBo "https://www.passportjs.org/packages/passport-oauth2/"
+
+// #endregion
 
 interface Token {
   exp: number;
@@ -12,28 +57,46 @@ interface Token {
 }
 
 export default class AuthService {
-	encryptionKey = process.env.ENCRYPTION_KEY ?? "secret";
+  generateAccessToken(user: User): string {
+    const token = jwt.sign({
+      id: user.id,
+      email: user.email,
+    }, encryptionKey, { expiresIn: moment().add(5, "m").unix() });
 
-	getTokens(user: User) {
-		const authToken = jwt.sign({
-			id: user.id,
-			email: user.email,
-			refresh: false
-		}, this.encryptionKey, { expiresIn: moment().add(5, "m").unix() });
+    return token;
+  }
 
-		const refreshToken = jwt.sign({
-			id: user.id,
-			refresh: true
-		}, this.encryptionKey, { expiresIn: moment().add(6, "M").unix() });
+  generateRefreshToken(user: User): string {
+    const token = jwt.sign({
+      id: user.id,
+      email: user.email,
+    }, encryptionKey, { expiresIn: moment().add(6, "M").unix() });
 
-		return { authToken, refreshToken };
-	}
+    return token;
+  }
 
-	getRoles(user: User) {
-		return Database.manager.findBy(Role, { user });
-	}
+  getTokens(user: User) {
+    return { accessToken: this.generateAccessToken(user), refreshToken: this.generateRefreshToken(user) };
+  }
 
-	decodeToken(authToken: string): Token {
-		return jwt.verify(authToken, this.encryptionKey) as Token;
-	}
+  getRoles(user: User) {
+    return Database.manager.findBy(Role, { user });
+  }
+
+  getCommittees(user: User) {
+    
+  }
 }
+
+export function asyncJwtAuthentication(req: Request, res: Response): Promise<User> {
+  return new Promise((resolve, reject) => {
+    passport.authenticate("jwt", (err, user, info) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(user);
+    })(req, res)
+  })
+}
+

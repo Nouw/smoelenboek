@@ -1,0 +1,21 @@
+FROM node:20
+
+WORKDIR /app
+
+COPY . .
+
+RUN yarn
+
+# CMD ["yarn", "workspace", "smoelenboek-backend", "compile"]
+CMD ["yarn", "workspace", "smoelenboek-backend", "start:dev"]
+
+# FROM node:20-alpine
+#
+# WORKDIR /app
+# COPY . .
+#
+# RUN yarn && yarn build:backend
+#
+# EXPOSE 8080
+#
+# CMD ["node", "packages/smoelenboek-backend/dist/index.js"]
