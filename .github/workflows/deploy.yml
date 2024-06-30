@@ -1,11 +1,10 @@
 name: Deploy
 
-on: 
+on:
   workflow_run:
-    workflows: ["Build"]
-    branches: ["early-access"]
-    types:
-      - completed
+    workflows: [Build]
+    types: [requested]
+    branches: [canary]
 
 env:
   DEPLOY_FOLDER_BETA: /home/deploy/projects/smoelenboek
