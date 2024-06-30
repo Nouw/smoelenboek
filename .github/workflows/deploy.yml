@@ -10,8 +10,7 @@ env:
   DEPLOY_FOLDER_BETA: /home/deploy/projects/smoelenboek
 
 jobs:
-  deploy:
-    on-success:
+  on-success: 
       runs-on: ubuntu-latest
       steps:
         - name: Determine deploy branch
