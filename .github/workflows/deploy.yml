@@ -1,31 +1,58 @@
-name: Deploy to Beta-VPS
+name: Deploy
 
 on:
-  push:
-    branches:
-      - master 
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch used for this deploy (determines which image is pulled from the container registry)'
+        required: false
+        default: 'main'
+      version:
+        description: 'The version used for this deploy (determines which image is pulled from the container registry)'
+        required: false
+        default: 'latest'
+  workflow_run:
+    workflows: ["Build"]
+    branches: ["early-access"]
+    types:
+      - completed
+
+env:
+  DEPLOY_FOLDER_BETA: /home/deploy/projects/smoelenboek
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Copy Repository to VPS
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.BETA_VPS_HOST }}
-        username: ${{ secrets.BETA_VPS_USERNAME }}
-        key: ${{ secrets.BETA_VPS_KEY }}
-        source: '.'
-        target: '/home/fabio/smoelenboek'
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_BRANCH }}
+          path: 'checkout'
+          sparse-checkout: |
+            docker-compose.prod.yml
+          sparse-checkout-cone-mode: false
 
-    - name: Deploy using Docker Compoes
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.BETA_VPS_HOST }}
-        username: ${{ secrets.BETA_VPS_USERNAME }}
-        key: ${{ secrets.BETA_VPS_KEY }}
-        script: |
-          cd /home/fabio/smoelenboek 
-          docker compose down
-          docker compose up -d --build
+      - name: Determine deploy branch
+        run: |
+          echo "DEPLOY_BRANCH=${{ github.event.workflow_run.head_branch || github.event.inputs.branch }}" >> $GITHUB_ENV
+
+      - name: Deploy to staging server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.PETRA_SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ vars.BETA_DEPLOY_HOSTNAME }}
+          REMOTE_USER: ${{ vars.BETA_DEPLOY_USER }}
+          SOURCE: 'checkout/'
+          TARGET: ${{ env.DEPLOY_FOLDER_BETA }} # Should be generic?
+          EXCLUDE: '.git'
+          SCRIPT_BEFORE: |
+            cd ${{ env.DEPLOY_FOLDER_BETA }}
+            if test -f "docker-compose.yaml"; then
+              docker compose down
+            fi
+          # TODO: Create .env for detector platform
+          SCRIPT_AFTER: |            
+            cd ${{ env.DEPLOY_FOLDER_BETA }}
+            echo "${{ secrets.DOCKER_ACCESS_TOKEN  }}" | docker login docker.io -u nouw --password-stdin
+            docker compose pull             
+            docker compose up -d
