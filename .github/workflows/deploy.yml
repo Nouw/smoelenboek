@@ -3,8 +3,8 @@ name: Deploy
 on:
   workflow_run:
     workflows: [Build]
-    types: [requested]
-    branches: [canary]
+    types: [completed]
+    branches: ["master", "early-access"]
 
 env:
   DEPLOY_FOLDER_BETA: /home/deploy/projects/smoelenboek
