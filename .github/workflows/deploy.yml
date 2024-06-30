@@ -1,16 +1,6 @@
 name: Deploy
 
-on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'The branch used for this deploy (determines which image is pulled from the container registry)'
-        required: false
-        default: 'main'
-      version:
-        description: 'The version used for this deploy (determines which image is pulled from the container registry)'
-        required: false
-        default: 'latest'
+on: 
   workflow_run:
     workflows: ["Build"]
     branches: ["early-access"]
