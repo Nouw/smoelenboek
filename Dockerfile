@@ -6,4 +6,4 @@ COPY . .
 RUN yarn 
 RUN npm install -g typescript 
 RUN yarn && yarn workspace smoelenboek-backend compile
-CMD ["node", "packages/smoelenboek-backend/dist/index.js"]
+CMD ["node", "--env-file", ".env", "packages/smoelenboek-backend/dist/index.js"]

@@ -1,5 +1,4 @@
 import { DataSource } from "typeorm";
-import dotenv from "dotenv";
 import {
 	Activity,
 	Category,
@@ -23,8 +22,6 @@ import {
 	UserCommitteeSeason,
 	UserTeamSeason
 } from "smoelenboek-types";
-
-dotenv.config();
 
 const root = process.env.PRODUCTION === "false" ? "src" : "dist";
 const extension = process.env.PRODUCTION === "false" ? "ts" : "js";

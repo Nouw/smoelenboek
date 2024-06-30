@@ -17661,7 +17661,6 @@ __metadata:
     body-parser: "npm:^1.20.2"
     bull: "npm:^4.11.3"
     cors: "npm:^2.8.5"
-    dotenv: "npm:^16.0.3"
     eslint: "npm:^8.40.0"
     eslint-config-prettier: "npm:^8.8.0"
     exceljs: "npm:^4.3.0"

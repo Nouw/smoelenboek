@@ -4,7 +4,7 @@
   "packageManager": "yarn@4.1.0",
   "private": true,
   "scrips": {
-    "build:backend": "yarn workspace smoelenboek-backend compile"
+    "build:backend": "docker build"
   },
   "workspaces": [
     "packages/*"
