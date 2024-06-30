@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch used for this deploy (determines which image is pulled from the container registry)'
+        required: false
+        default: 'early-access'
+      version:
+        description: 'The version used for this deploy (determines which image is pulled from the container registry)'
+        required: false
+        default: 'latest'
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+    branches: ["master", "early-access"]
+
+env:
+  DEPLOY_FOLDER_BETA: /home/deploy/projects/smoelenboek
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine deploy branch
+        run: |
+          echo "DEPLOY_BRANCH=${{ github.event.workflow_run.head_branch || github.event.inputs.branch }}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_BRANCH }}
+          path: 'checkout'
+          sparse-checkout: |
+            docker-compose.prod.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Deploy to staging server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.BETA_PRIVATE_SSH_KEY}}
+          REMOTE_HOST: ${{ vars.BETA_DEPLOY_HOSTNAME }}
+          REMOTE_USER: ${{ vars.BETA_DEPLOY_USER }}
+          SOURCE: 'checkout/'
+          TARGET: ${{ env.DEPLOY_FOLDER_BETA }}
+          EXCLUDE: '.git'
+          SCRIPT_BEFORE: |
+            cd ${{ env.DEPLOY_FOLDER_BETA }}
+            if test -f "docker-compose.yaml"; then
+              docker compose down
+            fi
+          SCRIPT_AFTER: |            
+            cd ${{ env.DEPLOY_FOLDER_BETA }}
+            echo "${{ secrets.DOCKER_ACCESS_TOKEN  }}" | docker login docker.io -u nouw --password-stdin
+            docker compose pull             
+            docker compose up -d
