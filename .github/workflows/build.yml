@@ -35,10 +35,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          # TODO: Should we use secrets for this instead, using /run/secrets?
           build-args: |
             DEPLOY_ENV=${{ env.BRANCH_NAME }}
-          # TODO: Do something with version in docker tag
           tags: |
             nouw/smoelenboek:${{ env.BRANCH_NAME }}-latest
             nouw/smoelenboek:${{ env.BRANCH_NAME }}-${{ steps.package-version.outputs.current-version}}

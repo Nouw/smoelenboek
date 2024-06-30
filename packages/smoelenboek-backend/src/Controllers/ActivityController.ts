@@ -65,11 +65,11 @@ export default class ActivityController {
   private readonly entityService = new EntityService();
   private readonly registrationService = new RegistrationService();
 
-	@AuthenticatedAnonymous(false)
+  @AuthenticatedAnonymous(false)
   @Get("/")
   async getActivities(@Request() req: RequestWithAnonymous, @Response() res) {
     const where: FindOptionsWhere<Activity> = {};
-    
+
     if (!req.user) {
       where.public = true;
     }
@@ -97,26 +97,26 @@ export default class ActivityController {
         commitee: true,
       },
     });
-     
+
     if (!req.user && !activity.public) {
       new ApiResponse<Activity>(false, "ACCESS_DENIED").send(res);
-      return
+      return;
     }
 
     new ApiResponse<Activity>(true, "ENTITY_RETRIEVED", activity).send(res);
   }
-  
+
   @AuthenticatedAnonymous(false)
   @Validate()
   @Get("/form/:id", getFormRules)
   async getForm(@Request() req, @Response() res) {
     const { id } = matchedData(req);
     // Prevent anonymous users from seeing the form
-    const activity = await Database.manager.findOne(Activity, { where: { form: { id } }});
-    
+    const activity = await Database.manager.findOne(Activity, { where: { form: { id } } });
+
     if (!activity.public && !req.user) {
       new ApiResponse<Form>(false, "ACCESS_DENIED").send(res);
-      return 
+      return;
     }
 
     const form: Form = await Database.manager.findOne(Form, {
@@ -166,8 +166,8 @@ export default class ActivityController {
   async postActivity(@Request() req, @Response() res) {
     const activityBody: Activity = req.body.activity;
     const formBody: Form = req.body.form;
-    
-    const committee = await Database.manager.findOneOrFail(Committee, { where: { id: req.body.committee }})
+
+    const committee = await Database.manager.findOneOrFail(Committee, { where: { id: req.body.committee } });
     const activity = Database.manager.create(Activity, activityBody);
     activity.commitee = committee;
     const form = Database.manager.create(Form, formBody);
@@ -177,7 +177,7 @@ export default class ActivityController {
     activity.form = form;
 
     for (const question of formBody.questions) {
-      const formQuestion = Database.manager.create(FormQuestion, question);
+      const formQuestion: FormQuestion = Database.manager.create(FormQuestion, question);
 
       //we don't have question items then
       const items = [];
@@ -211,8 +211,8 @@ export default class ActivityController {
 
     new ApiResponse(true, "ENTITY_DELETED").send(res);
   }
-	
-	@AuthenticatedAnonymous()
+
+  @AuthenticatedAnonymous()
   @Validate()
   @Get("/response/:id", responseRules)
   async getResponse(
@@ -254,10 +254,10 @@ export default class ActivityController {
     new ApiResponse(true, "ENTITY_RETRIEVED", answers).send(res);
   }
 
-	@Authenticated()
+  @Authenticated()
   @Guard("activity.create")
   @Validate()
-  @Post("/form/sheet/:id", createFormRules) 
+  @Post("/form/sheet/:id", createFormRules)
   async linkFormToSheet(@Request() req, @Response() res, @Next() next) {
     const { id } = matchedData(req);
 
@@ -290,7 +290,7 @@ export default class ActivityController {
     }).send(res);
   }
 
-	@Authenticated()
+  @Authenticated()
   @Guard("activity.create")
   @Validate()
   @Get("/responses/:id", getResponsesRules)
@@ -314,10 +314,10 @@ export default class ActivityController {
     );
   }
 
-	@Authenticated()
+  @Authenticated()
   @Guard("activity.create")
   @Validate()
-  @Put("/:id", updateActivityRules) 
+  @Put("/:id", updateActivityRules)
   async updateActivity(@Request() req, @Response() res) {
     const {
       id,
@@ -352,7 +352,7 @@ export default class ActivityController {
   // TODO: Add guard
   @Authenticated()
   @Validate()
-	@Put("/settings/:id", updateActivitySettingsRules)
+  @Put("/settings/:id", updateActivitySettingsRules)
   async updateActivitySettings(@Request() req, @Response() res) {
     const { id, public: publica } = matchedData(req);
 
@@ -370,7 +370,7 @@ export default class ActivityController {
   }
 
   // TODO: Add guard
-	@Validate()
+  @Validate()
   @Delete("/:id", deleteActivityRules)
   async deleteActivity(@Request() req, @Response() res) {
     const { id } = matchedData(req);
@@ -381,7 +381,7 @@ export default class ActivityController {
     });
 
     if (activity.form?.sheetId !== null) {
-      const doc = await new GoogleSpreadsheet(
+      const doc = new GoogleSpreadsheet(
         activity.form.sheetId,
         serviceAccountAuth,
       );
@@ -408,8 +408,8 @@ export default class ActivityController {
     res.json("Deleted sheet!");
   }
 
-	@Authenticated()
-  @Get("/registrations/") 
+  @Authenticated()
+  @Get("/registrations/")
   async getRegistrations(
     @Request() req: RequestWithAnonymous,
     @Response() res,
@@ -425,7 +425,7 @@ export default class ActivityController {
     }
   }
 
-	@AuthenticatedAnonymous()
+  @AuthenticatedAnonymous()
   @Validate()
   @Get("/registration/:id", getPreviousResponse)
   async getPreviousRegistration(
@@ -454,7 +454,7 @@ export default class ActivityController {
     }
   }
 
-	@AuthenticatedAnonymous()
+  @AuthenticatedAnonymous()
   @Validate()
   @Delete("/registration/:id", deleteRegistration) // TODO: Add rules  
   async deleteRegistration(
@@ -468,9 +468,9 @@ export default class ActivityController {
     new ApiResponse(true, "ENTITY_DELETED").send(res);
   }
 
-	@Authenticated()
+  @Authenticated()
   @Validate()
-  @Get("/participants/:id", getActivityParticipants) 
+  @Get("/participants/:id", getActivityParticipants)
   async getParticipants(@Request() req, @Response() res) {
     const { id } = matchedData(req);
 
@@ -481,9 +481,9 @@ export default class ActivityController {
     ).send(res);
   }
 
-  @Authenticated() 
+  @Authenticated()
   @Validate()
-	@Post("/form/sheet/sync/:id", getFormSheetSync)
+  @Post("/form/sheet/sync/:id", getFormSheetSync)
   async getSyncSheet(@Request() req, @Response() res) {
     const { id } = matchedData(req);
 
@@ -491,7 +491,7 @@ export default class ActivityController {
 
     new ApiResponse(true, "ENTITY_RETRIEVED").send(res);
   }
- 
+
   @Authenticated()
   @Get("/managed/list")
   async getManagedActivities(@Request() req: RequestE, @Response() res) {
@@ -501,12 +501,12 @@ export default class ActivityController {
       .innerJoin("c.userCommitteeSeason", "ucs")
       .innerJoin("ucs.user", "u")
       .where("ucs.seasonId = :seasonId", { seasonId: 21 }) // TODO: Get current season
-      .andWhere("u.id = :userId", { userId: req.user.id }) 
-    
+      .andWhere("u.id = :userId", { userId: req.user.id });
+
     if (!IsAdmin(req.user) && !isBoard(req.user)) {
-      query = query.andWhere("c.id = ucs.committee.id")
+      query = query.andWhere("c.id = ucs.committee.id");
     }
-    
+
     const activities = await query.getMany();
 
     new ApiResponse(true, "ENTITY_RETRIEVED", activities).send(res);

@@ -8,14 +8,13 @@ import {
 } from "smoelenboek-types";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { serviceAccountAuth } from "../Utilities/Google";
-import moment from "moment";
 import { Database } from "../Database";
 import { FormRegistration } from "../Controllers/ActivityController";
 import { IsNull, Not } from "typeorm";
 import GoogleSpreadsheetService from "./GoogleSpreadsheetService";
 
 export default class ActivityService {
-  private sheetsService = new GoogleSpreadsheetService();	
+  private sheetsService = new GoogleSpreadsheetService();
 
   async removeActivity(activity: Activity) {
     await Database.manager.transaction(async (manager) => {
@@ -34,7 +33,7 @@ export default class ActivityService {
 
         // remove the sheet if it exists
         if (activity.form?.sheetId) {
-          const doc = await new GoogleSpreadsheet(
+          const doc = new GoogleSpreadsheet(
             activity.form.sheetId,
             serviceAccountAuth,
           );
