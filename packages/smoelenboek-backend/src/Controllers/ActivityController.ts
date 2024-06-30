@@ -183,7 +183,7 @@ export default class ActivityController {
       const items = [];
       if (formQuestion.type !== "text") {
         for (const item of question.items) {
-          const questionItem = Database.manager.create(FormQuestionItem, item);
+          const questionItem: FormQuestionItem = Database.manager.create(FormQuestionItem, item);
           questionItem.question = formQuestion;
           items.push(questionItem);
         }
@@ -231,7 +231,7 @@ export default class ActivityController {
       next(new Error("No identification found in request!"));
     }
 
-    const formAnswer = await Database.manager.findOneByOrFail(
+    const formAnswer: FormAnswer = await Database.manager.findOneByOrFail(
       FormAnswer,
       where,
     );
