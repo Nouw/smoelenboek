@@ -4,6 +4,8 @@ services:
     image: mysql
     environment:
       MYSQL_DATABASE: smoelenboek_beta
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'no' 
       MYSQL_USER: smoelenboek
       MYSQL_PASSWORD: smoelenboek
     ports:
