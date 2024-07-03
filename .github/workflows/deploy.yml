@@ -42,5 +42,5 @@ jobs:
           SCRIPT_AFTER: |            
             cd ${{ env.DEPLOY_FOLDER_BETA }}
             echo "${{ secrets.DOCKER_ACCESS_TOKEN  }}" | docker login docker.io -u nouw --password-stdin
-            docker compose pull             
-            docker compose up -d
+            docker compose -f docker-compose.prod.yml pull             
+            docker compose -f docker-compose.prod.yml up -d
