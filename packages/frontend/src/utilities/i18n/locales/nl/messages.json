@@ -1,0 +1,70 @@
+{
+  "season": {
+    "create": "Seizoen aangemaakt!",
+    "delete": "Seizoen verwijderd!",
+    "update": "Seizoen bijgewerkt!"
+  },
+  "user": {
+    "delete": "Gebruiker verwijderd!",
+    "create": "Gebruiker aangemaakt!",
+    "update": "Gebruiker bijgewerkt!"
+  },
+  "teams": {
+    "delete": "Team verwijderd!",
+    "create": "Team aangemaakt!",
+    "update": "Team bijgewerkt!",
+    "already-part": "is al onderdeel van het team!",
+    "added": "Toegevoegd",
+    "to-team": "aan team!",
+    "remove-player": "Speler uit team verwijderd!",
+    "role-update": "Rol bijgewerkt!",
+    "sync-photo": "Synchronisatie van teamfoto's gestart"
+  },
+  "committee": {
+    "delete": "Commissie verwijderd!",
+    "create": "Commissie aangemaakt!",
+    "update": "Commissie bijgewerkt!",
+    "added": "Toegevoegd",
+    "to-committee": "aan commissie!",
+    "already-part": "is al onderdeel van de commissie!",
+    "role-update": "Rol bijgewerkt!",
+    "remove-user": "Gebruiker uit commissie verwijderd!"
+  },
+  "protototo": {
+    "season": {
+      "delete": "Seizoen verwijderd!",
+      "create": "Seizoen aangemaakt!",
+      "update": "Seizoen bijgewerkt!"
+    },
+    "match": {
+      "delete": "Wedstrijd verwijderd!",
+      "create": "Wedstrijd aangemaakt!",
+      "update": "Wedstrijd bijgewerkt!"
+    },
+    "submit-message": "Succesvol weddenschap verzonden!"
+  },
+  "documents": {
+    "create": "Categorie aangemaakt!",
+    "update": "Categorie bijgewerkt!",
+    "delete": "Categorie verwijderd!"
+  },
+  "settings": {
+    "success": "Wachtwoord bijgewerkt!",
+    "information-updated": "Informatie bijgewerkt!",
+    "profile-picture": "Profiele foto geupdate!"
+  },
+  "auth": {
+    "required": {
+      "password": "Wachtwoord is vereist",
+      "email": "E-mail is vereist"
+    },
+    "valid": {
+      "email": "Voer een geldig e-mailadres in"
+    }
+  },
+  "tikkie": "Hierbij bevestig ik dat ik de bovenstaande tikkie heb betaald en deelneem aan de ProtoToto",
+  "pay-tikkie": "Tikkie betalen",
+  "activity": {
+    "registration-success": "Successvol geregistreerd voor {{ name }}"
+  }
+}

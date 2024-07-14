@@ -1,0 +1,20 @@
+{
+  "header": "Form management",
+  "create-form": "Create form",
+  "title": "Form title",
+  "question": {
+    "add-question": "Add question",
+    "type": "Type",
+    "text": "Text",
+    "choice": "Choice",
+    "select": "Select",
+    "answer": "Your answer",
+    "question": "Question",
+    "paragraph": "Paragraph",
+    "required": "Required"
+  },
+  "field-required": "This field is required!",
+	"avg": "I agree to the processing of my personal data by USV Protos",
+  "registration-closed-after-open": "The registration closed date should be after the open date",
+  "date-after-registration-closed": "The date should be after registration closed"
+}

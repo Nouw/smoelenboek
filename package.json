@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@nestjs/mapped-types": "*"
+  },
+  "name": "smoelenboek",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Fabio Dijkshoorn <webcie@usvprotos.nl>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

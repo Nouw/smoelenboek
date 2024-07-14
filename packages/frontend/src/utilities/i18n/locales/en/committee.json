@@ -1,0 +1,14 @@
+{
+  "header": "Committee management",
+  "committees": "Committees",
+  "create-committee": "Add committee",
+  "update-committee": "Update committee",
+  "name": "Name",
+  "options": "Options",
+  "delete-committee": "Delete committee",
+  "add-member": "Add member",
+  "role": "Role",
+  "add-user": "Add user to committee",
+  "view-photo": "View photo",
+  "update-photo": "Update photo"
+}

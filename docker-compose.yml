@@ -1,0 +1,42 @@
+services:
+  database:
+    container_name: mysql
+    image: mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: smoelenboek
+      MYSQL_USER: smoelenboek
+      MYSQL_PASSWORD: smoelenboek
+    ports:
+      - 3307:3306
+    volumes:
+      - db-data:/var/lib/mysql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - smoelenboek
+  backend:
+    container_name: backend
+    image: node:20
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ${DOCKER_OCI_CONFIG_PATH}:/root/.oci 
+    command: ./bin/backend_dev.sh 
+    depends_on:
+      - database
+    ports:
+      - 8080:3000
+    networks:
+        - smoelenboek
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+ 
+networks:
+  smoelenboek:
+
+volumes:
+  db-data:

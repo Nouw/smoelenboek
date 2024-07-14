@@ -1,0 +1,18 @@
+{
+  "open-registration": "Open inschrijving",
+  "close-registration": "Sluit inschrijving",
+  "public": "Openbaar",
+  "enter-description": "Voer beschrijving in",
+  "title": "Titel",
+  "location": "Locatie",
+  "create-activity": "Activiteit aanmaken",
+  "maximum": "Maximum",
+  "date": "Datum",
+  "registration-open": "Inschrijven open",
+  "registration-closed": "Inschrijving gesloten",
+  "open-for-external": "Zet dit op true als deze acitiviteit ook open is voor externe",
+  "responses": "Antwoorden",
+  "open-sheets": "Open Sheets",
+  "link-responses-to-sheets": "Link inschrijven aan Sheets",
+  "registration-success": "Succesvol ingeschreven voor {{ name }}"
+}

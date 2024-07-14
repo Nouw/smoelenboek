@@ -1,0 +1,14 @@
+{
+  "header": "Commissiebeheer",
+  "committees": "Commissies",
+  "create-committee": "Commissie toevoegen",
+  "update-committee": "Commissie bijwerken",
+  "name": "Naam",
+  "options": "Opties",
+  "delete-committee": "Commissie verwijderen",
+  "add-member": "Lid toevoegen",
+  "role": "Rol",
+  "add-user": "Lid aan commissie toevoegen",
+  "view-photo": "Foto bekijken",
+  "update-photo": "Foto bijwerken"
+}

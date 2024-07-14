@@ -1,0 +1,16 @@
+{
+  "players": "Spelers",
+  "coaches": "Coaches",
+  "header": "Teambeheer",
+  "teams": "Teams",
+  "create-team": "Team toevoegen",
+  "name": "Naam",
+  "delete-team": "Team verwijderen",
+  "league": "Competitie",
+  "add-player": "Speler toevoegen",
+  "role": "Rol",
+  "add-user": "Lid aan team toevoegen",
+  "sync-photos": "Sync Photos",
+  "update-team": "Team updaten"
+}
+

@@ -1,0 +1,15 @@
+{
+  "submit": "Submit",
+  "search": "Search user", 
+  "confirmation": "Are you sure you want to remove",
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "save": "Save",
+  "email-request": "Send email password reset request!",
+	"name": "Name",
+	"upload": "Upload",
+  "back": "Back",
+  "email": "Email",
+  "type": "Type",
+  "next": "Next"
+}

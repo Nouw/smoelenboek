@@ -1,0 +1,26 @@
+{
+  "header": "Ledenbeheer",
+  "users": "Leden",
+  "create-user": "Lid toevoegen",
+  "update-user": "Lid bijwerken",
+  "delete-user": "Lid verwijderen",
+  "first-name": "Voornaam",
+  "last-name": "Achternaam",
+  "street-name": "Straatnaam",
+  "house-number": "Huisnummer",
+  "postcode": "Postcode",
+  "city": "Stad",
+  "i-b-a-n": "IBAN",
+  "email": "E-mail",
+  "password": "Wachtwoord",
+  "phone-number": "Telefoonnummer",
+  "birthdate": "Geboortedatum",
+  "bond-number": "Bondnummer",
+  "registration-date": "Registratiedatum",
+  "back-number": "Rugnummer",
+  "referee-license": "Scheidsrechterslicentie",
+  "activities": "Seizoens activiteiten",
+  "export-to-excel": "Exporteren naar Excel",
+  "forgot-password": "Wachtwoord vergeten"
+}
+
