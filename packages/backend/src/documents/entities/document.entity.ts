@@ -15,7 +15,7 @@ export class Document {
   @Column()
   path: string;
 
-  @Column()
+  @Column({ nullable: true })
   originalName: string;
 
   @ManyToOne(() => Category, (category) => category.documents)

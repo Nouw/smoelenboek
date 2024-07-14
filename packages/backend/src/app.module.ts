@@ -70,7 +70,7 @@ import * as process from 'process';
         RefreshToken,
       ],
       subscribers: [CategorySubscriber],
-      synchronize: true,
+      synchronize: false,
       autoLoadEntities: true,
     }),
 
