@@ -25,7 +25,7 @@ services:
     depends_on:
       - database
     ports:
-      - ${DOCKER_BACKEND_PORT:-8080}:8080
+      - ${DOCKER_BACKEND_PORT:-8080}:3000
     networks:
       - smoelenboek
     extra_hosts:
