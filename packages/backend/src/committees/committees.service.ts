@@ -39,7 +39,14 @@ export class CommitteesService {
         { seasonId: currentSeason.id },
       )
       .leftJoinAndSelect('ucs.user', 'u')
-      .select(['c', 'u.firstName', 'u.lastName', 'u.id', 'ucs.function'])
+      .select([
+        'c',
+        'u.firstName',
+        'u.lastName',
+        'u.id',
+        'u.profilePicture',
+        'ucs.function',
+      ])
       .where('c.id = :committeeId', { committeeId: id })
       .getOne();
   }
