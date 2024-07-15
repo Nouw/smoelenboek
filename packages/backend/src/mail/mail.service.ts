@@ -41,7 +41,7 @@ export class MailService {
             button: {
               color: this.color,
               text: 'Wachtwoord instellen',
-              link: `http://localhost:5173/auth/password/reset?token=${token.token}`, //TODO: change this to frontend
+              link: `https::/smoelenboek.usvprotos.nl/auth/password/reset?token=${token.token}`, //TODO: change this to frontend
             },
           },
         ],
@@ -65,7 +65,7 @@ export class MailService {
             button: {
               color: '#d0211c',
               text: 'Wachtwoord instellen',
-              link: `http://localhost:5173/auth/password/reset?token=${token.token}`,
+              link: `http://smoelenboek.usvprotos.nl/auth/password/reset?token=${token.token}`,
             },
           },
         ],
