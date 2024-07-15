@@ -18,10 +18,15 @@ import { Roles } from 'src/auth/decorators/roles.decorators';
 import { Role } from 'src/auth/enums/role.enum';
 import { Request as RequestType } from 'src/auth/types/request';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MailService } from '../mail/mail.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly mailService: MailService,
+  ) {}
 
   @Roles(Role.Admin)
   @Post()

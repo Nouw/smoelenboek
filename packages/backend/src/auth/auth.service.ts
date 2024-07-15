@@ -15,6 +15,9 @@ import { User } from 'src/users/entities/user.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { format, subDays } from 'date-fns';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetToken } from './entities/reset-token.entity';
+import { randomBytes } from 'crypto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +26,10 @@ export class AuthService {
     private jwtService: JwtService,
     @InjectRepository(RefreshToken)
     private refreshTokensRepository: Repository<RefreshToken>,
-  ) { }
+    @InjectRepository(ResetToken)
+    private resetTokensRepository: Repository<ResetToken>,
+    private mailService: MailService,
+  ) {}
 
   async signIn(
     username: string,
@@ -118,9 +124,40 @@ export class AuthService {
 
     user.password = await hash(changePasswordDto.newPassword, 10);
 
-    await this.usersService.update(user.id, user);
+    await this.usersService.save(user);
 
     return;
+  }
+
+  async requestResetPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    // If no user just return
+    if (!user) {
+      return;
+    }
+
+    let token = await this.resetTokensRepository.findOneBy({ user: user });
+    // Delete the old token
+    if (token) {
+      await this.resetTokensRepository.remove([token]);
+    }
+
+    token = this.resetTokensRepository.create();
+    token.user = user;
+    token.token = randomBytes(32).toString('hex');
+
+    await this.resetTokensRepository.save(token);
+
+    await this.mailService.sendResetPassword(token);
+
+    return;
+  }
+
+  async resetPassword(token: ResetToken, password: string) {
+    const user = token.user;
+    user.password = await hash(password, 10);
+
+    return this.usersService.save(user);
   }
 
   @Cron(CronExpression.EVERY_MINUTE)

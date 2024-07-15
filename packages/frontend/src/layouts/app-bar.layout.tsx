@@ -4,7 +4,15 @@ import { useAppSelector, useAppDispatch } from "../store/hooks";
 import isAuthenticated from "../hooks/auth/is-authenticated.hook";
 import { useNavigate } from "react-router-dom";
 import { useLazyGetProfilePictureQuery } from "../api/endpoints/user.api";
-import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Stack,
+} from "@mui/material";
 import { red } from "@mui/material/colors";
 import { logout } from "../store/slices/auth.slice";
 
@@ -28,7 +36,6 @@ export const AppBarLayout: React.FC = () => {
     if (authenticated) {
       getPicture();
     }
-
   }, [trigger, authenticated]);
 
   React.useEffect(() => {
@@ -37,9 +44,8 @@ export const AppBarLayout: React.FC = () => {
     });
 
     return () => {
-      document.removeEventListener(
-        "profilePictureUpdate",
-        () => console.log("Stopped listening to picture updates"),
+      document.removeEventListener("profilePictureUpdate", () =>
+        console.log("Stopped listening to picture updates"),
       );
     };
   }, [trigger]);
@@ -65,7 +71,7 @@ export const AppBarLayout: React.FC = () => {
       </Box>
     );
   }
-  console.log(import.meta.env.VITE_APP_OBJECT_STORAGE_URL, data)
+
   return (
     <>
       <Box sx={{ flexGrow: 0 }}>
@@ -75,8 +81,9 @@ export const AppBarLayout: React.FC = () => {
             onClick={(e) => setMenuAnchor(e.currentTarget)}
           >
             <Avatar
-              src={`${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${data?.picture ?? "user/default.jpg"
-                }`}
+              src={`${import.meta.env.VITE_APP_OBJECT_STORAGE_URL}/${
+                data?.picture ?? "user/default.jpg"
+              }`}
             />
           </IconButton>
         </Stack>
@@ -116,4 +123,4 @@ export const AppBarLayout: React.FC = () => {
       </Menu>
     </>
   );
-}
+};

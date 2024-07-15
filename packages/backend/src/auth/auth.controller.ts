@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Request,
 } from '@nestjs/common';
@@ -12,10 +13,12 @@ import { Public } from './decorators/public.decorator';
 import { SignInDto } from './dto/sign-in.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Request as ReqType } from './types/request';
+import { ResetTokenPipe } from './pipes/reset-token.pipe';
+import { ResetToken } from './entities/reset-token.entity';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -37,6 +40,23 @@ export class AuthController {
     @Request() request: ReqType,
   ) {
     return this.authService.changePassword(changePasswordDto, request.user);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('password/request-reset')
+  @Public()
+  requestResetPassword(@Body('email') email: string) {
+    return this.authService.requestResetPassword(email);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('password/reset/:token')
+  @Public()
+  resetPassword(
+    @Param('token', ResetTokenPipe) token: ResetToken,
+    @Body('password') password: string,
+  ) {
+    return this.authService.resetPassword(token, password);
   }
 
   @Get('profile')

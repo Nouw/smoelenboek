@@ -6,7 +6,10 @@ import { TeamsList } from "./screens/teams/teams.list";
 import { teamsInfoLoader, teamsLoader } from "./screens/teams/teams.loader";
 import { TeamsInfo } from "./screens/teams/teams.info";
 import { CommitteesList } from "./screens/committees/committees.list";
-import { committeeInfoLoader, committeesLoader } from "./screens/committees/committees.loader";
+import {
+  committeeInfoLoader,
+  committeesLoader,
+} from "./screens/committees/committees.loader";
 import { CommitteesInfo } from "./screens/committees/committees.info";
 import { DocumentsList } from "./screens/documents/documents.list";
 import { categoriesLoader } from "./screens/categories/categories.loader";
@@ -26,11 +29,17 @@ import { pictureLoader } from "./screens/settings/picture/picture.loader";
 import { AdminLayout } from "./layouts/admin.layout";
 import { Dashboard } from "./screens/dashboard/dashboard";
 import { SeasonsList } from "./screens/dashboard/seasons/seasons.list";
-import { seasonLoader, seasonsLoader } from "./screens/dashboard/seasons/seasons.loader";
+import {
+  seasonLoader,
+  seasonsLoader,
+} from "./screens/dashboard/seasons/seasons.loader";
 import { SeasonsInfo } from "./screens/dashboard/seasons/seasons.info";
 import { SeasonsAdd } from "./screens/dashboard/seasons/seasons.add";
 import { UsersList } from "./screens/dashboard/users/users.list";
-import { userLoader, usersLoader } from "./screens/dashboard/users/users.loader";
+import {
+  userLoader,
+  usersLoader,
+} from "./screens/dashboard/users/users.loader";
 import { UsersInfo } from "./screens/dashboard/users/users.info";
 import { UsersCreate } from "./screens/dashboard/users/users.create";
 import { TeamsList as TeamsDashboardList } from "./screens/dashboard/teams/teams.list";
@@ -43,10 +52,12 @@ import { CategoriesList as CategoriesDashboardList } from "./screens/dashboard/c
 import { CategoriesAdd } from "./screens/dashboard/categories/categories.add";
 import { DocumentsList as DocumentsDashboardList } from "./screens/dashboard/documents/documents.list";
 import { ActivitiesList } from "./screens/activities/activities.list";
+import { ResetPasswordRequest } from "./screens/auth/reset-password/request/reset-password-request.tsx";
+import { ResetPassword } from "./screens/auth/reset-password/reset-password.tsx";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <AppLayout />,
     errorElement: <ErrorLayout />,
     children: [
@@ -59,8 +70,16 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "login",
-            element: <Login />
-          }
+            element: <Login />,
+          },
+          {
+            path: "password/request-reset",
+            element: <ResetPasswordRequest />,
+          },
+          {
+            path: "password/reset",
+            element: <ResetPassword />,
+          },
         ],
       },
       {
@@ -68,12 +87,12 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "",
-            element: <ActivitiesList />
-          }
-        ]
+            element: <ActivitiesList />,
+          },
+        ],
       },
       {
-        path: '',
+        path: "",
         element: <ProtectedLayout />,
         children: [
           {
@@ -88,8 +107,8 @@ export const router = createBrowserRouter([
                 path: "info/:id",
                 element: <TeamsInfo />,
                 loader: teamsInfoLoader,
-              }
-            ]
+              },
+            ],
           },
           {
             path: "committees",
@@ -103,8 +122,8 @@ export const router = createBrowserRouter([
                 path: "info/:id",
                 element: <CommitteesInfo />,
                 loader: committeeInfoLoader,
-              }
-            ]
+              },
+            ],
           },
           {
             path: "documents",
@@ -118,28 +137,28 @@ export const router = createBrowserRouter([
                 path: ":id",
                 element: <DocumentsList />,
                 loader: documentsLoader,
-              }
-            ]
+              },
+            ],
           },
           {
             path: "vcp",
-            element: <VCP />
+            element: <VCP />,
           },
           {
             path: "sponsorhengel",
-            element: <SponsorHengel />
+            element: <SponsorHengel />,
           },
           {
             path: "profile/:id",
             element: <Profile />,
-            loader: profileLoader
+            loader: profileLoader,
           },
           {
             path: "settings",
             children: [
               {
                 path: "",
-                element: <Settings />
+                element: <Settings />,
               },
               {
                 path: "change-password",
@@ -154,8 +173,8 @@ export const router = createBrowserRouter([
                 path: "picture",
                 element: <Picture />,
                 loader: pictureLoader,
-              }
-            ]
+              },
+            ],
           },
           {
             path: "dashboard",
@@ -163,7 +182,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: "",
-                element: <Dashboard />
+                element: <Dashboard />,
               },
               {
                 path: "seasons",
@@ -180,9 +199,9 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "add",
-                    element: <SeasonsAdd />
-                  }
-                ]
+                    element: <SeasonsAdd />,
+                  },
+                ],
               },
               {
                 path: "users",
@@ -200,8 +219,8 @@ export const router = createBrowserRouter([
                   {
                     path: "add",
                     element: <UsersCreate />,
-                  }
-                ]
+                  },
+                ],
               },
               {
                 path: "teams",
@@ -213,14 +232,14 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "add",
-                    element: <TeamsAdd />
+                    element: <TeamsAdd />,
                   },
                   {
                     path: "edit/:id",
                     element: <TeamsDashboardInfo />,
                     loader: teamsInfoLoader,
-                  }
-                ]
+                  },
+                ],
               },
               {
                 path: "committees",
@@ -238,8 +257,8 @@ export const router = createBrowserRouter([
                     path: "edit/:id",
                     element: <CommitteesDashboardInfo />,
                     loader: committeeInfoLoader,
-                  }
-                ]
+                  },
+                ],
               },
               {
                 path: "documents",
@@ -254,21 +273,21 @@ export const router = createBrowserRouter([
                       },
                       {
                         path: "add",
-                        element: <CategoriesAdd />
+                        element: <CategoriesAdd />,
                       },
                       {
                         path: ":id",
                         element: <DocumentsDashboardList />,
                         loader: documentsLoader,
-                      }
-                    ]
-                  }, 
-                ]
-              }
-            ]
-          }
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
         ],
-      }
-    ]
-  }
+      },
+    ],
+  },
 ]);

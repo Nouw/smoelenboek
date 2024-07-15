@@ -1,4 +1,4 @@
-import { TeamRank } from 'src/teams/enums/team-rank.enum';
+import { TeamRank } from '../../teams/enums/team-rank.enum';
 import {
   Column,
   Entity,

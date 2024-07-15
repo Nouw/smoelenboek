@@ -18,7 +18,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:create": "typeorm-ts-node-commonjs migration:generate -d src/database/typeorm-data-source.ts",
+    "migration:up": "typeorm-ts-node-commonjs migration:run -d src/database/typeorm-data-source.ts",
+    "migration:down": "typeorm-ts-node-commonjs migration:revert -dsrc/database/typeorm-data-source.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.2",
@@ -35,8 +38,11 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "mailgen": "^2.0.28",
     "model": "workspace:^",
     "mysql2": "^3.10.2",
+    "nodemailer": "^6.9.14",
     "oci-common": "^2.89.2",
     "oci-objectstorage": "^2.89.2",
     "oci-sdk": "^2.89.2",
@@ -53,6 +59,7 @@
     "@types/jest": "^29.5.2",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.3.1",
+    "@types/nodemailer": "^6.4.15",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

@@ -1,7 +1,7 @@
 import React from "react";
-import { Formik, FormikProps } from "formik";
-import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useResetPasswordMutation } from "../../../api/endpoints/auth.api.ts";
+import { SnackbarContext } from "../../../providers/snackbar/snackbar.context.ts";
 import {
   Box,
   Card,
@@ -12,35 +12,34 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Formik, FormikProps } from "formik";
+import { FormValues, schema } from "./schema.ts";
 import { LoadingButton } from "@mui/lab";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import * as Yup from "yup";
-import { schema } from "./schema";
-import { useLoginMutation } from "../../../api/endpoints/auth.api";
-import { login as sliceLogin } from "../../../store/slices/auth.slice";
-import { useAppDispatch } from "../../../store/hooks";
 
-type FormValues = Yup.InferType<typeof schema>;
+export const ResetPassword: React.FC = () => {
+  const { t } = useTranslation(["user", "common", "messages"]);
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
-export const Login: React.FC = () => {
-  const { t } = useTranslation(["user", "common"]);
-
-  const [login, { isLoading }] = useLoginMutation();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
 
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const { success } = React.useContext(SnackbarContext);
 
-  async function submit(email: string, password: string) {
+  async function submit(password: string) {
     try {
-      const res = await login({ email, password }).unwrap();
+      await resetPassword({ password, token }).unwrap();
 
-      dispatch(sliceLogin(res));
-
-      navigate("/");
+      success(t("messages:auth.password.success"));
     } catch (e) {
       console.error(e);
     }
+  }
+
+  if (!token) {
+    throw new Response("Token is not valid!", { status: 403 });
   }
 
   return (
@@ -51,30 +50,20 @@ export const Login: React.FC = () => {
             <Formik<FormValues>
               validationSchema={schema}
               initialValues={{
-                email: "",
                 password: "",
               }}
-              onSubmit={(values) => {
-                submit(values.email, values.password);
+              onSubmit={(values, { setSubmitting }) => {
+                submit(values.password);
+                setSubmitting(false);
               }}
             >
               {(props: FormikProps<FormValues>) => (
                 <form onSubmit={props.handleSubmit} noValidate>
                   <Typography variant="h4" textAlign="center">
-                    Login
+                    Reset password
                   </Typography>
                   <br />
                   <Stack spacing={2}>
-                    <TextField
-                      id="email"
-                      label={t("user:email")}
-                      type="email"
-                      value={props.values.email}
-                      onChange={props.handleChange}
-                      error={props.touched.email && Boolean(props.errors.email)}
-                      helperText={props.touched.email && props.errors.email}
-                      fullWidth
-                    />
                     <TextField
                       id="password"
                       label={t("user:password")}
@@ -98,14 +87,6 @@ export const Login: React.FC = () => {
                       }}
                       fullWidth
                     />
-                    <Link to="/auth/password/request-reset">
-                      <Typography
-                        variant="caption"
-                        color={(theme) => theme.palette.primary.main}
-                      >
-                        {t("user:forgot-password")}?
-                      </Typography>
-                    </Link>
                     <LoadingButton
                       type="submit"
                       loading={props.isSubmitting || isLoading}

@@ -60,6 +60,10 @@
     },
     "valid": {
       "email": "Voer een geldig e-mailadres in"
+    },
+    "password": {
+      "request-reset": "De link voor het opnieuw instellen van uw wachtwoord is naar uw e-mail verzonden",
+      "success": "Uw wachtwoord is succesvol opnieuw ingesteld."
     }
   },
   "tikkie": "Hierbij bevestig ik dat ik de bovenstaande tikkie heb betaald en deelneem aan de ProtoToto",

@@ -9,16 +9,19 @@ import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
+import { MailModule } from '../mail/mail.module';
+import { ResetToken } from './entities/reset-token.entity';
 
 @Module({
   imports: [
     UsersModule,
+    MailModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '5m' },
     }),
-    TypeOrmModule.forFeature([RefreshToken]),
+    TypeOrmModule.forFeature([RefreshToken, ResetToken]),
   ],
   controllers: [AuthController],
   providers: [

@@ -14,7 +14,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly oracleService: OracleService,
-  ) { }
+  ) {}
 
   findForAuth(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
@@ -41,6 +41,10 @@ export class UsersService {
 
   update(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
     return this.usersRepository.update(id, updateUserDto);
+  }
+
+  save(user: User) {
+    return this.usersRepository.save(user);
   }
 
   remove(id: number) {
@@ -118,7 +122,7 @@ export class UsersService {
 
     const seasons = formattedUser.seasons;
     const keys = Object.keys(seasons);
-    keys.sort(function(a, b) {
+    keys.sort(function (a, b) {
       return parseInt(b) - parseInt(a);
     });
 
