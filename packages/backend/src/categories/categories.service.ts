@@ -30,13 +30,24 @@ export class CategoriesService {
 
   async findAll() {
     const seasons = await this.seasonsService.findAll();
-
+    //@ts-expect-error should add the user key to the express request type
+    const joined = this.request.user.joined;
     const entities = {};
 
     for (const season of seasons) {
-      entities[season.name] = await this.categoriesRepository.findBy({
-        created: Between(season.startDate, season.endDate),
-      });
+      if (isAfter(joined, season.startDate)) {
+        break;
+      }
+
+      entities[season.name] = await this.categoriesRepository
+        .createQueryBuilder('c')
+        .select(['c'])
+        .where('c.created BETWEEN :start AND :end', {
+          start: season.startDate,
+          end: season.endDate,
+        })
+        .andWhere('c.created > :joined', { joined })
+        .getMany();
     }
 
     return entities;
