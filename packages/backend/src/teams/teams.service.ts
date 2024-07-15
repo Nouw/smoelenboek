@@ -39,7 +39,14 @@ export class TeamsService {
         { seasonId: season.id },
       )
       .leftJoinAndSelect('uts.user', 'u')
-      .select(['t', 'u.firstName', 'u.lastName', 'u.id', 'uts.function'])
+      .select([
+        't',
+        'u.firstName',
+        'u.lastName',
+        'u.id',
+        'u.profilePicture',
+        'uts.function',
+      ])
       .where('t.id = :teamId', { teamId: id })
       .getOne();
   }
