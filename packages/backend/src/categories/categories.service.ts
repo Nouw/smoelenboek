@@ -3,7 +3,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { SeasonService } from 'src/season/season.service';
 import { isAfter, isBefore } from 'date-fns';
 import { REQUEST } from '@nestjs/core';
@@ -29,32 +29,14 @@ export class CategoriesService {
   }
 
   async findAll() {
-    const categories = await this.categoriesRepository.find();
     const seasons = await this.seasonsService.findAll();
 
     const entities = {};
 
-    for (const category of categories) {
-      //@ts-expect-error should add the user key to the express request type
-      if (!isBefore(this.request.user.joined, category.created)) {
-        continue;
-      }
-
-      const season = seasons.find(
-        (s) =>
-          isAfter(category.created, s.startDate) &&
-          isBefore(category.created, s.endDate),
-      );
-
-      if (!season) {
-        continue;
-      }
-
-      if (!entities[season.name]) {
-        entities[season.name] = [category];
-      } else {
-        entities[season.name].push(category);
-      }
+    for (const season of seasons) {
+      entities[season.name] = await this.categoriesRepository.findBy({
+        created: Between(season.startDate, season.endDate),
+      });
     }
 
     return entities;

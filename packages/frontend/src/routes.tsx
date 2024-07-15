@@ -54,8 +54,10 @@ import { DocumentsList as DocumentsDashboardList } from "./screens/dashboard/doc
 import { ActivitiesList } from "./screens/activities/activities.list";
 import { ResetPasswordRequest } from "./screens/auth/reset-password/request/reset-password-request.tsx";
 import { ResetPassword } from "./screens/auth/reset-password/reset-password.tsx";
+import { wrapCreateBrowserRouter } from "@sentry/react";
 
-export const router = createBrowserRouter([
+const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
+export const router = sentryWrappedBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
