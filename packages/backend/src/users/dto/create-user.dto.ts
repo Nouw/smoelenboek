@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsEmail()
@@ -24,4 +25,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   bankaccountNumber: string;
+
+  @Type(() => Date)
+  birthDate: Date;
 }

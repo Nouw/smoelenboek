@@ -5,9 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { OracleModule } from 'src/oracle/oracle.module';
 import { MailModule } from '../mail/mail.module';
+import { ResetToken } from '../auth/entities/reset-token.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), OracleModule, MailModule],
+  imports: [
+    TypeOrmModule.forFeature([User, ResetToken]),
+    OracleModule,
+    MailModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [TypeOrmModule, UsersService],

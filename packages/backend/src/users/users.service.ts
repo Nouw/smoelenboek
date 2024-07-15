@@ -8,12 +8,19 @@ import { Request } from 'express';
 import { UserCommitteeSeason } from 'src/committees/entities/user-committee-season.entity';
 import { UserTeamSeason } from 'src/teams/entities/user-team-season.entity';
 import { OracleService } from 'src/oracle/oracle.service';
+import { MailService } from '../mail/mail.service';
+import { ResetToken } from '../auth/entities/reset-token.entity';
+import { randomBytes } from 'crypto';
+import { format, parseISO } from 'date-fns';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly oracleService: OracleService,
+    private readonly mailService: MailService,
+    @InjectRepository(ResetToken)
+    private resetTokensRepository: Repository<ResetToken>,
   ) {}
 
   findForAuth(email: string): Promise<User | undefined> {
@@ -27,8 +34,22 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  create(createUserDto: CreateUserDto): Promise<User> {
-    return this.usersRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = createUserDto as User;
+    user.password = 'reset';
+    user.joinDate = new Date(); //TODO: transform this into create date
+
+    await this.usersRepository.save(user);
+
+    const token = this.resetTokensRepository.create();
+    token.user = user;
+    token.token = randomBytes(32).toString('hex');
+
+    await this.resetTokensRepository.save(token);
+
+    await this.mailService.sendWelcome(token);
+
+    return user;
   }
 
   findAll(): Promise<User[]> {
