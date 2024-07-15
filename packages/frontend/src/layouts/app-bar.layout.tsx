@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { logout } from "../store/slices/auth.slice";
+import { SearchUser } from "../components/users/search-user.tsx";
 
 export const AppBarLayout: React.FC = () => {
   const { t } = useTranslation(["menu"]);
@@ -76,6 +77,10 @@ export const AppBarLayout: React.FC = () => {
     <>
       <Box sx={{ flexGrow: 0 }}>
         <Stack spacing={2} direction="row" alignItems="center">
+          <SearchUser
+            inDrawer
+            onSelect={(user) => navigate(`/profile/${user.id}`)}
+          />
           <IconButton
             size="large"
             onClick={(e) => setMenuAnchor(e.currentTarget)}
