@@ -4,7 +4,7 @@ import { UpdateActivityDto } from './dto/update-activity.dto';
 import { CommitteesService } from 'src/committees/committees.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from './entities/activity.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { FormQuestionItem } from './form/entities/form-question-item.entity';
 
 @Injectable()
@@ -46,8 +46,14 @@ export class ActivitiesService {
     return this.activitiesRepository.save(activity);
   }
 
-  findAll() {
-    return this.activitiesRepository.find();
+  findAll(pub = false) {
+    const where: FindOptionsWhere<Activity> = {};
+
+    if (pub) {
+      where.public = true;
+    }
+
+    return this.activitiesRepository.find({ where, order: { date: 'DESC' } });
   }
 
   findOne(id: number) {

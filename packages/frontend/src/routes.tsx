@@ -55,6 +55,8 @@ import { ActivitiesList } from "./screens/activities/activities.list";
 import { ResetPasswordRequest } from "./screens/auth/reset-password/request/reset-password-request.tsx";
 import { ResetPassword } from "./screens/auth/reset-password/reset-password.tsx";
 import { wrapCreateBrowserRouter } from "@sentry/react";
+import { ActivitiesList as ActivitiesDashboardList } from "./screens/dashboard/activities/activities.list";
+import { ActivitiesAdd } from "./screens/dashboard/activities/activities.add.tsx";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 export const router = sentryWrappedBrowserRouter([
@@ -283,6 +285,19 @@ export const router = sentryWrappedBrowserRouter([
                         loader: documentsLoader,
                       },
                     ],
+                  },
+                ],
+              },
+              {
+                path: "activities",
+                children: [
+                  {
+                    path: "",
+                    element: <ActivitiesDashboardList />,
+                  },
+                  {
+                    path: "create",
+                    element: <ActivitiesAdd />,
                   },
                 ],
               },

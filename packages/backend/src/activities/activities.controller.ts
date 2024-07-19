@@ -12,6 +12,8 @@ import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { Roles } from 'src/auth/decorators/roles.decorators';
 import { Role } from 'src/auth/enums/role.enum';
+import { Public } from '../auth/decorators/public.decorator';
+import { User } from '../auth/decorators/user.decorator';
 
 @Controller('activities')
 export class ActivitiesController {
@@ -24,7 +26,9 @@ export class ActivitiesController {
   }
 
   @Get()
-  findAll() {
+  @Public()
+  findAll(@User() user) {
+    console.log(user);
     return this.activitiesService.findAll();
   }
 

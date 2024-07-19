@@ -13,7 +13,7 @@ export class DocumentsService {
     @InjectRepository(Document)
     private readonly documentsRepository: Repository<Document>,
     private readonly oracleService: OracleService,
-  ) { }
+  ) {}
 
   async findAll(category: Category) {
     const documents = await this.documentsRepository.findBy({
@@ -27,7 +27,7 @@ export class DocumentsService {
     for (const id of ids) {
       const doc = await this.documentsRepository.findOneBy({ id: +id });
 
-      return this.documentsRepository.remove(doc);
+      this.documentsRepository.remove(doc);
     }
 
     return;
