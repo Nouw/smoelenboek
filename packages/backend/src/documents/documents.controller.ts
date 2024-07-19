@@ -16,6 +16,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { CategoryPipe } from 'src/categories/pipes/category.pipe';
 import { Roles } from 'src/auth/decorators/roles.decorators';
 import { Role } from 'src/auth/enums/role.enum';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('documents')
 export class DocumentsController {
