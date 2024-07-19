@@ -17,6 +17,7 @@ services:
       - smoelenboek
   backend:
     container_name: backend
+    image: nouw/smoelenboek
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
