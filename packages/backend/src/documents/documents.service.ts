@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Category } from 'src/categories/entities/category.entity';
 import { createHash } from 'crypto';
 import { OracleService } from 'src/oracle/oracle.service';
@@ -13,7 +13,7 @@ export class DocumentsService {
     @InjectRepository(Document)
     private readonly documentsRepository: Repository<Document>,
     private readonly oracleService: OracleService,
-  ) { }
+  ) {}
 
   async findAll(category: Category) {
     const documents = await this.documentsRepository.findBy({
@@ -27,10 +27,12 @@ export class DocumentsService {
     for (const id of ids) {
       const doc = await this.documentsRepository.findOneBy({ id: +id });
 
-      return this.documentsRepository.remove(doc);
+      await this.oracleService.remove(doc.path);
+
+      await this.documentsRepository.remove(doc);
     }
 
-    return;
+    return HttpStatus.OK;
   }
 
   async uploadFiles(files: Express.Multer.File[], category: Category) {

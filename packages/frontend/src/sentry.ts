@@ -36,4 +36,5 @@ Sentry.init({
   // plus for 100% of sessions with an error
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
+  enabled: import.meta.env.VITE_APP_ENVIRONMENT_MODE === "production",
 });

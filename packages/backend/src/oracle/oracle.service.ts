@@ -53,7 +53,7 @@ export class OracleService {
       this.logger.debug(`Uploaded file (${folder}/${name}) to Oracle`);
       return name;
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 
@@ -102,6 +102,8 @@ export class OracleService {
       bucketName: this.bucketName,
       objectName: path,
     };
+
+    this.logger.debug(`Removed file (${path}) from Oracle`);
 
     return client.deleteObject(request);
   }
