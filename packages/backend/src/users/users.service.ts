@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Not, Repository, UpdateResult } from 'typeorm';
 import { Request } from 'express';
 import { UserCommitteeSeason } from 'src/committees/entities/user-committee-season.entity';
 import { UserTeamSeason } from 'src/teams/entities/user-team-season.entity';
@@ -11,7 +11,6 @@ import { OracleService } from 'src/oracle/oracle.service';
 import { MailService } from '../mail/mail.service';
 import { ResetToken } from '../auth/entities/reset-token.entity';
 import { randomBytes } from 'crypto';
-import { format, parseISO } from 'date-fns';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +20,7 @@ export class UsersService {
     private readonly mailService: MailService,
     @InjectRepository(ResetToken)
     private resetTokensRepository: Repository<ResetToken>,
-  ) {}
+  ) { }
 
   findForAuth(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
@@ -53,7 +52,7 @@ export class UsersService {
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.usersRepository.findBy({ leaveDate: Not(IsNull()) });
   }
 
   findOne(id: number): Promise<User> {
@@ -143,7 +142,7 @@ export class UsersService {
 
     const seasons = formattedUser.seasons;
     const keys = Object.keys(seasons);
-    keys.sort(function (a, b) {
+    keys.sort(function(a, b) {
       return parseInt(b) - parseInt(a);
     });
 
