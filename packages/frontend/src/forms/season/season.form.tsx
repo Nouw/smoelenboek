@@ -4,7 +4,6 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LoadingButton } from "@mui/lab";
 import * as Yup from "yup";
 import { useTranslation } from "react-i18next";
-import { constructNow } from "date-fns";
 
 export interface SeasonFormValues extends FormikValues {
   startDate: Date,

@@ -3,8 +3,10 @@ import * as Yup from "yup";
 import { useTranslation } from "react-i18next";
 import { Box, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
 import { Field, Formik, FormikProps } from "formik";
-import { DatePicker, LoadingButton } from "@mui/lab";
+import { LoadingButton } from "@mui/lab";
 import { schema } from "./schema";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { parse } from "date-fns";
 
 export type FormValues = Yup.InferType<typeof schema>;
 
@@ -18,29 +20,13 @@ export const UserForm: React.FC<UsersInfoProps> = ({ initialValues: baseValues, 
   const { t } = useTranslation(["common", "error", "user"]);
   const initialValues = baseValues ?? schema.cast({});
 
-  //
-  //async function submit(values: FormValues & { setSubmitting:(submitting: boolean) => void }) {
-  //  try {
-  //    if (method === 'put') {
-  //      const res = await updateMember({ admin: admin ?? false, user: values as unknown as User}).unwrap();
-  //
-  //      dispatch(updateMembers([res.data]));
-  //    } else {
-  //      const res = await createMember(values as unknown as User).unwrap();
-  //
-  //      dispatch(addMembers([res.data]));
-  //    }
-  //
-  //    snackbar.openSnackbar(message, Severity.SUCCESS)
-  //    values.setSubmitting(false);
-  //  } catch (e) {
-  //    console.error(e);
-  //    snackbar.openSnackbar(t("error:error-message"), Severity.ERROR);
-  //    values.setSubmitting(false);
-  //  }
-  //
-  //  return
-  //}
+  function convertDate(date: string | Date): Date {
+    if (typeof date === 'string' || date instanceof String) {
+      return parse(date as string, "yyyy-MM-dd", new Date());
+    }
+
+    return date;
+  }
 
   return (
     <Card>
@@ -153,8 +139,8 @@ export const UserForm: React.FC<UsersInfoProps> = ({ initialValues: baseValues, 
                     <>
                       <DatePicker
                         label={t("user:birthdate")}
-                        format="DD-MM-YYYY"
-                        value={props.values.birthDate}
+                        format="dd-MM-yyyy"
+                        value={convertDate(props.values.birthDate)}
                         onChange={(value: Date) => props.setFieldValue("birthDate", value, true)}
                         slotProps={{
                           textField: {

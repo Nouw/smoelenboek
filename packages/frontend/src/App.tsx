@@ -13,6 +13,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/L
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { nl } from 'date-fns/locale/nl';
 
 function App() {
   const theme = getTheme();
@@ -22,7 +23,7 @@ function App() {
     <Provider store={store}>
       <PersistGate loading={<Loading />} persistor={persistor}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={nl}>
             <DndProvider backend={HTML5Backend}>
               <SnackbarProvider>
                 <RouterProvider router={router} />
