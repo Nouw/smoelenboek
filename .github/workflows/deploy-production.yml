@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+    branches: ["master"]
+
+env:
+  DEPLOY_FOLDER: '/home/deploy/smoelenboek-v5'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine deploy branch
+        run: |
+          echo "DEPLOY_BRANCH=${{ github.event.workflow_run.head_branch || github.event.inputs.branch }}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_BRANCH }}
+          path: 'checkout'
+          sparse-checkout: |
+            docker-compose.prod.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Deploy to staging server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.PROD_PRIVATE_SSH_KEY }}
+          REMOTE_HOST: ${{ vars.PROD_DEPLOY_HOSTNAME }}
+          REMOTE_USER: ${{ vars.PROD_DEPLOY_USER }}
+          SOURCE: 'checkout/'
+          TARGET: ${{ env.DEPLOY_FOLDER }}
+          EXCLUDE: '.git'
+          SCRIPT_BEFORE: |
+            cd ${{ env.DEPLOY_FOLDER }}
+            if test -f "docker-compose.yaml"; then
+              docker compose down
+            fi
+          SCRIPT_AFTER: |
+            cd ${{ env.DEPLOY_FOLDER }}
+            echo "${{ secrets.DOCKER_ACCESS_TOKEN  }}" | docker login docker.io -u nouw --password-stdin
+            docker compose -f docker-compose.prod.yml pull             
+            docker compose -f docker-compose.prod.yml up -d
