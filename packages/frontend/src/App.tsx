@@ -19,6 +19,8 @@ function App() {
   const theme = getTheme();
   const persistor = persistStore(store);
 
+  console.log(`Running Smoelenboek with version ${import.meta.env.VITE_REACT_APP_VERSION}`)
+
   return (
     <Provider store={store}>
       <PersistGate loading={<Loading />} persistor={persistor}>

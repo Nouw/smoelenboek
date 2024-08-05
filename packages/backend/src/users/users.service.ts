@@ -52,7 +52,7 @@ export class UsersService {
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.findBy({ leaveDate: Not(IsNull()) });
+    return this.usersRepository.findBy({ leaveDate: IsNull() });
   }
 
   findOne(id: number): Promise<User> {
