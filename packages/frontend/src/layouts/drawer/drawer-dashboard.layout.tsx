@@ -15,13 +15,13 @@ const items: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.add-activity",
-        navigateTo: "activity/create"
+        navigateTo: "activity/create",
       },
       {
         title: "activities",
-        navigateTo: "activity/"
-      }
-    ]
+        navigateTo: "activity/",
+      },
+    ],
   },
   {
     title: "dashboard.headers.season-management",
@@ -94,7 +94,7 @@ const items: DrawerItem[] = [
       },
       {
         title: "dashboard.add-season",
-        navigateTo: "protototo/season",
+        navigateTo: "dashboard/protototo/matches/add",
       },
     ],
   },
@@ -131,4 +131,4 @@ export const DrawerDashboardLayout: React.FC = () => {
       ))}
     </List>
   );
-}
+};

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
+import httpMocks from 'node-mocks-http';
 
 describe('AuthController', () => {
   let controller: AuthController;

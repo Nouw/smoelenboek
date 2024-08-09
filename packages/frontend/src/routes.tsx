@@ -55,6 +55,7 @@ import { ActivitiesList } from "./screens/activities/activities.list";
 import { ResetPasswordRequest } from "./screens/auth/reset-password/request/reset-password-request.tsx";
 import { ResetPassword } from "./screens/auth/reset-password/reset-password.tsx";
 import { wrapCreateBrowserRouter } from "@sentry/react";
+import { MatchesAdd } from "./screens/dashboard/protototo/matches.add.tsx";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 export const router = sentryWrappedBrowserRouter([
@@ -281,6 +282,20 @@ export const router = sentryWrappedBrowserRouter([
                         path: ":id",
                         element: <DocumentsDashboardList />,
                         loader: documentsLoader,
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                path: "protototo",
+                children: [
+                  {
+                    path: "matches",
+                    children: [
+                      {
+                        path: "add",
+                        element: <MatchesAdd />,
                       },
                     ],
                   },
