@@ -22,5 +22,6 @@
   "referee-license": "Referee license",
   "activities": "Seasonal participation",
   "export-to-excel": "Export to Excel",
-  "forgot-password": "Forgot password"
+  "forgot-password": "Forgot password",
+  "import": "Import members"
 }

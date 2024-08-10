@@ -11,6 +11,9 @@ import { OracleService } from 'src/oracle/oracle.service';
 import { MailService } from '../mail/mail.service';
 import { ResetToken } from '../auth/entities/reset-token.entity';
 import { randomBytes } from 'crypto';
+import * as exceljs from 'exceljs';
+import { Readable } from 'stream';
+import { parseISO } from 'date-fns';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +23,7 @@ export class UsersService {
     private readonly mailService: MailService,
     @InjectRepository(ResetToken)
     private resetTokensRepository: Repository<ResetToken>,
-  ) { }
+  ) {}
 
   findForAuth(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
@@ -142,7 +145,7 @@ export class UsersService {
 
     const seasons = formattedUser.seasons;
     const keys = Object.keys(seasons);
-    keys.sort(function(a, b) {
+    keys.sort(function (a, b) {
       return parseInt(b) - parseInt(a);
     });
 
@@ -196,5 +199,48 @@ export class UsersService {
       })
       .andWhere('u.leaveDate IS NULL')
       .getMany();
+  }
+
+  async importUsers(file: Express.Multer.File) {
+    const workbook = new exceljs.Workbook();
+    const fileType = file.originalname.split('.')[1];
+
+    const stream = new Readable();
+
+    stream.push(file.buffer);
+    stream.push(null);
+
+    let worksheet: exceljs.Worksheet;
+
+    if (fileType === 'csv') {
+      worksheet = await workbook.csv.read(stream);
+    } else if (fileType === 'xlsx') {
+      await workbook.xlsx.read(stream);
+      worksheet = workbook.getWorksheet(1);
+    } else {
+      throw Error('Wrong filetype!');
+    }
+
+    console.log(worksheet);
+
+    for (const row of worksheet.getRows(2, worksheet.actualRowCount)) {
+      if (row.getCell(3).value === null) {
+        continue;
+      }
+
+      await this.create({
+        firstName: row.getCell(1).value as string,
+        lastName: row.getCell(2).value as string,
+        email: row.getCell(3).value as string,
+        phoneNumber: row.getCell(4).value as string,
+        streetName: row.getCell(5).value as string,
+        houseNumber: row.getCell(6).value as string,
+        postcode: row.getCell(7).value as string,
+        city: row.getCell(8).value as string,
+        bankaccountNumber: row.getCell(9).value as string,
+        bondNumber: row.getCell(10).value as string,
+        birthDate: row.getCell(12).value as Date,
+      });
+    }
   }
 }

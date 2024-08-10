@@ -7,7 +7,8 @@
   "user": {
     "delete": "Deleted user!",
     "create": "Created user!",
-    "update": "Updated user!"
+    "update": "Updated user!",
+    "imported": "Imported users!"
   },
   "teams": {
     "delete": "Deleted team!",

@@ -79,4 +79,11 @@ export class UsersController {
   searchUser(@Query('name') name: string) {
     return this.usersService.searchUser(name);
   }
+
+  @Roles(Role.Admin)
+  @Post('import/excel')
+  @UseInterceptors(FileInterceptor('sheet'))
+  importUsers(@UploadedFile() file: Express.Multer.File) {
+    return this.usersService.importUsers(file);
+  }
 }

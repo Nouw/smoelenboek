@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -19,14 +18,17 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { Delete, Download, Edit } from "@mui/icons-material";
+import { Delete, Download, Edit, Upload } from "@mui/icons-material";
 import { useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LoadingButton } from "@mui/lab";
 import { Options } from "../../../components/dashboard/options";
 import { User } from "backend";
 import { SnackbarContext } from "../../../providers/snackbar/snackbar.context";
-import { useDeleteUserMutation } from "../../../api/endpoints/user.api";
+import {
+  useDeleteUserMutation,
+  usePostImportUsersMutation,
+} from "../../../api/endpoints/user.api";
 
 export const UsersList: React.FC = () => {
   const { success, error } = React.useContext(SnackbarContext);
@@ -37,11 +39,15 @@ export const UsersList: React.FC = () => {
   const isLoading = useNavigation().state === "loading";
 
   const [deleteUser] = useDeleteUserMutation();
+  const [importUsers, { isLoading: isImportLoading }] =
+    usePostImportUsersMutation();
   //const [exportMembers, { isLoading: isExportLoading }] =
   //  useLazyGetExportQuery();
 
   const [visible, setVisible] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<number>(-1);
+
+  const inputFile = React.createRef<HTMLInputElement>();
 
   async function removeUser() {
     const user = users[selected];
@@ -78,38 +84,76 @@ export const UsersList: React.FC = () => {
     //}
   }
 
+  async function uploadMembers() {
+    const files = inputFile.current?.files;
+
+    if (!files) {
+      return;
+    }
+
+    if (files.length === 1) {
+      const file = files[0];
+
+      try {
+        const form = new FormData();
+        form.set("sheet", file);
+
+        await importUsers(form).unwrap();
+
+        success(t("messages:user.imported"));
+      } catch (e) {
+        console.error(e);
+        error(t("error:error-message"));
+      }
+    }
+  }
+
   if (isLoading) {
     return <CircularProgress />;
   }
 
   return (
     <Stack spacing={2}>
-      <Box>
+      <Stack spacing={2} direction="row">
         <LoadingButton
+          disabled
           loading={false}
           variant="contained"
           onClick={() => exportToExcel()}
-					startIcon={<Download/>}
+          startIcon={<Download />}
         >
-					{t("user:export-to-excel")} 
+          {t("user:export-to-excel")}
         </LoadingButton>
-      </Box>
+        <LoadingButton
+          loading={isImportLoading}
+          variant="contained"
+          startIcon={<Upload />}
+          onClick={() => inputFile.current?.click()}
+        >
+          {t("user:import")}
+        </LoadingButton>
+        <input
+          type="file"
+          id="file"
+          ref={inputFile}
+          onChange={() => uploadMembers()}
+          style={{ display: "none" }}
+        />
+      </Stack>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>
-                {t("common:name")}
-              </TableCell>
-              <TableCell align="right">
-                {t("options:options")}
-              </TableCell>
+              <TableCell>{t("common:name")}</TableCell>
+              <TableCell align="right">{t("options:options")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user: User, key: number) => (
               <TableRow key={user.id}>
-                <TableCell>{user.firstName} {user.lastName}</TableCell>
+                <TableCell>
+                  {user.firstName} {user.lastName}
+                </TableCell>
                 <TableCell align="right">
                   <Options>
                     <MenuItem onClick={() => navigate(`edit/${user.id}`)}>
@@ -157,4 +201,4 @@ export const UsersList: React.FC = () => {
       </Dialog>
     </Stack>
   );
-}
+};

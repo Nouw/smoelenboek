@@ -26,6 +26,12 @@ export class CreateUserDto {
   @IsNotEmpty()
   bankaccountNumber: string;
 
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  @IsNotEmpty()
+  bondNumber: string;
+
   @Type(() => Date)
   birthDate: Date;
 }
