@@ -20,7 +20,7 @@ export class UsersService {
     private readonly mailService: MailService,
     @InjectRepository(ResetToken)
     private resetTokensRepository: Repository<ResetToken>,
-  ) { }
+  ) {}
 
   findForAuth(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
@@ -67,8 +67,16 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  remove(id: number) {
-    return this.usersRepository.delete(id);
+  async remove(id: number) {
+    const user = await this.findOne(id);
+
+    if (!user) {
+      return;
+    }
+
+    user.leaveDate = new Date();
+
+    return this.save(user);
   }
 
   async picture(request: Request) {
@@ -142,7 +150,7 @@ export class UsersService {
 
     const seasons = formattedUser.seasons;
     const keys = Object.keys(seasons);
-    keys.sort(function(a, b) {
+    keys.sort(function (a, b) {
       return parseInt(b) - parseInt(a);
     });
 
