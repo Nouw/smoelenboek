@@ -15,7 +15,7 @@ export class SeasonService {
   constructor(
     @InjectRepository(Season)
     private readonly seasonsRepository: Repository<Season>,
-  ) { }
+  ) {}
 
   async getCurrentSeason(): Promise<Season> {
     const now = format(new Date(), 'yyyy-MM-dd');

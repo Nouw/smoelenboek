@@ -30,3 +30,4 @@ export { UpdateCommitteeDto } from './committees/dto/update-committee.dto';
 export { CreateCategoryDto } from './categories/dto/create-category.dto';
 export { CategoryType } from './categories/enums/catagory-type.enum';
 export { UpdateCategoryDto } from './categories/dto/update-category.dto';
+export { CreateProtototoSeasonDto } from './protototo/dto/create-protototo-season.dto';

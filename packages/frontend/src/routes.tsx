@@ -56,6 +56,10 @@ import { ResetPasswordRequest } from "./screens/auth/reset-password/request/rese
 import { ResetPassword } from "./screens/auth/reset-password/reset-password.tsx";
 import { wrapCreateBrowserRouter } from "@sentry/react";
 import { MatchesAdd } from "./screens/dashboard/protototo/matches.add.tsx";
+import { SeasonsAdd as ProtototoSeasonAdd } from "./screens/dashboard/protototo/seasons.add.tsx";
+import { SeasonsList as ProtototoSeasonsList } from "./screens/dashboard/protototo/seasons.list";
+import { seasonsLoader as protototoSeasonsLoader } from "./screens/dashboard/protototo/seasons.loader";
+import { MatchesList } from "./screens/dashboard/protototo/matches.list.tsx";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 export const router = sentryWrappedBrowserRouter([
@@ -294,8 +298,26 @@ export const router = sentryWrappedBrowserRouter([
                     path: "matches",
                     children: [
                       {
+                        path: ":id",
+                        element: <MatchesList />,
+                      },
+                      {
                         path: "add",
                         element: <MatchesAdd />,
+                      },
+                    ],
+                  },
+                  {
+                    path: "seasons",
+                    children: [
+                      {
+                        path: "",
+                        element: <ProtototoSeasonsList />,
+                        loader: protototoSeasonsLoader,
+                      },
+                      {
+                        path: "add",
+                        element: <ProtototoSeasonAdd />,
                       },
                     ],
                   },

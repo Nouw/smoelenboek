@@ -4,5 +4,6 @@
   "remove": "Verwijderen",
   "add-match": "Wedstrijd toevoegen",
   "export-participants": "Deelnemers exporteren",
-  "insert-result": "Resultaat invoeren"
+  "insert-result": "Resultaat invoeren",
+  "matches": "Wedstrijden"
 }

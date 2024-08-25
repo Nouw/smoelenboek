@@ -90,11 +90,11 @@ const items: DrawerItem[] = [
     subItems: [
       {
         title: "dashboard.seasons",
-        navigateTo: "protototo/",
+        navigateTo: "dashboard/protototo/seasons/",
       },
       {
         title: "dashboard.add-season",
-        navigateTo: "dashboard/protototo/matches/add",
+        navigateTo: "dashboard/protototo/seasons/add",
       },
     ],
   },
