@@ -19,7 +19,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { Delete, Download, Edit } from "@mui/icons-material";
+import { Delete, Download, Edit, RestartAlt } from "@mui/icons-material";
 import { useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LoadingButton } from "@mui/lab";
@@ -27,6 +27,7 @@ import { Options } from "../../../components/dashboard/options";
 import { User } from "backend";
 import { SnackbarContext } from "../../../providers/snackbar/snackbar.context";
 import { useDeleteUserMutation } from "../../../api/endpoints/user.api";
+import { useRequestResetPasswordMutation } from "../../../api/endpoints/auth.api";
 
 export const UsersList: React.FC = () => {
   const { success, error } = React.useContext(SnackbarContext);
@@ -37,6 +38,7 @@ export const UsersList: React.FC = () => {
   const isLoading = useNavigation().state === "loading";
 
   const [deleteUser] = useDeleteUserMutation();
+  const [resetPassword] = useRequestResetPasswordMutation();
   //const [exportMembers, { isLoading: isExportLoading }] =
   //  useLazyGetExportQuery();
 
@@ -57,6 +59,19 @@ export const UsersList: React.FC = () => {
       console.error(e);
       error(t("error:error-message"));
     }
+  }
+
+  async function requestResetPassword(email: string) {
+    try {
+      await resetPassword({ email });
+
+      success(t("messages:auth.password.request-reset-admin"))
+    } catch (e) {
+      console.error(e);
+      error(t("error:error-message"));
+    }
+
+    console.log(email);
   }
 
   async function exportToExcel() {
@@ -117,6 +132,12 @@ export const UsersList: React.FC = () => {
                         <Edit fontSize="small" />
                       </ListItemIcon>
                       {t("options:edit")}
+                    </MenuItem>
+                    <MenuItem onClick={() => requestResetPassword(user.email)}>
+                      <ListItemIcon>
+                        <RestartAlt />
+                      </ListItemIcon>
+                      {t("options:reset-password")}
                     </MenuItem>
                     <MenuItem
                       onClick={() => {

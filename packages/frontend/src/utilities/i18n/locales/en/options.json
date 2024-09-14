@@ -4,5 +4,6 @@
   "remove": "Delete",
   "add-match": "Add match",
   "export-participants": "Export participants",
-  "insert-result": "Add result"
+  "insert-result": "Add result",
+  "reset-password": "Reset password"
 }
