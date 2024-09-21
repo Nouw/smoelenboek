@@ -1,4 +1,4 @@
-import { CreateTeamDto, Team, TeamFunction } from "backend";
+import { CreateTeamDto, Team, TeamFunction, UpdateTeamDto } from "backend";
 import { API } from "../API";
 
 export const teamsApiSlice = API.enhanceEndpoints({ addTagTypes: ["Teams"] }).injectEndpoints({
@@ -48,6 +48,13 @@ export const teamsApiSlice = API.enhanceEndpoints({ addTagTypes: ["Teams"] }).in
           "function": func,
         }
       })
+    }),
+    updateTeam: builder.mutation<Team, { id: number, body: UpdateTeamDto }>({
+      query: ({ id, body}) => ({
+        url: `teams/${id}`,
+        method: "PATCH",
+        body,
+      })
     })
   })
 });
@@ -60,4 +67,5 @@ export const {
   useAddUserToTeamMutation,
   useRemoveUserToTeamMutation,
   useUpdateUserToTeamMutation,
+  useUpdateTeamMutation,
 } = teamsApiSlice;

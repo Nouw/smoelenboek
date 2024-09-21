@@ -7,9 +7,9 @@ import { Add, Delete } from "@mui/icons-material";
 import { SearchUser } from "../../../components/users/search-user";
 import { useLoaderData, useRevalidator } from "react-router-dom";
 import { FormValues, TeamsForm } from "../../../forms/teams/teams.form";
-import { useAddUserToTeamMutation, useCreateTeamMutation, useRemoveUserToTeamMutation, useUpdateUserToTeamMutation } from "../../../api/endpoints/teams.api";
+import { useAddUserToTeamMutation, useRemoveUserToTeamMutation, useUpdateTeamMutation, useUpdateUserToTeamMutation } from "../../../api/endpoints/teams.api";
 import { SelectRole } from "../../../components/teams/select-role";
-import { CreateTeamDto, Team, TeamFunction, User, UserTeamSeason } from "backend";
+import { Team, TeamFunction, UpdateTeamDto, User, UserTeamSeason } from "backend";
 
 
 export const TeamsInfo: React.FC = () => {
@@ -22,15 +22,15 @@ export const TeamsInfo: React.FC = () => {
   const [addPlayerToTeamApi] = useAddUserToTeamMutation();
   const [removePlayerFromTeamApi] = useRemoveUserToTeamMutation();
   const [updatePlayerApi] = useUpdateUserToTeamMutation();
-  const [createTeam] = useCreateTeamMutation();
+  const [updateTeamApi] = useUpdateTeamMutation(); 
 
   const [visible, setVisible] = React.useState<boolean>(false);
 
   async function updateTeam({ values, setSubmitting }: { values: FormValues, setSubmitting: (value: boolean) => void }) {
     try {
-      await createTeam(values as unknown as CreateTeamDto).unwrap();
+      await updateTeamApi({ id: team.id, body: values as unknown as UpdateTeamDto }).unwrap();
 
-      success(t("messages:teams.create"))
+      success(t("messages:teams.update"))
     } catch (e) {
       console.error(e);
       error(t("error:error-message"));
