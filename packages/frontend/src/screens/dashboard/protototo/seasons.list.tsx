@@ -101,7 +101,7 @@ export const SeasonsList: React.FC = () => {
                       </ListItemIcon>
                       {t("options:edit")}
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem onClick={() => navigate(`/dashboard/protototo/matches/${season.id}`)}>
                       <ListItemIcon>
                         <Sports fontSize="small" />
                       </ListItemIcon>

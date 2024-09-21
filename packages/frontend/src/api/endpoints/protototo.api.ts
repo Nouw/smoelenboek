@@ -1,5 +1,6 @@
 import { API } from "../API.ts";
 import {
+    CreateProtototoMatchDto,
   CreateProtototoSeasonDto,
   ProtototoMatch,
   ProtototoSeason,
@@ -45,10 +46,19 @@ export const protototoApiSlice = API.enhanceEndpoints({
         method: "GET",
       }),
     }),
+    addMatch: builder.mutation<void, CreateProtototoMatchDto>({
+      query: (body) => ({
+        url: "protototo/season/match",
+        method: "POST",
+        body,
+      })
+    }) 
   }),
 });
 
 export const {
   useCreateProtototoSeasonMutation,
   useDeletePrototoSeasonMutation,
+  useGetProtototoSeasonsQuery,
+  useAddMatchMutation,
 } = protototoApiSlice;

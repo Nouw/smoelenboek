@@ -14,6 +14,7 @@ import { CreateProtototoSeasonDto } from './dto/create-protototo-season.dto';
 import { Roles } from '../auth/decorators/roles.decorators';
 import { Role } from '../auth/enums/role.enum';
 import { DatePipe } from '../season/pipes/date.pipe';
+import { CreateProtototoMatchDto } from './dto/create-protototo-match.dto';
 
 @Controller('protototo')
 export class ProtototoController {
@@ -56,5 +57,10 @@ export class ProtototoController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.protototoService.remove(+id);
+  }
+
+  @Post('season/match')
+  addMatch(@Body() createMatchDto: CreateProtototoMatchDto) {
+    return this.protototoService.createMatch(createMatchDto);
   }
 }
