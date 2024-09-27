@@ -14,7 +14,7 @@ export const schema = Yup.object({
     .test("overlap", "Date is overlapping with an another season", (value) =>
       overlap(value),
     ),
-  tikkie: Yup.string(),
+  tikkie: Yup.string().nullable(),
 });
 
 function overlap(value: Date | undefined): Promise<boolean> {

@@ -22,6 +22,7 @@ import { CategorySubscriber } from '../categories/subscribers/category.subscribe
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { ProtototoMatchResult } from '../protototo/entities/protototo-result.entity';
 
 dotenv.config({ path: '../../.env' });
 console.log(path.join(__dirname, '../migrations/**/*.ts'));
@@ -36,6 +37,7 @@ export const databaseSource: TypeOrmModuleOptions = {
     ProtototoMatch,
     ProtototoSeason,
     ProtototoPrediction,
+    ProtototoMatchResult,
     User,
     Team,
     UserTeamSeason,

@@ -39,7 +39,11 @@
     "match": {
       "delete": "Deleted match!",
       "create": "Created match!",
-      "update": "Updated match!"
+      "update": "Updated match!",
+      "already-added": "Match already added to season!",
+      "added": "Added match to season!",
+      "fetched-result": "Set positions are stored on the server!",
+      "fetch-not-found": "Set positions are not in DWF yet!"
     },
     "submit-message": "Successfully send bet!"
   },

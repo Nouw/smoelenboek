@@ -7,5 +7,6 @@ import { HttpModule } from '@nestjs/axios';
   imports: [HttpModule],
   controllers: [NevoboController],
   providers: [NevoboService],
+  exports: [NevoboService],
 })
 export class NevoboModule {}

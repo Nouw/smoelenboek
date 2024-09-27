@@ -3,6 +3,16 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { format } from 'date-fns';
 
+interface NevoboMatch {
+  setstanden: Array<SetStand>;
+}
+
+interface SetStand {
+  set: number;
+  puntenA: number;
+  puntenB: number;
+}
+
 @Injectable()
 export class NevoboService {
   constructor(private readonly httpService: HttpService) {}
@@ -41,5 +51,15 @@ export class NevoboService {
   }
   remove(id: number) {
     return `This action removes a #${id} nevobo`;
+  }
+
+  async getMatchResult(id: string): Promise<NevoboMatch> {
+    const res = await firstValueFrom(
+      this.httpService.get(
+        `https://api.nevobo.nl/competitie/wedstrijden/${id}`,
+      ),
+    );
+
+    return res.data;
   }
 }

@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Stack, Typography } from "@mui/material";
 import { Field, FieldProps, Formik, FormikProps, FormikValues } from "formik";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
 import { LoadingButton } from "@mui/lab";
 import * as Yup from "yup";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,7 @@ type SeasonFormProps<T> = {
   }) => void;
   heading?: string;
   fields?: (props: FormikProps<T>) => JSX.Element[] | JSX.Element;
+  time?: boolean;
 };
 
 export const SeasonForm = <T extends SeasonFormValues>({
@@ -28,6 +29,7 @@ export const SeasonForm = <T extends SeasonFormValues>({
   submit,
   heading,
   fields,
+  time = false,
 }: SeasonFormProps<T>) => {
   const { t } = useTranslation(["common", "season"]);
 
@@ -50,19 +52,38 @@ export const SeasonForm = <T extends SeasonFormValues>({
                   {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                   {/* @ts-ignore */}
                   {({ form: { touched, errors } }) => (
-                    <DatePicker
-                      label={t("season:start-date")}
-                      format="dd-MM-yyyy"
-                      value={props.values.startDate}
-                      onChange={(e) => props.setFieldValue("startDate", e)}
-                      slotProps={{
-                        textField: {
-                          variant: "outlined",
-                          error: touched.startDate && Boolean(errors.startDate),
-                          helperText: <p>{errors.startDate}</p>,
-                        },
-                      }}
-                    />
+                    <>
+                      {time ? (
+                        <DateTimePicker
+                          label={t("season:start-date")}
+                          format="hh:mm dd-MM-yyyy"
+                          value={props.values.startDate}
+                          onChange={(e) => props.setFieldValue("startDate", e)}
+                          slotProps={{
+                            textField: {
+                              variant: "outlined",
+                              error: touched.startDate && Boolean(errors.startDate),
+                              helperText: <p>{errors.startDate}</p>,
+                            },
+                          }}
+
+                        />
+                      ) : (
+                        <DatePicker
+                          label={t("season:start-date")}
+                          format="dd-MM-yyyy"
+                          value={props.values.startDate}
+                          onChange={(e) => props.setFieldValue("startDate", e)}
+                          slotProps={{
+                            textField: {
+                              variant: "outlined",
+                              error: touched.startDate && Boolean(errors.startDate),
+                              helperText: <p>{errors.startDate}</p>,
+                            },
+                          }}
+                        />
+                      )}
+                    </>
                   )}
                 </Field>
                 <Field name="endDate">
@@ -70,19 +91,36 @@ export const SeasonForm = <T extends SeasonFormValues>({
                   {/* @ts-ignore */}
                   {({ form: { touched, errors } }: FieldProps) => (
                     <>
-                      <DatePicker
-                        label={t("season:end-date")}
-                        format="dd-MM-yyyy"
-                        value={props.values.endDate}
-                        onChange={(e) => props.setFieldValue("endDate", e)}
-                        slotProps={{
-                          textField: {
-                            variant: "outlined",
-                            error: touched.endDate && Boolean(errors.endDate),
-                            helperText: <p>{errors.endDate as string}</p>,
-                          },
-                        }}
-                      />
+                      {time ? (
+                        <DateTimePicker
+                          label={t("season:end-date")}
+                          format="hh:mm dd-MM-yyyy"
+                          value={props.values.endDate}
+                          onChange={(e) => props.setFieldValue("endDate", e)}
+                          slotProps={{
+                            textField: {
+                              variant: "outlined",
+                              error: touched.endDate && Boolean(errors.endDate),
+                              helperText: <p>{errors.endDate as string}</p>,
+                            },
+                          }}
+                        />
+                      ) : (
+                        <DatePicker
+                          label={t("season:end-date")}
+                          format="dd-MM-yyyy"
+                          value={props.values.endDate}
+                          onChange={(e) => props.setFieldValue("endDate", e)}
+                          slotProps={{
+                            textField: {
+                              variant: "outlined",
+                              error: touched.endDate && Boolean(errors.endDate),
+                              helperText: <p>{errors.endDate as string}</p>,
+                            },
+                          }}
+                        />
+                      )}
+
                     </>
                   )}
                 </Field>

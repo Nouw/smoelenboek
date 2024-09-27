@@ -1,33 +1,40 @@
+import { ProtototoSeason } from "backend";
 import React from "react";
-import { SeasonForm } from "../../../forms/season/season.form.tsx";
-import { schema } from "../../../forms/protototo/schema.ts";
-import { constructNow } from "date-fns";
-import { SnackbarContext } from "../../../providers/snackbar/snackbar.context.ts";
+import { useLoaderData } from "react-router-dom";
+import { SeasonForm } from "../../../forms/season/season.form";
+import { schema } from "../../../forms/protototo/schema";
+import { SnackbarContext } from "../../../providers/snackbar/snackbar.context";
 import { useTranslation } from "react-i18next";
-import { TextField } from "@mui/material";
+import { useUpdateProtototoSeasonMutation } from "../../../api/endpoints/protototo.api";
 import * as Yup from "yup";
-import { useCreateProtototoSeasonMutation } from "../../../api/endpoints/protototo.api.ts";
+import { TextField } from "@mui/material";
+import { toDate } from "date-fns";
 
 type FormValues = Yup.InferType<typeof schema>;
 
-export const SeasonsAdd: React.FC = () => {
+export const SeasonEdit: React.FC = () => {
+  const season = useLoaderData() as ProtototoSeason;
   const { success, error } = React.useContext(SnackbarContext);
   const { t } = useTranslation(["messages", "error", "protototo"]);
 
-  const [createSeason] = useCreateProtototoSeasonMutation();
+  //const [createSeason] = useCreateProtototoSeasonMutation();
+  const [updateSeason] = useUpdateProtototoSeasonMutation();
 
   async function submit(values: {
     [p: string]: any;
     setSubmitting: (isSubmitting: boolean) => void;
   }) {
     try {
-      await createSeason({
-        end: values.endDate,
-        start: values.startDate,
-        tikkie: values.tikkie,
+      await updateSeason({
+        id: season.id,
+        body: {
+          end: values.endDate,
+          start: values.startDate,
+          tikkie: values.tikkie,
+        }
       }).unwrap();
 
-      success(t("messages:season.create"));
+      success(t("messages:season.update"));
     } catch (e) {
       console.error(e);
       error(t("error:error-message"));
@@ -42,8 +49,9 @@ export const SeasonsAdd: React.FC = () => {
       schema={schema}
       time
       initialValues={{
-        startDate: constructNow(new Date()),
-        endDate: constructNow(new Date()),
+        startDate: toDate(season.start),
+        endDate: toDate(season.end),
+        tikkie: season.tikkie,
       }}
       submit={submit}
       fields={(props) => (
@@ -58,4 +66,4 @@ export const SeasonsAdd: React.FC = () => {
       )}
     />
   );
-};
+}

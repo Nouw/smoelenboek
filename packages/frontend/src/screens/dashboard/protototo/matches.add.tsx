@@ -24,9 +24,12 @@ import {
 import { Loading } from "../../../components/loading.tsx";
 import { Team } from "../../../components/dashboard/protototo/team.tsx";
 import { format } from "date-fns";
-import { Add } from "@mui/icons-material";
-import { useGetProtototoSeasonsQuery } from "../../../api/endpoints/protototo.api.ts";
+import { Add, ArrowBack, ArrowLeft } from "@mui/icons-material";
+import { useAddMatchMutation, useGetProtototoSeasonsQuery } from "../../../api/endpoints/protototo.api.ts";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { SnackbarContext } from "../../../providers/snackbar/snackbar.context.ts";
+import { isFetchBaseQueryError } from "../../../store/helpers.ts";
 
 interface NevoboMatch {
   uuid: string,
@@ -37,16 +40,16 @@ interface NevoboMatch {
 
 export const MatchesAdd: React.FC = () => {
   const { data, isLoading } = useGetNevoboTeamsQuery(undefined);
-  const { t } = useTranslation();
+  const { t } = useTranslation(["messages", "error"]);
+  const params = useParams();
+  const { success, error } = React.useContext(SnackbarContext);
+  const navigate = useNavigate(); 
 
   const [trigger, { data: matches, isLoading: matchesLoading }] =
     useLazyGetNevoboMatchesQuery();
-  const { data: seasons, isLoading: isSeasonsLoading } = useGetProtototoSeasonsQuery()
+  const [addMatch] = useAddMatchMutation();
 
   const [selectedTeam, setSelectedTeam] = React.useState<string>();
-  const [visible, setVisible] = React.useState(false);
-  const [selectedSeason, setSelectedSeason] = React.useState<number>();
-  const [selectedMatch, setSelectedMatch] = React.useState<NevoboMatch>();
 
   React.useEffect(() => {
     if (!selectedTeam) {
@@ -56,17 +59,30 @@ export const MatchesAdd: React.FC = () => {
     trigger(encodeURIComponent(selectedTeam));
   }, [selectedTeam]);
 
-  async function addMatchToSeason() {
-    console.log(selectedMatch, selectedSeason);
-    setVisible(false);
+  async function addMatchToSeason(match: NevoboMatch) {
+    try {
+      await addMatch({ seasonId: parseInt(params.id!), homeTeam: match.teams[0], awayTeam: match.teams[1], nevoboId: match.uuid }).unwrap();
+      
+      success(t('messages:protototo.match.added'))
+    } catch (e) {
+      console.error(e);
+      if (isFetchBaseQueryError(e)) {
+        if (e.status === 409) {
+          error(t('messages:protototo.match.already-added'));
+        }
+      } else {
+        error(t('error:error-message"'))
+      }
+    }
   }
 
-  if (isLoading || isSeasonsLoading || data == undefined) {
+  if (isLoading || data == undefined) {
     return <Loading />;
   }
 
   return (
     <>
+      <Button onClick={() => navigate(-1)} startIcon={<ArrowBack />} variant="contained" sx={{ mb: 2 }}>{t("common:back")}</Button> 
       <Card>
         <CardContent>
           <FormControl fullWidth>
@@ -103,42 +119,14 @@ export const MatchesAdd: React.FC = () => {
                     {format(match.datum, "hh:mm dd-MM-yyyy")}
                   </Typography>
                 </Stack>
-                <IconButton color="primary" onClick={() => { setSelectedMatch(match); setVisible(true) }} sx={{ ml: "auto" }}>
+                <IconButton color="primary" onClick={() => addMatchToSeason(match)} sx={{ ml: "auto" }}>
                   <Add />
                 </IconButton>
               </Stack>
             ))
           )}
         </CardContent>
-      </Card>
-      <Dialog open={visible} onClose={() => setVisible(false)}>
-        <DialogTitle>Debug</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth>
-            <InputLabel id="seasons-select-label">Seasons</InputLabel>
-            <Select
-              labelId="seasons-select-label"
-              id="seasons-select"
-              value={selectedSeason}
-              label="Seasons"
-              onChange={(e) => setSelectedSeason(parseInt(e.target.value as string))}
-            >
-              {seasons?.map((season) => (
-                <MenuItem value={season.id}>{format(season.start, 'hh:mm dd-MM-yyyy')} - {format(season.end, 'hh:mm dd-MM-yyyy')}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setVisible(false)}>
-            {t("common:cancel")}
-          </Button>
-          <Button onClick={() => addMatchToSeason()}>
-            {t("common:submit")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+      </Card> 
     </>
   );
 };

@@ -20,7 +20,7 @@ export class UsersService {
     private readonly mailService: MailService,
     @InjectRepository(ResetToken)
     private resetTokensRepository: Repository<ResetToken>,
-  ) { }
+  ) {}
 
   findForAuth(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
@@ -142,7 +142,7 @@ export class UsersService {
 
     const seasons = formattedUser.seasons;
     const keys = Object.keys(seasons);
-    keys.sort(function(a, b) {
+    keys.sort(function (a, b) {
       return parseInt(b) - parseInt(a);
     });
 

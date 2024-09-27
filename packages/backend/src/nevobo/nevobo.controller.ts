@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { NevoboService } from './nevobo.service';
 import { Public } from '../auth/decorators/public.decorator';
 
@@ -40,5 +32,10 @@ export class NevoboController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.nevoboService.remove(+id);
+  }
+
+  @Get('match/result/:id')
+  getMatchResult(@Param('id') id: string): any {
+    return this.nevoboService.getMatchResult(id);
   }
 }

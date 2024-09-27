@@ -41,6 +41,7 @@
     "class-validator": "^0.14.1",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "mailgen": "^2.0.28",
     "model": "workspace:^",
     "mysql2": "^3.10.2",

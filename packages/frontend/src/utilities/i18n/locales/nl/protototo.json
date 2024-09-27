@@ -6,7 +6,6 @@
   "id": "Id",
   "start": "Start",
   "end": "Einde",
-  "options": "Opties",
   "tikkie": "Tikkie",
   "play-date": "Speeldatum",
   "home": "Thuis",
@@ -24,5 +23,7 @@
     "three": "Set 3",
     "four": "Set 4",
     "five": "Set 5"
-  }
+  },
+  "fetch-result": "Resultaat ophalen",
+  "view-result": "Resultaat bekijken"
 }

@@ -26,10 +26,10 @@ import {
   TableRow,
 } from "@mui/material";
 import { Options } from "../../../components/dashboard/options.tsx";
-import { Delete, Edit, Sports } from "@mui/icons-material";
+import { Delete, Download, Edit, Sports } from "@mui/icons-material";
 import { format } from "date-fns";
 import { Loading } from "../../../components/loading.tsx";
-import { useDeletePrototoSeasonMutation } from "../../../api/endpoints/protototo.api.ts";
+import { useDeletePrototoSeasonMutation, useGetProtototoParticipantsMutation } from "../../../api/endpoints/protototo.api.ts";
 
 export const SeasonsList: React.FC = () => {
   const navigate = useNavigate();
@@ -50,9 +50,10 @@ export const SeasonsList: React.FC = () => {
   const [selected, setSelected] = React.useState<number>(-1);
 
   const [trigger] = useDeletePrototoSeasonMutation();
+  const [getParticipants] = useGetProtototoParticipantsMutation();
 
   function formatDate(date: string | Date) {
-    return format(date, "d-M-yyyy");
+    return format(date, "hh:mm d-M-yyyy");
   }
 
   async function deleteSeason() {
@@ -95,11 +96,17 @@ export const SeasonsList: React.FC = () => {
                 <TableCell>{formatDate(season.end)}</TableCell>
                 <TableCell align="right">
                   <Options>
-                    <MenuItem onClick={() => navigate(`edit/${season.id}`)}>
+                    <MenuItem onClick={() => navigate(`/dashboard/protototo/seasons/edit/${season.id}`)}>
                       <ListItemIcon>
                         <Edit fontSize="small" />
                       </ListItemIcon>
                       {t("options:edit")}
+                    </MenuItem>
+                    <MenuItem onClick={() => getParticipants(season.id)}>
+                      <ListItemIcon>
+                        <Download fontSize="small" />
+                      </ListItemIcon>
+                      {t("options:export-participants")}
                     </MenuItem>
                     <MenuItem onClick={() => navigate(`/dashboard/protototo/matches/${season.id}`)}>
                       <ListItemIcon>
