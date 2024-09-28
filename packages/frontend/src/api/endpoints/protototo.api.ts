@@ -4,8 +4,10 @@ import {
   CreateProtototoSeasonDto,
   ProtototoMatch,
   ProtototoMatchResult,
+  ProtototoPrediction,
   ProtototoSeason,
   UpdateProtototoDto,
+  ProtototoPredictionDto 
 } from "backend";
 
 export const protototoApiSlice = API.enhanceEndpoints({
@@ -89,7 +91,20 @@ export const protototoApiSlice = API.enhanceEndpoints({
         url: `protototo/${id}`,
         method: "GET",
       })
-    })
+    }),
+    getCurrentProtototoSeason: builder.query<ProtototoSeason, null>({
+      query: () => ({
+        url: 'protototo/season/current',
+        method: "GET",
+      })
+    }),
+    saveProtototoBet: builder.mutation<ProtototoPrediction, { id: number, body: ProtototoPredictionDto }>({
+      query: ({ id, body }) => ({
+        url: `protototo/bet/${id}`,
+        method: "POST",
+        body,
+      })
+    }) 
   }),
 });
 
@@ -103,4 +118,5 @@ export const {
   useFetchProtototoMatchResultMutation,
   useGetProtototoParticipantsMutation,
   useUpdateProtototoSeasonMutation,
+  useSaveProtototoBetMutation,
 } = protototoApiSlice;

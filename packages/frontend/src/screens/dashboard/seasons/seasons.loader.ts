@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../../store/store";
+import { rehydrationPromise, store } from "../../../store/store";
 import { seasonsApiSlice } from "../../../api/endpoints/seasons.api";
 
 export const seasonsLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+  
   const req = store.dispatch(seasonsApiSlice.endpoints.getSeasons.initiate());
 
   try {

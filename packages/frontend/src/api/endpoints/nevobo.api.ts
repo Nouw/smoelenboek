@@ -32,6 +32,12 @@ const nevoboApiSlice = API.enhanceEndpoints({
         method: "GET",
       }),
     }),
+    getNevoboMatch: builder.query<any, string>({
+      query: (id) => ({
+        url: `nevobo/match/result/${id}`,
+        method: "GET",
+      })
+    })
   }),
 });
 
@@ -39,4 +45,5 @@ export const {
   useGetNevoboTeamsQuery,
   useLazyGetNevoboMatchesQuery,
   useGetNevoboTeamQuery,
+  useLazyGetNevoboMatchQuery,
 } = nevoboApiSlice;

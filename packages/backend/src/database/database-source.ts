@@ -23,6 +23,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { ProtototoMatchResult } from '../protototo/entities/protototo-result.entity';
+import { ProtototoPredictionExternal } from '../protototo/entities/protototo-prediction-external.entity';
 
 dotenv.config({ path: '../../.env' });
 console.log(path.join(__dirname, '../migrations/**/*.ts'));
@@ -37,6 +38,7 @@ export const databaseSource: TypeOrmModuleOptions = {
     ProtototoMatch,
     ProtototoSeason,
     ProtototoPrediction,
+    ProtototoPredictionExternal,
     ProtototoMatchResult,
     User,
     Team,

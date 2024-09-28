@@ -34,3 +34,4 @@ export { CreateProtototoSeasonDto } from './protototo/dto/create-protototo-seaso
 export { CreateProtototoMatchDto } from './protototo/dto/create-protototo-match.dto';
 export { ProtototoMatchResult } from './protototo/entities/protototo-result.entity';
 export { UpdateProtototoSeasonDto } from './protototo/dto/update-protototo-season.dto';
+export { ProtototoPredictionDto } from './protototo/dto/protototo-prediction.dto';

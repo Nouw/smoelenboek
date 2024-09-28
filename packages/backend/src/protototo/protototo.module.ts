@@ -7,6 +7,7 @@ import { ProtototoMatch } from './entities/protototo-match.entity';
 import { NevoboModule } from 'src/nevobo/nevobo.module';
 import { ProtototoMatchResult } from './entities/protototo-result.entity';
 import { ProtototoPrediction } from './entities/protototo-prediction.entity';
+import { ProtototoPredictionExternal } from './entities/protototo-prediction-external.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProtototoPrediction } from './entities/protototo-prediction.entity';
       ProtototoMatch,
       ProtototoMatchResult,
       ProtototoPrediction,
+      ProtototoPredictionExternal,
     ]),
   ],
   controllers: [ProtototoController],

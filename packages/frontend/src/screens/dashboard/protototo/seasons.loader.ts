@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../../store/store.ts";
+import { rehydrationPromise, store } from "../../../store/store.ts";
 import { protototoApiSlice } from "../../../api/endpoints/protototo.api.ts";
 
 export const seasonsLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+
   const req = store.dispatch(
     protototoApiSlice.endpoints.getProtototoSeasons.initiate(),
   );

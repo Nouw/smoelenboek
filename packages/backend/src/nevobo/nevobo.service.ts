@@ -15,7 +15,7 @@ interface SetStand {
 
 @Injectable()
 export class NevoboService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly httpService: HttpService) { }
 
   async teams() {
     const res = await firstValueFrom(

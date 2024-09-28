@@ -62,6 +62,8 @@ import { seasonsLoader as protototoSeasonsLoader, seasonLoader as protototoSeaso
 import { MatchesList } from "./screens/dashboard/protototo/matches.list.tsx";
 import { matchesLoader } from "./screens/dashboard/protototo/matches.loader.ts";
 import { SeasonEdit } from "./screens/dashboard/protototo/seasons.edit.tsx";
+import { ProtototoBetList } from "./screens/protototo/protototo.list.tsx";
+import { protototoBetsLoader } from "./screens/protototo/protototo.loader.ts";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 export const router = sentryWrappedBrowserRouter([
@@ -99,6 +101,16 @@ export const router = sentryWrappedBrowserRouter([
             element: <ActivitiesList />,
           },
         ],
+      },
+      {
+        path: "protototo",
+        children: [
+          {
+            path: "",
+            element: <ProtototoBetList />,
+            loader: protototoBetsLoader,
+          }
+        ]
       },
       {
         path: "",

@@ -34,6 +34,7 @@ export class NevoboController {
     return this.nevoboService.remove(+id);
   }
 
+  @Public()
   @Get('match/result/:id')
   getMatchResult(@Param('id') id: string): any {
     return this.nevoboService.getMatchResult(id);
