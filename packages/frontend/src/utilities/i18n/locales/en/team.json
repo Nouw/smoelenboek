@@ -10,5 +10,6 @@
   "add-player": "Add player",
   "role": "Role",
   "add-user": "Add user to team",
-  "sync-photos": "Sync photos"
+  "sync-photos": "Sync photos",
+  "update-team": "Update team"
 }

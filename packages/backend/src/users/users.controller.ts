@@ -19,7 +19,6 @@ import { Role } from 'src/auth/enums/role.enum';
 import { Request as RequestType } from 'src/auth/types/request';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MailService } from '../mail/mail.service';
-import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {

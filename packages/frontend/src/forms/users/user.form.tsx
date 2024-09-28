@@ -18,7 +18,7 @@ type UsersInfoProps = {
 
 export const UserForm: React.FC<UsersInfoProps> = ({ initialValues: baseValues, submit, header }) => {
   const { t } = useTranslation(["common", "error", "user"]);
-  const initialValues = baseValues ?? schema.cast({});
+  const initialValues = schema.cast(baseValues)
 
   function convertDate(date: string | Date): Date {
     if (typeof date === 'string' || date instanceof String) {
@@ -124,7 +124,7 @@ export const UserForm: React.FC<UsersInfoProps> = ({ initialValues: baseValues, 
                   helperText={props.touched.bondNumber && props.errors.bondNumber}
                 />
                 <TextField
-                  id="backNumer"
+                  id="backNumber"
                   label={t("user:back-number")}
                   type="number"
                   value={props.values.backNumber}

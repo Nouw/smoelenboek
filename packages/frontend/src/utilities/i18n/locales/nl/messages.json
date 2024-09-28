@@ -67,7 +67,8 @@
     },
     "password": {
       "request-reset": "De link voor het opnieuw instellen van uw wachtwoord is naar uw e-mail verzonden",
-      "success": "Uw wachtwoord is succesvol opnieuw ingesteld."
+      "success": "Uw wachtwoord is succesvol opnieuw ingesteld.",
+      "request-reset-admin": "De link voor het opnieuw instellen van het wachtwoord is verzonden"
     }
   },
   "tikkie": "Hierbij bevestig ik dat ik de bovenstaande tikkie heb betaald en deelneem aan de ProtoToto",

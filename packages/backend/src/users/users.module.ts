@@ -6,6 +6,9 @@ import { User } from './entities/user.entity';
 import { OracleModule } from 'src/oracle/oracle.module';
 import { MailModule } from '../mail/mail.module';
 import { ResetToken } from '../auth/entities/reset-token.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Module({
   imports: [
@@ -14,7 +17,17 @@ import { ResetToken } from '../auth/entities/reset-token.entity';
     MailModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [
+    UsersService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
   exports: [TypeOrmModule, UsersService],
 })
 export class UsersModule {}
