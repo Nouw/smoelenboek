@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../../store/store.ts";
+import { rehydrationPromise, store } from "../../../store/store.ts";
 import { protototoApiSlice } from "../../../api/endpoints/protototo.api.ts";
 
 export const matchesLoader: ActionFunction = async ({ params }) => {
+  await rehydrationPromise;
+
   const req = store.dispatch(
     protototoApiSlice.endpoints.getMatches.initiate(+params.id!),
   );

@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../store/store"
+import { rehydrationPromise, store } from "../../store/store"
 import { categoriesApiSlice } from "../../api/endpoints/categories.api";
 
 export const categoriesLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+
   const req = store.dispatch(categoriesApiSlice.endpoints.getCategories.initiate(undefined as void, { forceRefetch: true }));
 
   try {

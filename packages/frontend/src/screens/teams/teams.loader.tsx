@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
 import { teamsApiSlice } from "../../api/endpoints/teams.api"
-import { store } from "../../store/store"
+import { rehydrationPromise, store } from "../../store/store"
 
 export const teamsLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+
   const req = store.dispatch(teamsApiSlice.endpoints.getTeams.initiate());
 
   try {
@@ -16,6 +18,8 @@ export const teamsLoader: ActionFunction = async () => {
 }
 
 export const teamsInfoLoader: ActionFunction = async ({ params }) => {
+  await rehydrationPromise;
+
   const req = store.dispatch(teamsApiSlice.endpoints.getTeam.initiate(+params.id!, { forceRefetch: true }));
 
   try {

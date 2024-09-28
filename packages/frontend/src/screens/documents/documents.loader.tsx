@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../store/store";
+import { rehydrationPromise, store } from "../../store/store";
 import { documentsApiSlice } from "../../api/endpoints/documents.api";
 
 export const documentsLoader: ActionFunction = async ({ params }) => {
+  await rehydrationPromise;
+
   const req = store.dispatch(
     documentsApiSlice.endpoints.getDocuments.initiate(+params.id!, {
       forceRefetch: true,

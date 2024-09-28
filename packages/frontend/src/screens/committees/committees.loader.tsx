@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
 import { committeesApiSlice } from "../../api/endpoints/committees.api";
-import { store } from "../../store/store";
+import { rehydrationPromise, store } from "../../store/store";
 
 export const committeesLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+
   const req = store.dispatch(committeesApiSlice.endpoints.getCommittees.initiate());
 
   try {
@@ -16,6 +18,8 @@ export const committeesLoader: ActionFunction = async () => {
 }
 
 export const committeeInfoLoader: ActionFunction = async ({ params }) => {
+  await rehydrationPromise;
+
   const req = store.dispatch(committeesApiSlice.endpoints.getCommittee.initiate(+params.id!, { forceRefetch: true }));
 
   try {

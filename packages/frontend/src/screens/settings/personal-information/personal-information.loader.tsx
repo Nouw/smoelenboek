@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../../store/store";
+import { rehydrationPromise, store } from "../../../store/store";
 import { userApiSlice } from "../../../api/endpoints/user.api";
 
 export const personalInformationLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+
   const id = store.getState().auth.id;
   
   if (!id) {

@@ -1,8 +1,10 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../../store/store";
+import { rehydrationPromise, store } from "../../../store/store";
 import { userApiSlice } from "../../../api/endpoints/user.api";
 
 export const usersLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+
   const req = store.dispatch(userApiSlice.endpoints.getUsers.initiate());
 
   try {
@@ -16,6 +18,8 @@ export const usersLoader: ActionFunction = async () => {
 }
 
 export const userLoader: ActionFunction = async ({ params }) => {
+  await rehydrationPromise;
+
   const req = store.dispatch(userApiSlice.endpoints.getInfo.initiate(+params.id!));
 
   try {
