@@ -17,6 +17,7 @@ import { ActivitiesModule } from './activities/activities.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { databaseSource } from './database/database-source';
+import { NevoboModule } from './nevobo/nevobo.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { databaseSource } from './database/database-source';
     ProtototoModule,
     ActivitiesModule,
     MailModule,
+    NevoboModule,
   ],
   controllers: [AppController],
   providers: [AppService],

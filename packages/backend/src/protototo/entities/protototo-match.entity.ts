@@ -4,11 +4,14 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
 import { ProtototoSeason } from './protototo-season.entity';
 import { ProtototoPrediction } from './protototo-prediction.entity';
+import { ProtototoMatchResult } from './protototo-result.entity';
+import { ProtototoPredictionExternal } from './protototo-prediction-external.entity';
 
 @Entity()
 export class ProtototoMatch {
@@ -34,4 +37,13 @@ export class ProtototoMatch {
 
   @OneToMany(() => ProtototoPrediction, (prediction) => prediction.match)
   predictions: Relation<ProtototoPrediction[]>;
+
+  @OneToMany(
+    () => ProtototoPredictionExternal,
+    (prediction) => prediction.match,
+  )
+  externalPredictions: Relation<ProtototoPredictionExternal[]>;
+
+  @OneToOne(() => ProtototoMatchResult, (result) => result.match)
+  result: Relation<ProtototoMatchResult>;
 }

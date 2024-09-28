@@ -11,21 +11,21 @@ const publicItems: DrawerItem[] = [
     navigateTo: "activities",
     rank: 1,
   },
-  //{
-  //  title: "Protototo",
-  //  subheader: true,
-  //  subItems: [
-  //    {
-  //      title: "protototo.predict",
-  //      navigateTo: "protototo",
-  //    },
-  //    // {
-  //    //   title: "Leaderboards",
-  //    //   navigateTo: ""
-  //    // },
-  //  ],
-  //  rank: 4,
-  //},
+  {
+    title: "Protototo",
+    subheader: true,
+    subItems: [
+      {
+        title: "protototo.predict",
+        navigateTo: "protototo",
+      },
+      // {
+      //   title: "Leaderboards",
+      //   navigateTo: ""
+      // },
+    ],
+    rank: 4,
+  },
 ];
 
 const defaultItems: DrawerItem[] = [

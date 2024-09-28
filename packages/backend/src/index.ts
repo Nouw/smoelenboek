@@ -30,3 +30,8 @@ export { UpdateCommitteeDto } from './committees/dto/update-committee.dto';
 export { CreateCategoryDto } from './categories/dto/create-category.dto';
 export { CategoryType } from './categories/enums/catagory-type.enum';
 export { UpdateCategoryDto } from './categories/dto/update-category.dto';
+export { CreateProtototoSeasonDto } from './protototo/dto/create-protototo-season.dto';
+export { CreateProtototoMatchDto } from './protototo/dto/create-protototo-match.dto';
+export { ProtototoMatchResult } from './protototo/entities/protototo-result.entity';
+export { UpdateProtototoSeasonDto } from './protototo/dto/update-protototo-season.dto';
+export { ProtototoPredictionDto } from './protototo/dto/protototo-prediction.dto';

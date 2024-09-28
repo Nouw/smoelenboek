@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Relation,
+} from 'typeorm';
 import { ProtototoMatch } from './protototo-match.entity';
 
 @Entity()

@@ -55,6 +55,15 @@ import { ActivitiesList } from "./screens/activities/activities.list";
 import { ResetPasswordRequest } from "./screens/auth/reset-password/request/reset-password-request.tsx";
 import { ResetPassword } from "./screens/auth/reset-password/reset-password.tsx";
 import { wrapCreateBrowserRouter } from "@sentry/react";
+import { MatchesAdd } from "./screens/dashboard/protototo/matches.add.tsx";
+import { SeasonsAdd as ProtototoSeasonAdd } from "./screens/dashboard/protototo/seasons.add.tsx";
+import { SeasonsList as ProtototoSeasonsList } from "./screens/dashboard/protototo/seasons.list";
+import { seasonsLoader as protototoSeasonsLoader, seasonLoader as protototoSeasonLoader } from "./screens/dashboard/protototo/seasons.loader";
+import { MatchesList } from "./screens/dashboard/protototo/matches.list.tsx";
+import { matchesLoader } from "./screens/dashboard/protototo/matches.loader.ts";
+import { SeasonEdit } from "./screens/dashboard/protototo/seasons.edit.tsx";
+import { ProtototoBetList } from "./screens/protototo/protototo.list.tsx";
+import { protototoBetsLoader } from "./screens/protototo/protototo.loader.ts";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 export const router = sentryWrappedBrowserRouter([
@@ -92,6 +101,16 @@ export const router = sentryWrappedBrowserRouter([
             element: <ActivitiesList />,
           },
         ],
+      },
+      {
+        path: "protototo",
+        children: [
+          {
+            path: "",
+            element: <ProtototoBetList />,
+            loader: protototoBetsLoader,
+          }
+        ]
       },
       {
         path: "",
@@ -282,6 +301,44 @@ export const router = sentryWrappedBrowserRouter([
                         element: <DocumentsDashboardList />,
                         loader: documentsLoader,
                       },
+                    ],
+                  },
+                ],
+              },
+              {
+                path: "protototo",
+                children: [
+                  {
+                    path: "matches",
+                    children: [
+                      {
+                        path: ":id",
+                        element: <MatchesList />,
+                        loader: matchesLoader, 
+                      },
+                      {
+                        path: ":id/add",
+                        element: <MatchesAdd />,
+                      },
+                    ],
+                  },
+                  {
+                    path: "seasons",
+                    children: [
+                      {
+                        path: "",
+                        element: <ProtototoSeasonsList />,
+                        loader: protototoSeasonsLoader,
+                      },
+                      {
+                        path: "add",
+                        element: <ProtototoSeasonAdd />,
+                      },
+                      {
+                        path: "edit/:id",
+                        element: <SeasonEdit />,
+                        loader: protototoSeasonLoader, 
+                      }
                     ],
                   },
                 ],

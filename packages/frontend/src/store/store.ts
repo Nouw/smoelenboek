@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
   persistReducer,
+  persistStore,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authSlice from "./slices/auth.slice";
@@ -20,6 +21,14 @@ export const store = configureStore({
     API.middleware,
   ]
 })
+
+let rehydrationResolve: () => void;
+
+export const rehydrationPromise = new Promise<void>((resolve) => {
+  rehydrationResolve = resolve;
+});
+
+export const persistor = persistStore(store, null, () => rehydrationResolve());
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

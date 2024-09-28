@@ -1,32 +1,33 @@
 import { ActionFunction } from "react-router-dom";
-import { store } from "../../../store/store";
+import { rehydrationPromise, store } from "../../../store/store";
 import { seasonsApiSlice } from "../../../api/endpoints/seasons.api";
 
 export const seasonsLoader: ActionFunction = async () => {
+  await rehydrationPromise;
+  
   const req = store.dispatch(seasonsApiSlice.endpoints.getSeasons.initiate());
 
   try {
-    const response = await req.unwrap();
-    return response;
+    return await req.unwrap();
   } catch (e) {
     console.log(e);
     throw new Response("Something went wrong!", { status: 500 });
   } finally {
-    req.unsubscribe()
+    req.unsubscribe();
   }
-}
+};
 
 export const seasonLoader: ActionFunction = async ({ params }) => {
-  const req = store.dispatch(seasonsApiSlice.endpoints.getSeason.initiate(+params.id!));
+  const req = store.dispatch(
+    seasonsApiSlice.endpoints.getSeason.initiate(+params.id!),
+  );
 
   try {
-    const response = await req.unwrap();
-    return response;
+    return await req.unwrap();
   } catch (e) {
     console.log(e);
     throw new Response("Something went wrong!", { status: 500 });
   } finally {
-    req.unsubscribe()
+    req.unsubscribe();
   }
-
-}
+};

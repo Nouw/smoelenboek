@@ -39,7 +39,11 @@
     "match": {
       "delete": "Wedstrijd verwijderd!",
       "create": "Wedstrijd aangemaakt!",
-      "update": "Wedstrijd bijgewerkt!"
+      "update": "Wedstrijd bijgewerkt!",
+      "already-added": "Wedstrijd is al toegevoegd aan seizoen!",
+      "added": "Wedstrijd toegevoegd aan seizoen!",
+      "fetched-result": "Set standen zijn opgeslagen op de server!",
+      "fetch-not-found": "Set positions are not in DWF yet!" 
     },
     "submit-message": "Succesvol weddenschap verzonden!"
   },

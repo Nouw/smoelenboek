@@ -6,7 +6,6 @@
   "id": "Id",
   "start": "Start",
   "end": "End",
-  "options": "Options",
   "tikkie": "Tikkie",
   "play-date": "Play date",
   "home": "Home",
@@ -24,5 +23,7 @@
     "three": "Set 3",
     "four": "Set 4",
     "five": "Set 5"
-  }
+  },
+  "fetch-result": "Fetch result",
+  "view-result": "View result"
 }

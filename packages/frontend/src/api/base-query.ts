@@ -35,19 +35,23 @@ export const baseQueryReauth: BaseQueryFn<
     if (!mutex.isLocked()) {
       const release = await mutex.acquire()
       try {
-        const state = api.getState() as AuthState;
-        
-        const refreshResult = await baseQuery({ url: "auth/refresh", body: { refresh_token: state.refreshToken }, method: 'POST' }, api, extraOptions);
-        
-        if ((refreshResult.data as { access_token: string }).access_token) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          api.dispatch(setAccessToken(refreshResult.data.access_token));
+        const state = api.getState() as RootState;
 
-          result = await baseQuery(args, api, extraOptions);
-          
-        } else {
+        if (!state.auth.refreshToken) {
           api.dispatch(logout);
+        } else {
+          const refreshResult = await baseQuery({ url: "auth/refresh", body: { refresh_token: state.auth.refreshToken }, method: 'POST' }, api, extraOptions);
+
+          if ((refreshResult.data as { access_token: string }).access_token) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            api.dispatch(setAccessToken(refreshResult.data.access_token));
+
+            result = await baseQuery(args, api, extraOptions);
+
+          } else {
+            api.dispatch(logout);
+          }
         }
       } finally {
         release();
