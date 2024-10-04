@@ -45,7 +45,7 @@ export class ProtototoService {
     @InjectRepository(ProtototoPredictionExternal)
     private readonly protototoPredictionExternalRepository: Repository<ProtototoPredictionExternal>,
     private nevoboService: NevoboService,
-  ) {}
+  ) { }
 
   createSeason(createSeasonDto: CreateProtototoSeasonDto) {
     const entity = createSeasonDto as ProtototoSeason;
@@ -267,7 +267,7 @@ export class ProtototoService {
   async getCurrentSeason(user?: User) {
     const season = await this.protototoSeasonRepository.findOne({
       where: {
-        start: Raw((alias) => `CURDATE() BETWEEN ${alias} AND end`),
+        start: Raw((alias) => `CURRENT_TIMESTAMP() BETWEEN ${alias} AND end`),
       },
       relations: {
         matches: {
@@ -275,6 +275,10 @@ export class ProtototoService {
         },
       },
     });
+
+    if (!season) {
+      return null;
+    }
 
     for (let key = 0; key < season.matches.length; key++) {
       season.matches[key].predictions = [];
@@ -292,6 +296,8 @@ export class ProtototoService {
   }
 
   async saveBet(id: number, bet: ProtototoPredictionDto, user: User) {
+    console.log(user);
+
     const prediction = bet.email
       ? await this.getExternalBet(id, bet)
       : await this.getUserBet(id, user);

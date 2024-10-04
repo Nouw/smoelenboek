@@ -9,6 +9,7 @@ import {
   Query,
   StreamableFile,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { Request as ReqType } from '../auth/types/request';
 import { ProtototoService } from './protototo.service';
@@ -20,6 +21,7 @@ import { CreateProtototoMatchDto } from './dto/create-protototo-match.dto';
 import { UpdateProtototoSeasonDto } from './dto/update-protototo-season.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ProtototoPredictionDto } from './dto/protototo-prediction.dto';
+import { PublicUserGuard } from 'src/auth/public-user.guard';
 
 @Controller('protototo')
 export class ProtototoController {
@@ -97,8 +99,9 @@ export class ProtototoController {
     return this.protototoService.getCurrentSeason(request.user);
   }
 
-  @Public()
   @Post('bet/:id')
+  @Public()
+  @UseGuards(PublicUserGuard)
   saveBet(
     @Param('id') id: string,
     @Body() body: ProtototoPredictionDto,
