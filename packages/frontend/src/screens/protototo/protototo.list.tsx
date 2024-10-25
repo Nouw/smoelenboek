@@ -1,4 +1,4 @@
-import { Alert, Card, CardContent, CardHeader, Stack, TextField } from "@mui/material";
+import { Alert, Button, Card, CardContent, CardHeader, Checkbox, FormControl, FormControlLabel, FormGroup, FormHelperText, Stack, TextField } from "@mui/material";
 import { ProtototoMatch, ProtototoSeason } from "backend";
 import React from "react";
 import { useLoaderData } from "react-router-dom";
@@ -62,15 +62,16 @@ export const ProtototoBetList: React.FC = () => {
             <>
               <Card>
                 <CardHeader title="Gegevens" />
-                  <CardContent>
+                <CardContent>
                   <Stack gap={2}>
                     <TextField
-                        id="email"
-                        value={props.values.email}
-                        onChange={props.handleChange}
-                        error={Boolean(props.errors.email)}
-                        helperText={props.touched.email && Boolean(props.errors.email) && t(`form:${props.errors.email}`)}
-                      />
+                      id="email"
+                      label={t("user:email")}
+                      value={props.values.email}
+                      onChange={props.handleChange}
+                      error={Boolean(props.errors.email)}
+                      helperText={props.touched.email && Boolean(props.errors.email) && t(`form:${props.errors.email}`)}
+                    />
                     <Stack direction="row" gap={2}>
                       <TextField
                         id="firstName"
@@ -81,7 +82,7 @@ export const ProtototoBetList: React.FC = () => {
                         helperText={props.touched.firstName && Boolean(props.errors.firstName) && t(`form:${props.errors.firstName}`)}
                         fullWidth
                       />
-                     <TextField
+                      <TextField
                         id="lastName"
                         label={t("user:last-name")}
                         value={props.values.lastName}
@@ -90,7 +91,27 @@ export const ProtototoBetList: React.FC = () => {
                         helperText={props.touched.lastName && Boolean(props.errors.lastName) && t(`form:${props.errors.lastName}`)}
                         fullWidth
                       />
-                     </Stack>
+                    </Stack>
+                    {season.tikkie &&
+                      <>
+                        <FormControl required error={props.touched.tikkie && Boolean(props.errors.tikkie)}>
+                          <FormGroup>
+                            <Button
+                              sx={{ mr: 'auto', my: 2, backgroundColor: '#413f80' }}
+                              variant="contained"
+                              onClick={() => window.open(season.tikkie, '_blank')?.focus()}>
+                              Tikkie
+                            </Button>
+                            <FormControlLabel control={<Checkbox />} checked={props.values.tikkie} onChange={(_, checked) => props.setFieldValue('tikkie', checked)} label={t('protototo:tikkie')} />
+
+                          </FormGroup>
+                          {props.errors.tikkie &&
+                            <FormHelperText error>{props.errors.tikkie === "tikkie is a required field" ? t('form:field-required') : t(`form:${props.errors.tikkie}`)}</FormHelperText>
+
+                          }
+                        </FormControl>
+                      </>
+                    }
                   </Stack>
                 </CardContent>
               </Card>

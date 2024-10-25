@@ -1,6 +1,6 @@
 import { Mutex } from "async-mutex";
 import { BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { AuthState, logout, setAccessToken } from "../store/slices/auth.slice";
+import { logout, setAccessToken } from "../store/slices/auth.slice";
 import { RootState } from "../store/store";
 
 const mutex = new Mutex();
@@ -38,11 +38,11 @@ export const baseQueryReauth: BaseQueryFn<
         const state = api.getState() as RootState;
 
         if (!state.auth.refreshToken) {
-          api.dispatch(logout);
+          api.dispatch(logout());
         } else {
           const refreshResult = await baseQuery({ url: "auth/refresh", body: { refresh_token: state.auth.refreshToken }, method: 'POST' }, api, extraOptions);
 
-          if ((refreshResult.data as { access_token: string }).access_token) {
+          if ((refreshResult.data as { access_token: string })?.access_token) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             api.dispatch(setAccessToken(refreshResult.data.access_token));
@@ -50,7 +50,7 @@ export const baseQueryReauth: BaseQueryFn<
             result = await baseQuery(args, api, extraOptions);
 
           } else {
-            api.dispatch(logout);
+            api.dispatch(logout());
           }
         }
       } finally {
