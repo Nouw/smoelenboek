@@ -66,7 +66,7 @@ export class UsersController {
   }
 
   @Post('user/picture/upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('profilePicture'))
   uploadPicture(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestType,
