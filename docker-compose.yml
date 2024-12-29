@@ -20,21 +20,31 @@ services:
   backend:
     container_name: backend
     image: node:20
-    working_dir: /app
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+      target: ${TARGET}
+    develop:
+      watch:
+        - action: sync
+          path: ./packages/backend/src
+          target: /app/packages/backend/src
+        - action: sync
+          path: ./packages/backend/package.json
+          target: /app/packages/backend/package.json
+        - action: rebuild
+          path: /app/packages/backend/yarn.lock
     volumes:
-      - .:/app
-      - /app/node_modules
-      - ${DOCKER_OCI_CONFIG_PATH}:/root/.oci 
-    command: ./bin/backend_dev.sh 
+      - ${DOCKER_OCI_CONFIG_PATH}:/root/.oci
     depends_on:
       - database
     ports:
-      - 8080:3000
+      - ${DOCKER_BACKEND_PORT:-8080}:3000
     networks:
-        - smoelenboek
+      - smoelenboek
     extra_hosts:
       - "host.docker.internal:host-gateway"
- 
+
 networks:
   smoelenboek:
 

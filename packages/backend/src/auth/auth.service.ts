@@ -46,7 +46,7 @@ export class AuthService {
       throw new NotFoundException();
     }
 
-    if (!this.isPasswordValid(pass, user?.password)) {
+    if (!(await this.isPasswordValid(pass, user?.password))) {
       throw new UnauthorizedException();
     }
 
