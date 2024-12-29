@@ -1,0 +1,37 @@
+name: Build and Deploy container
+
+on:
+  push:
+    branches:
+      - master  # Trigger on pushes to the main branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Log in to the private Docker registry
+      - name: Log in to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.REGISTRY_URL }} # e.g., docker.io or your private registry
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Step 3: Build the Docker image
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t ${{ secrets.REPOSITORY_NAME }}:latest \
+            -t ${{ secrets.REPOSITORY_NAME }}:${{ github.sha }} \
+            -f docker-compose.yml .
+
+      # Step 4: Push the Docker image to the private registry
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.REPOSITORY_NAME }}:latest
+          docker push ${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
