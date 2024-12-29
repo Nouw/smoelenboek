@@ -25,19 +25,19 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs: [build-and-push]
     steps:
      - name: Setup SSH Key
        uses: webfactory/ssh-agent@v0.5.3
        with:
          ssh-private-key: ${{ secrets.DEPLOY_GH_PRIVATE_KEY }}
 
-     - name: Restart Docker Containers
-       env:
-         OCI_INSTANCE_IP: ${{ secrets.SERVER_IP }}
-         OCI_USER: ${{ secrets.SERVER_USER }}
-       run: |
-         ssh ${OCI_USER}@${OCI_INSTANCE_IP} << EOF
-           cd /home/${OCI_USER}/smoelenboek
-           docker pull nouw/smoelenboek
-           docker compose up -d
-         EOF
+     - name: Restart Docker containers
+       uses: appleboy/ssh-action@v1.2.0
+       with:
+         host: ${{ secrets.SERVER_IP }}
+         username: ${{ secrets.SERVER_USER }}
+         script: |
+          cd /home/${{ secrets.SERVER_USER }}/smoelenboek 
+          docker pull nouw/smoelenboek
+          docker compose up -d
