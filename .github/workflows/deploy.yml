@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'packages/backend/**'
+      - 'package.json'
+      - '.github/**'
+      - 'docker/backend/**'
+      - 'docker-compose.yml'
 
 jobs:
   build-and-push:
