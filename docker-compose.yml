@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
-      target: ${TARGET}
+      target: ${TARGET:-production}
     develop:
       watch:
         - action: sync
@@ -35,7 +35,7 @@ services:
         - action: rebuild
           path: /app/packages/backend/yarn.lock
     volumes:
-      - ${DOCKER_OCI_CONFIG_PATH-""}:/root/.oci
+      - ${DOCKER_OCI_CONFIG_PATH:-"~/.oci/"}:/root/.oci
     depends_on:
       - database
     ports:
