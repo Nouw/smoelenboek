@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -27,7 +27,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker buildx bake --set backend.tags=nouw/smoelenboek:latest --set backend.platform=linux/amd64,linux/arm64 --push
+          docker buildx bake --set backend.tags=nouw/smoelenboek:latest --set backend.platform=linux/arm64 --push
 
 
   deploy:
