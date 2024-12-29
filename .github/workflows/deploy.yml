@@ -30,7 +30,7 @@ jobs:
         with:
           push: true
           tags: nouw/smoelenboek:latest
-          file: ${{ context }}/docker-compose.yml
+          file: docker-compose.yml
 
 #      - name: Build Docker Image
 #        run: |
