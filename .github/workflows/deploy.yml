@@ -22,3 +22,22 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker compose build --push 
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Setup SSH Key
+       uses: webfactory/ssh-agent@v0.5.3
+       with:
+         ssh-private-key: ${{ secrets.DEPLOY_GH_PRIVATE_KEY }}
+
+     - name: Restart Docker Containers
+       env:
+         OCI_INSTANCE_IP: ${{ secrets.SERVER_IP }}
+         OCI_USER: ${{ secrets.SERVER_USER }}
+       run: |
+         ssh ${OCI_USER}@${OCI_INSTANCE_IP} << EOF
+           cd /home/${OCI_USER}/smoelenboek
+           docker pull nouw/smoelenboek
+           docker compose up -d
+         EOF
