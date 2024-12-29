@@ -4,7 +4,7 @@
   "entity-deleted": "Removed {{ name }}",
   "login-success": "Succesfully logged in",
   "logout-success": "Succesfully logged out",
-  "invalid-credentails": "Invalid credentails",
+  "invalid-credentials": "Invalid credentails",
   "token-invalid": "Authentication token is invalid",
   "access-denied": "Access denied",
   "role-required": "You don't have the required permissions to access this",
@@ -15,5 +15,5 @@
   "entity-deletion-failed": "Failed to delete {{ name }}",
   "entity-not-found": "Could not find {{ name }}",
   "invalid-request-parameters": "Invalid request parameters",
-  "invalid-payload-format": "Payload has incorrect format" 
+  "invalid-payload-format": "Payload has incorrect format"
 }

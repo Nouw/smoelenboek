@@ -19,11 +19,13 @@ import { schema } from "./schema";
 import { useLoginMutation } from "../../../api/endpoints/auth.api";
 import { login as sliceLogin } from "../../../store/slices/auth.slice";
 import { useAppDispatch } from "../../../store/hooks";
+import {SnackbarContext} from "../../../providers/snackbar/snackbar.context.ts";
 
 type FormValues = Yup.InferType<typeof schema>;
 
 export const Login: React.FC = () => {
-  const { t } = useTranslation(["user", "common"]);
+  const { t } = useTranslation(["user", "common", "api"]);
+  const { error } = React.useContext(SnackbarContext);
 
   const [login, { isLoading }] = useLoginMutation();
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
@@ -38,7 +40,10 @@ export const Login: React.FC = () => {
       dispatch(sliceLogin(res));
 
       navigate("/");
-    } catch (e) {
+    } catch (e: any) {
+      if (e.status == 401) {
+        error(t("api:invalid-credentials"))
+      }
       console.error(e);
     }
   }
@@ -54,8 +59,9 @@ export const Login: React.FC = () => {
                 email: "",
                 password: "",
               }}
-              onSubmit={(values) => {
-                submit(values.email, values.password);
+              onSubmit={async (values, { setSubmitting }) => {
+                await submit(values.email, values.password);
+                setSubmitting(false);
               }}
             >
               {(props: FormikProps<FormValues>) => (

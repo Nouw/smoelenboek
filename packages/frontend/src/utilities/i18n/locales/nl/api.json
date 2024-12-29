@@ -4,7 +4,7 @@
   "entity-deleted": "Verwijderd {{ name }}",
   "login-success": "Succesvol ingelogd",
   "logout-success": "Succesvol uitgelogd",
-  "invalid-credentails": "Ongeldige inloggegevens",
+  "invalid-credentials": "Ongeldige inloggegevens",
   "token-invalid": "Authenticatietoken is ongeldig",
   "access-denied": "Toegang geweigerd",
   "role-required": "U heeft niet de benodigde rechten voor toegang",

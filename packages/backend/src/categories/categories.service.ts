@@ -3,9 +3,9 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Between, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { SeasonService } from 'src/season/season.service';
-import { isAfter, isBefore } from 'date-fns';
+import { isBefore } from 'date-fns';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 
@@ -16,7 +16,7 @@ export class CategoriesService {
     private readonly categoriesRepository: Repository<Category>,
     private readonly seasonsService: SeasonService,
     @Inject(REQUEST)
-    private readonly request: Request,
+    private readonly request: Request & { user: { joined: string } },
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
@@ -30,13 +30,11 @@ export class CategoriesService {
 
   async findAll() {
     const seasons = await this.seasonsService.findAll();
-    //@ts-expect-error should add the user key to the express request type
     const joined = this.request.user.joined;
     const entities = {};
-
     for (const season of seasons) {
-      if (isAfter(joined, season.startDate)) {
-        break;
+      if (isBefore(season.endDate, joined)) {
+        continue;
       }
 
       entities[season.name] = await this.categoriesRepository
@@ -46,7 +44,6 @@ export class CategoriesService {
           start: season.startDate,
           end: season.endDate,
         })
-        .andWhere('c.created > :joined', { joined })
         .getMany();
     }
 
