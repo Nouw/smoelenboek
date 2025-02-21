@@ -19,12 +19,14 @@ import { Roles } from 'src/auth/decorators/roles.decorators';
 import { Role } from 'src/auth/enums/role.enum';
 import { TeamFunction } from './enums/team-rank.enum';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('teams')
 export class TeamsController {
   constructor(
     private readonly teamsService: TeamsService,
     private readonly userTeamSeasonsService: UserTeamSeasonService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Roles(Role.Admin)
@@ -82,5 +84,11 @@ export class TeamsController {
     @Param('userId', UserPipe) user: User,
   ) {
     return this.userTeamSeasonsService.removeUserToTeam(user, team);
+  }
+
+  @Roles(Role.Admin)
+  @Post('sync-photos')
+  async syncPhotos() {
+    return this.teamsService.syncPhotos();
   }
 }

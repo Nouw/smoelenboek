@@ -25,7 +25,10 @@ import { Team } from "backend";
 import { SnackbarContext } from "../../../providers/snackbar/snackbar.context";
 import { Loading } from "../../../components/loading";
 import { Options } from "../../../components/dashboard/options";
-import { useDeleteTeamMutation } from "../../../api/endpoints/teams.api";
+import {
+  useDeleteTeamMutation,
+  useSyncTeamPhotosMutation
+} from "../../../api/endpoints/teams.api";
 
 export const TeamsList: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +37,7 @@ export const TeamsList: React.FC = () => {
   const { t } = useTranslation(["common", "team", "messages", "options", "error"]);
 
   const [deleteTeamApi] = useDeleteTeamMutation();
+  const [syncTeamPhotosApi, { isLoading: syncPhotosIsLoading }] = useSyncTeamPhotosMutation();
   //const [syncPhotosApi, { isLoading: syncPhotosIsLoading }] =
   //  useJobSyncTeamPhotosMutation();
   const teams = useLoaderData() as Team[];
@@ -63,14 +67,14 @@ export const TeamsList: React.FC = () => {
   }
 
   async function syncPhotos() {
-    //try {
-    //  await syncPhotosApi();
-    //
-    //  snackbar.openSnackbar(t("messages:teams.sync-photo"), Severity.SUCCESS);
-    //} catch (e) {
-    //  console.error(e);
-    //  snackbar.openSnackbar(t("error:error-message", Severity.ERROR));
-    //}
+    try {
+     await syncTeamPhotosApi();
+
+     success(t("messages:teams.sync-photo"));
+    } catch (e) {
+     console.error(e);
+     error(t("error:error-message"));
+    }
   }
 
   return (
@@ -80,7 +84,7 @@ export const TeamsList: React.FC = () => {
         onClick={() => syncPhotos()}
         sx={{ mb: 2 }}
         startIcon={<Sync />}
-        loading={false}
+        loading={syncPhotosIsLoading}
       >
         {t("team:sync-photos")}
       </LoadingButton>

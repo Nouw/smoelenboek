@@ -1,16 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Team } from './entities/team.entity';
 import { Repository } from 'typeorm';
 import { SeasonService } from 'src/season/season.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TeamsService {
+  private readonly logger = new Logger(TeamsService.name);
+
   constructor(
     @InjectRepository(Team) private readonly teamsRepository: Repository<Team>,
     private readonly seasonsService: SeasonService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   create(createTeamDto: CreateTeamDto): Promise<Team> {
@@ -75,5 +79,9 @@ export class TeamsService {
     }
 
     return this.teamsRepository.remove(team);
+  }
+
+  async syncPhotos() {
+    return this.eventEmitter.emit('teams.sync-photos');
   }
 }

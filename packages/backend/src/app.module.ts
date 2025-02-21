@@ -18,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { databaseSource } from './database/database-source';
 import { NevoboModule } from './nevobo/nevobo.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -25,8 +26,9 @@ import { NevoboModule } from './nevobo/nevobo.module';
     ConfigModule.forRoot({
       envFilePath: ['../../.env', '../../.env.local'],
     }),
-
     TypeOrmModule.forRoot(databaseSource),
+
+    EventEmitterModule.forRoot(),
 
     AuthModule,
     UsersModule,

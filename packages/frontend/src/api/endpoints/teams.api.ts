@@ -55,6 +55,12 @@ export const teamsApiSlice = API.enhanceEndpoints({ addTagTypes: ["Teams"] }).in
         method: "PATCH",
         body,
       })
+    }),
+    syncTeamPhotos: builder.mutation<Team, void>({
+      query: () => ({
+        url: "teams/sync-photos",
+        method: "POST"
+      })
     })
   })
 });
@@ -68,4 +74,5 @@ export const {
   useRemoveUserToTeamMutation,
   useUpdateUserToTeamMutation,
   useUpdateTeamMutation,
+  useSyncTeamPhotosMutation
 } = teamsApiSlice;

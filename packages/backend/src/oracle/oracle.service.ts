@@ -108,6 +108,33 @@ export class OracleService {
     return client.deleteObject(request);
   }
 
+  public async uploadBuffer(file: Buffer, fileType: string, folder = '') {
+    const stream = new Readable();
+
+    stream.push(file);
+    stream.push(null);
+
+    const name = this.generateName(fileType);
+
+    const request: os.requests.PutObjectRequest = {
+      namespaceName: this.namespaceName,
+      bucketName: this.bucketName,
+      objectName: `${folder}/${name}`, // TODO: Does this work if you put an object in the main folder?
+      putObjectBody: stream,
+      contentLength: stream.readableLength,
+    };
+
+    try {
+      const client = this.client();
+
+      await client.putObject(request);
+      this.logger.debug(`Uploaded file (${folder}/${name}) to Oracle`);
+      return name;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   private generateName(type: string) {
     return `${Date.now()}-${Math.round(Math.random() * 1e9)}.${type}`;
   }
