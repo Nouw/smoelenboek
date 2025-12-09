@@ -28,7 +28,8 @@ export class SyncPhotosListener {
 
     for (const imageUrl of images) {
       const parts = imageUrl.split('/');
-      const filename = parts[parts.length - 1];
+      let filename = parts[parts.length - 1];
+      filename = filename.split('.')[0];
       const filenameParts = filename.split('-');
       const teamName = `${filenameParts[0]} ${filenameParts[1]}`;
 
