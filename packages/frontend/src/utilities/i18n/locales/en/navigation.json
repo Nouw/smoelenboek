@@ -7,6 +7,7 @@
     "predict": "Predict"
   },
   "documents": "Documents",
+  "polls": "Polls",
   "administration": "Administration",
   "vcp": "Confidential contact person",
   "committees": "Committees",
@@ -19,7 +20,8 @@
       "committee-management": "Committee management",
       "protototo-management": "Protototo management",
       "documents-management": "Document management",
-      "activity-management": "Activity management"
+      "activity-management": "Activity management",
+      "poll-management": "Poll management"
     },
     "seasons": "Seasons",
     "add-season": "Add season",
@@ -31,7 +33,11 @@
     "categories": "Categories",
     "add-category": "Add category",
     "add-activity": "Add activity",
-    "activities": "Activities"
+    "activities": "Activities",
+    "polls": "Polls",
+    "add-poll": "Add poll",
+    "edit-poll": "Edit poll",
+    "no-polls": "No polls yet"
   },
   "activities": "Activities"
 }

@@ -12,5 +12,18 @@
   "email": "Email",
   "type": "Type",
   "next": "Next",
-  "avg": "I agree to the processing of my personal data by USV Protos"
+  "avg": "I agree to the processing of my personal data by USV Protos",
+  "question": "Question",
+  "option": "Option",
+  "options": "Options",
+  "add-option": "Add option",
+  "single-choice": "Single choice",
+  "multiple-choice": "Multiple choice",
+  "total-votes": "Total votes",
+  "votes": "votes",
+  "insights": "Insights",
+  "edit": "Edit",
+  "vote": "Vote",
+  "no-polls": "No polls yet",
+  "no-active-polls": "There are currently no active polls"
 }

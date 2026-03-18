@@ -6,12 +6,6 @@ import { List } from "@mui/material";
 
 const publicItems: DrawerItem[] = [
   {
-    title: "activities", // TODO: Should translate this
-    subheader: false,
-    navigateTo: "activities",
-    rank: 1,
-  },
-  {
     title: "Protototo",
     subheader: true,
     subItems: [
@@ -29,6 +23,12 @@ const publicItems: DrawerItem[] = [
 ];
 
 const defaultItems: DrawerItem[] = [
+  {
+    title: "polls",
+    subheader: false,
+    navigateTo: "polls",
+    rank: 1,
+  },
   {
     title: "Teams",
     subheader: true,

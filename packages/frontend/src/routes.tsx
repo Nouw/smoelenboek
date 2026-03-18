@@ -64,6 +64,12 @@ import { matchesLoader } from "./screens/dashboard/protototo/matches.loader.ts";
 import { SeasonEdit } from "./screens/dashboard/protototo/seasons.edit.tsx";
 import { ProtototoBetList } from "./screens/protototo/protototo.list.tsx";
 import { protototoBetsLoader } from "./screens/protototo/protototo.loader.ts";
+import { PollsList } from "./screens/dashboard/polls/polls.list";
+import { PollsAdd } from "./screens/dashboard/polls/polls.add";
+import { PollInfo } from "./screens/dashboard/polls/poll.info";
+import { pollLoader, pollsLoader } from "./screens/dashboard/polls/polls.loader";
+import { PollsList as UserPollsList } from "./screens/polls/polls.list";
+import { pollsLoader as userPollsLoader } from "./screens/polls/polls.loader";
 
 const sentryWrappedBrowserRouter = wrapCreateBrowserRouter(createBrowserRouter);
 export const router = sentryWrappedBrowserRouter([
@@ -196,6 +202,11 @@ export const router = sentryWrappedBrowserRouter([
                 loader: pictureLoader,
               },
             ],
+          },
+          {
+            path: "polls",
+            element: <UserPollsList />,
+            loader: userPollsLoader,
           },
           {
             path: "dashboard",
@@ -340,6 +351,25 @@ export const router = sentryWrappedBrowserRouter([
                         loader: protototoSeasonLoader, 
                       }
                     ],
+                  },
+                ],
+              },
+              {
+                path: "polls",
+                children: [
+                  {
+                    path: "",
+                    element: <PollsList />,
+                    loader: pollsLoader,
+                  },
+                  {
+                    path: "add",
+                    element: <PollsAdd />,
+                  },
+                  {
+                    path: "info/:id",
+                    element: <PollInfo />,
+                    loader: pollLoader,
                   },
                 ],
               },

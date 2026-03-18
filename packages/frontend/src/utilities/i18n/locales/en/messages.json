@@ -52,6 +52,13 @@
     "update": "Updated category!",
     "delete": "Deleted category!"
   },
+  "poll": {
+    "create": "Created poll!",
+    "update": "Updated poll!",
+    "delete": "Deleted poll!",
+    "vote": "Saved vote!",
+    "invalid-date-range": "The end date must be after the start date"
+  },
   "settings": {
     "success": "Password updated!",
     "information-updated": "Updated information!",

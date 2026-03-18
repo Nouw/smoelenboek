@@ -19,5 +19,6 @@
     "email": "Voer een geldig e-mailadres in"
   },
   "registration-closed-after-open": "De sluitingsdatum van de registratie moet na de open datum liggen",
-  "date-after-registration-closed": "De datum moet vallen na sluiting van de registratie"
+  "date-after-registration-closed": "De datum moet vallen na sluiting van de registratie",
+  "end-date-after-start": "De einddatum moet na de startdatum liggen"
 }

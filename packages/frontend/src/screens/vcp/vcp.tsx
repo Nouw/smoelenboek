@@ -10,10 +10,10 @@ type VCPT = {
 }
 
 const people: VCPT[] = [
-  { name: 'Silke Geraats', phone: '+31 6 18984397', email: 'vcp-intern@usvprotos.nl', avatar: 'silke.jpg' },
-  { name: 'Stan van Hees', phone: '+31 6 14658332', email: 'vcp-alumnus@usvprotos.nl', avatar: 'stan.jpeg' },
-  { name: 'Rosanne Kars', phone: '+31 6 28496457', email: 'vcp-extern@usvprotos.nl', avatar: 'rosanne.jpeg' }
-]
+  { name: 'Annebel Schouwenaar', phone: '+31 6 19819974', email: 'vcp-intern@usvprotos.nl', avatar: 'annebel.jpeg' },
+  { name: 'Jasper Wolfs', phone: '+31 6 30477445', email: 'vcp-intern2@usvprotos.nl', avatar: 'jasper.jpeg' },
+  { name: 'Silke Geraats', phone: 'Telefoonnummer op aanvraag bij het bestuur', email: 'vcp-alumnus@usvprotos.nl', avatar: 'silke.jpg' }
+  ]
 
 export const VCP: React.FC = () => {
   return (

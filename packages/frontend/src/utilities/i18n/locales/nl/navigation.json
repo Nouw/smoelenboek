@@ -7,6 +7,7 @@
     "predict": "Voorspellen"
   },
   "documents": "Documenten",
+  "polls": "Polls",
   "administration": "Administratie",
   "vcp": "Vertrouwenscontactpersoon",
   "committees": "Commissies",
@@ -19,7 +20,8 @@
       "committee-management": "Commissiesbeheer",
       "protototo-management": "Protototobeheer",
       "documents-management": "Documentenbeheer",
-      "activity-management": "Activiteitenbeheer"
+      "activity-management": "Activiteitenbeheer",
+      "poll-management": "Pollbeheer"
     },
     "seasons": "Seizoenen",
     "add-season": "Seizoen toevoegen",
@@ -31,7 +33,11 @@
     "categories": "Categorieën",
     "add-category": "Categorie toevoegen",
     "add-activity": "Activiteit toevoegen",
-    "activities": "Activiteiten"
+    "activities": "Activiteiten",
+    "polls": "Polls",
+    "add-poll": "Poll toevoegen",
+    "edit-poll": "Poll bewerken",
+    "no-polls": "Er zijn nog geen polls"
   },
   "activities": "Activiteiten"
 }

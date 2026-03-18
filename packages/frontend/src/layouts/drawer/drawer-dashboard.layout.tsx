@@ -113,6 +113,21 @@ const items: DrawerItem[] = [
       },
     ],
   },
+  {
+    title: "dashboard.headers.poll-management",
+    subheader: true,
+    translateHeader: true,
+    subItems: [
+      {
+        title: "dashboard.polls",
+        navigateTo: "dashboard/polls/",
+      },
+      {
+        title: "dashboard.add-poll",
+        navigateTo: "dashboard/polls/add",
+      },
+    ],
+  },
 ];
 
 export const DrawerDashboardLayout: React.FC = () => {

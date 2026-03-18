@@ -12,6 +12,18 @@
   "email": "Email",
   "type": "Type",
   "next": "Volgende",
-  "avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos"
+  "avg": "Ik ga akkoord met de verwerking van mijn persoonsgegevens door USV Protos",
+  "question": "Vraag",
+  "option": "Optie",
+  "options": "Opties",
+  "add-option": "Optie toevoegen",
+  "single-choice": "Een keuze",
+  "multiple-choice": "Meerdere keuzes",
+  "total-votes": "Totaal stemmen",
+  "votes": "stemmen",
+  "insights": "Inzichten",
+  "edit": "Bewerken",
+  "vote": "Stem",
+  "no-polls": "Er zijn nog geen polls",
+  "no-active-polls": "Er zijn momenteel geen actieve polls"
 }
-

@@ -46,3 +46,4 @@ typings/
 .idea/
 
 .env.copy
+/actions-runner/

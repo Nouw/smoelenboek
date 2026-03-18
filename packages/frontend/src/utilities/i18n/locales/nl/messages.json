@@ -52,6 +52,13 @@
     "update": "Categorie bijgewerkt!",
     "delete": "Categorie verwijderd!"
   },
+  "poll": {
+    "create": "Poll aangemaakt!",
+    "update": "Poll bijgewerkt!",
+    "delete": "Poll verwijderd!",
+    "vote": "Stem opgeslagen!",
+    "invalid-date-range": "De einddatum moet na de startdatum liggen"
+  },
   "settings": {
     "success": "Wachtwoord bijgewerkt!",
     "information-updated": "Informatie bijgewerkt!",
