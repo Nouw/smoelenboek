@@ -3,6 +3,7 @@ import { RefreshToken } from '../../auth/entities/refresh-token.entity';
 import { Role } from '../../auth/enums/role.enum';
 import { UserCommitteeSeason } from '../../committees/entities/user-committee-season.entity';
 import { ProtototoPrediction } from '../../protototo/entities/protototo-prediction.entity';
+import { PropollVote } from '../../propoll/entities/propoll-vote.entity';
 import { UserTeamSeason } from '../../teams/entities/user-team-season.entity';
 import {
   Entity,
@@ -80,6 +81,9 @@ export class User {
 
   @OneToMany(() => ProtototoPrediction, (prediction) => prediction.user)
   predictions: Relation<ProtototoPrediction[]>;
+
+  @OneToMany(() => PropollVote, (propollVote) => propollVote.user)
+  propollVotes: Relation<PropollVote[]>;
 
   @ManyToMany(() => Activity)
   activities: Relation<Activity[]>;

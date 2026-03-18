@@ -24,6 +24,9 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { ProtototoMatchResult } from '../protototo/entities/protototo-result.entity';
 import { ProtototoPredictionExternal } from '../protototo/entities/protototo-prediction-external.entity';
+import { Propoll } from '../propoll/entities/propoll.entity';
+import { PropollOption } from '../propoll/entities/propoll-option.entity';
+import { PropollVote } from '../propoll/entities/propoll-vote.entity';
 
 dotenv.config({ path: '../../.env' });
 console.log(path.join(__dirname, '../migrations/**/*.ts'));
@@ -40,6 +43,9 @@ export const databaseSource: TypeOrmModuleOptions = {
     ProtototoPrediction,
     ProtototoPredictionExternal,
     ProtototoMatchResult,
+    Propoll,
+    PropollOption,
+    PropollVote,
     User,
     Team,
     UserTeamSeason,

@@ -19,6 +19,7 @@ import { MailModule } from './mail/mail.module';
 import { databaseSource } from './database/database-source';
 import { NevoboModule } from './nevobo/nevobo.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PropollModule } from './propoll/propoll.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     ActivitiesModule,
     MailModule,
     NevoboModule,
+    PropollModule,
   ],
   controllers: [AppController],
   providers: [AppService],

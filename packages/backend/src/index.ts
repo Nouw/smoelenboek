@@ -35,3 +35,8 @@ export { CreateProtototoMatchDto } from './protototo/dto/create-protototo-match.
 export { ProtototoMatchResult } from './protototo/entities/protototo-result.entity';
 export { UpdateProtototoSeasonDto } from './protototo/dto/update-protototo-season.dto';
 export { ProtototoPredictionDto } from './protototo/dto/protototo-prediction.dto';
+export { Propoll } from './propoll/entities/propoll.entity';
+export { PropollOption } from './propoll/entities/propoll-option.entity';
+export { PropollVote } from './propoll/entities/propoll-vote.entity';
+export { CreatePropollDto } from './propoll/dto/create-propoll.dto';
+export { VotePropollDto } from './propoll/dto/vote-propoll.dto';
