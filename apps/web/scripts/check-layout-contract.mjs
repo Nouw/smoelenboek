@@ -2,7 +2,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const appShell = readFileSync(join('app', 'app-shell.tsx'), 'utf8');
+const componentsConfig = readFileSync('components.json', 'utf8');
 const globals = readFileSync(join('app', 'globals.css'), 'utf8');
+const packageJson = readFileSync('package.json', 'utf8');
 const layout = readFileSync(join('app', 'layout.tsx'), 'utf8');
 const page = readFileSync(join('app', 'page.tsx'), 'utf8');
 
@@ -42,6 +44,24 @@ if (!layout.includes('suppressHydrationWarning')) {
 
 if (/--background:\s*#|--foreground:\s*#|\*\s*{[^}]*padding:\s*0/s.test(globals)) {
   throw new Error('App globals must not override Shadcn theme/reset output.');
+}
+
+if (globals.includes('@import "@repo/ui/globals.css"')) {
+  throw new Error('Web app must own Shadcn globals for Turbopack dev CSS.');
+}
+
+for (const term of ['@theme inline', '--color-card', '@layer base', '@source "./**/*.{ts,tsx}"']) {
+  if (!globals.includes(term)) {
+    throw new Error(`Web globals missing required Tailwind/Shadcn term: ${term}`);
+  }
+}
+
+if (!componentsConfig.includes('"css": "app/globals.css"')) {
+  throw new Error('Web Shadcn config must point at app/globals.css.');
+}
+
+if (packageJson.includes('--turbopack')) {
+  throw new Error('Web dev must use webpack until Turbopack emits Tailwind utilities correctly.');
 }
 
 console.log('Web layout contract passed.');
