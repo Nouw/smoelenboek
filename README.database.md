@@ -10,6 +10,7 @@ cp packages/rpc/.env.example packages/rpc/.env.local
 ```
 
 Fill in the Clerk values in both files before using authenticated flows.
+The web app needs `CLERK_SECRET_KEY` because Clerk middleware runs on the Next.js server, not in the browser bundle.
 
 ## Start Postgres
 
@@ -38,3 +39,4 @@ pnpm --filter web dev
 ```
 
 The web app reads only `NEXT_PUBLIC_*` values from `apps/web/.env.local`.
+Its server-side middleware also reads `CLERK_SECRET_KEY` from the same file.

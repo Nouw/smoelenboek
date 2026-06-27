@@ -25,6 +25,7 @@ This Turborepo includes the following packages & apps:
     ├── @repo/api                 # Shared `NestJS` resources.
     ├── @repo/eslint-config       # `eslint` configurations (includes `prettier`)
     ├── @repo/jest-config         # `jest` configurations
+    ├── @repo/rpc                 # tRPC, CQRS, Clerk, and database service.
     ├── @repo/typescript-config   # `tsconfig.json`s used throughout the monorepo
     └── @repo/ui                  # Shareable stub React component library.
 ```
@@ -57,8 +58,11 @@ pnpm run build
 #### Develop
 
 ```bash
-# Will run the development server for all the app & packages with the supported `dev` script.
+# Opens one macOS Terminal window per long-running dev process.
 pnpm run dev
+
+# Runs the old multiplexed Turbo dev stream in the current terminal.
+pnpm run dev:turbo
 ```
 
 #### test
