@@ -1,6 +1,14 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "CLERK_SECRET_KEY",
+    "DATABASE_URL",
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_TRPC_URL",
+    "PORT",
+    "WEB_ORIGIN"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
@@ -11,7 +19,12 @@
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**"]
     },
     "lint": {},
-    "test": {},
-    "test:e2e": {}
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"]
+    },
+    "eval": {}
   }
 }

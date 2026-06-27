@@ -3,6 +3,9 @@ import { Button } from '@repo/ui/button';
 import Image, { type ImageProps } from 'next/image';
 
 import styles from './page.module.css';
+import { UserPanel } from './user-panel';
+
+export const dynamic = 'force-dynamic';
 
 type Props = Omit<ImageProps, 'src'> & {
   srcLight: string;
@@ -88,6 +91,8 @@ export default async function Home() {
         <Button appName="web" className={styles.secondary}>
           Open alert
         </Button>
+
+        <UserPanel />
 
         {links.length > 0 ? (
           <div className={styles.ctas}>
