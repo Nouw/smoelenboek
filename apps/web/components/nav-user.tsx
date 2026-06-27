@@ -24,7 +24,7 @@ import {
   useSidebar,
 } from "@repo/ui/components/sidebar"
 
-export function NavUser() {
+export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header" }) {
   const { openUserProfile, signOut } = useClerk()
   const { user } = useUser()
   const { isMobile } = useSidebar()
@@ -34,30 +34,51 @@ export function NavUser() {
     .filter(Boolean)
     .map((part) => part?.slice(0, 1).toUpperCase())
     .join("")
+  const isHeader = variant === "header"
+  const trigger = isHeader ? (
+    <button
+      type="button"
+      className="inline-flex h-9 min-w-9 items-center justify-center gap-2 rounded-md px-2 text-sm font-medium outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      aria-label="Open account menu"
+    >
+      <Settings className="size-4 sm:hidden" />
+      <Avatar className="hidden h-8 w-8 rounded-lg sm:flex">
+        <AvatarImage src={user?.imageUrl} alt="" />
+        <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
+      </Avatar>
+      <div className="hidden max-w-36 text-left text-sm leading-tight lg:grid">
+        <span className="truncate font-medium">{displayName}</span>
+        <span className="truncate text-xs text-muted-foreground">{email}</span>
+      </div>
+      <ChevronsUpDown className="hidden size-4 text-muted-foreground sm:block" />
+    </button>
+  ) : (
+    <SidebarMenuButton
+      size="lg"
+      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+    >
+      <Avatar className="h-8 w-8 rounded-lg">
+        <AvatarImage src={user?.imageUrl} alt="" />
+        <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
+      </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <span className="truncate font-medium">{displayName}</span>
+        <span className="truncate text-xs">{email}</span>
+      </div>
+      <ChevronsUpDown className="ml-auto size-4" />
+    </SidebarMenuButton>
+  )
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className={isHeader ? "w-auto" : undefined}>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user?.imageUrl} alt="" />
-                <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{displayName}</span>
-                <span className="truncate text-xs">{email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
+            {trigger}
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            className="min-w-56 rounded-lg sm:w-(--radix-dropdown-menu-trigger-width)"
+            side={isMobile || isHeader ? "bottom" : "right"}
             align="end"
             sideOffset={4}
           >

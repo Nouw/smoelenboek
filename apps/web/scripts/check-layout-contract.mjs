@@ -7,9 +7,10 @@ const componentsConfig = readFileSync('components.json', 'utf8');
 const globals = readFileSync(join('app', 'globals.css'), 'utf8');
 const navUser = readFileSync(join('components', 'nav-user.tsx'), 'utf8');
 const packageJson = readFileSync('package.json', 'utf8');
+const siteHeader = readFileSync(join('components', 'site-header.tsx'), 'utf8');
 const layout = readFileSync(join('app', 'layout.tsx'), 'utf8');
 const page = readFileSync(join('app', 'page.tsx'), 'utf8');
-const layoutSurface = [appShell, appSidebar, navUser].join('\n');
+const layoutSurface = [appShell, appSidebar, navUser, siteHeader].join('\n');
 
 const requiredTerms = [
   'SignedOut',
@@ -25,6 +26,8 @@ const requiredTerms = [
   'Profile',
   'Settings',
   'Logout',
+  'type="search"',
+  'variant="header"',
   'SidebarProvider',
   'SidebarInset',
 ];
