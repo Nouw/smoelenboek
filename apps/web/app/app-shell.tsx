@@ -4,14 +4,9 @@ import {
   SignInButton,
   SignedIn,
   SignedOut,
-  useClerk,
-  useUser,
 } from '@clerk/nextjs';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@repo/ui/components/avatar';
+import { AppSidebar } from '@/components/app-sidebar';
+import { SiteHeader } from '@/components/site-header';
 import { Button } from '@repo/ui/components/button';
 import {
   Card,
@@ -21,19 +16,11 @@ import {
   CardTitle,
 } from '@repo/ui/components/card';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@repo/ui/components/dropdown-menu';
-import { cn } from '@repo/ui/lib/utils';
+  SidebarInset,
+  SidebarProvider,
+} from '@repo/ui/components/sidebar';
 import {
-  CircleUserRound,
   FileText,
-  LogOut,
-  Settings,
   ShieldCheck,
   Trophy,
   UsersRound,
@@ -107,62 +94,13 @@ function SignedOutLayout() {
 
 function SignedInLayout() {
   return (
-    <div className="bg-background text-foreground min-h-svh">
-      <div className="flex min-h-svh">
-        <aside className="border-border bg-card hidden w-72 shrink-0 border-r lg:flex lg:flex-col">
-          <div className="border-border flex h-16 items-center px-6">
-            <div>
-              <div className="text-base font-semibold">Smoelenboek</div>
-              <div className="text-muted-foreground text-xs">Member portal</div>
-            </div>
-          </div>
-          <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Main">
-            {navigationItems.map((item) => (
-              <NavigationButton key={item.label} item={item} />
-            ))}
-          </nav>
-        </aside>
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="border-border bg-background/95 sticky top-0 z-20 border-b backdrop-blur">
-            <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-              <div className="min-w-0 lg:hidden">
-                <div className="text-sm font-semibold">Smoelenboek</div>
-                <div className="text-muted-foreground text-xs">Member portal</div>
-              </div>
-              <nav
-                className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:flex"
-                aria-label="Current section"
-              >
-                {navigationItems.map((item) => (
-                  <div
-                    key={item.label}
-                    className={cn(
-                      'flex h-9 items-center gap-2 rounded-md px-3 text-sm',
-                      item.active
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground',
-                    )}
-                  >
-                    <item.icon className="size-4" />
-                    {item.label}
-                  </div>
-                ))}
-              </nav>
-              <AccountMenu />
-            </div>
-            <nav
-              className="border-border flex gap-1 overflow-x-auto border-t px-3 py-2 lg:hidden"
-              aria-label="Main"
-            >
-              {navigationItems.map((item) => (
-                <MobileNavigationButton key={item.label} item={item} />
-              ))}
-            </nav>
-          </header>
-
-          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-            <section className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <div className="[--header-height:calc(--spacing(14))]">
+      <SidebarProvider className="flex flex-col">
+        <SiteHeader />
+        <div className="flex flex-1">
+          <AppSidebar />
+          <SidebarInset>
+            <section className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
               <div className="flex flex-col gap-1">
                 <h1 className="text-2xl font-semibold tracking-normal">
                   Teams
@@ -178,112 +116,10 @@ function SignedInLayout() {
                 ))}
               </div>
             </section>
-          </main>
+          </SidebarInset>
         </div>
-      </div>
+      </SidebarProvider>
     </div>
-  );
-}
-
-function AccountMenu() {
-  const { openUserProfile, signOut } = useClerk();
-  const { user } = useUser();
-  const initials = [user?.firstName, user?.lastName]
-    .filter(Boolean)
-    .map((part) => part?.slice(0, 1).toUpperCase())
-    .join('');
-  const displayName = user?.fullName ?? user?.primaryEmailAddress?.emailAddress;
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          className="h-10 max-w-52 justify-start gap-2 px-2"
-          aria-label="Open account menu"
-        >
-          <Avatar className="size-8">
-            <AvatarImage src={user?.imageUrl} alt="" />
-            <AvatarFallback className="text-xs">{initials || 'U'}</AvatarFallback>
-          </Avatar>
-          <span className="hidden min-w-0 flex-col items-start text-left sm:flex">
-            <span className="max-w-32 truncate text-sm font-medium">
-              {displayName ?? 'User'}
-            </span>
-            <span className="text-muted-foreground text-xs">Account</span>
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="truncate">
-          {displayName ?? 'Account'}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => openUserProfile()}>
-          <CircleUserRound className="size-4" />
-          Profile
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => openUserProfile()}>
-          <Settings className="size-4" />
-          Settings
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => {
-            void signOut();
-          }}
-        >
-          <LogOut className="size-4" />
-          Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-function NavigationButton({
-  item,
-}: {
-  item: (typeof navigationItems)[number];
-}) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        'flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors',
-        item.active
-          ? 'bg-accent text-accent-foreground'
-          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-      )}
-      aria-current={item.active ? 'page' : undefined}
-    >
-      <item.icon className="size-4" />
-      <span>{item.label}</span>
-    </button>
-  );
-}
-
-function MobileNavigationButton({
-  item,
-}: {
-  item: (typeof navigationItems)[number];
-}) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        'flex h-10 shrink-0 items-center gap-2 rounded-md px-3 text-sm transition-colors',
-        item.active
-          ? 'bg-accent text-accent-foreground'
-          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-      )}
-      aria-current={item.active ? 'page' : undefined}
-    >
-      <item.icon className="size-4" />
-      {item.label}
-    </button>
   );
 }
 

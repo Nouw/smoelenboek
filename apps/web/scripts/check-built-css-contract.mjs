@@ -20,6 +20,17 @@ const missing = requiredPatterns
   .filter(([, pattern]) => !pattern.test(css))
   .map(([name]) => name);
 
+for (const term of [
+  'bg-sidebar',
+  'background-color:var(--sidebar)',
+  'text-sidebar-foreground',
+  'color:var(--sidebar-foreground)',
+]) {
+  if (!css.includes(term)) {
+    missing.push(term);
+  }
+}
+
 if (missing.length > 0) {
   throw new Error(`Built CSS missing required Shadcn/Tailwind rules: ${missing.join(', ')}`);
 }
