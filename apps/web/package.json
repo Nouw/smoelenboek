@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev --turbopack --port 3001",
     "build": "next build --webpack",
+    "test": "node scripts/check-layout-contract.mjs",
+    "eval": "node scripts/check-layout-contract.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit"
@@ -17,6 +19,7 @@
     "@tanstack/react-query": "^5.90.12",
     "@trpc/client": "^11.7.2",
     "@trpc/react-query": "^11.7.2",
+    "lucide-react": "^1.21.0",
     "next": "16.2.0",
     "react": "19.2.5",
     "react-dom": "19.2.5"
