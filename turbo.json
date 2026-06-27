@@ -1,6 +1,7 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "ui": "tui",
   "globalEnv": [
     "CLERK_SECRET_KEY",
     "DATABASE_URL",

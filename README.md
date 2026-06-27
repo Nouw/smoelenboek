@@ -58,11 +58,8 @@ pnpm run build
 #### Develop
 
 ```bash
-# Opens one macOS Terminal window per long-running dev process.
+# Runs all persistent dev tasks through Turbo's TUI.
 pnpm run dev
-
-# Runs the old multiplexed Turbo dev stream in the current terminal.
-pnpm run dev:turbo
 ```
 
 #### test
