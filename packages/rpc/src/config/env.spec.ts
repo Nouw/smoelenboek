@@ -8,7 +8,7 @@ describe('validateRpcEnv', () => {
       validateRpcEnv({
         CLERK_SECRET_KEY: 'sk_test_123',
       }),
-    ).toThrow('DATABASE_URL is required for services/rpc.');
+    ).toThrow('DATABASE_URL is required for packages/rpc.');
   });
 
   it('requires CLERK_SECRET_KEY', () => {
@@ -16,7 +16,7 @@ describe('validateRpcEnv', () => {
       validateRpcEnv({
         DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
       }),
-    ).toThrow('CLERK_SECRET_KEY is required for services/rpc.');
+    ).toThrow('CLERK_SECRET_KEY is required for packages/rpc.');
   });
 
   it('applies runtime defaults', () => {

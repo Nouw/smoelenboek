@@ -6,7 +6,7 @@ The tRPC service owns the local PostgreSQL database.
 
 ```sh
 cp apps/web/.env.example apps/web/.env.local
-cp services/rpc/.env.example services/rpc/.env.local
+cp packages/rpc/.env.example packages/rpc/.env.local
 ```
 
 Fill in the Clerk values in both files before using authenticated flows.

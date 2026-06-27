@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const rpcSrc = join(root, 'services/rpc/src');
+const rpcSrc = join(root, 'packages/rpc/src');
 
 function listRouterFiles(directory) {
   const entries = readdirSync(directory);

@@ -13,7 +13,7 @@ describe('getDatabaseUrl', () => {
 
   it('rejects missing DATABASE_URL', () => {
     expect(() => getDatabaseUrl({} as NodeJS.ProcessEnv)).toThrow(
-      'DATABASE_URL is required for services/rpc.',
+      'DATABASE_URL is required for packages/rpc.',
     );
   });
 });

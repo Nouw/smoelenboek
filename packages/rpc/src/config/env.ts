@@ -46,7 +46,7 @@ function readRequiredString(
   const value = config[key];
 
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error(`${key} is required for services/rpc.`);
+    throw new Error(`${key} is required for packages/rpc.`);
   }
 
   return value;
