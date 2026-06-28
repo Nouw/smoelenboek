@@ -2,6 +2,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import type { DataSourceOptions } from 'typeorm';
 
 import { StoredEventEntity } from '../event-store/entities/stored-event.entity';
+import { SeasonEntity } from '../seasons/entities/season.entity';
 import { UserEntity } from '../users/entities/user.entity';
 
 export function getDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
@@ -20,7 +21,7 @@ export function createDataSourceOptions(
   return {
     type: 'postgres',
     url: getDatabaseUrl(env),
-    entities: [StoredEventEntity, UserEntity],
+    entities: [SeasonEntity, StoredEventEntity, UserEntity],
     migrations: [`${__dirname}/migrations/*{.ts,.js}`],
     synchronize: false,
   };

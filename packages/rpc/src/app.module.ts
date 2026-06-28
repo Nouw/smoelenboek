@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { rpcEnvFilePath, validateRpcEnv } from './config/env';
 import { createTypeOrmOptions } from './database/typeorm.config';
 import { EventStoreModule } from './event-store/event-store.module';
+import { SeasonsModule } from './seasons/seasons.module';
 import { TrpcModule } from './trpc/trpc.module';
 import { UsersModule } from './users/users.module';
 
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     CqrsModule.forRoot(),
     AuthModule,
     EventStoreModule,
+    SeasonsModule,
     UsersModule,
     TrpcModule,
   ],

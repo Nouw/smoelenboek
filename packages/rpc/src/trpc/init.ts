@@ -1,8 +1,9 @@
+import type { RouteMeta } from 'trpc-docs-generator';
 import { TRPCError, initTRPC } from '@trpc/server';
 
 import type { TrpcContext } from './context';
 
-export const trpc = initTRPC.context<TrpcContext>().create();
+export const trpc = initTRPC.context<TrpcContext>().meta<RouteMeta>().create();
 
 export const router = trpc.router;
 export const publicProcedure = trpc.procedure;
