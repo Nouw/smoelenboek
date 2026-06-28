@@ -6,15 +6,26 @@ describe('validateRpcEnv', () => {
   it('requires DATABASE_URL', () => {
     expect(() =>
       validateRpcEnv({
+        CLERK_PUBLISHABLE_KEY: 'pk_test_123',
         CLERK_SECRET_KEY: 'sk_test_123',
       }),
     ).toThrow('DATABASE_URL is required for packages/rpc.');
+  });
+
+  it('requires CLERK_PUBLISHABLE_KEY', () => {
+    expect(() =>
+      validateRpcEnv({
+        DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
+        CLERK_SECRET_KEY: 'sk_test_123',
+      }),
+    ).toThrow('CLERK_PUBLISHABLE_KEY is required for packages/rpc.');
   });
 
   it('requires CLERK_SECRET_KEY', () => {
     expect(() =>
       validateRpcEnv({
         DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
+        CLERK_PUBLISHABLE_KEY: 'pk_test_123',
       }),
     ).toThrow('CLERK_SECRET_KEY is required for packages/rpc.');
   });
@@ -23,10 +34,12 @@ describe('validateRpcEnv', () => {
     expect(
       validateRpcEnv({
         DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
+        CLERK_PUBLISHABLE_KEY: 'pk_test_123',
         CLERK_SECRET_KEY: 'sk_test_123',
       }),
     ).toEqual({
       DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
+      CLERK_PUBLISHABLE_KEY: 'pk_test_123',
       CLERK_SECRET_KEY: 'sk_test_123',
       WEB_ORIGIN: 'http://localhost:3001',
       PORT: '3002',

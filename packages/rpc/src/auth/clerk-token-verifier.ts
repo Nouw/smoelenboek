@@ -20,13 +20,20 @@ export interface ClerkAuthenticator {
 @Injectable()
 export class ClerkBackendAuthenticator implements ClerkAuthenticator {
   async authenticateRequest(request: IncomingMessage): Promise<ClerkAuthResult> {
+    const publishableKey = process.env.CLERK_PUBLISHABLE_KEY;
     const secretKey = process.env.CLERK_SECRET_KEY;
+
+    if (!publishableKey) {
+      throw new Error(
+        'CLERK_PUBLISHABLE_KEY is required for Clerk authentication.',
+      );
+    }
 
     if (!secretKey) {
       throw new Error('CLERK_SECRET_KEY is required for Clerk authentication.');
     }
 
-    const clerkClient = createClerkClient({ secretKey });
+    const clerkClient = createClerkClient({ publishableKey, secretKey });
     const requestState = await clerkClient.authenticateRequest(
       this.toWebRequest(request),
       {
@@ -101,7 +108,8 @@ export class ClerkBackendAuthenticator implements ClerkAuthenticator {
 
   private readRequestUrl(request: IncomingMessage): string {
     const host = request.headers.host ?? 'localhost:3002';
-    const proto = this.readFirstHeader(request.headers['x-forwarded-proto']) ?? 'http';
+    const proto =
+      this.readFirstHeader(request.headers['x-forwarded-proto']) ?? 'http';
     const path = request.url ?? '/';
 
     return new URL(path, `${proto}://${host}`).toString();

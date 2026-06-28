@@ -4,6 +4,7 @@ import { join } from 'node:path';
 
 export type RpcEnv = {
   DATABASE_URL: string;
+  CLERK_PUBLISHABLE_KEY: string;
   CLERK_SECRET_KEY: string;
   WEB_ORIGIN: string;
   PORT: string;
@@ -19,6 +20,10 @@ export function loadRpcEnv(): void {
 
 export function validateRpcEnv(config: Record<string, unknown>): RpcEnv {
   const databaseUrl = readRequiredString(config, 'DATABASE_URL');
+  const clerkPublishableKey = readRequiredString(
+    config,
+    'CLERK_PUBLISHABLE_KEY',
+  );
   const clerkSecretKey = readRequiredString(config, 'CLERK_SECRET_KEY');
   const webOrigin = readOptionalString(
     config,
@@ -33,6 +38,7 @@ export function validateRpcEnv(config: Record<string, unknown>): RpcEnv {
 
   return {
     DATABASE_URL: databaseUrl,
+    CLERK_PUBLISHABLE_KEY: clerkPublishableKey,
     CLERK_SECRET_KEY: clerkSecretKey,
     WEB_ORIGIN: webOrigin,
     PORT: port,

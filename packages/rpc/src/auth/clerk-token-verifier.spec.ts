@@ -20,14 +20,35 @@ function createRequest(authorization?: string): IncomingMessage {
   } as IncomingMessage;
 }
 
+function withClerkEnv(): () => void {
+  const previousPublishableKey = process.env.CLERK_PUBLISHABLE_KEY;
+  const previousSecretKey = process.env.CLERK_SECRET_KEY;
+
+  process.env.CLERK_PUBLISHABLE_KEY = 'pk_test_123';
+  process.env.CLERK_SECRET_KEY = 'sk_test_123';
+
+  return () => {
+    restoreEnvValue('CLERK_PUBLISHABLE_KEY', previousPublishableKey);
+    restoreEnvValue('CLERK_SECRET_KEY', previousSecretKey);
+  };
+}
+
+function restoreEnvValue(key: string, value: string | undefined): void {
+  if (value === undefined) {
+    delete process.env[key];
+    return;
+  }
+
+  process.env[key] = value;
+}
+
 describe('ClerkBackendAuthenticator', () => {
   it('returns anonymous context when Clerk does not authenticate the request', async () => {
     authenticateRequest.mockResolvedValue({
       isAuthenticated: false,
       toAuth: jest.fn(),
     });
-    const previousSecretKey = process.env.CLERK_SECRET_KEY;
-    process.env.CLERK_SECRET_KEY = 'sk_test_123';
+    const restoreEnv = withClerkEnv();
     const authenticator = new ClerkBackendAuthenticator();
 
     await expect(authenticator.authenticateRequest(createRequest())).resolves.toEqual({
@@ -37,7 +58,7 @@ describe('ClerkBackendAuthenticator', () => {
       claims: null,
     });
 
-    process.env.CLERK_SECRET_KEY = previousSecretKey;
+    restoreEnv();
   });
 
   it('accepts Clerk session tokens', async () => {
@@ -56,8 +77,7 @@ describe('ClerkBackendAuthenticator', () => {
         },
       }),
     });
-    const previousSecretKey = process.env.CLERK_SECRET_KEY;
-    process.env.CLERK_SECRET_KEY = 'sk_test_123';
+    const restoreEnv = withClerkEnv();
     const authenticator = new ClerkBackendAuthenticator();
 
     await expect(
@@ -76,7 +96,7 @@ describe('ClerkBackendAuthenticator', () => {
       acceptsToken: ['session_token', 'api_key'],
     });
 
-    process.env.CLERK_SECRET_KEY = previousSecretKey;
+    restoreEnv();
   });
 
   it('accepts Clerk API keys', async () => {
@@ -94,8 +114,7 @@ describe('ClerkBackendAuthenticator', () => {
         claims: { purpose: 'docs' },
       }),
     });
-    const previousSecretKey = process.env.CLERK_SECRET_KEY;
-    process.env.CLERK_SECRET_KEY = 'sk_test_123';
+    const restoreEnv = withClerkEnv();
     const authenticator = new ClerkBackendAuthenticator();
 
     await expect(
@@ -114,6 +133,6 @@ describe('ClerkBackendAuthenticator', () => {
       },
     });
 
-    process.env.CLERK_SECRET_KEY = previousSecretKey;
+    restoreEnv();
   });
 });
