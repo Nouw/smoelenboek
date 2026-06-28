@@ -18,6 +18,9 @@ The web app needs `CLERK_SECRET_KEY` because Clerk middleware runs on the Next.j
 docker compose up -d postgres
 ```
 
+Postgres is exposed on host port `5433` to avoid conflicts with a local
+Postgres installation on `5432`.
+
 ## Run migrations
 
 ```sh
