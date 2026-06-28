@@ -26,7 +26,7 @@ function listRouterFiles(directory) {
   return files;
 }
 
-const routerFiles = listRouterFiles(rpcSrc);
+const violations = [];
 
 const forbiddenPatterns = [
   /from ['"].*repositories\/.*['"]/,
@@ -37,7 +37,8 @@ const forbiddenPatterns = [
   /\.delete\(/,
 ];
 
-const violations = [];
+const routerFiles = listRouterFiles(rpcSrc);
+const commandHandlerFiles = listCommandHandlerFiles(rpcSrc);
 
 for (const file of routerFiles) {
   const source = readFileSync(join(root, file), 'utf8');
@@ -57,4 +58,42 @@ if (violations.length > 0) {
   process.exit(1);
 }
 
-console.log(`CQRS boundary eval passed for ${routerFiles.length} router file(s).`);
+console.log(
+  `CQRS boundary eval passed for ${routerFiles.length} router file(s) and ${commandHandlerFiles.length} command handler file(s).`,
+);
+
+function listCommandHandlerFiles(directory) {
+  const entries = readdirSync(directory);
+  const files = [];
+
+  for (const entry of entries) {
+    const absolutePath = join(directory, entry);
+    const stats = statSync(absolutePath);
+
+    if (stats.isDirectory()) {
+      files.push(...listCommandHandlerFiles(absolutePath));
+      continue;
+    }
+
+    if (entry.endsWith('.handler.ts') && absolutePath.includes('/commands/')) {
+      files.push(absolutePath.replace(`${root}/`, ''));
+    }
+  }
+
+  for (const file of files) {
+    const source = readFileSync(join(root, file), 'utf8');
+
+    if (source.includes('syncFromClerk(')) {
+      violations.push(`${file} calls the user read-model write path directly`);
+    }
+
+    if (
+      source.includes('createUserSyncedFromClerkEvent') &&
+      !source.includes('.appendAndProject(')
+    ) {
+      violations.push(`${file} creates a domain event without appending it`);
+    }
+  }
+
+  return files;
+}
