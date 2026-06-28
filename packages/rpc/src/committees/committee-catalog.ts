@@ -1,0 +1,35 @@
+export const COMMITTEE_NAMES = [
+  'Bestuur',
+  'Commissie van beroep',
+  'Webcommissie',
+  'Technische commissie',
+  'Feestcommissie',
+  'Toernooicommissie',
+  'Kascommissie',
+  'Weekendcommissie',
+  'Adviescommissie',
+  'Naadjecommissie',
+  'PR commissie',
+  'Beachcommissie',
+  'Jaarboekcommissie',
+  'Galacommissie',
+  'Scheidsrechterscommissie (VIS)',
+  'Trainerscommissie',
+  'Snowcommissie',
+  'CTVVCK',
+  'Goede doelencommissie',
+  'SocialCie',
+  'Lustrumcommissie',
+  'Inclusiviteitscommissie',
+] as const;
+
+export const COMMITTEE_ROLES = [
+  'commissielid',
+  'commissaris_externe_zaken',
+  'wedstrijdsecretaris',
+  'penningmeester',
+  'commissaris_zaalwacht_en_arbitrage',
+  'voorzitter',
+  'secretaris',
+] as const;
+

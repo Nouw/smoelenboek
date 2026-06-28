@@ -4,10 +4,13 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
+import { CommitteesModule } from './committees/committees.module';
 import { rpcEnvFilePath, validateRpcEnv } from './config/env';
 import { createTypeOrmOptions } from './database/typeorm.config';
 import { EventStoreModule } from './event-store/event-store.module';
+import { MembershipsModule } from './memberships/memberships.module';
 import { SeasonsModule } from './seasons/seasons.module';
+import { TeamsModule } from './teams/teams.module';
 import { TrpcModule } from './trpc/trpc.module';
 import { UsersModule } from './users/users.module';
 
@@ -23,8 +26,11 @@ import { UsersModule } from './users/users.module';
     }),
     CqrsModule.forRoot(),
     AuthModule,
+    CommitteesModule,
     EventStoreModule,
+    MembershipsModule,
     SeasonsModule,
+    TeamsModule,
     UsersModule,
     TrpcModule,
   ],

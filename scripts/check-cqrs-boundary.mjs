@@ -75,7 +75,10 @@ function listCommandHandlerFiles(directory) {
       continue;
     }
 
-    if (entry.endsWith('.handler.ts') && absolutePath.includes('/commands/')) {
+    if (
+      (entry.endsWith('.handler.ts') || entry.endsWith('.handlers.ts')) &&
+      absolutePath.includes('/commands/')
+    ) {
       files.push(absolutePath.replace(`${root}/`, ''));
     }
   }

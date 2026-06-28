@@ -1,0 +1,162 @@
+import type { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { z } from 'zod';
+
+import { protectedProcedure, router } from '../../trpc/init';
+import {
+  ArchiveTeamCommand,
+  AssignTeamMemberCommand,
+  CreateTeamCommand,
+  RemoveTeamMemberCommand,
+  UpdateTeamCommand,
+} from '../commands/team.commands';
+import { TEAM_ROLES } from '../team-catalog';
+import {
+  ListTeamMembershipsBySeasonQuery,
+  ListTeamsQuery,
+} from '../queries/team.queries';
+
+export type TeamRouterDependencies = {
+  commandBus: CommandBus;
+  queryBus: QueryBus;
+};
+
+const teamRoleSchema = z.enum(TEAM_ROLES);
+
+const teamOutputSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  archivedAt: z.iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
+const teamMembershipOutputSchema = z.object({
+  id: z.uuid(),
+  userId: z.uuid(),
+  teamId: z.uuid(),
+  seasonId: z.uuid(),
+  role: teamRoleSchema,
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
+export function createTeamRouter(dependencies: TeamRouterDependencies) {
+  return router({
+    list: protectedProcedure
+      .meta({
+        name: 'List Teams',
+        docs: {
+          description: 'List all teams.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .output(z.array(teamOutputSchema))
+      .query(() => dependencies.queryBus.execute(new ListTeamsQuery())),
+    membershipsBySeason: protectedProcedure
+      .meta({
+        name: 'List Team Memberships By Season',
+        docs: {
+          description: 'List team memberships for one season.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ seasonId: z.uuid() }))
+      .output(z.array(teamMembershipOutputSchema))
+      .query(({ input }) =>
+        dependencies.queryBus.execute(
+          new ListTeamMembershipsBySeasonQuery(input.seasonId),
+        ),
+      ),
+    create: protectedProcedure
+      .meta({
+        name: 'Create Team',
+        docs: {
+          description: 'Create a team catalog record.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ name: z.string().min(1) }))
+      .output(teamOutputSchema)
+      .mutation(({ input }) =>
+        dependencies.commandBus.execute(new CreateTeamCommand(input.name)),
+      ),
+    update: protectedProcedure
+      .meta({
+        name: 'Update Team',
+        docs: {
+          description: 'Rename a team catalog record.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ id: z.uuid(), name: z.string().min(1) }))
+      .output(teamOutputSchema)
+      .mutation(({ input }) =>
+        dependencies.commandBus.execute(
+          new UpdateTeamCommand(input.id, input.name),
+        ),
+      ),
+    archive: protectedProcedure
+      .meta({
+        name: 'Archive Team',
+        docs: {
+          description: 'Archive a team catalog record.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ id: z.uuid() }))
+      .output(teamOutputSchema)
+      .mutation(({ input }) =>
+        dependencies.commandBus.execute(new ArchiveTeamCommand(input.id)),
+      ),
+    assignMember: protectedProcedure
+      .meta({
+        name: 'Assign Team Member',
+        docs: {
+          description: 'Assign a user to a team for a season.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(
+        z.object({
+          userId: z.uuid(),
+          teamId: z.uuid(),
+          seasonId: z.uuid(),
+          role: teamRoleSchema,
+        }),
+      )
+      .output(teamMembershipOutputSchema)
+      .mutation(({ input }) =>
+        dependencies.commandBus.execute(
+          new AssignTeamMemberCommand(
+            input.userId,
+            input.teamId,
+            input.seasonId,
+            input.role,
+          ),
+        ),
+      ),
+    removeMember: protectedProcedure
+      .meta({
+        name: 'Remove Team Member',
+        docs: {
+          description: 'Remove a team membership assignment.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ membershipId: z.uuid() }))
+      .output(teamMembershipOutputSchema.nullable())
+      .mutation(({ input }) =>
+        dependencies.commandBus.execute(
+          new RemoveTeamMemberCommand(input.membershipId),
+        ),
+      ),
+  });
+}
+
