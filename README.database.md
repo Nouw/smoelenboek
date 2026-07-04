@@ -28,6 +28,17 @@ Postgres installation on `5432`.
 pnpm --filter @repo/rpc migration:run
 ```
 
+## Create a login user
+
+Public registration is disabled. Create users through the RPC admin command:
+
+```sh
+pnpm --filter @repo/rpc auth:create-user -- --email fabio@example.com --password "password1234" --name "Fabio"
+```
+
+The command uses Better Auth's email/password flow and prints the created user
+without printing the password.
+
 ## Run the RPC service
 
 ```sh

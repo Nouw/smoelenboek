@@ -8,6 +8,13 @@ export type BetterAuthInstance = {
   handler: (request: Request) => Promise<Response>;
   api: {
     getSession: (context: { headers: Headers }) => Promise<unknown>;
+    signUpEmail: (context: {
+      body: {
+        email: string;
+        password: string;
+        name: string;
+      };
+    }) => Promise<unknown>;
     verifyApiKey: (context: { body: { key: string } }) => Promise<unknown>;
   };
 };
@@ -19,8 +26,12 @@ let authPromise: Promise<BetterAuthInstance> | null = null;
 let nodeHandlerPromise: Promise<BetterAuthNodeHandler> | null = null;
 
 export function getBetterAuth(): Promise<BetterAuthInstance> {
-  authPromise ??= createBetterAuth();
+  authPromise ??= createBetterAuth({ disableSignUp: true });
   return authPromise;
+}
+
+export function createAdminBetterAuth(): Promise<BetterAuthInstance> {
+  return createBetterAuth({ disableSignUp: false });
 }
 
 export async function getBetterAuthNodeHandler(): Promise<BetterAuthNodeHandler> {
@@ -32,7 +43,9 @@ export async function getBetterAuthNodeHandler(): Promise<BetterAuthNodeHandler>
   return nodeHandlerPromise;
 }
 
-async function createBetterAuth(): Promise<BetterAuthInstance> {
+async function createBetterAuth(options: {
+  disableSignUp: boolean;
+}): Promise<BetterAuthInstance> {
   const [{ betterAuth }, { apiKey }] = await Promise.all([
     importEsm<BetterAuthModule>('better-auth'),
     importEsm<ApiKeyModule>('@better-auth/api-key'),
@@ -65,7 +78,7 @@ async function createBetterAuth(): Promise<BetterAuthInstance> {
     },
     emailAndPassword: {
       enabled: true,
-      disableSignUp: true,
+      disableSignUp: options.disableSignUp,
     },
     advanced: {
       database: {
