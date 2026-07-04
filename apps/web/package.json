@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@better-auth/api-key": "^1.6.23",
+    "@hookform/resolvers": "^5.4.0",
     "@repo/rpc": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.12",
@@ -23,7 +24,9 @@
     "lucide-react": "^1.21.0",
     "next": "16.2.0",
     "react": "19.2.5",
-    "react-dom": "19.2.5"
+    "react-dom": "19.2.5",
+    "react-hook-form": "^7.80.0",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@repo/api": "workspace:*",

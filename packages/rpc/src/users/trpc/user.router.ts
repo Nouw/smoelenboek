@@ -1,9 +1,11 @@
+import { updateUserProfileSchema } from '@repo/api';
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
 import { protectedProcedure, router } from '../../trpc/init';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
+import { UpdateUserProfileCommand } from '../commands/update-user-profile.command';
 import { GetCurrentUserQuery } from '../queries/get-current-user.query';
 
 export type UserRouterDependencies = {
@@ -100,6 +102,23 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
       .mutation(({ ctx }) =>
         dependencies.commandBus.execute(
           new SyncUserFromAuthCommand(ctx.userId, ctx.claims ?? {}),
+        ),
+      ),
+    updateProfile: protectedProcedure
+      .meta({
+        name: 'Update User Profile',
+        docs: {
+          description:
+            'Update the authenticated user profile image URL via an event-sourced command.',
+          tags: ['Users'],
+          auth: true,
+        },
+      })
+      .input(updateUserProfileSchema)
+      .output(userOutputSchema)
+      .mutation(({ ctx, input }) =>
+        dependencies.commandBus.execute(
+          new UpdateUserProfileCommand(ctx.userId, input),
         ),
       ),
     membershipHistory: protectedProcedure

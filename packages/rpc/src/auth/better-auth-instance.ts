@@ -80,6 +80,16 @@ async function createBetterAuth(options: {
           input: false,
         },
       },
+      changeEmail: {
+        enabled: true,
+      },
+    },
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        console.log(
+          `[email-verification] To: ${user.email}\n            URL: ${url}`,
+        );
+      },
     },
     emailAndPassword: {
       enabled: true,

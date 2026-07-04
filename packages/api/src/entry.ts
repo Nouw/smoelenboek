@@ -14,3 +14,7 @@ export type {
   TeamRole,
 } from './teams/dto/team.dto';
 export type { UserDto } from './users/dto/user.dto';
+export {
+  updateUserProfileSchema,
+  type UpdateUserProfileInput,
+} from './users/dto/update-user-profile.dto';

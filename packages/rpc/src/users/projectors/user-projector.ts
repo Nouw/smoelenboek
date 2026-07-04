@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
 import { UserEntity } from '../entities/user.entity';
+import type { UserProfileUpdatedPayload } from '../events/user-profile-updated.event';
 import type { UserSyncedFromAuthPayload } from '../events/user-synced-from-auth.event';
 
 @Injectable()
@@ -25,5 +26,25 @@ export class UserProjector {
     entity.imageUrl = payload.imageUrl;
 
     return repository.save(entity);
+  }
+
+  async projectProfileUpdated(
+    payload: UserProfileUpdatedPayload,
+    manager: EntityManager,
+  ): Promise<UserEntity> {
+    const repository = manager.getRepository(UserEntity);
+    const existing = await repository.findOneBy({
+      id: payload.userId,
+    });
+
+    if (!existing) {
+      throw new Error(
+        `Cannot project profile update for non-existent user ${payload.userId}.`,
+      );
+    }
+
+    existing.imageUrl = payload.imageUrl;
+
+    return repository.save(existing);
   }
 }

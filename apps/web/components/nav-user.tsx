@@ -1,6 +1,7 @@
 "use client"
 
 import { BadgeCheck, ChevronsUpDown, LogOut, Settings } from "lucide-react"
+import { useState } from "react"
 
 import { authClient } from "@/lib/auth-client"
 import {
@@ -24,10 +25,13 @@ import {
   useSidebar,
 } from "@repo/ui/components/sidebar"
 
+import { ProfileEditDialog } from "./profile-edit-dialog"
+
 export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header" }) {
   const session = authClient.useSession()
   const user = session.data?.user
   const { isMobile } = useSidebar()
+  const [profileOpen, setProfileOpen] = useState(false)
   const displayName = user?.name ?? user?.email ?? "User"
   const email = user?.email ?? "Account"
   const initials = displayName
@@ -99,7 +103,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
                 <BadgeCheck />
                 Profile
               </DropdownMenuItem>
@@ -127,6 +131,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
     </SidebarMenu>
   )
 }
