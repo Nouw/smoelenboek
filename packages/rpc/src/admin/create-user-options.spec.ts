@@ -6,6 +6,7 @@ describe('parseCreateUserArgs', () => {
   it('parses and normalizes required create-user arguments', () => {
     expect(
       parseCreateUserArgs([
+        '--',
         '--email',
         'USER@example.com',
         '--password',

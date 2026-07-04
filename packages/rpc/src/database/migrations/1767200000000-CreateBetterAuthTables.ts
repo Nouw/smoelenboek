@@ -31,7 +31,7 @@ export class CreateBetterAuthTables1767200000000
 
     await queryRunner.query(`
       CREATE TABLE "session" (
-        "id" text NOT NULL,
+        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
         "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
         "token" text NOT NULL,
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -51,7 +51,7 @@ export class CreateBetterAuthTables1767200000000
 
     await queryRunner.query(`
       CREATE TABLE "account" (
-        "id" text NOT NULL,
+        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
         "accountId" text NOT NULL,
         "providerId" text NOT NULL,
         "userId" uuid NOT NULL,
@@ -75,7 +75,7 @@ export class CreateBetterAuthTables1767200000000
 
     await queryRunner.query(`
       CREATE TABLE "verification" (
-        "id" text NOT NULL,
+        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
         "identifier" text NOT NULL,
         "value" text NOT NULL,
         "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -87,7 +87,7 @@ export class CreateBetterAuthTables1767200000000
 
     await queryRunner.query(`
       CREATE TABLE "apikey" (
-        "id" text NOT NULL,
+        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
         "configId" text NOT NULL DEFAULT 'default',
         "name" text,
         "start" text,

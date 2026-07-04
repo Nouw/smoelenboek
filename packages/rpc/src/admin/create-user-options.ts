@@ -14,6 +14,10 @@ export function parseCreateUserArgs(argv: string[]): CreateUserOptions {
       throw new Error(`Missing argument at index ${index}.`);
     }
 
+    if (current === '--') {
+      continue;
+    }
+
     if (!current.startsWith('--')) {
       throw new Error(`Unexpected argument: ${current}`);
     }

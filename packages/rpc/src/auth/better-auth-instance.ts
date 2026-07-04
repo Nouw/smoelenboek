@@ -6,6 +6,11 @@ type NodeIntegrationModule = typeof import('better-auth/node');
 
 export type BetterAuthInstance = {
   handler: (request: Request) => Promise<Response>;
+  $context: Promise<{
+    password: {
+      hash: (password: string) => Promise<string>;
+    };
+  }>;
   api: {
     getSession: (context: { headers: Headers }) => Promise<unknown>;
     signUpEmail: (context: {
