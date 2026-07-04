@@ -7,6 +7,7 @@ const authenticatedContext = {
   userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
   sessionId: 'sess_123',
   orgId: null,
+  authType: 'session',
   claims: { sub: 'user_123' },
 };
 
@@ -23,6 +24,7 @@ describe('committee tRPC router', () => {
           userId: null,
           sessionId: null,
           orgId: null,
+          authType: null,
           claims: null,
         })
         .committees.list(),
@@ -60,4 +62,3 @@ describe('committee tRPC router', () => {
     );
   });
 });
-

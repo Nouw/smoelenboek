@@ -16,6 +16,7 @@ describe('user tRPC e2e', () => {
           userId: null,
           sessionId: null,
           orgId: null,
+          authType: null,
           claims: null,
         })
         .user.me(),

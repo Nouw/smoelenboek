@@ -1,11 +1,7 @@
 'use client';
 
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-} from '@clerk/nextjs';
 import { AppSidebar } from '@/components/app-sidebar';
+import { authClient } from '@/lib/auth-client';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@repo/ui/components/button';
 import {
@@ -15,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@repo/ui/components/card';
+import { Input } from '@repo/ui/components/input';
+import { Label } from '@repo/ui/components/label';
 import {
   SidebarInset,
   SidebarProvider,
@@ -25,6 +23,7 @@ import {
   Trophy,
   UsersRound,
 } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
 
 const navigationItems = [
   {
@@ -54,23 +53,42 @@ const navigationItems = [
 ];
 
 export function AppShell() {
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-    return <AuthUnavailable />;
+  const session = authClient.useSession();
+
+  if (session.isPending) {
+    return <AuthLoading />;
   }
 
-  return (
-    <>
-      <SignedOut>
-        <SignedOutLayout />
-      </SignedOut>
-      <SignedIn>
-        <SignedInLayout />
-      </SignedIn>
-    </>
-  );
+  return session.data ? <AuthenticatedLayout /> : <LoginLayout />;
 }
 
-function SignedOutLayout() {
+function LoginLayout() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    const result = await authClient.signIn.email({
+      email,
+      password,
+      rememberMe: true,
+    });
+
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setError(result.error.message ?? 'Login failed.');
+      return;
+    }
+
+    window.location.reload();
+  }
+
   return (
     <main className="bg-background text-foreground flex min-h-svh items-center justify-center px-5 py-10">
       <Card className="w-full max-w-sm rounded-lg">
@@ -81,18 +99,45 @@ function SignedOutLayout() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SignInButton mode="modal">
-            <Button type="button" className="w-full">
-              Log in
+          <form className="space-y-4" onSubmit={onSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                autoComplete="email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                autoComplete="current-password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+            </div>
+            {error ? (
+              <p className="text-destructive text-sm" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in...' : 'Log in'}
             </Button>
-          </SignInButton>
+          </form>
         </CardContent>
       </Card>
     </main>
   );
 }
 
-function SignedInLayout() {
+function AuthenticatedLayout() {
   return (
     <div className="[--header-height:calc(--spacing(14))]">
       <SidebarProvider className="flex flex-col">
@@ -145,14 +190,14 @@ function SectionPlaceholder({
   );
 }
 
-function AuthUnavailable() {
+function AuthLoading() {
   return (
     <main className="bg-background text-foreground flex min-h-svh items-center justify-center px-5 py-10">
       <Card className="w-full max-w-sm rounded-lg">
         <CardHeader>
-          <CardTitle>Authentication unavailable</CardTitle>
+          <CardTitle>Loading</CardTitle>
           <CardDescription>
-            Add the Clerk publishable key to enable login.
+            Checking your session.
           </CardDescription>
         </CardHeader>
       </Card>

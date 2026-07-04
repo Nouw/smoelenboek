@@ -5,8 +5,10 @@ import type { UserEntity } from '../entities/user.entity';
 export function toUserDto(user: UserEntity): UserDto {
   return {
     id: user.id,
-    clerkUserId: user.clerkUserId,
+    authUserId: user.authUserId,
     email: user.email,
+    emailVerified: user.emailVerified,
+    name: user.name,
     firstName: user.firstName,
     lastName: user.lastName,
     imageUrl: user.imageUrl,

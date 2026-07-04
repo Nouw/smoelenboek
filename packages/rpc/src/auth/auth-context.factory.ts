@@ -3,15 +3,15 @@ import type { IncomingMessage } from 'http';
 
 import type { AuthContext } from './auth-context';
 import {
-  CLERK_AUTHENTICATOR,
-  type ClerkAuthenticator,
-} from './clerk-token-verifier';
+  BETTER_AUTH_AUTHENTICATOR,
+  type BetterAuthAuthenticator,
+} from './better-auth-authenticator';
 
 @Injectable()
 export class AuthContextFactory {
   constructor(
-    @Inject(CLERK_AUTHENTICATOR)
-    private readonly authenticator: ClerkAuthenticator,
+    @Inject(BETTER_AUTH_AUTHENTICATOR)
+    private readonly authenticator: BetterAuthAuthenticator,
   ) {}
 
   async create(request: IncomingMessage): Promise<AuthContext> {

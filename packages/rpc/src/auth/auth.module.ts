@@ -2,18 +2,18 @@ import { Module } from '@nestjs/common';
 
 import { AuthContextFactory } from './auth-context.factory';
 import {
-  CLERK_AUTHENTICATOR,
-  ClerkBackendAuthenticator,
-} from './clerk-token-verifier';
+  BETTER_AUTH_AUTHENTICATOR,
+  BetterAuthBackendAuthenticator,
+} from './better-auth-authenticator';
 
 @Module({
   providers: [
     AuthContextFactory,
     {
-      provide: CLERK_AUTHENTICATOR,
-      useClass: ClerkBackendAuthenticator,
+      provide: BETTER_AUTH_AUTHENTICATOR,
+      useClass: BetterAuthBackendAuthenticator,
     },
   ],
-  exports: [AuthContextFactory, CLERK_AUTHENTICATOR],
+  exports: [AuthContextFactory, BETTER_AUTH_AUTHENTICATOR],
 })
 export class AuthModule {}

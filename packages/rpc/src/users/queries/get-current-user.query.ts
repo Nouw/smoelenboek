@@ -1,3 +1,3 @@
 export class GetCurrentUserQuery {
-  constructor(public readonly clerkUserId: string) {}
+  constructor(public readonly userId: string) {}
 }

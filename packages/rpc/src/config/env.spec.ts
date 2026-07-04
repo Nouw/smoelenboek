@@ -6,41 +6,41 @@ describe('validateRpcEnv', () => {
   it('requires DATABASE_URL', () => {
     expect(() =>
       validateRpcEnv({
-        CLERK_PUBLISHABLE_KEY: 'pk_test_123',
-        CLERK_SECRET_KEY: 'sk_test_123',
+        BETTER_AUTH_SECRET: 'better-auth-secret-with-32-characters',
+        BETTER_AUTH_URL: 'http://localhost:3002',
       }),
     ).toThrow('DATABASE_URL is required for packages/rpc.');
   });
 
-  it('requires CLERK_PUBLISHABLE_KEY', () => {
+  it('requires BETTER_AUTH_SECRET', () => {
     expect(() =>
       validateRpcEnv({
         DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
-        CLERK_SECRET_KEY: 'sk_test_123',
+        BETTER_AUTH_URL: 'http://localhost:3002',
       }),
-    ).toThrow('CLERK_PUBLISHABLE_KEY is required for packages/rpc.');
+    ).toThrow('BETTER_AUTH_SECRET is required for packages/rpc.');
   });
 
-  it('requires CLERK_SECRET_KEY', () => {
+  it('requires BETTER_AUTH_URL', () => {
     expect(() =>
       validateRpcEnv({
         DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
-        CLERK_PUBLISHABLE_KEY: 'pk_test_123',
+        BETTER_AUTH_SECRET: 'better-auth-secret-with-32-characters',
       }),
-    ).toThrow('CLERK_SECRET_KEY is required for packages/rpc.');
+    ).toThrow('BETTER_AUTH_URL is required for packages/rpc.');
   });
 
   it('applies runtime defaults', () => {
     expect(
       validateRpcEnv({
         DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
-        CLERK_PUBLISHABLE_KEY: 'pk_test_123',
-        CLERK_SECRET_KEY: 'sk_test_123',
+        BETTER_AUTH_SECRET: 'better-auth-secret-with-32-characters',
+        BETTER_AUTH_URL: 'http://localhost:3002',
       }),
     ).toEqual({
       DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
-      CLERK_PUBLISHABLE_KEY: 'pk_test_123',
-      CLERK_SECRET_KEY: 'sk_test_123',
+      BETTER_AUTH_SECRET: 'better-auth-secret-with-32-characters',
+      BETTER_AUTH_URL: 'http://localhost:3002',
       WEB_ORIGIN: 'http://localhost:3001',
       PORT: '3002',
     });

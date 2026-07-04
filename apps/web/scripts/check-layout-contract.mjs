@@ -13,12 +13,9 @@ const page = readFileSync(join('app', 'page.tsx'), 'utf8');
 const layoutSurface = [appShell, appSidebar, navUser, siteHeader].join('\n');
 
 const requiredTerms = [
-  'SignedOut',
-  'SignedIn',
-  'SignInButton',
-  'useClerk',
-  'openUserProfile',
-  'signOut',
+  'authClient.useSession',
+  'authClient.signIn.email',
+  'authClient.signOut',
   'Teams',
   'Committees',
   'Documents',
@@ -40,6 +37,10 @@ if (!page.includes('<AppShell />')) {
 
 if (missingTerms.length > 0) {
   throw new Error(`Layout contract missing: ${missingTerms.join(', ')}`);
+}
+
+if (/Clerk|@clerk\/nextjs/.test(layoutSurface)) {
+  throw new Error('Layout must not import Clerk.');
 }
 
 if (/SignUp|sign up|register|registration/i.test(layoutSurface)) {

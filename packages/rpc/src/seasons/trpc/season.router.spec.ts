@@ -7,6 +7,7 @@ const authenticatedContext = {
   userId: 'user_123',
   sessionId: 'sess_123',
   orgId: null,
+  authType: 'session',
   claims: { sub: 'user_123' },
 };
 
@@ -23,6 +24,7 @@ describe('season tRPC router', () => {
           userId: null,
           sessionId: null,
           orgId: null,
+          authType: null,
           claims: null,
         })
         .seasons.list(),
@@ -65,4 +67,3 @@ describe('season tRPC router', () => {
     );
   });
 });
-

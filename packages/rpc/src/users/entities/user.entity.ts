@@ -11,11 +11,17 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
-  clerkUserId!: string;
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  authUserId!: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, unique: true })
   email!: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  emailVerified!: boolean;
+
+  @Column({ type: 'varchar', default: '' })
+  name!: string;
 
   @Column({ type: 'varchar', nullable: true })
   firstName!: string | null;

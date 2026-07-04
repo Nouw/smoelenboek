@@ -12,9 +12,7 @@ export class GetCurrentUserHandler
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async execute(query: GetCurrentUserQuery): Promise<UserDto | null> {
-    const user = await this.usersRepository.findByClerkUserId(
-      query.clerkUserId,
-    );
+    const user = await this.usersRepository.findById(query.userId);
 
     return user ? toUserDto(user) : null;
   }

@@ -2,22 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
 import { UserEntity } from '../entities/user.entity';
-import type { UserSyncedFromClerkPayload } from '../events/user-synced-from-clerk.event';
+import type { UserSyncedFromAuthPayload } from '../events/user-synced-from-auth.event';
 
 @Injectable()
 export class UserProjector {
-  async projectSyncedFromClerk(
-    payload: UserSyncedFromClerkPayload,
+  async projectSyncedFromAuth(
+    payload: UserSyncedFromAuthPayload,
     manager: EntityManager,
   ): Promise<UserEntity> {
     const repository = manager.getRepository(UserEntity);
     const existing = await repository.findOneBy({
-      clerkUserId: payload.clerkUserId,
+      id: payload.userId,
     });
-    const entity = existing ?? repository.create();
+    const entity = existing ?? repository.create({ id: payload.userId });
 
-    entity.clerkUserId = payload.clerkUserId;
+    entity.authUserId = payload.authUserId;
     entity.email = payload.email;
+    entity.emailVerified = payload.emailVerified;
+    entity.name = payload.name;
     entity.firstName = payload.firstName;
     entity.lastName = payload.lastName;
     entity.imageUrl = payload.imageUrl;
@@ -25,4 +27,3 @@ export class UserProjector {
     return repository.save(entity);
   }
 }
-

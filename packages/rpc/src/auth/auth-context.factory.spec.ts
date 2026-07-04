@@ -2,7 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { IncomingMessage } from 'http';
 
 import { AuthContextFactory } from './auth-context.factory';
-import type { ClerkAuthenticator } from './clerk-token-verifier';
+import type { BetterAuthAuthenticator } from './better-auth-authenticator';
 
 function createRequest(authorization?: string): IncomingMessage {
   return {
@@ -13,12 +13,13 @@ function createRequest(authorization?: string): IncomingMessage {
 }
 
 describe('AuthContextFactory', () => {
-  it('creates the context through the Clerk authenticator', async () => {
-    const authenticator: ClerkAuthenticator = {
+  it('creates the context through the Better Auth authenticator', async () => {
+    const authenticator: BetterAuthAuthenticator = {
       authenticateRequest: jest.fn().mockResolvedValue({
         userId: 'user_123',
         sessionId: 'sess_123',
         orgId: 'org_123',
+        authType: 'session',
         claims: {
           sub: 'user_123',
           sid: 'sess_123',
@@ -33,6 +34,7 @@ describe('AuthContextFactory', () => {
       userId: 'user_123',
       sessionId: 'sess_123',
       orgId: 'org_123',
+      authType: 'session',
       claims: {
         sub: 'user_123',
         sid: 'sess_123',

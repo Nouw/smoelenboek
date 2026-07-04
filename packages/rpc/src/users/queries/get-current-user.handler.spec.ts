@@ -6,7 +6,7 @@ import { GetCurrentUserQuery } from './get-current-user.query';
 describe('GetCurrentUserHandler', () => {
   it('returns null when no user projection exists', async () => {
     const handler = new GetCurrentUserHandler({
-      findByClerkUserId: jest.fn().mockResolvedValue(null),
+      findById: jest.fn().mockResolvedValue(null),
     } as never);
 
     await expect(

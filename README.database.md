@@ -9,8 +9,9 @@ cp apps/web/.env.example apps/web/.env.local
 cp packages/rpc/.env.example packages/rpc/.env.local
 ```
 
-Fill in the Clerk values in both files before using authenticated flows.
-The web app needs `CLERK_SECRET_KEY` because Clerk middleware runs on the Next.js server, not in the browser bundle.
+Generate a `BETTER_AUTH_SECRET` with `openssl rand -base64 32` for the RPC
+service before using authenticated flows. The web app only needs public URLs;
+Better Auth sessions and API keys are owned by the RPC service.
 
 ## Start Postgres
 
@@ -42,4 +43,3 @@ pnpm --filter web dev
 ```
 
 The web app reads only `NEXT_PUBLIC_*` values from `apps/web/.env.local`.
-Its server-side middleware also reads `CLERK_SECRET_KEY` from the same file.

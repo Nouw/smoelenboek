@@ -1,8 +1,8 @@
 "use client"
 
-import { useClerk, useUser } from "@clerk/nextjs"
 import { BadgeCheck, ChevronsUpDown, LogOut, Settings } from "lucide-react"
 
+import { authClient } from "@/lib/auth-client"
 import {
   Avatar,
   AvatarFallback,
@@ -25,15 +25,18 @@ import {
 } from "@repo/ui/components/sidebar"
 
 export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header" }) {
-  const { openUserProfile, signOut } = useClerk()
-  const { user } = useUser()
+  const session = authClient.useSession()
+  const user = session.data?.user
   const { isMobile } = useSidebar()
-  const displayName = user?.fullName ?? user?.primaryEmailAddress?.emailAddress ?? "User"
-  const email = user?.primaryEmailAddress?.emailAddress ?? "Account"
-  const initials = [user?.firstName, user?.lastName]
+  const displayName = user?.name ?? user?.email ?? "User"
+  const email = user?.email ?? "Account"
+  const initials = displayName
+    .split(/\s+/)
     .filter(Boolean)
-    .map((part) => part?.slice(0, 1).toUpperCase())
+    .slice(0, 2)
+    .map((part) => part.slice(0, 1).toUpperCase())
     .join("")
+  const imageUrl = user?.image ?? undefined
   const isHeader = variant === "header"
   const trigger = isHeader ? (
     <button
@@ -43,7 +46,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
     >
       <Settings className="size-4 sm:hidden" />
       <Avatar className="hidden h-8 w-8 rounded-lg sm:flex">
-        <AvatarImage src={user?.imageUrl} alt="" />
+        <AvatarImage src={imageUrl} alt="" />
         <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
       </Avatar>
       <div className="hidden max-w-36 text-left text-sm leading-tight lg:grid">
@@ -58,7 +61,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
     >
       <Avatar className="h-8 w-8 rounded-lg">
-        <AvatarImage src={user?.imageUrl} alt="" />
+        <AvatarImage src={imageUrl} alt="" />
         <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">
@@ -85,7 +88,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user?.imageUrl} alt="" />
+                  <AvatarImage src={imageUrl} alt="" />
                   <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -96,11 +99,11 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={() => openUserProfile()}>
+              <DropdownMenuItem>
                 <BadgeCheck />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => openUserProfile()}>
+              <DropdownMenuItem>
                 <Settings />
                 Settings
               </DropdownMenuItem>
@@ -109,7 +112,13 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
             <DropdownMenuItem
               variant="destructive"
               onSelect={() => {
-                void signOut()
+                void authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => {
+                      window.location.reload()
+                    },
+                  },
+                })
               }}
             >
               <LogOut />

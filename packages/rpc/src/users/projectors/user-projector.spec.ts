@@ -14,10 +14,13 @@ describe('UserProjector', () => {
     const projector = new UserProjector();
 
     await expect(
-      projector.projectSyncedFromClerk(
+      projector.projectSyncedFromAuth(
         {
-          clerkUserId: 'user_123',
+          userId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
+          authUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
           email: 'julien@example.com',
+          emailVerified: true,
+          name: 'Julien',
           firstName: 'Julien',
           lastName: null,
           imageUrl: null,
@@ -27,13 +30,17 @@ describe('UserProjector', () => {
     ).resolves.toBe(entity);
 
     expect(repository.findOneBy).toHaveBeenCalledWith({
-      clerkUserId: 'user_123',
+      id: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
     });
-    expect(repository.create).toHaveBeenCalledWith();
+    expect(repository.create).toHaveBeenCalledWith({
+      id: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
+    });
     expect(repository.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUserId: 'user_123',
+        authUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
         email: 'julien@example.com',
+        emailVerified: true,
+        name: 'Julien',
         firstName: 'Julien',
         lastName: null,
         imageUrl: null,
@@ -43,8 +50,11 @@ describe('UserProjector', () => {
 
   it('updates an existing user projection', async () => {
     const entity = Object.assign(new UserEntity(), {
-      clerkUserId: 'user_123',
+      id: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
+      authUserId: null,
       email: 'old@example.com',
+      emailVerified: false,
+      name: 'Old',
       firstName: 'Old',
       lastName: null,
       imageUrl: null,
@@ -56,10 +66,13 @@ describe('UserProjector', () => {
     };
     const projector = new UserProjector();
 
-    await projector.projectSyncedFromClerk(
+    await projector.projectSyncedFromAuth(
       {
-        clerkUserId: 'user_123',
+        userId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
+        authUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
         email: 'new@example.com',
+        emailVerified: true,
+        name: 'New Name',
         firstName: 'New',
         lastName: 'Name',
         imageUrl: 'https://example.com/avatar.png',
@@ -70,8 +83,10 @@ describe('UserProjector', () => {
     expect(repository.create).not.toHaveBeenCalled();
     expect(repository.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkUserId: 'user_123',
+        authUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
         email: 'new@example.com',
+        emailVerified: true,
+        name: 'New Name',
         firstName: 'New',
         lastName: 'Name',
         imageUrl: 'https://example.com/avatar.png',
@@ -79,4 +94,3 @@ describe('UserProjector', () => {
     );
   });
 });
-

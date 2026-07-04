@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { protectedProcedure, router } from '../../trpc/init';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
-import { SyncUserFromClerkCommand } from '../commands/sync-user-from-clerk.command';
+import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
 import { GetCurrentUserQuery } from '../queries/get-current-user.query';
 
 export type UserRouterDependencies = {
@@ -13,8 +13,10 @@ export type UserRouterDependencies = {
 
 const userOutputSchema = z.object({
   id: z.uuid(),
-  clerkUserId: z.string(),
+  authUserId: z.string().nullable(),
   email: z.email().nullable(),
+  emailVerified: z.boolean(),
+  name: z.string(),
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
   imageUrl: z.string().nullable(),
@@ -84,12 +86,12 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
       .query(({ ctx }) =>
         dependencies.queryBus.execute(new GetCurrentUserQuery(ctx.userId)),
       ),
-    syncFromClerk: protectedProcedure
+    syncFromAuth: protectedProcedure
       .meta({
-        name: 'Sync User From Clerk',
+        name: 'Sync User From Auth',
         docs: {
           description:
-            'Append a Clerk user sync event and project the authenticated user.',
+            'Append an auth user sync event and project the authenticated user.',
           tags: ['Users'],
           auth: true,
         },
@@ -97,7 +99,7 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
       .output(userOutputSchema)
       .mutation(({ ctx }) =>
         dependencies.commandBus.execute(
-          new SyncUserFromClerkCommand(ctx.userId, ctx.claims ?? {}),
+          new SyncUserFromAuthCommand(ctx.userId, ctx.claims ?? {}),
         ),
       ),
     membershipHistory: protectedProcedure

@@ -10,10 +10,10 @@ describe('EventStoreRepository', () => {
       sequence: '1',
       aggregateType: 'user',
       aggregateId: 'user_123',
-      eventType: 'user.synced_from_clerk',
+      eventType: 'user.synced_from_auth',
       eventVersion: 1,
-      payload: { clerkUserId: 'user_123' },
-      metadata: { source: 'clerk' },
+      payload: { userId: 'user_123' },
+      metadata: { source: 'better-auth' },
       occurredAt: new Date('2026-06-28T00:00:00.000Z'),
     };
     const create = jest.fn((event) => event);
@@ -30,10 +30,10 @@ describe('EventStoreRepository', () => {
         {
           aggregateType: 'user',
           aggregateId: 'user_123',
-          eventType: 'user.synced_from_clerk',
+          eventType: 'user.synced_from_auth',
           eventVersion: 1,
-          payload: { clerkUserId: 'user_123' },
-          metadata: { source: 'clerk' },
+          payload: { userId: 'user_123' },
+          metadata: { source: 'better-auth' },
         },
         projector,
       ),
@@ -43,18 +43,18 @@ describe('EventStoreRepository', () => {
     expect(create).toHaveBeenCalledWith({
       aggregateType: 'user',
       aggregateId: 'user_123',
-      eventType: 'user.synced_from_clerk',
+      eventType: 'user.synced_from_auth',
       eventVersion: 1,
-      payload: { clerkUserId: 'user_123' },
-      metadata: { source: 'clerk' },
+      payload: { userId: 'user_123' },
+      metadata: { source: 'better-auth' },
     });
     expect(save).toHaveBeenCalledWith({
       aggregateType: 'user',
       aggregateId: 'user_123',
-      eventType: 'user.synced_from_clerk',
+      eventType: 'user.synced_from_auth',
       eventVersion: 1,
-      payload: { clerkUserId: 'user_123' },
-      metadata: { source: 'clerk' },
+      payload: { userId: 'user_123' },
+      metadata: { source: 'better-auth' },
     });
     expect(projector).toHaveBeenCalledWith(savedEvent, manager);
   });

@@ -11,7 +11,7 @@ export class UsersRepository {
     private readonly repository: Repository<UserEntity>,
   ) {}
 
-  findByClerkUserId(clerkUserId: string): Promise<UserEntity | null> {
-    return this.repository.findOneBy({ clerkUserId });
+  findById(id: string): Promise<UserEntity | null> {
+    return this.repository.findOneBy({ id });
   }
 }

@@ -13,6 +13,7 @@ describe('user tRPC router', () => {
       userId: null,
       sessionId: null,
       orgId: null,
+      authType: null,
       claims: null,
     });
 
@@ -29,12 +30,13 @@ describe('user tRPC router', () => {
       userId: 'user_123',
       sessionId: 'sess_123',
       orgId: null,
+      authType: 'session',
       claims: { sub: 'user_123' },
     });
 
     await expect(caller.user.me()).resolves.toBeNull();
     expect(execute).toHaveBeenCalledWith(
-      expect.objectContaining({ clerkUserId: 'user_123' }),
+      expect.objectContaining({ userId: 'user_123' }),
     );
   });
 });

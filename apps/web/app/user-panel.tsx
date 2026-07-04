@@ -1,6 +1,6 @@
 'use client';
 
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { authClient } from '@/lib/auth-client';
 import {
   Avatar,
   AvatarFallback,
@@ -20,25 +20,16 @@ import { Skeleton } from '@repo/ui/components/skeleton';
 import { trpc } from './trpc';
 
 export function UserPanel() {
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-    return (
-      <Card className="w-full max-w-xl">
-        <CardHeader>
-          <CardTitle>Authentication</CardTitle>
-          <CardDescription>Clerk is not configured.</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
   return <AuthenticatedUserPanel />;
 }
 
 function AuthenticatedUserPanel() {
+  const session = authClient.useSession();
   const user = trpc.user.me.useQuery(undefined, {
     retry: false,
+    enabled: Boolean(session.data),
   });
-  const syncUser = trpc.user.syncFromClerk.useMutation({
+  const syncUser = trpc.user.syncFromAuth.useMutation({
     onSuccess: () => user.refetch(),
   });
   const initials = [user.data?.firstName, user.data?.lastName]
@@ -48,20 +39,15 @@ function AuthenticatedUserPanel() {
 
   return (
     <Card className="w-full max-w-xl">
-      <SignedOut>
+      {!session.data ? (
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
           <CardDescription>
-            Use your account to sync and inspect your profile.
+            Use the main login form to sync and inspect your profile.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <SignInButton mode="modal">
-            <Button type="button">Sign in</Button>
-          </SignInButton>
-        </CardContent>
-      </SignedOut>
-      <SignedIn>
+      ) : (
+        <>
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
@@ -72,11 +58,23 @@ function AuthenticatedUserPanel() {
               <div>
                 <CardTitle>Profile</CardTitle>
                 <CardDescription>
-                  Current Clerk user projection in the app database.
+                  Current auth user projection in the app database.
                 </CardDescription>
               </div>
             </div>
-            <UserButton />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => window.location.reload(),
+                  },
+                });
+              }}
+            >
+              Logout
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -103,7 +101,8 @@ function AuthenticatedUserPanel() {
               : 'No synced user profile yet.'}
           </pre>
         </CardContent>
-      </SignedIn>
+        </>
+      )}
     </Card>
   );
 }

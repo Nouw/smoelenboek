@@ -86,12 +86,12 @@ function listCommandHandlerFiles(directory) {
   for (const file of files) {
     const source = readFileSync(join(root, file), 'utf8');
 
-    if (source.includes('syncFromClerk(')) {
+    if (source.includes('syncFromAuth(')) {
       violations.push(`${file} calls the user read-model write path directly`);
     }
 
     if (
-      source.includes('createUserSyncedFromClerkEvent') &&
+      source.includes('createUserSyncedFromAuthEvent') &&
       !source.includes('.appendAndProject(')
     ) {
       violations.push(`${file} creates a domain event without appending it`);
