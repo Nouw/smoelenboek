@@ -1,7 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
 import { Readable } from 'node:stream';
+import { ReadableStream as WebReadableStream } from 'node:stream/web';
 
 const maxImageBytes = 5 * 1024 * 1024;
 
@@ -296,15 +302,34 @@ export class MediaService {
       return content;
     }
 
+    if (this.isWebReadableStream(content)) {
+      return Readable.fromWeb(content);
+    }
+
     if (Buffer.isBuffer(content)) {
       return Readable.from(content);
+    }
+
+    if (content instanceof Uint8Array) {
+      return Readable.from(Buffer.from(content));
+    }
+
+    if (content instanceof ArrayBuffer) {
+      return Readable.from(Buffer.from(content));
     }
 
     if (typeof content === 'string') {
       return Readable.from(Buffer.from(content));
     }
 
-      throw new NotFoundException('Object not found.');
+    throw new BadGatewayException('Object storage returned an unsupported body.');
+  }
+
+  private isWebReadableStream(content: unknown): content is WebReadableStream {
+    return (
+      typeof WebReadableStream !== 'undefined' &&
+      content instanceof WebReadableStream
+    );
   }
 
   private objectBody(object: {

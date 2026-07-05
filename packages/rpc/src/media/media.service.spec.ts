@@ -211,6 +211,53 @@ describe('MediaService', () => {
     });
   });
 
+  it('loads objects from web stream response bodies', async () => {
+    const getObject = jest.fn().mockResolvedValue({
+      value: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('image'));
+          controller.close();
+        },
+      }),
+      contentLength: 5,
+      contentType: 'image/webp',
+      eTag: '"etag-3"',
+    });
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ getObject });
+
+    const object = await service.getObjectByName(
+      'profile-images/user_123/avatar.webp',
+    );
+
+    await expect(readAll(object.content)).resolves.toBe('image');
+    expect(object.contentLength).toBe(5);
+    expect(object.contentType).toBe('image/webp');
+    expect(object.etag).toBe('"etag-3"');
+  });
+
+  it('loads objects from byte array response bodies', async () => {
+    const getObject = jest.fn().mockResolvedValue({
+      value: new Uint8Array(Buffer.from('image')),
+      contentLength: 5,
+      contentType: 'image/webp',
+      eTag: '"etag-4"',
+    });
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ getObject });
+
+    const object = await service.getObjectByName(
+      'profile-images/user_123/avatar.webp',
+    );
+
+    await expect(readAll(object.content)).resolves.toBe('image');
+    expect(object.contentLength).toBe(5);
+    expect(object.contentType).toBe('image/webp');
+    expect(object.etag).toBe('"etag-4"');
+  });
+
   it('maps OCI 404 responses to NotFoundException', async () => {
     const getObject = jest.fn().mockRejectedValue({ statusCode: 404 });
     const service = new MediaService();
@@ -238,4 +285,20 @@ function imageFile(
     size: options.size ?? buffer.length,
     buffer,
   };
+}
+
+async function readAll(readable: Readable): Promise<string> {
+  const chunks: Buffer[] = [];
+
+  for await (const chunk of readable) {
+    if (Buffer.isBuffer(chunk)) {
+      chunks.push(chunk);
+    } else if (chunk instanceof Uint8Array) {
+      chunks.push(Buffer.from(chunk));
+    } else if (typeof chunk === 'string') {
+      chunks.push(Buffer.from(chunk));
+    }
+  }
+
+  return Buffer.concat(chunks).toString();
 }
