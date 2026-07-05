@@ -38,7 +38,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) => part.slice(0, 1).toUpperCase())
+    .map((part: string) => part.slice(0, 1).toUpperCase())
     .join("")
   const imageUrl = user?.image ?? undefined
   const isHeader = variant === "header"
