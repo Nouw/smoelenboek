@@ -15,9 +15,19 @@ const data = {
   navMain: [
     {
       title: "Teams",
-      url: "#",
+      url: "/teams/men",
       icon: UsersRound,
       isActive: true,
+      items: [
+        {
+          title: "Men",
+          url: "/teams/men",
+        },
+        {
+          title: "Women",
+          url: "/teams/women",
+        },
+      ],
     },
     {
       title: "Committees",
