@@ -140,7 +140,7 @@ function LoginLayout() {
 function AuthenticatedLayout() {
   return (
     <div className="[--header-height:calc(--spacing(14))]">
-      <SidebarProvider className="flex flex-col">
+      <SidebarProvider className="flex flex-col pt-(--header-height)">
         <SiteHeader />
         <div className="flex flex-1">
           <AppSidebar />
