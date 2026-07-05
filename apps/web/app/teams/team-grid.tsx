@@ -2,7 +2,7 @@
 
 import { AlertCircle, ImageIcon, Loader2 } from 'lucide-react';
 import { trpc } from '../trpc';
-import { isMensTeam, isWomensTeam } from './team-filters';
+import { isMensTeam, isWomensTeam, sortTeamsByNameNumber } from './team-filters';
 
 type TeamGridProps = {
   gender: 'men' | 'women';
@@ -11,17 +11,15 @@ type TeamGridProps = {
 const pageCopy = {
   men: {
     title: 'Heren teams',
-    description: 'Overzicht van alle heren teams.',
     empty: 'Geen heren teams gevonden.',
   },
   women: {
     title: 'Dames teams',
-    description: 'Overzicht van alle dames teams.',
     empty: 'Geen dames teams gevonden.',
   },
 } satisfies Record<
   TeamGridProps['gender'],
-  { title: string; description: string; empty: string }
+  { title: string; empty: string }
 >;
 
 export function TeamGrid({ gender }: TeamGridProps) {
@@ -46,14 +44,14 @@ export function TeamGrid({ gender }: TeamGridProps) {
     );
   }
 
-  const visibleTeams =
-    teams.data?.filter(gender === 'men' ? isMensTeam : isWomensTeam) ?? [];
+  const visibleTeams = sortTeamsByNameNumber(
+    teams.data?.filter(gender === 'men' ? isMensTeam : isWomensTeam) ?? [],
+  );
 
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-normal">{copy.title}</h1>
-        <p className="text-sm text-muted-foreground">{copy.description}</p>
       </div>
 
       {visibleTeams.length === 0 ? (
