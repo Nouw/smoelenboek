@@ -1,15 +1,21 @@
 import {
   Controller,
   Delete,
+  Get,
+  Header,
+  HttpCode,
   Post,
+  Param,
   Req,
+  Res,
   UnauthorizedException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
+import { pipeline } from 'node:stream/promises';
 
 import { AuthContextFactory } from '../auth/auth-context.factory';
 import { UpdateUserProfileCommand } from '../users/commands/update-user-profile.command';
@@ -102,6 +108,57 @@ export class ProfileImageController {
           error instanceof Error ? error.message : String(error)
         }`,
       );
+    }
+  }
+}
+
+@Controller('media/images')
+export class ImageController {
+  constructor(
+    private readonly authContextFactory: AuthContextFactory,
+    private readonly mediaService: MediaService,
+  ) {}
+
+  @Get('*objectName')
+  @HttpCode(200)
+  @Header('Cache-Control', 'private, max-age=86400, immutable')
+  async getImage(
+    @Req() request: Request,
+    @Res() response: Response,
+    @Param('objectName') objectNameParam: string | string[],
+  ): Promise<void> {
+    await this.requireAuthenticated(request);
+
+    const objectName = Array.isArray(objectNameParam)
+      ? objectNameParam.join('/')
+      : objectNameParam;
+    const image = await this.mediaService.getImageByObjectName(objectName);
+    const requestEtag = request.headers['if-none-match'];
+
+    if (image.etag && requestEtag === image.etag) {
+      response.status(304).end();
+      return;
+    }
+
+    response.setHeader('Content-Type', image.contentType);
+    response.setHeader('Cache-Control', 'private, max-age=86400, immutable');
+
+    if (image.contentLength !== null) {
+      response.setHeader('Content-Length', String(image.contentLength));
+    }
+
+    if (image.etag) {
+      response.setHeader('ETag', image.etag);
+    }
+
+    await pipeline(image.content, response);
+  }
+
+  private async requireAuthenticated(request: Request): Promise<void> {
+    const context = await this.authContextFactory.create(request);
+
+    if (!context.userId) {
+      throw new UnauthorizedException('Authentication is required.');
     }
   }
 }

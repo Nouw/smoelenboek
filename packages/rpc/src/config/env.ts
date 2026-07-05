@@ -16,7 +16,6 @@ export type RpcEnv = {
   OCI_PRIVATE_KEY_PASSPHRASE?: string;
   OCI_OBJECT_STORAGE_NAMESPACE: string;
   OCI_OBJECT_STORAGE_BUCKET: string;
-  OCI_OBJECT_STORAGE_PUBLIC_BASE_URL?: string;
 };
 
 export const rpcEnvFilePath = join(__dirname, '..', '..', '.env.local');
@@ -55,12 +54,6 @@ export function validateRpcEnv(config: Record<string, unknown>): RpcEnv {
     config,
     'OCI_OBJECT_STORAGE_BUCKET',
   );
-  const ociObjectStoragePublicBaseUrl = readOptionalString(
-    config,
-    'OCI_OBJECT_STORAGE_PUBLIC_BASE_URL',
-    '',
-  );
-
   if (!Number.isInteger(Number(port)) || Number(port) <= 0) {
     throw new Error('PORT must be a positive integer.');
   }
@@ -81,9 +74,6 @@ export function validateRpcEnv(config: Record<string, unknown>): RpcEnv {
       : {}),
     OCI_OBJECT_STORAGE_NAMESPACE: ociObjectStorageNamespace,
     OCI_OBJECT_STORAGE_BUCKET: ociObjectStorageBucket,
-    ...(ociObjectStoragePublicBaseUrl
-      ? { OCI_OBJECT_STORAGE_PUBLIC_BASE_URL: ociObjectStoragePublicBaseUrl }
-      : {}),
   };
 }
 

@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
+import { Readable } from 'node:stream';
 
 const maxImageBytes = 5 * 1024 * 1024;
 
@@ -10,6 +11,8 @@ const imageExtensionsByMimeType = new Map([
   ['image/webp', 'webp'],
   ['image/gif', 'gif'],
 ]);
+
+const allowedObjectPrefixes = ['profile-images/', 'team-images/', 'photobooks/'];
 
 export type UploadedImage = {
   objectName: string;
@@ -41,7 +44,21 @@ type OciObjectStorageClient = {
     namespaceName: string;
     bucketName: string;
     objectName: string;
-  }): Promise<{ value?: { content?: unknown } }>;
+  }): Promise<{
+    value?: {
+      content?: unknown;
+      contentLength?: number;
+      contentType?: string;
+      eTag?: string;
+    };
+  }>;
+};
+
+export type StoredImage = {
+  content: Readable;
+  contentLength: number | null;
+  contentType: string;
+  etag: string | null;
 };
 
 type OciModules = {
@@ -91,7 +108,7 @@ export class MediaService {
 
     return {
       objectName,
-      imageUrl: this.toPublicUrl(objectName),
+      imageUrl: this.toRpcImageUrl(objectName),
     };
   }
 
@@ -114,30 +131,45 @@ export class MediaService {
     });
   }
 
-  async getImageByUrl(imageUrl: string): Promise<unknown | null> {
-    const objectName = this.objectNameFromUrl(imageUrl);
-
-    if (!objectName) {
-      return null;
-    }
-
+  async getImageByObjectName(objectName: string): Promise<StoredImage> {
+    this.assertAllowedObjectName(objectName);
     const client = await this.getClient();
-    const object = await client.getObject({
-      namespaceName: this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
-      bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
-      objectName,
-    });
 
-    return object.value?.content ?? null;
+    try {
+      const object = await client.getObject({
+        namespaceName: this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
+        bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
+        objectName,
+      });
+      const value = object.value;
+
+      if (!value?.content) {
+        throw new NotFoundException('Image not found.');
+      }
+
+      return {
+        content: this.toReadable(value.content),
+        contentLength:
+          typeof value.contentLength === 'number' ? value.contentLength : null,
+        contentType: value.contentType ?? this.contentTypeFromObjectName(objectName),
+        etag: value.eTag ?? null,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException || this.isOciNotFound(error)) {
+        throw new NotFoundException('Image not found.');
+      }
+
+      throw error;
+    }
   }
 
-  publicUrlBase(): string {
-    const customBaseUrl = process.env.OCI_OBJECT_STORAGE_PUBLIC_BASE_URL;
+  toRpcImageUrl(objectName: string): string {
+    this.assertAllowedObjectName(objectName);
 
-    if (customBaseUrl) {
-      return customBaseUrl.replace(/\/+$/, '');
-    }
+    return `${this.rpcBaseUrl()}/media/images/${this.encodeObjectName(objectName)}`;
+  }
 
+  legacyOciPublicUrlBase(): string {
     const region = this.requiredEnv('OCI_REGION');
     const namespace = encodeURIComponent(
       this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
@@ -148,22 +180,30 @@ export class MediaService {
   }
 
   objectNameFromUrl(imageUrl: string): string | null {
-    const baseUrl = `${this.publicUrlBase()}/`;
+    const rpcBaseUrl = `${this.rpcBaseUrl()}/media/images/`;
 
-    if (!imageUrl.startsWith(baseUrl)) {
+    if (imageUrl.startsWith(rpcBaseUrl)) {
+      return this.decodeObjectName(imageUrl.slice(rpcBaseUrl.length));
+    }
+
+    const legacyBaseUrl = `${this.legacyOciPublicUrlBase()}/`;
+
+    if (!imageUrl.startsWith(legacyBaseUrl)) {
       return null;
     }
 
-    const path = imageUrl.slice(baseUrl.length);
+    return this.decodeObjectName(imageUrl.slice(legacyBaseUrl.length));
+  }
 
-    if (!path) {
-      return null;
+  assertAllowedObjectName(objectName: string): void {
+    if (
+      !objectName ||
+      objectName.includes('..') ||
+      objectName.startsWith('/') ||
+      !allowedObjectPrefixes.some((prefix) => objectName.startsWith(prefix))
+    ) {
+      throw new BadRequestException('Image object name is not allowed.');
     }
-
-    return path
-      .split('/')
-      .map((part) => decodeURIComponent(part))
-      .join('/');
   }
 
   private validateImage(file: ImageUploadFile): void {
@@ -180,13 +220,80 @@ export class MediaService {
     }
   }
 
-  private toPublicUrl(objectName: string): string {
-    const encodedObjectName = objectName
+  private encodeObjectName(objectName: string): string {
+    return objectName
       .split('/')
       .map((part) => encodeURIComponent(part))
       .join('/');
+  }
 
-    return `${this.publicUrlBase()}/${encodedObjectName}`;
+  private decodeObjectName(encodedObjectName: string): string | null {
+    if (!encodedObjectName) {
+      return null;
+    }
+
+    try {
+      const objectName = encodedObjectName
+        .split('/')
+        .map((part) => decodeURIComponent(part))
+        .join('/');
+
+      this.assertAllowedObjectName(objectName);
+      return objectName;
+    } catch {
+      return null;
+    }
+  }
+
+  private rpcBaseUrl(): string {
+    return this.requiredEnv('BETTER_AUTH_URL').replace(/\/+$/, '');
+  }
+
+  private contentTypeFromObjectName(objectName: string): string {
+    const extension = extname(objectName).toLowerCase();
+
+    if (extension === '.jpg' || extension === '.jpeg') {
+      return 'image/jpeg';
+    }
+
+    if (extension === '.png') {
+      return 'image/png';
+    }
+
+    if (extension === '.webp') {
+      return 'image/webp';
+    }
+
+    if (extension === '.gif') {
+      return 'image/gif';
+    }
+
+    return 'application/octet-stream';
+  }
+
+  private toReadable(content: unknown): Readable {
+    if (content instanceof Readable) {
+      return content;
+    }
+
+    if (Buffer.isBuffer(content)) {
+      return Readable.from(content);
+    }
+
+    if (typeof content === 'string') {
+      return Readable.from(Buffer.from(content));
+    }
+
+    throw new NotFoundException('Image not found.');
+  }
+
+  private isOciNotFound(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'statusCode' in error &&
+      (error as { statusCode?: unknown }).statusCode === 404
+    );
   }
 
   private safeExtension(filename: string): string {

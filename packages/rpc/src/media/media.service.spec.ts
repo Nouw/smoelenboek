@@ -1,5 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
+import { Readable } from 'node:stream';
 
 import { type ImageUploadFile, MediaService } from './media.service';
 
@@ -16,6 +17,7 @@ describe('MediaService', () => {
       OCI_PRIVATE_KEY: 'private-key',
       OCI_OBJECT_STORAGE_NAMESPACE: 'namespace',
       OCI_OBJECT_STORAGE_BUCKET: 'bucket',
+      BETTER_AUTH_URL: 'http://localhost:3002',
     };
   });
 
@@ -40,7 +42,7 @@ describe('MediaService', () => {
       /^profile-images\/user_123\/[0-9a-f-]+\.png$/,
     );
     expect(result.imageUrl).toBe(
-      `https://objectstorage.eu-amsterdam-1.oraclecloud.com/n/namespace/b/bucket/o/${result.objectName}`,
+      `http://localhost:3002/media/images/${result.objectName}`,
     );
     expect(putObject).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -81,16 +83,19 @@ describe('MediaService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('deletes only URLs belonging to the configured bucket', async () => {
+  it('deletes RPC image URLs and ignores external URLs', async () => {
     const deleteObject = jest.fn().mockResolvedValue({});
     const service = new MediaService();
     (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
       Promise.resolve({ deleteObject });
 
     await service.deleteImageByUrl(
-      'https://objectstorage.eu-amsterdam-1.oraclecloud.com/n/namespace/b/bucket/o/profile-images/user_123/avatar.png',
+      'http://localhost:3002/media/images/profile-images/user_123/avatar.png',
     );
     await service.deleteImageByUrl('https://example.com/avatar.png');
+    await service.deleteImageByUrl(
+      'http://localhost:3002/media/images/profile-images/%',
+    );
 
     expect(deleteObject).toHaveBeenCalledTimes(1);
     expect(deleteObject).toHaveBeenCalledWith({
@@ -100,15 +105,14 @@ describe('MediaService', () => {
     });
   });
 
-  it('supports a custom public base URL', async () => {
-    process.env.OCI_OBJECT_STORAGE_PUBLIC_BASE_URL = 'https://cdn.example.com/images/';
+  it('deletes legacy OCI public URLs for cleanup', async () => {
     const deleteObject = jest.fn().mockResolvedValue({});
     const service = new MediaService();
     (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
       Promise.resolve({ deleteObject });
 
     await service.deleteImageByUrl(
-      'https://cdn.example.com/images/profile-images/user_123/avatar.png',
+      'https://objectstorage.eu-amsterdam-1.oraclecloud.com/n/namespace/b/bucket/o/profile-images/user_123/avatar.png',
     );
 
     expect(deleteObject).toHaveBeenCalledWith(
@@ -116,6 +120,67 @@ describe('MediaService', () => {
         objectName: 'profile-images/user_123/avatar.png',
       }),
     );
+  });
+
+  it('allows future photobook image object names', () => {
+    const service = new MediaService();
+
+    expect(() =>
+      service.assertAllowedObjectName(
+        'photobooks/album_123/thumb/image_456.webp',
+      ),
+    ).not.toThrow();
+    expect(
+      service.toRpcImageUrl('photobooks/album_123/original/image_456.jpg'),
+    ).toBe(
+      'http://localhost:3002/media/images/photobooks/album_123/original/image_456.jpg',
+    );
+  });
+
+  it('rejects unsupported object names', () => {
+    const service = new MediaService();
+
+    expect(() =>
+      service.assertAllowedObjectName('documents/secret.pdf'),
+    ).toThrow(BadRequestException);
+    expect(() =>
+      service.assertAllowedObjectName('profile-images/../secret.png'),
+    ).toThrow(BadRequestException);
+  });
+
+  it('loads image objects from OCI with stream metadata', async () => {
+    const content = Readable.from(Buffer.from('image'));
+    const getObject = jest.fn().mockResolvedValue({
+      value: {
+        content,
+        contentLength: 5,
+        contentType: 'image/png',
+        eTag: '"etag-1"',
+      },
+    });
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ getObject });
+
+    await expect(
+      service.getImageByObjectName('profile-images/user_123/avatar.png'),
+    ).resolves.toEqual({
+      content,
+      contentLength: 5,
+      contentType: 'image/png',
+      etag: '"etag-1"',
+    });
+  });
+
+  it('maps OCI 404 responses to NotFoundException', async () => {
+    const getObject = jest.fn().mockRejectedValue({ statusCode: 404 });
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ getObject });
+
+    await expect(
+      service.getImageByObjectName('profile-images/user_123/missing.png'),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });
 
