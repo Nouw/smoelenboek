@@ -2,97 +2,49 @@ import { UnauthorizedException } from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 import { Readable, Writable } from 'node:stream';
 
-import { UpdateUserProfileCommand } from '../users/commands/update-user-profile.command';
+import {
+  DeleteProfileImageCommand,
+  UploadProfileImageCommand,
+} from './commands/profile-image.commands';
 import type { ImageUploadFile } from './media.service';
-import { ImageController, ProfileImageController } from './profile-image.controller';
+import { ObjectController, ProfileImageController } from './profile-image.controller';
 
 describe('ProfileImageController', () => {
-  it('uploads a profile image, updates the user, and deletes the previous image', async () => {
-    const execute = jest.fn().mockResolvedValue({});
-    const deleteImageByUrl = jest.fn().mockResolvedValue(undefined);
+  it('dispatches profile image uploads to the command bus', async () => {
+    const file = {} as ImageUploadFile;
+    const execute = jest.fn().mockResolvedValue({
+      imageUrl:
+        'http://localhost:3002/media/objects/profile-images/user_123/new.png',
+    });
     const controller = new ProfileImageController(
       { create: jest.fn().mockResolvedValue({ userId: 'user_123' }) } as never,
       { execute } as never,
-      {
-        uploadImage: jest.fn().mockResolvedValue({
-          imageUrl:
-            'http://localhost:3002/media/images/profile-images/user_123/new.png',
-        }),
-        deleteImageByUrl,
-      } as never,
-      {
-        findById: jest.fn().mockResolvedValue({
-          imageUrl:
-            'http://localhost:3002/media/images/profile-images/user_123/old.png',
-        }),
-      } as never,
     );
 
     await expect(
-      controller.uploadProfileImage({} as never, {} as ImageUploadFile),
+      controller.uploadProfileImage({} as never, file),
     ).resolves.toEqual({
       imageUrl:
-        'http://localhost:3002/media/images/profile-images/user_123/new.png',
+        'http://localhost:3002/media/objects/profile-images/user_123/new.png',
     });
 
     expect(execute).toHaveBeenCalledWith(
-      new UpdateUserProfileCommand('user_123', {
-        imageUrl:
-          'http://localhost:3002/media/images/profile-images/user_123/new.png',
-      }),
-    );
-    expect(deleteImageByUrl).toHaveBeenCalledWith(
-      'http://localhost:3002/media/images/profile-images/user_123/old.png',
+      new UploadProfileImageCommand('user_123', file),
     );
   });
 
-  it('cleans up the uploaded object when the profile update fails', async () => {
-    const deleteImageByUrl = jest.fn().mockResolvedValue(undefined);
-    const controller = new ProfileImageController(
-      { create: jest.fn().mockResolvedValue({ userId: 'user_123' }) } as never,
-      { execute: jest.fn().mockRejectedValue(new Error('db failed')) } as never,
-      {
-        uploadImage: jest.fn().mockResolvedValue({
-          imageUrl:
-            'http://localhost:3002/media/images/profile-images/user_123/new.png',
-        }),
-        deleteImageByUrl,
-      } as never,
-      { findById: jest.fn().mockResolvedValue({ imageUrl: null }) } as never,
-    );
-
-    await expect(
-      controller.uploadProfileImage({} as never, {} as ImageUploadFile),
-    ).rejects.toThrow('db failed');
-
-    expect(deleteImageByUrl).toHaveBeenCalledWith(
-      'http://localhost:3002/media/images/profile-images/user_123/new.png',
-    );
-  });
-
-  it('clears the profile image and deletes the previous object', async () => {
-    const execute = jest.fn().mockResolvedValue({});
-    const deleteImageByUrl = jest.fn().mockResolvedValue(undefined);
+  it('dispatches profile image deletes to the command bus', async () => {
+    const execute = jest.fn().mockResolvedValue({ imageUrl: null });
     const controller = new ProfileImageController(
       { create: jest.fn().mockResolvedValue({ userId: 'user_123' }) } as never,
       { execute } as never,
-      { deleteImageByUrl } as never,
-      {
-        findById: jest.fn().mockResolvedValue({
-          imageUrl:
-            'http://localhost:3002/media/images/profile-images/user_123/old.png',
-        }),
-      } as never,
     );
 
     await expect(controller.deleteProfileImage({} as never)).resolves.toEqual({
       imageUrl: null,
     });
     expect(execute).toHaveBeenCalledWith(
-      new UpdateUserProfileCommand('user_123', { imageUrl: null }),
-    );
-    expect(deleteImageByUrl).toHaveBeenCalledWith(
-      'http://localhost:3002/media/images/profile-images/user_123/old.png',
+      new DeleteProfileImageCommand('user_123'),
     );
   });
 
@@ -100,8 +52,6 @@ describe('ProfileImageController', () => {
     const controller = new ProfileImageController(
       { create: jest.fn().mockResolvedValue({ userId: null }) } as never,
       { execute: jest.fn() } as never,
-      { uploadImage: jest.fn(), deleteImageByUrl: jest.fn() } as never,
-      { findById: jest.fn() } as never,
     );
 
     await expect(
@@ -110,15 +60,15 @@ describe('ProfileImageController', () => {
   });
 });
 
-describe('ImageController', () => {
-  it('rejects unauthenticated image reads', async () => {
-    const controller = new ImageController(
+describe('ObjectController', () => {
+  it('rejects unauthenticated object reads', async () => {
+    const controller = new ObjectController(
       { create: jest.fn().mockResolvedValue({ userId: null }) } as never,
-      { getImageByObjectName: jest.fn() } as never,
+      { execute: jest.fn() } as never,
     );
 
     await expect(
-      controller.getImage(
+      controller.getObject(
         { headers: {} } as never,
         responseDouble() as never,
         ['profile-images', 'user_123', 'avatar.png'],
@@ -126,22 +76,21 @@ describe('ImageController', () => {
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  it('streams authenticated image reads with cache headers', async () => {
+  it('streams authenticated object reads with cache headers through the query bus', async () => {
     const content = Readable.from(Buffer.from('image'));
     const response = responseDouble();
-    const controller = new ImageController(
+    const execute = jest.fn().mockResolvedValue({
+      content,
+      contentLength: 5,
+      contentType: 'image/png',
+      etag: '"etag-1"',
+    });
+    const controller = new ObjectController(
       { create: jest.fn().mockResolvedValue({ userId: 'user_123' }) } as never,
-      {
-        getImageByObjectName: jest.fn().mockResolvedValue({
-          content,
-          contentLength: 5,
-          contentType: 'image/png',
-          etag: '"etag-1"',
-        }),
-      } as never,
+      { execute } as never,
     );
 
-    await controller.getImage(
+    await controller.getObject(
       { headers: {} } as never,
       response as never,
       ['profile-images', 'user_123', 'avatar.png'],
@@ -155,14 +104,19 @@ describe('ImageController', () => {
       'private, max-age=86400, immutable',
     );
     expect(response.written.toString()).toBe('image');
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        objectName: 'profile-images/user_123/avatar.png',
+      }),
+    );
   });
 
   it('returns 304 when the ETag matches', async () => {
     const response = responseDouble();
-    const controller = new ImageController(
+    const controller = new ObjectController(
       { create: jest.fn().mockResolvedValue({ userId: 'user_123' }) } as never,
       {
-        getImageByObjectName: jest.fn().mockResolvedValue({
+        execute: jest.fn().mockResolvedValue({
           content: Readable.from(Buffer.from('image')),
           contentLength: 5,
           contentType: 'image/png',
@@ -171,7 +125,7 @@ describe('ImageController', () => {
       } as never,
     );
 
-    await controller.getImage(
+    await controller.getObject(
       { headers: { 'if-none-match': '"etag-1"' } } as never,
       response as never,
       'profile-images/user_123/avatar.png',

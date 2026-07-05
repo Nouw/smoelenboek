@@ -12,15 +12,18 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request, Response } from 'express';
 import { pipeline } from 'node:stream/promises';
 
 import { AuthContextFactory } from '../auth/auth-context.factory';
-import { UpdateUserProfileCommand } from '../users/commands/update-user-profile.command';
-import { UsersRepository } from '../users/repositories/users.repository';
-import { type ImageUploadFile, MediaService } from './media.service';
+import {
+  DeleteProfileImageCommand,
+  UploadProfileImageCommand,
+} from './commands/profile-image.commands';
+import { type ImageUploadFile, type StoredObject } from './media.service';
+import { GetObjectQuery } from './queries/get-object.query';
 
 type ProfileImageResponse = {
   imageUrl: string | null;
@@ -31,8 +34,6 @@ export class ProfileImageController {
   constructor(
     private readonly authContextFactory: AuthContextFactory,
     private readonly commandBus: CommandBus,
-    private readonly mediaService: MediaService,
-    private readonly usersRepository: UsersRepository,
   ) {}
 
   @Post()
@@ -49,28 +50,8 @@ export class ProfileImageController {
     @UploadedFile() file: ImageUploadFile,
   ): Promise<ProfileImageResponse> {
     const userId = await this.requireUserId(request);
-    const currentUser = await this.usersRepository.findById(userId);
-    const previousImageUrl = currentUser?.imageUrl ?? null;
-    const uploadedImage = await this.mediaService.uploadImage(
-      'profile-images',
-      userId,
-      file,
-    );
 
-    try {
-      await this.commandBus.execute(
-        new UpdateUserProfileCommand(userId, {
-          imageUrl: uploadedImage.imageUrl,
-        }),
-      );
-    } catch (error) {
-      await this.mediaService.deleteImageByUrl(uploadedImage.imageUrl);
-      throw error;
-    }
-
-    await this.deletePreviousImage(previousImageUrl);
-
-    return { imageUrl: uploadedImage.imageUrl };
+    return this.commandBus.execute(new UploadProfileImageCommand(userId, file));
   }
 
   @Delete()
@@ -78,15 +59,8 @@ export class ProfileImageController {
     @Req() request: Request,
   ): Promise<ProfileImageResponse> {
     const userId = await this.requireUserId(request);
-    const currentUser = await this.usersRepository.findById(userId);
-    const previousImageUrl = currentUser?.imageUrl ?? null;
 
-    await this.commandBus.execute(
-      new UpdateUserProfileCommand(userId, { imageUrl: null }),
-    );
-    await this.deletePreviousImage(previousImageUrl);
-
-    return { imageUrl: null };
+    return this.commandBus.execute(new DeleteProfileImageCommand(userId));
   }
 
   private async requireUserId(request: Request): Promise<string> {
@@ -98,31 +72,19 @@ export class ProfileImageController {
 
     return context.userId;
   }
-
-  private async deletePreviousImage(imageUrl: string | null): Promise<void> {
-    try {
-      await this.mediaService.deleteImageByUrl(imageUrl);
-    } catch (error) {
-      console.warn(
-        `[media] Failed to delete previous profile image: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-    }
-  }
 }
 
-@Controller('media/images')
-export class ImageController {
+@Controller(['media/objects', 'media/images'])
+export class ObjectController {
   constructor(
     private readonly authContextFactory: AuthContextFactory,
-    private readonly mediaService: MediaService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get('*objectName')
   @HttpCode(200)
   @Header('Cache-Control', 'private, max-age=86400, immutable')
-  async getImage(
+  async getObject(
     @Req() request: Request,
     @Res() response: Response,
     @Param('objectName') objectNameParam: string | string[],
@@ -132,26 +94,28 @@ export class ImageController {
     const objectName = Array.isArray(objectNameParam)
       ? objectNameParam.join('/')
       : objectNameParam;
-    const image = await this.mediaService.getImageByObjectName(objectName);
+    const object = await this.queryBus.execute<GetObjectQuery, StoredObject>(
+      new GetObjectQuery(objectName),
+    );
     const requestEtag = request.headers['if-none-match'];
 
-    if (image.etag && requestEtag === image.etag) {
+    if (object.etag && requestEtag === object.etag) {
       response.status(304).end();
       return;
     }
 
-    response.setHeader('Content-Type', image.contentType);
+    response.setHeader('Content-Type', object.contentType);
     response.setHeader('Cache-Control', 'private, max-age=86400, immutable');
 
-    if (image.contentLength !== null) {
-      response.setHeader('Content-Length', String(image.contentLength));
+    if (object.contentLength !== null) {
+      response.setHeader('Content-Length', String(object.contentLength));
     }
 
-    if (image.etag) {
-      response.setHeader('ETag', image.etag);
+    if (object.etag) {
+      response.setHeader('ETag', object.etag);
     }
 
-    await pipeline(image.content, response);
+    await pipeline(object.content, response);
   }
 
   private async requireAuthenticated(request: Request): Promise<void> {

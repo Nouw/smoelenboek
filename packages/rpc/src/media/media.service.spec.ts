@@ -42,7 +42,7 @@ describe('MediaService', () => {
       /^profile-images\/user_123\/[0-9a-f-]+\.png$/,
     );
     expect(result.imageUrl).toBe(
-      `http://localhost:3002/media/images/${result.objectName}`,
+      `http://localhost:3002/media/objects/${result.objectName}`,
     );
     expect(putObject).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -83,14 +83,14 @@ describe('MediaService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('deletes RPC image URLs and ignores external URLs', async () => {
+  it('deletes RPC object URLs and ignores external URLs', async () => {
     const deleteObject = jest.fn().mockResolvedValue({});
     const service = new MediaService();
     (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
       Promise.resolve({ deleteObject });
 
     await service.deleteImageByUrl(
-      'http://localhost:3002/media/images/profile-images/user_123/avatar.png',
+      'http://localhost:3002/media/objects/profile-images/user_123/avatar.png',
     );
     await service.deleteImageByUrl('https://example.com/avatar.png');
     await service.deleteImageByUrl(
@@ -98,6 +98,23 @@ describe('MediaService', () => {
     );
 
     expect(deleteObject).toHaveBeenCalledTimes(1);
+    expect(deleteObject).toHaveBeenCalledWith({
+      namespaceName: 'namespace',
+      bucketName: 'bucket',
+      objectName: 'profile-images/user_123/avatar.png',
+    });
+  });
+
+  it('deletes legacy RPC image URLs', async () => {
+    const deleteObject = jest.fn().mockResolvedValue({});
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ deleteObject });
+
+    await service.deleteObjectByUrl(
+      'http://localhost:3002/media/images/profile-images/user_123/avatar.png',
+    );
+
     expect(deleteObject).toHaveBeenCalledWith({
       namespaceName: 'namespace',
       bucketName: 'bucket',
@@ -133,7 +150,7 @@ describe('MediaService', () => {
     expect(
       service.toRpcImageUrl('photobooks/album_123/original/image_456.jpg'),
     ).toBe(
-      'http://localhost:3002/media/images/photobooks/album_123/original/image_456.jpg',
+      'http://localhost:3002/media/objects/photobooks/album_123/original/image_456.jpg',
     );
   });
 
@@ -148,7 +165,7 @@ describe('MediaService', () => {
     ).toThrow(BadRequestException);
   });
 
-  it('loads image objects from OCI with stream metadata', async () => {
+  it('loads objects from OCI with stream metadata', async () => {
     const content = Readable.from(Buffer.from('image'));
     const getObject = jest.fn().mockResolvedValue({
       value: {
@@ -163,7 +180,7 @@ describe('MediaService', () => {
       Promise.resolve({ getObject });
 
     await expect(
-      service.getImageByObjectName('profile-images/user_123/avatar.png'),
+      service.getObjectByName('profile-images/user_123/avatar.png'),
     ).resolves.toEqual({
       content,
       contentLength: 5,
@@ -172,7 +189,7 @@ describe('MediaService', () => {
     });
   });
 
-  it('loads image objects from the OCI SDK response body', async () => {
+  it('loads objects from the OCI SDK response body', async () => {
     const content = Readable.from(Buffer.from('image'));
     const getObject = jest.fn().mockResolvedValue({
       value: content,
@@ -185,7 +202,7 @@ describe('MediaService', () => {
       Promise.resolve({ getObject });
 
     await expect(
-      service.getImageByObjectName('profile-images/user_123/avatar.webp'),
+      service.getObjectByName('profile-images/user_123/avatar.webp'),
     ).resolves.toEqual({
       content,
       contentLength: 5,
@@ -201,7 +218,7 @@ describe('MediaService', () => {
       Promise.resolve({ getObject });
 
     await expect(
-      service.getImageByObjectName('profile-images/user_123/missing.png'),
+      service.getObjectByName('profile-images/user_123/missing.png'),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

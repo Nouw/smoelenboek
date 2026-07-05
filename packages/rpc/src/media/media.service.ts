@@ -14,10 +14,12 @@ const imageExtensionsByMimeType = new Map([
 
 const allowedObjectPrefixes = ['profile-images/', 'team-images/', 'photobooks/'];
 
-export type UploadedImage = {
+export type UploadedObject = {
   objectName: string;
   imageUrl: string;
 };
+
+export type UploadedImage = UploadedObject;
 
 export type ImageUploadFile = {
   originalname: string;
@@ -52,12 +54,14 @@ type OciObjectStorageClient = {
   }>;
 };
 
-export type StoredImage = {
+export type StoredObject = {
   content: Readable;
   contentLength: number | null;
   contentType: string;
   etag: string | null;
 };
+
+export type StoredImage = StoredObject;
 
 type OciModules = {
   common: {
@@ -86,7 +90,7 @@ export class MediaService {
     scope: 'profile-images' | 'team-images',
     ownerId: string,
     file: ImageUploadFile,
-  ): Promise<UploadedImage> {
+  ): Promise<UploadedObject> {
     this.validateImage(file);
 
     const extension =
@@ -106,16 +110,16 @@ export class MediaService {
 
     return {
       objectName,
-      imageUrl: this.toRpcImageUrl(objectName),
+      imageUrl: this.toRpcObjectUrl(objectName),
     };
   }
 
-  async deleteImageByUrl(imageUrl: string | null | undefined): Promise<void> {
-    if (!imageUrl) {
+  async deleteObjectByUrl(objectUrl: string | null | undefined): Promise<void> {
+    if (!objectUrl) {
       return;
     }
 
-    const objectName = this.objectNameFromUrl(imageUrl);
+    const objectName = this.objectNameFromUrl(objectUrl);
 
     if (!objectName) {
       return;
@@ -129,7 +133,11 @@ export class MediaService {
     });
   }
 
-  async getImageByObjectName(objectName: string): Promise<StoredImage> {
+  async deleteImageByUrl(imageUrl: string | null | undefined): Promise<void> {
+    await this.deleteObjectByUrl(imageUrl);
+  }
+
+  async getObjectByName(objectName: string): Promise<StoredObject> {
     this.assertAllowedObjectName(objectName);
     const client = await this.getClient();
 
@@ -142,7 +150,7 @@ export class MediaService {
       const value = this.objectBody(object);
 
       if (!value) {
-        throw new NotFoundException('Image not found.');
+        throw new NotFoundException('Object not found.');
       }
 
       return {
@@ -154,17 +162,25 @@ export class MediaService {
       };
     } catch (error) {
       if (error instanceof NotFoundException || this.isOciNotFound(error)) {
-        throw new NotFoundException('Image not found.');
+        throw new NotFoundException('Object not found.');
       }
 
       throw error;
     }
   }
 
-  toRpcImageUrl(objectName: string): string {
+  async getImageByObjectName(objectName: string): Promise<StoredObject> {
+    return this.getObjectByName(objectName);
+  }
+
+  toRpcObjectUrl(objectName: string): string {
     this.assertAllowedObjectName(objectName);
 
-    return `${this.rpcBaseUrl()}/media/images/${this.encodeObjectName(objectName)}`;
+    return `${this.rpcBaseUrl()}/media/objects/${this.encodeObjectName(objectName)}`;
+  }
+
+  toRpcImageUrl(objectName: string): string {
+    return this.toRpcObjectUrl(objectName);
   }
 
   legacyOciPublicUrlBase(): string {
@@ -178,10 +194,16 @@ export class MediaService {
   }
 
   objectNameFromUrl(imageUrl: string): string | null {
-    const rpcBaseUrl = `${this.rpcBaseUrl()}/media/images/`;
+    const rpcObjectBaseUrl = `${this.rpcBaseUrl()}/media/objects/`;
 
-    if (imageUrl.startsWith(rpcBaseUrl)) {
-      return this.decodeObjectName(imageUrl.slice(rpcBaseUrl.length));
+    if (imageUrl.startsWith(rpcObjectBaseUrl)) {
+      return this.decodeObjectName(imageUrl.slice(rpcObjectBaseUrl.length));
+    }
+
+    const rpcImageBaseUrl = `${this.rpcBaseUrl()}/media/images/`;
+
+    if (imageUrl.startsWith(rpcImageBaseUrl)) {
+      return this.decodeObjectName(imageUrl.slice(rpcImageBaseUrl.length));
     }
 
     const legacyBaseUrl = `${this.legacyOciPublicUrlBase()}/`;
@@ -200,7 +222,7 @@ export class MediaService {
       objectName.startsWith('/') ||
       !allowedObjectPrefixes.some((prefix) => objectName.startsWith(prefix))
     ) {
-      throw new BadRequestException('Image object name is not allowed.');
+      throw new BadRequestException('Object name is not allowed.');
     }
   }
 
@@ -282,7 +304,7 @@ export class MediaService {
       return Readable.from(Buffer.from(content));
     }
 
-    throw new NotFoundException('Image not found.');
+      throw new NotFoundException('Object not found.');
   }
 
   private objectBody(object: {
