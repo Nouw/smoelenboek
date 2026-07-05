@@ -21,6 +21,19 @@ export type BetterAuthInstance = {
       };
     }) => Promise<unknown>;
     verifyApiKey: (context: { body: { key: string } }) => Promise<unknown>;
+    createApiKey: (context: {
+      body: {
+        userId: string;
+        name?: string;
+        prefix?: string;
+        expiresIn?: number;
+        metadata?: unknown;
+        rateLimitEnabled?: boolean;
+        rateLimitMax?: number;
+        rateLimitTimeWindow?: number;
+        remaining?: number;
+      };
+    }) => Promise<unknown>;
   };
 };
 export type BetterAuthNodeHandler = ReturnType<
