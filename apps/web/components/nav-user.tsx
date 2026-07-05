@@ -79,7 +79,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
   return (
     <SidebarMenu className={isHeader ? "w-auto" : undefined}>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             {trigger}
           </DropdownMenuTrigger>
