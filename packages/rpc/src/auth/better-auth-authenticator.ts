@@ -15,14 +15,15 @@ type BetterAuthSession = {
     id: string;
     userId: string;
   };
-  user: {
-    id: string;
-    email: string;
-    emailVerified: boolean;
-    name: string;
-    image?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
+    user: {
+      id: string;
+      email: string;
+      emailVerified: boolean;
+      name: string;
+      role?: string | null;
+      image?: string | null;
+      firstName?: string | null;
+      lastName?: string | null;
   };
 };
 
@@ -66,11 +67,13 @@ export class BetterAuthBackendAuthenticator implements BetterAuthAuthenticator {
       sessionId: session.session.id,
       orgId: null,
       authType: 'session',
+      role: session.user.role ?? 'user',
       claims: {
         sub: session.user.id,
         email: session.user.email,
         email_verified: session.user.emailVerified,
         name: session.user.name,
+        role: session.user.role ?? 'user',
         first_name: session.user.firstName ?? undefined,
         last_name: session.user.lastName ?? undefined,
         image_url: session.user.image ?? undefined,
@@ -101,6 +104,7 @@ export class BetterAuthBackendAuthenticator implements BetterAuthAuthenticator {
       sessionId: null,
       orgId: null,
       authType: 'api_key',
+      role: null,
       claims: {
         sub: result.key.referenceId,
         api_key_id: result.key.id,
@@ -147,6 +151,7 @@ function anonymousContext(): AuthContext {
     sessionId: null,
     orgId: null,
     authType: null,
+    role: null,
     claims: null,
   };
 }

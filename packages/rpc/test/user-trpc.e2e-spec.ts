@@ -17,7 +17,8 @@ describe('user tRPC e2e', () => {
           sessionId: null,
           orgId: null,
           authType: null,
-          claims: null,
+      role: null,
+      claims: null,
         })
         .user.me(),
     ).rejects.toBeInstanceOf(TRPCError);

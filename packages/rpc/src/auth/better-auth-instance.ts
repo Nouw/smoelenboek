@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 type BetterAuthModule = typeof import('better-auth');
 type ApiKeyModule = typeof import('@better-auth/api-key');
 type NodeIntegrationModule = typeof import('better-auth/node');
+type BetterAuthPluginsModule = typeof import('better-auth/plugins');
 
 export type BetterAuthInstance = {
   handler: (request: Request) => Promise<Response>;
@@ -20,6 +21,14 @@ export type BetterAuthInstance = {
         name: string;
       };
     }) => Promise<unknown>;
+    createUser: (context: {
+      body: {
+        email: string;
+        password: string;
+        name: string;
+        role?: string | string[];
+      };
+    }) => Promise<unknown>;
     verifyApiKey: (context: { body: { key: string } }) => Promise<unknown>;
     createApiKey: (context: {
       body: {
@@ -33,6 +42,13 @@ export type BetterAuthInstance = {
         rateLimitTimeWindow?: number;
         remaining?: number;
       };
+    }) => Promise<unknown>;
+    setRole: (context: {
+      body: {
+        userId: string;
+        role: string | string[];
+      };
+      headers?: Headers;
     }) => Promise<unknown>;
   };
 };
@@ -64,9 +80,10 @@ export async function getBetterAuthNodeHandler(): Promise<BetterAuthNodeHandler>
 async function createBetterAuth(options: {
   disableSignUp: boolean;
 }): Promise<BetterAuthInstance> {
-  const [{ betterAuth }, { apiKey }] = await Promise.all([
+  const [{ betterAuth }, { apiKey }, { admin }] = await Promise.all([
     importEsm<BetterAuthModule>('better-auth'),
     importEsm<ApiKeyModule>('@better-auth/api-key'),
+    importEsm<BetterAuthPluginsModule>('better-auth/plugins'),
   ]);
 
   return betterAuth({
@@ -113,8 +130,15 @@ async function createBetterAuth(options: {
         generateId: 'uuid',
       },
     },
-    plugins: [apiKey()],
-  }) as BetterAuthInstance;
+    plugins: createBetterAuthPlugins(apiKey, admin),
+  }) as unknown as BetterAuthInstance;
+}
+
+export function createBetterAuthPlugins<TApiKeyPlugin, TAdminPlugin>(
+  apiKey: () => TApiKeyPlugin,
+  admin: () => TAdminPlugin,
+): [TApiKeyPlugin, TAdminPlugin] {
+  return [apiKey(), admin()];
 }
 
 function readRequiredEnv(key: string): string {

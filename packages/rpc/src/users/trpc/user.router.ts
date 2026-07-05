@@ -22,6 +22,7 @@ const userOutputSchema = z.object({
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
   imageUrl: z.string().nullable(),
+  role: z.string(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });

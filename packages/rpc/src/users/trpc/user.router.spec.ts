@@ -14,6 +14,7 @@ describe('user tRPC router', () => {
       sessionId: null,
       orgId: null,
       authType: null,
+      role: null,
       claims: null,
     });
 
@@ -31,7 +32,8 @@ describe('user tRPC router', () => {
       sessionId: 'sess_123',
       orgId: null,
       authType: 'session',
-      claims: { sub: 'user_123' },
+  role: 'user',
+  claims: { sub: 'user_123' },
     });
 
     await expect(caller.user.me()).resolves.toBeNull();
@@ -50,6 +52,7 @@ describe('user tRPC router', () => {
       sessionId: null,
       orgId: null,
       authType: null,
+      role: null,
       claims: null,
     });
 
@@ -68,6 +71,7 @@ describe('user tRPC router', () => {
       firstName: 'User',
       lastName: null,
       imageUrl: 'https://example.com/new.png',
+      role: 'user',
       createdAt: '2026-07-04T00:00:00.000Z',
       updatedAt: '2026-07-04T00:00:00.000Z',
     });
@@ -80,7 +84,8 @@ describe('user tRPC router', () => {
       sessionId: 'sess_123',
       orgId: null,
       authType: 'session',
-      claims: { sub: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd' },
+  role: 'user',
+  claims: { sub: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd' },
     });
 
     await expect(

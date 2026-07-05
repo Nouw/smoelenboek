@@ -8,6 +8,7 @@ export type AuthClaims = Record<string, unknown> & {
   first_name?: string;
   last_name?: string;
   image_url?: string;
+  role?: string;
 };
 
 export type AuthContext = {
@@ -15,5 +16,6 @@ export type AuthContext = {
   sessionId: string | null;
   orgId: string | null;
   authType: 'session' | 'api_key' | null;
+  role: string | null;
   claims: AuthClaims | null;
 };

@@ -18,6 +18,27 @@ describe('parseCreateUserArgs', () => {
       email: 'user@example.com',
       password: 'password123',
       name: 'Test User',
+      role: 'user',
+    });
+  });
+
+  it('parses an optional user role', () => {
+    expect(
+      parseCreateUserArgs([
+        '--email',
+        'admin@example.com',
+        '--password',
+        'password123',
+        '--name',
+        'Admin User',
+        '--role',
+        'admin',
+      ]),
+    ).toEqual({
+      email: 'admin@example.com',
+      password: 'password123',
+      name: 'Admin User',
+      role: 'admin',
     });
   });
 

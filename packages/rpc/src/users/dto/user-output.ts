@@ -12,6 +12,7 @@ export function toUserDto(user: UserEntity): UserDto {
     firstName: user.firstName,
     lastName: user.lastName,
     imageUrl: user.imageUrl,
+    role: user.role,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
   };

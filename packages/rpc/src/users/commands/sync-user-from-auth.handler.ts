@@ -31,6 +31,7 @@ export class SyncUserFromAuthHandler
       firstName: this.readStringClaim(command.claims, 'first_name'),
       lastName: this.readStringClaim(command.claims, 'last_name'),
       imageUrl: this.readStringClaim(command.claims, 'image_url'),
+      role: this.readStringClaim(command.claims, 'role') ?? 'user',
     });
 
     const user = await this.eventStoreRepository.appendAndProject(

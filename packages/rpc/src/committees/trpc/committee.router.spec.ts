@@ -8,6 +8,7 @@ const authenticatedContext = {
   sessionId: 'sess_123',
   orgId: null,
   authType: 'session',
+  role: 'user',
   claims: { sub: 'user_123' },
 };
 
@@ -25,7 +26,8 @@ describe('committee tRPC router', () => {
           sessionId: null,
           orgId: null,
           authType: null,
-          claims: null,
+      role: null,
+      claims: null,
         })
         .committees.list(),
     ).rejects.toBeInstanceOf(TRPCError);

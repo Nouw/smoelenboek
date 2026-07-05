@@ -20,6 +20,7 @@ describe('AuthContextFactory', () => {
         sessionId: 'sess_123',
         orgId: 'org_123',
         authType: 'session',
+        role: 'admin',
         claims: {
           sub: 'user_123',
           sid: 'sess_123',
@@ -35,6 +36,7 @@ describe('AuthContextFactory', () => {
       sessionId: 'sess_123',
       orgId: 'org_123',
       authType: 'session',
+      role: 'admin',
       claims: {
         sub: 'user_123',
         sid: 'sess_123',

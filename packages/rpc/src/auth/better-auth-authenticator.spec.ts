@@ -38,6 +38,7 @@ describe('BetterAuthBackendAuthenticator', () => {
       sessionId: null,
       orgId: null,
       authType: null,
+      role: null,
       claims: null,
     });
   });
@@ -54,6 +55,7 @@ describe('BetterAuthBackendAuthenticator', () => {
         emailVerified: true,
         name: 'Member Example',
         image: 'https://example.com/avatar.png',
+        role: 'admin',
         firstName: 'Member',
         lastName: 'Example',
       },
@@ -69,11 +71,13 @@ describe('BetterAuthBackendAuthenticator', () => {
       sessionId: 'session_123',
       orgId: null,
       authType: 'session',
+      role: 'admin',
       claims: {
         sub: 'user_123',
         email: 'member@example.com',
         email_verified: true,
         name: 'Member Example',
+        role: 'admin',
         first_name: 'Member',
         last_name: 'Example',
         image_url: 'https://example.com/avatar.png',
@@ -107,6 +111,7 @@ describe('BetterAuthBackendAuthenticator', () => {
       sessionId: null,
       orgId: null,
       authType: 'api_key',
+      role: null,
       claims: {
         sub: 'user_123',
         api_key_id: 'key_123',

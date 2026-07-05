@@ -19,6 +19,7 @@ type AdminUser = {
   id: string;
   email: string;
   name: string;
+  role?: string | null;
 };
 
 async function main(): Promise<void> {
@@ -34,6 +35,7 @@ async function main(): Promise<void> {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role ?? options.role,
       },
       null,
       2,
@@ -43,14 +45,15 @@ async function main(): Promise<void> {
 
 async function createUserWithCredential(
   auth: BetterAuthInstance,
-  options: { email: string; password: string; name: string },
+  options: { email: string; password: string; name: string; role: string },
 ): Promise<AdminUser> {
   try {
-    const result = (await auth.api.signUpEmail({
+    const result = (await auth.api.createUser({
       body: {
         email: options.email,
         password: options.password,
         name: options.name,
+        role: options.role,
       },
     })) as SignUpEmailResult;
 
@@ -70,7 +73,7 @@ async function createUserWithCredential(
 
 async function attachMissingCredentialAccount(
   auth: BetterAuthInstance,
-  options: { email: string; password: string },
+  options: { email: string; password: string; role: string },
 ): Promise<AdminUser> {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -96,6 +99,10 @@ async function attachMissingCredentialAccount(
       INSERT_CREDENTIAL_ACCOUNT_SQL,
       createCredentialAccountValues(user.id, passwordHash),
     );
+    await pool.query('UPDATE "users" SET "role" = $1 WHERE "id" = $2', [
+      options.role,
+      user.id,
+    ]);
 
     return user;
   } finally {
@@ -108,10 +115,10 @@ async function findUserByEmail(
   email: string,
 ): Promise<AdminUser | null> {
   const result = await pool.query<AdminUser>(
-    `
-      SELECT "id", "email", "name"
-      FROM "users"
-      WHERE lower("email") = lower($1)
+      `
+        SELECT "id", "email", "name", "role"
+        FROM "users"
+        WHERE lower("email") = lower($1)
       LIMIT 1
     `,
     [email],

@@ -16,6 +16,7 @@ describe('SyncUserFromAuthHandler', () => {
       firstName: 'Julien',
       lastName: null,
       imageUrl: null,
+      role: 'admin',
       createdAt: now,
       updatedAt: now,
     };
@@ -39,6 +40,7 @@ describe('SyncUserFromAuthHandler', () => {
             name: 'Julien Example',
             first_name: 'Julien',
             last_name: '',
+            role: 'admin',
           },
         ),
       ),
@@ -51,6 +53,7 @@ describe('SyncUserFromAuthHandler', () => {
       firstName: 'Julien',
       lastName: null,
       imageUrl: null,
+      role: 'admin',
       createdAt: '2026-06-27T00:00:00.000Z',
       updatedAt: '2026-06-27T00:00:00.000Z',
     });
@@ -70,6 +73,7 @@ describe('SyncUserFromAuthHandler', () => {
           firstName: 'Julien',
           lastName: null,
           imageUrl: null,
+          role: 'admin',
         },
         metadata: {
           source: 'better-auth',
@@ -87,6 +91,7 @@ describe('SyncUserFromAuthHandler', () => {
         firstName: 'Julien',
         lastName: null,
         imageUrl: null,
+        role: 'admin',
       },
       { manager: true },
     );

@@ -24,6 +24,7 @@ export class UserProjector {
     entity.firstName = payload.firstName;
     entity.lastName = payload.lastName;
     entity.imageUrl = payload.imageUrl;
+    entity.role = payload.role;
 
     return repository.save(entity);
   }

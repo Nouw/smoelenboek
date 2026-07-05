@@ -2,6 +2,7 @@ export type CreateUserOptions = {
   email: string;
   password: string;
   name: string;
+  role: string;
 };
 
 export function parseCreateUserArgs(argv: string[]): CreateUserOptions {
@@ -36,6 +37,7 @@ export function parseCreateUserArgs(argv: string[]): CreateUserOptions {
   const email = readRequiredValue(values, 'email').toLowerCase();
   const password = readRequiredValue(values, 'password');
   const name = readRequiredValue(values, 'name');
+  const role = readOptionalValue(values, 'role') ?? 'user';
 
   if (!email.includes('@')) {
     throw new Error('--email must be a valid email address.');
@@ -49,7 +51,17 @@ export function parseCreateUserArgs(argv: string[]): CreateUserOptions {
     email,
     password,
     name,
+    role,
   };
+}
+
+function readOptionalValue(
+  values: Map<string, string>,
+  key: string,
+): string | undefined {
+  const value = values.get(key)?.trim();
+
+  return value || undefined;
 }
 
 function readRequiredValue(values: Map<string, string>, key: string): string {

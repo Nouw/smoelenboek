@@ -11,6 +11,7 @@ export type UserSyncedFromAuthPayload = {
   firstName: string | null;
   lastName: string | null;
   imageUrl: string | null;
+  role: string;
 };
 
 export type UserSyncedFromAuthMetadata = {

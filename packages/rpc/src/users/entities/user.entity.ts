@@ -32,6 +32,18 @@ export class UserEntity {
   @Column({ type: 'varchar', nullable: true })
   imageUrl!: string | null;
 
+  @Column({ type: 'varchar', default: 'user' })
+  role!: string;
+
+  @Column({ type: 'boolean', default: false })
+  banned!: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  banReason!: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  banExpires!: Date | null;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 
