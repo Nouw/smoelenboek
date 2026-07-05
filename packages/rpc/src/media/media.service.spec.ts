@@ -172,6 +172,28 @@ describe('MediaService', () => {
     });
   });
 
+  it('loads image objects from the OCI SDK response body', async () => {
+    const content = Readable.from(Buffer.from('image'));
+    const getObject = jest.fn().mockResolvedValue({
+      value: content,
+      contentLength: 5,
+      contentType: 'image/webp',
+      eTag: '"etag-2"',
+    });
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ getObject });
+
+    await expect(
+      service.getImageByObjectName('profile-images/user_123/avatar.webp'),
+    ).resolves.toEqual({
+      content,
+      contentLength: 5,
+      contentType: 'image/webp',
+      etag: '"etag-2"',
+    });
+  });
+
   it('maps OCI 404 responses to NotFoundException', async () => {
     const getObject = jest.fn().mockRejectedValue({ statusCode: 404 });
     const service = new MediaService();

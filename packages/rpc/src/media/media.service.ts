@@ -45,12 +45,10 @@ type OciObjectStorageClient = {
     bucketName: string;
     objectName: string;
   }): Promise<{
-    value?: {
-      content?: unknown;
-      contentLength?: number;
-      contentType?: string;
-      eTag?: string;
-    };
+    value?: unknown;
+    contentLength?: number;
+    contentType?: string;
+    eTag?: string;
   }>;
 };
 
@@ -141,9 +139,9 @@ export class MediaService {
         bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
         objectName,
       });
-      const value = object.value;
+      const value = this.objectBody(object);
 
-      if (!value?.content) {
+      if (!value) {
         throw new NotFoundException('Image not found.');
       }
 
@@ -285,6 +283,57 @@ export class MediaService {
     }
 
     throw new NotFoundException('Image not found.');
+  }
+
+  private objectBody(object: {
+    value?: unknown;
+    contentLength?: number;
+    contentType?: string;
+    eTag?: string;
+  }):
+    | {
+        content: unknown;
+        contentLength?: number;
+        contentType?: string;
+        eTag?: string;
+      }
+    | null {
+    const value = object.value;
+
+    if (!value) {
+      return null;
+    }
+
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      'content' in value
+    ) {
+      const legacyValue = value as {
+        content?: unknown;
+        contentLength?: number;
+        contentType?: string;
+        eTag?: string;
+      };
+
+      if (!legacyValue.content) {
+        return null;
+      }
+
+      return {
+        content: legacyValue.content,
+        contentLength: legacyValue.contentLength,
+        contentType: legacyValue.contentType,
+        eTag: legacyValue.eTag,
+      };
+    }
+
+    return {
+      content: value,
+      contentLength: object.contentLength,
+      contentType: object.contentType,
+      eTag: object.eTag,
+    };
   }
 
   private isOciNotFound(error: unknown): boolean {
