@@ -16,6 +16,7 @@ export class TeamProjector {
     const entity = existing ?? repository.create({ id: payload.teamId });
 
     entity.name = payload.name;
+    entity.imageUrl = payload.imageUrl;
     entity.archivedAt = payload.archivedAt ? new Date(payload.archivedAt) : null;
 
     return repository.save(entity);
@@ -53,4 +54,3 @@ export class TeamProjector {
     return existing;
   }
 }
-

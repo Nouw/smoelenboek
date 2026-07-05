@@ -35,6 +35,7 @@ export class CreateTeamHandler
     const event = createTeamCreatedEvent({
       teamId: randomUUID(),
       name: command.name,
+      imageUrl: command.imageUrl,
       archivedAt: null,
     });
     const team = await this.eventStoreRepository.appendAndProject(
@@ -67,6 +68,8 @@ export class UpdateTeamHandler
     const event = createTeamUpdatedEvent({
       teamId: command.id,
       name: command.name,
+      imageUrl:
+        command.imageUrl === undefined ? existing.imageUrl : command.imageUrl,
       archivedAt: existing.archivedAt?.toISOString() ?? null,
     });
     const team = await this.eventStoreRepository.appendAndProject(
@@ -99,6 +102,7 @@ export class ArchiveTeamHandler
     const event = createTeamArchivedEvent({
       teamId: command.id,
       name: existing.name,
+      imageUrl: existing.imageUrl,
       archivedAt: new Date().toISOString(),
     });
     const team = await this.eventStoreRepository.appendAndProject(
@@ -166,4 +170,3 @@ export class RemoveTeamMemberHandler
     return membership ? toTeamMembershipDto(membership) : null;
   }
 }
-

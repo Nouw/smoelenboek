@@ -20,7 +20,8 @@ import {
   FormMessage,
 } from './form';
 import { Input } from '@repo/ui/components/input';
-import { useState } from 'react';
+import { Trash2, Upload } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -29,7 +30,6 @@ import { trpc } from '@/app/trpc';
 
 const profileFormSchema = z.object({
   email: z.string().email(),
-  imageUrl: z.string().url().nullable(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -49,45 +49,49 @@ export function ProfileEditDialog({
     | { kind: 'error'; message: string }
     | { kind: 'success'; emailChanged: boolean; imageUrlChanged: boolean }
   >({ kind: 'idle' });
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageStatus, setImageStatus] = useState<
+    | { kind: 'idle' }
+    | { kind: 'uploading' }
+    | { kind: 'deleting' }
+    | { kind: 'error'; message: string }
+  >({ kind: 'idle' });
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const user = trpc.user.me.useQuery(undefined, {
     enabled: open,
     retry: false,
   });
-  const updateProfile = trpc.user.updateProfile.useMutation();
+  const imageBusy =
+    imageStatus.kind === 'uploading' || imageStatus.kind === 'deleting';
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     values: {
       email: user.data?.email ?? '',
-      imageUrl: user.data?.imageUrl ?? '',
     },
   });
 
-  const watchedImageUrl = form.watch('imageUrl');
+  useEffect(() => {
+    if (open) {
+      setImageUrl(user.data?.imageUrl ?? null);
+      setImageStatus({ kind: 'idle' });
+    }
+  }, [open, user.data?.imageUrl]);
 
   async function onSubmit(values: ProfileFormValues) {
     setStatus({ kind: 'submitting' });
 
     const currentEmail = user.data?.email ?? '';
-    const currentImageUrl = user.data?.imageUrl ?? null;
     const emailChanged = values.email !== currentEmail;
-    const imageUrlChanged = values.imageUrl !== currentImageUrl;
 
-    if (!emailChanged && !imageUrlChanged) {
+    if (!emailChanged) {
       setStatus({ kind: 'idle' });
       onOpenChange(false);
       return;
     }
 
     try {
-      if (imageUrlChanged) {
-        await updateProfile.mutateAsync({ imageUrl: values.imageUrl });
-        await authClient.updateUser({
-          image: values.imageUrl,
-        });
-      }
-
       if (emailChanged) {
         await authClient.changeEmail({
           newEmail: values.email,
@@ -100,7 +104,7 @@ export function ProfileEditDialog({
       setStatus({
         kind: 'success',
         emailChanged,
-        imageUrlChanged,
+        imageUrlChanged: false,
       });
 
       setTimeout(() => {
@@ -112,6 +116,74 @@ export function ProfileEditDialog({
         kind: 'error',
         message:
           error instanceof Error ? error.message : 'Failed to update profile.',
+      });
+    }
+  }
+
+  async function uploadProfileImage(file: File) {
+    setImageStatus({ kind: 'uploading' });
+    setStatus({ kind: 'idle' });
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${rpcBaseUrl()}/media/profile-image`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      const body = (await response.json()) as { imageUrl?: string; message?: string };
+
+      if (!response.ok || !body.imageUrl) {
+        throw new Error(body.message ?? 'Failed to upload profile picture.');
+      }
+
+      setImageUrl(body.imageUrl);
+      await authClient.updateUser({ image: body.imageUrl });
+      await user.refetch();
+      setImageStatus({ kind: 'idle' });
+    } catch (error) {
+      setImageStatus({
+        kind: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to upload profile picture.',
+      });
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }
+
+  async function deleteProfileImage() {
+    setImageStatus({ kind: 'deleting' });
+    setStatus({ kind: 'idle' });
+
+    try {
+      const response = await fetch(`${rpcBaseUrl()}/media/profile-image`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const body = (await response.json()) as { message?: string };
+        throw new Error(body.message ?? 'Failed to remove profile picture.');
+      }
+
+      setImageUrl(null);
+      await authClient.updateUser({ image: null });
+      await user.refetch();
+      setImageStatus({ kind: 'idle' });
+    } catch (error) {
+      setImageStatus({
+        kind: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to remove profile picture.',
       });
     }
   }
@@ -166,41 +238,64 @@ export function ProfileEditDialog({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Profile picture URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        placeholder="https://example.com/avatar.png"
-                        {...field}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {watchedImageUrl ? (
+              <div className="space-y-2">
+                <FormLabel>Profile picture</FormLabel>
                 <div className="flex items-center gap-3 rounded-md border p-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={watchedImageUrl}
-                    alt="Preview"
-                    className="h-10 w-10 rounded-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  <span className="text-muted-foreground text-sm">
-                    Preview
-                  </span>
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-sm font-medium text-accent-foreground">
+                    {imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      'U'
+                    )}
+                  </div>
+                  <div className="flex min-w-0 flex-1 gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      onChange={(event) => {
+                        const file = event.currentTarget.files?.[0];
+
+                        if (file) {
+                          void uploadProfileImage(file);
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={imageBusy}
+                    >
+                      <Upload className="size-4" />
+                      {imageStatus.kind === 'uploading' ? 'Uploading...' : 'Upload'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => void deleteProfileImage()}
+                      disabled={!imageUrl || imageBusy}
+                    >
+                      <Trash2 className="size-4" />
+                      Remove
+                    </Button>
+                  </div>
                 </div>
-              ) : null}
+                {imageStatus.kind === 'error' ? (
+                  <p className="text-destructive-foreground text-sm">
+                    {imageStatus.message}
+                  </p>
+                ) : null}
+              </div>
 
               {status.kind === 'error' && (
                 <p className="text-destructive-foreground text-sm">
@@ -217,7 +312,12 @@ export function ProfileEditDialog({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={status.kind === 'submitting'}>
+                <Button
+                  type="submit"
+                  disabled={
+                    status.kind === 'submitting' || imageBusy
+                  }
+                >
                   {status.kind === 'submitting' ? 'Saving...' : 'Save changes'}
                 </Button>
               </DialogFooter>
@@ -227,4 +327,10 @@ export function ProfileEditDialog({
       </DialogContent>
     </Dialog>
   );
+}
+
+function rpcBaseUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_AUTH_URL ?? 'http://localhost:3002'
+  ).replace(/\/+$/, '');
 }

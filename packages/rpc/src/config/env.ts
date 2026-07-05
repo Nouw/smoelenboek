@@ -8,6 +8,15 @@ export type RpcEnv = {
   BETTER_AUTH_URL: string;
   WEB_ORIGIN: string;
   PORT: string;
+  OCI_REGION: string;
+  OCI_TENANCY_OCID: string;
+  OCI_USER_OCID: string;
+  OCI_FINGERPRINT: string;
+  OCI_PRIVATE_KEY: string;
+  OCI_PRIVATE_KEY_PASSPHRASE?: string;
+  OCI_OBJECT_STORAGE_NAMESPACE: string;
+  OCI_OBJECT_STORAGE_BUCKET: string;
+  OCI_OBJECT_STORAGE_PUBLIC_BASE_URL?: string;
 };
 
 export const rpcEnvFilePath = join(__dirname, '..', '..', '.env.local');
@@ -28,6 +37,29 @@ export function validateRpcEnv(config: Record<string, unknown>): RpcEnv {
     'http://localhost:3001',
   );
   const port = readOptionalString(config, 'PORT', '3002');
+  const ociRegion = readRequiredString(config, 'OCI_REGION');
+  const ociTenancyOcid = readRequiredString(config, 'OCI_TENANCY_OCID');
+  const ociUserOcid = readRequiredString(config, 'OCI_USER_OCID');
+  const ociFingerprint = readRequiredString(config, 'OCI_FINGERPRINT');
+  const ociPrivateKey = readRequiredString(config, 'OCI_PRIVATE_KEY');
+  const ociPrivateKeyPassphrase = readOptionalString(
+    config,
+    'OCI_PRIVATE_KEY_PASSPHRASE',
+    '',
+  );
+  const ociObjectStorageNamespace = readRequiredString(
+    config,
+    'OCI_OBJECT_STORAGE_NAMESPACE',
+  );
+  const ociObjectStorageBucket = readRequiredString(
+    config,
+    'OCI_OBJECT_STORAGE_BUCKET',
+  );
+  const ociObjectStoragePublicBaseUrl = readOptionalString(
+    config,
+    'OCI_OBJECT_STORAGE_PUBLIC_BASE_URL',
+    '',
+  );
 
   if (!Number.isInteger(Number(port)) || Number(port) <= 0) {
     throw new Error('PORT must be a positive integer.');
@@ -39,6 +71,19 @@ export function validateRpcEnv(config: Record<string, unknown>): RpcEnv {
     BETTER_AUTH_URL: betterAuthUrl,
     WEB_ORIGIN: webOrigin,
     PORT: port,
+    OCI_REGION: ociRegion,
+    OCI_TENANCY_OCID: ociTenancyOcid,
+    OCI_USER_OCID: ociUserOcid,
+    OCI_FINGERPRINT: ociFingerprint,
+    OCI_PRIVATE_KEY: ociPrivateKey,
+    ...(ociPrivateKeyPassphrase
+      ? { OCI_PRIVATE_KEY_PASSPHRASE: ociPrivateKeyPassphrase }
+      : {}),
+    OCI_OBJECT_STORAGE_NAMESPACE: ociObjectStorageNamespace,
+    OCI_OBJECT_STORAGE_BUCKET: ociObjectStorageBucket,
+    ...(ociObjectStoragePublicBaseUrl
+      ? { OCI_OBJECT_STORAGE_PUBLIC_BASE_URL: ociObjectStoragePublicBaseUrl }
+      : {}),
   };
 }
 

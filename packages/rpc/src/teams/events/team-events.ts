@@ -11,6 +11,7 @@ export const TEAM_MEMBER_REMOVED_EVENT = 'team.member_removed';
 export type TeamSnapshotPayload = {
   teamId: string;
   name: string;
+  imageUrl: string | null;
   archivedAt: string | null;
 };
 
@@ -88,4 +89,3 @@ export function createTeamMemberRemovedEvent(
     metadata: { source: 'manual' },
   };
 }
-

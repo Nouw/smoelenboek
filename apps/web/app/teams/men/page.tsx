@@ -43,8 +43,17 @@ export default function MensTeamsPage() {
             key={team.id}
             className="flex items-center gap-3 rounded-lg border bg-card p-4 text-card-foreground"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
-              <UsersRound className="size-5" />
+            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-accent text-accent-foreground">
+              {team.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={team.imageUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <UsersRound className="size-5" />
+              )}
             </div>
             <div className="min-w-0">
               <h2 className="truncate text-sm font-medium">{team.name}</h2>

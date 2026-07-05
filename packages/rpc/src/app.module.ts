@@ -8,6 +8,7 @@ import { CommitteesModule } from './committees/committees.module';
 import { rpcEnvFilePath, validateRpcEnv } from './config/env';
 import { createTypeOrmOptions } from './database/typeorm.config';
 import { EventStoreModule } from './event-store/event-store.module';
+import { MediaModule } from './media/media.module';
 import { MembershipsModule } from './memberships/memberships.module';
 import { SeasonsModule } from './seasons/seasons.module';
 import { TeamsModule } from './teams/teams.module';
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     CommitteesModule,
     EventStoreModule,
+    MediaModule,
     MembershipsModule,
     SeasonsModule,
     TeamsModule,

@@ -61,4 +61,65 @@ describe('team tRPC router', () => {
       }),
     );
   });
+
+  it('dispatches team creation with imageUrl', async () => {
+    const execute = jest.fn().mockResolvedValue({
+      id: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      name: 'Heren 1',
+      imageUrl: 'https://cdn.example.com/teams/heren-1.png',
+      archivedAt: null,
+      createdAt: '2026-06-28T00:00:00.000Z',
+      updatedAt: '2026-06-28T00:00:00.000Z',
+    });
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter.createCaller(authenticatedContext).teams.create({
+        name: 'Heren 1',
+        imageUrl: 'https://cdn.example.com/teams/heren-1.png',
+      }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        imageUrl: 'https://cdn.example.com/teams/heren-1.png',
+      }),
+    );
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Heren 1',
+        imageUrl: 'https://cdn.example.com/teams/heren-1.png',
+      }),
+    );
+  });
+
+  it('dispatches team update without requiring imageUrl', async () => {
+    const execute = jest.fn().mockResolvedValue({
+      id: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      name: 'Heren 1',
+      imageUrl: null,
+      archivedAt: null,
+      createdAt: '2026-06-28T00:00:00.000Z',
+      updatedAt: '2026-06-28T00:00:00.000Z',
+    });
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter.createCaller(authenticatedContext).teams.update({
+        id: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+        name: 'Heren 1',
+      }),
+    ).resolves.toEqual(expect.objectContaining({ imageUrl: null }));
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+        name: 'Heren 1',
+        imageUrl: undefined,
+      }),
+    );
+  });
 });

@@ -9,6 +9,7 @@ export type TeamRole =
 export interface TeamDto {
   id: string;
   name: string;
+  imageUrl: string | null;
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -23,4 +24,3 @@ export interface TeamMembershipDto {
   createdAt: string;
   updatedAt: string;
 }
-

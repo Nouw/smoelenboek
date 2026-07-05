@@ -14,6 +14,9 @@ export class TeamEntity {
   @Column({ unique: true })
   name!: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  imageUrl!: string | null;
+
   @Column({ type: 'timestamptz', nullable: true })
   archivedAt!: Date | null;
 
@@ -23,4 +26,3 @@ export class TeamEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
 }
-

@@ -25,6 +25,7 @@ const teamRoleSchema = z.enum(TEAM_ROLES);
 const teamOutputSchema = z.object({
   id: z.uuid(),
   name: z.string(),
+  imageUrl: z.string().nullable(),
   archivedAt: z.iso.datetime().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
@@ -78,10 +79,17 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           auth: true,
         },
       })
-      .input(z.object({ name: z.string().min(1) }))
+      .input(
+        z.object({
+          name: z.string().min(1),
+          imageUrl: z.string().url().nullable().optional(),
+        }),
+      )
       .output(teamOutputSchema)
       .mutation(({ input }) =>
-        dependencies.commandBus.execute(new CreateTeamCommand(input.name)),
+        dependencies.commandBus.execute(
+          new CreateTeamCommand(input.name, input.imageUrl ?? null),
+        ),
       ),
     update: protectedProcedure
       .meta({
@@ -92,11 +100,17 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           auth: true,
         },
       })
-      .input(z.object({ id: z.uuid(), name: z.string().min(1) }))
+      .input(
+        z.object({
+          id: z.uuid(),
+          name: z.string().min(1),
+          imageUrl: z.string().url().nullable().optional(),
+        }),
+      )
       .output(teamOutputSchema)
       .mutation(({ input }) =>
         dependencies.commandBus.execute(
-          new UpdateTeamCommand(input.id, input.name),
+          new UpdateTeamCommand(input.id, input.name, input.imageUrl),
         ),
       ),
     archive: protectedProcedure
@@ -159,4 +173,3 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
       ),
   });
 }
-
