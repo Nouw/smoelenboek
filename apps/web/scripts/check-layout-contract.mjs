@@ -6,6 +6,10 @@ const appSidebar = readFileSync(join('components', 'app-sidebar.tsx'), 'utf8');
 const componentsConfig = readFileSync('components.json', 'utf8');
 const globals = readFileSync(join('app', 'globals.css'), 'utf8');
 const navUser = readFileSync(join('components', 'nav-user.tsx'), 'utf8');
+const profileEditDialog = readFileSync(
+  join('components', 'profile-edit-dialog.tsx'),
+  'utf8',
+);
 const packageJson = readFileSync('package.json', 'utf8');
 const siteHeader = readFileSync(join('components', 'site-header.tsx'), 'utf8');
 const layout = readFileSync(join('app', 'layout.tsx'), 'utf8');
@@ -75,6 +79,32 @@ if (!componentsConfig.includes('"css": "app/globals.css"')) {
 
 if (packageJson.includes('--turbopack')) {
   throw new Error('Web dev must use webpack until Turbopack emits Tailwind utilities correctly.');
+}
+
+if (
+  !profileEditDialog.includes(
+    'flex flex-col items-start gap-3 rounded-md border p-3 sm:flex-row sm:items-center',
+  )
+) {
+  throw new Error('Profile image controls must stack on narrow screens.');
+}
+
+if (
+  !profileEditDialog.includes(
+    'grid w-full min-w-0 flex-1 gap-2 sm:grid-cols-2',
+  )
+) {
+  throw new Error('Profile image actions must use a responsive grid.');
+}
+
+const wrappingProfileButtonCount = (
+  profileEditDialog.match(
+    /className="h-auto min-h-9 min-w-0 whitespace-normal"/g,
+  ) ?? []
+).length;
+
+if (wrappingProfileButtonCount !== 2) {
+  throw new Error('Both profile image action buttons must wrap translated labels.');
 }
 
 console.log('Web layout contract passed.');

@@ -240,7 +240,7 @@ export function ProfileEditDialog({
 
               <div className="space-y-2">
                 <FormLabel>Profile picture</FormLabel>
-                <div className="flex items-center gap-3 rounded-md border p-3">
+                <div className="flex flex-col items-start gap-3 rounded-md border p-3 sm:flex-row sm:items-center">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-sm font-medium text-accent-foreground">
                     {imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -256,7 +256,7 @@ export function ProfileEditDialog({
                       'U'
                     )}
                   </div>
-                  <div className="flex min-w-0 flex-1 gap-2">
+                  <div className="grid w-full min-w-0 flex-1 gap-2 sm:grid-cols-2">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -273,6 +273,7 @@ export function ProfileEditDialog({
                     <Button
                       type="button"
                       variant="outline"
+                      className="h-auto min-h-9 min-w-0 whitespace-normal"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={imageBusy}
                     >
@@ -282,6 +283,7 @@ export function ProfileEditDialog({
                     <Button
                       type="button"
                       variant="outline"
+                      className="h-auto min-h-9 min-w-0 whitespace-normal"
                       onClick={() => void deleteProfileImage()}
                       disabled={!imageUrl || imageBusy}
                     >
