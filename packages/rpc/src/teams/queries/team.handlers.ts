@@ -55,7 +55,7 @@ export class ListTeamMembershipsBySeasonHandler
     query: ListTeamMembershipsBySeasonQuery,
   ): Promise<TeamMembershipDto[]> {
     const memberships = await this.teamsRepository.findMembershipsBySeason(
-      query.seasonId,
+      query.seasonKey,
     );
 
     return memberships.map(toTeamMembershipDto);

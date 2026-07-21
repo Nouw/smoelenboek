@@ -26,8 +26,8 @@ describe('team tRPC router', () => {
           sessionId: null,
           orgId: null,
           authType: null,
-      role: null,
-      claims: null,
+          role: null,
+          claims: null,
         })
         .teams.list(),
     ).rejects.toBeInstanceOf(TRPCError);
@@ -38,8 +38,10 @@ describe('team tRPC router', () => {
       id: '02ac256b-ce8f-44e9-8913-7569c3401264',
       userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
       teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
-      seasonId: 'db20ae5d-414e-4b21-9794-08756e89b765',
+      seasonKey: 2025,
       role: 'setter',
+      startedOn: '2025-08-01',
+      endedOn: null,
       createdAt: '2026-06-28T00:00:00.000Z',
       updatedAt: '2026-06-28T00:00:00.000Z',
     });
@@ -52,15 +54,44 @@ describe('team tRPC router', () => {
       appRouter.createCaller(authenticatedContext).teams.assignMember({
         userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
         teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
-        seasonId: 'db20ae5d-414e-4b21-9794-08756e89b765',
+        seasonKey: 2025,
         role: 'setter',
       }),
     ).resolves.toEqual(expect.objectContaining({ role: 'setter' }));
     expect(execute).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
+        seasonKey: 2025,
         role: 'setter',
       }),
+    );
+  });
+
+  it('allows assignment to default to the current season', async () => {
+    const execute = jest.fn().mockResolvedValue({
+      id: '02ac256b-ce8f-44e9-8913-7569c3401264',
+      userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
+      teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      seasonKey: 2025,
+      role: 'setter',
+      startedOn: '2025-08-01',
+      endedOn: null,
+      createdAt: '2026-06-28T00:00:00.000Z',
+      updatedAt: '2026-06-28T00:00:00.000Z',
+    });
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await appRouter.createCaller(authenticatedContext).teams.assignMember({
+      userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
+      teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      role: 'setter',
+    });
+
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({ seasonKey: undefined }),
     );
   });
 

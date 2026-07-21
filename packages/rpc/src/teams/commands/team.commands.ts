@@ -23,8 +23,9 @@ export class AssignTeamMemberCommand {
   constructor(
     public readonly userId: string,
     public readonly teamId: string,
-    public readonly seasonId: string,
     public readonly role: TeamRole,
+    public readonly seasonKey?: number,
+    public readonly startedOn?: string,
   ) {}
 }
 

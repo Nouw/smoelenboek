@@ -32,13 +32,16 @@ const membershipHistoryOutputSchema = z.object({
   seasonCount: z.number().int(),
   seasons: z.array(
     z.object({
-      seasonId: z.uuid(),
+      seasonKey: z.number().int().min(1900).max(3000),
+      label: z.string(),
+      startsOn: z.iso.date(),
+      endsBefore: z.iso.date(),
       teamMemberships: z.array(
         z.object({
           id: z.uuid(),
           userId: z.uuid(),
           teamId: z.uuid(),
-          seasonId: z.uuid(),
+          seasonKey: z.number().int().min(1900).max(3000),
           role: z.enum([
             'libero',
             'middle',
@@ -47,6 +50,8 @@ const membershipHistoryOutputSchema = z.object({
             'outside_hitter',
             'opposite_hitter',
           ]),
+          startedOn: z.iso.date(),
+          endedOn: z.iso.date().nullable(),
           createdAt: z.iso.datetime(),
           updatedAt: z.iso.datetime(),
         }),
@@ -56,7 +61,7 @@ const membershipHistoryOutputSchema = z.object({
           id: z.uuid(),
           userId: z.uuid(),
           committeeId: z.uuid(),
-          seasonId: z.uuid(),
+          seasonKey: z.number().int().min(1900).max(3000),
           role: z.enum([
             'commissielid',
             'commissaris_externe_zaken',
@@ -66,6 +71,8 @@ const membershipHistoryOutputSchema = z.object({
             'voorzitter',
             'secretaris',
           ]),
+          startedOn: z.iso.date(),
+          endedOn: z.iso.date().nullable(),
           createdAt: z.iso.datetime(),
           updatedAt: z.iso.datetime(),
         }),

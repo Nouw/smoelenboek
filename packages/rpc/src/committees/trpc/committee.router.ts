@@ -34,8 +34,10 @@ const committeeMembershipOutputSchema = z.object({
   id: z.uuid(),
   userId: z.uuid(),
   committeeId: z.uuid(),
-  seasonId: z.uuid(),
+  seasonKey: z.number().int().min(1900).max(3000),
   role: committeeRoleSchema,
+  startedOn: z.iso.date(),
+  endedOn: z.iso.date().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -64,11 +66,11 @@ export function createCommitteeRouter(
           auth: true,
         },
       })
-      .input(z.object({ seasonId: z.uuid() }))
+      .input(z.object({ seasonKey: z.number().int().min(1900).max(3000) }))
       .output(z.array(committeeMembershipOutputSchema))
       .query(({ input }) =>
         dependencies.queryBus.execute(
-          new ListCommitteeMembershipsBySeasonQuery(input.seasonId),
+          new ListCommitteeMembershipsBySeasonQuery(input.seasonKey),
         ),
       ),
     create: protectedProcedure
@@ -83,9 +85,7 @@ export function createCommitteeRouter(
       .input(z.object({ name: z.string().min(1) }))
       .output(committeeOutputSchema)
       .mutation(({ input }) =>
-        dependencies.commandBus.execute(
-          new CreateCommitteeCommand(input.name),
-        ),
+        dependencies.commandBus.execute(new CreateCommitteeCommand(input.name)),
       ),
     update: protectedProcedure
       .meta({
@@ -115,9 +115,7 @@ export function createCommitteeRouter(
       .input(z.object({ id: z.uuid() }))
       .output(committeeOutputSchema)
       .mutation(({ input }) =>
-        dependencies.commandBus.execute(
-          new ArchiveCommitteeCommand(input.id),
-        ),
+        dependencies.commandBus.execute(new ArchiveCommitteeCommand(input.id)),
       ),
     assignMember: protectedProcedure
       .meta({
@@ -132,8 +130,9 @@ export function createCommitteeRouter(
         z.object({
           userId: z.uuid(),
           committeeId: z.uuid(),
-          seasonId: z.uuid(),
+          seasonKey: z.number().int().min(1900).max(3000).optional(),
           role: committeeRoleSchema,
+          startedOn: z.iso.date().optional(),
         }),
       )
       .output(committeeMembershipOutputSchema)
@@ -142,8 +141,9 @@ export function createCommitteeRouter(
           new AssignCommitteeMemberCommand(
             input.userId,
             input.committeeId,
-            input.seasonId,
             input.role,
+            input.seasonKey,
+            input.startedOn,
           ),
         ),
       ),
@@ -165,4 +165,3 @@ export function createCommitteeRouter(
       ),
   });
 }
-

@@ -35,8 +35,10 @@ const teamMembershipOutputSchema = z.object({
   id: z.uuid(),
   userId: z.uuid(),
   teamId: z.uuid(),
-  seasonId: z.uuid(),
+  seasonKey: z.number().int().min(1900).max(3000),
   role: teamRoleSchema,
+  startedOn: z.iso.date(),
+  endedOn: z.iso.date().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -63,11 +65,11 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           auth: true,
         },
       })
-      .input(z.object({ seasonId: z.uuid() }))
+      .input(z.object({ seasonKey: z.number().int().min(1900).max(3000) }))
       .output(z.array(teamMembershipOutputSchema))
       .query(({ input }) =>
         dependencies.queryBus.execute(
-          new ListTeamMembershipsBySeasonQuery(input.seasonId),
+          new ListTeamMembershipsBySeasonQuery(input.seasonKey),
         ),
       ),
     create: protectedProcedure
@@ -140,8 +142,9 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
         z.object({
           userId: z.uuid(),
           teamId: z.uuid(),
-          seasonId: z.uuid(),
+          seasonKey: z.number().int().min(1900).max(3000).optional(),
           role: teamRoleSchema,
+          startedOn: z.iso.date().optional(),
         }),
       )
       .output(teamMembershipOutputSchema)
@@ -150,8 +153,9 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           new AssignTeamMemberCommand(
             input.userId,
             input.teamId,
-            input.seasonId,
             input.role,
+            input.seasonKey,
+            input.startedOn,
           ),
         ),
       ),

@@ -37,10 +37,10 @@ export class ListCommitteeMembershipsBySeasonHandler
   async execute(
     query: ListCommitteeMembershipsBySeasonQuery,
   ): Promise<CommitteeMembershipDto[]> {
-    const memberships =
-      await this.committeesRepository.findMembershipsBySeason(query.seasonId);
+    const memberships = await this.committeesRepository.findMembershipsBySeason(
+      query.seasonKey,
+    );
 
     return memberships.map(toCommitteeMembershipDto);
   }
 }
-

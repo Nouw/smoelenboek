@@ -1,20 +1,14 @@
 import type { SeasonDto } from '@repo/api';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { toSeasonDto } from '../dto/season-output';
-import { SeasonsRepository } from '../repositories/seasons.repository';
+import { getSeasonForDate } from '../season-policy';
 import { GetCurrentSeasonQuery } from './get-current-season.query';
 
 @QueryHandler(GetCurrentSeasonQuery)
 export class GetCurrentSeasonHandler
-  implements IQueryHandler<GetCurrentSeasonQuery, SeasonDto | null>
+  implements IQueryHandler<GetCurrentSeasonQuery, SeasonDto>
 {
-  constructor(private readonly seasonsRepository: SeasonsRepository) {}
-
-  async execute(query: GetCurrentSeasonQuery): Promise<SeasonDto | null> {
-    const season = await this.seasonsRepository.findCurrent(query.at);
-
-    return season ? toSeasonDto(season) : null;
+  async execute(query: GetCurrentSeasonQuery): Promise<SeasonDto> {
+    return getSeasonForDate(query.at);
   }
 }
-

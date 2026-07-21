@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
+import { resolveMembershipEnd } from '../../seasons/season-policy';
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
 import { CommitteeEntity } from '../entities/committee.entity';
 import type {
-  CommitteeMembershipPayload,
+  CommitteeMembershipAssignedPayload,
+  CommitteeMembershipEndedPayload,
   CommitteeSnapshotPayload,
 } from '../events/committee-events';
 
@@ -19,13 +21,15 @@ export class CommitteeProjector {
     const entity = existing ?? repository.create({ id: payload.committeeId });
 
     entity.name = payload.name;
-    entity.archivedAt = payload.archivedAt ? new Date(payload.archivedAt) : null;
+    entity.archivedAt = payload.archivedAt
+      ? new Date(payload.archivedAt)
+      : null;
 
     return repository.save(entity);
   }
 
   async projectMemberAssigned(
-    payload: CommitteeMembershipPayload,
+    payload: CommitteeMembershipAssignedPayload,
     manager: EntityManager,
   ): Promise<CommitteeMembershipEntity> {
     const repository = manager.getRepository(CommitteeMembershipEntity);
@@ -34,14 +38,16 @@ export class CommitteeProjector {
 
     entity.userId = payload.userId;
     entity.committeeId = payload.committeeId;
-    entity.seasonId = payload.seasonId;
+    entity.seasonKey = payload.seasonKey;
     entity.role = payload.role;
+    entity.startedOn = payload.startedOn;
+    entity.endedOn = payload.endedOn;
 
     return repository.save(entity);
   }
 
   async projectMemberRemoved(
-    payload: CommitteeMembershipPayload,
+    payload: CommitteeMembershipEndedPayload,
     manager: EntityManager,
   ): Promise<CommitteeMembershipEntity | null> {
     const repository = manager.getRepository(CommitteeMembershipEntity);
@@ -51,9 +57,15 @@ export class CommitteeProjector {
       return null;
     }
 
-    await repository.delete({ id: payload.membershipId });
+    if (existing.endedOn === null) {
+      existing.endedOn = resolveMembershipEnd(
+        existing.seasonKey,
+        existing.startedOn,
+        payload.removedOn,
+      );
+      await repository.save(existing);
+    }
 
     return existing;
   }
 }
-

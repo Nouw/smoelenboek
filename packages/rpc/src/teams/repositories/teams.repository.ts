@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
 import { TeamEntity } from '../entities/team.entity';
@@ -22,12 +22,22 @@ export class TeamsRepository {
     return this.teamsRepository.findOneBy({ id });
   }
 
-  findMembershipsBySeason(seasonId: string): Promise<TeamMembershipEntity[]> {
-    return this.membershipsRepository.find({ where: { seasonId } });
+  findMembershipsBySeason(seasonKey: number): Promise<TeamMembershipEntity[]> {
+    return this.membershipsRepository.find({
+      where: { seasonKey, endedOn: IsNull() },
+    });
   }
 
   findMembershipsByUser(userId: string): Promise<TeamMembershipEntity[]> {
     return this.membershipsRepository.find({ where: { userId } });
   }
-}
 
+  async findSeasonKeys(): Promise<number[]> {
+    const rows = await this.membershipsRepository
+      .createQueryBuilder('membership')
+      .select('DISTINCT membership.seasonKey', 'seasonKey')
+      .getRawMany<{ seasonKey: number | string }>();
+
+    return rows.map(({ seasonKey }) => Number(seasonKey));
+  }
+}

@@ -20,10 +20,11 @@ export function toCommitteeMembershipDto(
     id: membership.id,
     userId: membership.userId,
     committeeId: membership.committeeId,
-    seasonId: membership.seasonId,
+    seasonKey: membership.seasonKey,
     role: membership.role,
+    startedOn: membership.startedOn,
+    endedOn: membership.endedOn,
     createdAt: membership.createdAt.toISOString(),
     updatedAt: membership.updatedAt.toISOString(),
   };
 }
-

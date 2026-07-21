@@ -1,6 +1,5 @@
 export class ListTeamsQuery {}
 
 export class ListTeamMembershipsBySeasonQuery {
-  constructor(public readonly seasonId: string) {}
+  constructor(public readonly seasonKey: number) {}
 }
-

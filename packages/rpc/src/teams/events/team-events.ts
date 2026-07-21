@@ -15,12 +15,19 @@ export type TeamSnapshotPayload = {
   archivedAt: string | null;
 };
 
-export type TeamMembershipPayload = {
+export type TeamMembershipAssignedPayload = {
   membershipId: string;
   userId: string;
   teamId: string;
-  seasonId: string;
+  seasonKey: number;
   role: TeamRole;
+  startedOn: string;
+  endedOn: null;
+};
+
+export type TeamMembershipEndedPayload = {
+  membershipId: string;
+  removedOn: string;
 };
 
 type ManualMetadata = { source: 'manual' };
@@ -65,26 +72,26 @@ export function createTeamArchivedEvent(
 }
 
 export function createTeamMemberAssignedEvent(
-  payload: TeamMembershipPayload,
-): DomainEvent<TeamMembershipPayload, ManualMetadata> {
+  payload: TeamMembershipAssignedPayload,
+): DomainEvent<TeamMembershipAssignedPayload, ManualMetadata> {
   return {
     aggregateType: 'team_membership',
     aggregateId: payload.membershipId,
     eventType: TEAM_MEMBER_ASSIGNED_EVENT,
-    eventVersion: 1,
+    eventVersion: 2,
     payload,
     metadata: { source: 'manual' },
   };
 }
 
 export function createTeamMemberRemovedEvent(
-  payload: TeamMembershipPayload,
-): DomainEvent<TeamMembershipPayload, ManualMetadata> {
+  payload: TeamMembershipEndedPayload,
+): DomainEvent<TeamMembershipEndedPayload, ManualMetadata> {
   return {
     aggregateType: 'team_membership',
     aggregateId: payload.membershipId,
     eventType: TEAM_MEMBER_REMOVED_EVENT,
-    eventVersion: 1,
+    eventVersion: 2,
     payload,
     metadata: { source: 'manual' },
   };

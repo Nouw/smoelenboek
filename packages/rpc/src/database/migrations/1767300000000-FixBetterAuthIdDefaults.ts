@@ -15,7 +15,7 @@ export class FixBetterAuthIdDefaults1767300000000
           ALTER COLUMN "id" TYPE uuid
           USING (
             CASE
-              WHEN "id" ~* '${UUID_PATTERN}' THEN "id"::uuid
+              WHEN "id"::text ~* '${UUID_PATTERN}' THEN "id"::text::uuid
               ELSE gen_random_uuid()
             END
           )

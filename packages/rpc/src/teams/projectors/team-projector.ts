@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
+import { resolveMembershipEnd } from '../../seasons/season-policy';
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
 import { TeamEntity } from '../entities/team.entity';
-import type { TeamMembershipPayload, TeamSnapshotPayload } from '../events/team-events';
+import type {
+  TeamMembershipAssignedPayload,
+  TeamMembershipEndedPayload,
+  TeamSnapshotPayload,
+} from '../events/team-events';
 
 @Injectable()
 export class TeamProjector {
@@ -17,13 +22,15 @@ export class TeamProjector {
 
     entity.name = payload.name;
     entity.imageUrl = payload.imageUrl;
-    entity.archivedAt = payload.archivedAt ? new Date(payload.archivedAt) : null;
+    entity.archivedAt = payload.archivedAt
+      ? new Date(payload.archivedAt)
+      : null;
 
     return repository.save(entity);
   }
 
   async projectMemberAssigned(
-    payload: TeamMembershipPayload,
+    payload: TeamMembershipAssignedPayload,
     manager: EntityManager,
   ): Promise<TeamMembershipEntity> {
     const repository = manager.getRepository(TeamMembershipEntity);
@@ -32,14 +39,16 @@ export class TeamProjector {
 
     entity.userId = payload.userId;
     entity.teamId = payload.teamId;
-    entity.seasonId = payload.seasonId;
+    entity.seasonKey = payload.seasonKey;
     entity.role = payload.role;
+    entity.startedOn = payload.startedOn;
+    entity.endedOn = payload.endedOn;
 
     return repository.save(entity);
   }
 
   async projectMemberRemoved(
-    payload: TeamMembershipPayload,
+    payload: TeamMembershipEndedPayload,
     manager: EntityManager,
   ): Promise<TeamMembershipEntity | null> {
     const repository = manager.getRepository(TeamMembershipEntity);
@@ -49,7 +58,14 @@ export class TeamProjector {
       return null;
     }
 
-    await repository.delete({ id: payload.membershipId });
+    if (existing.endedOn === null) {
+      existing.endedOn = resolveMembershipEnd(
+        existing.seasonKey,
+        existing.startedOn,
+        payload.removedOn,
+      );
+      await repository.save(existing);
+    }
 
     return existing;
   }

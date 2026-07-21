@@ -4,7 +4,6 @@ import type { DataSourceOptions } from 'typeorm';
 import { CommitteeMembershipEntity } from '../committees/entities/committee-membership.entity';
 import { CommitteeEntity } from '../committees/entities/committee.entity';
 import { StoredEventEntity } from '../event-store/entities/stored-event.entity';
-import { SeasonEntity } from '../seasons/entities/season.entity';
 import { TeamMembershipEntity } from '../teams/entities/team-membership.entity';
 import { TeamEntity } from '../teams/entities/team.entity';
 import { UserEntity } from '../users/entities/user.entity';
@@ -28,7 +27,6 @@ export function createDataSourceOptions(
     entities: [
       CommitteeEntity,
       CommitteeMembershipEntity,
-      SeasonEntity,
       StoredEventEntity,
       TeamEntity,
       TeamMembershipEntity,

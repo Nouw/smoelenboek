@@ -19,12 +19,12 @@ export class AssignCommitteeMemberCommand {
   constructor(
     public readonly userId: string,
     public readonly committeeId: string,
-    public readonly seasonId: string,
     public readonly role: CommitteeRole,
+    public readonly seasonKey?: number,
+    public readonly startedOn?: string,
   ) {}
 }
 
 export class RemoveCommitteeMemberCommand {
   constructor(public readonly membershipId: string) {}
 }
-

@@ -28,6 +28,32 @@ Postgres installation on `5432`.
 pnpm --filter @repo/rpc migration:run
 ```
 
+The season-key migration preserves former team and committee memberships and
+removes the old generated `seasons` table. It is intentionally one-way because
+reverting to hard-deleted memberships would discard that restored history.
+
+Its PostgreSQL restoration fixture runs when a disposable empty database is
+provided:
+
+```sh
+TEST_SEASON_MIGRATION_DATABASE_URL=postgresql://... \
+  pnpm --filter @repo/rpc test:e2e --runInBand
+```
+
+## Seasons and membership history
+
+Seasons follow one association-wide policy in the `Europe/Amsterdam` calendar:
+August 1 through the next August 1, with the end date excluded. The numeric
+`seasonKey` is the first calendar year, so `2025` represents `2025/2026`.
+
+Season records are computed and never generated or administered. New team and
+committee memberships default to the current season. Imports and advance
+planning can provide an explicit `seasonKey` and `startedOn` date. `createdAt`
+remains an audit timestamp and is never used to determine membership history.
+
+Ending a membership sets `endedOn`; it does not delete the membership. Season
+rosters omit ended memberships, while user history retains them.
+
 ## Create a login user
 
 Public registration is disabled. Create users through the RPC admin command:

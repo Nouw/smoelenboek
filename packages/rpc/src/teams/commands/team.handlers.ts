@@ -4,6 +4,11 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import {
+  getLocalDate,
+  getSeasonKey,
+  resolveMembershipStart,
+} from '../../seasons/season-policy';
 import { toTeamDto, toTeamMembershipDto } from '../dto/team-output';
 import {
   createTeamArchivedEvent,
@@ -125,12 +130,15 @@ export class AssignTeamMemberHandler
   ) {}
 
   async execute(command: AssignTeamMemberCommand): Promise<TeamMembershipDto> {
+    const seasonKey = command.seasonKey ?? getSeasonKey(new Date());
     const event = createTeamMemberAssignedEvent({
       membershipId: randomUUID(),
       userId: command.userId,
       teamId: command.teamId,
-      seasonId: command.seasonId,
+      seasonKey,
       role: command.role,
+      startedOn: resolveMembershipStart(seasonKey, command.startedOn),
+      endedOn: null,
     });
     const membership = await this.eventStoreRepository.appendAndProject(
       event,
@@ -156,10 +164,7 @@ export class RemoveTeamMemberHandler
   ): Promise<TeamMembershipDto | null> {
     const event = createTeamMemberRemovedEvent({
       membershipId: command.membershipId,
-      userId: '',
-      teamId: '',
-      seasonId: '',
-      role: 'coach_trainer',
+      removedOn: getLocalDate(new Date()),
     });
     const membership = await this.eventStoreRepository.appendAndProject(
       event,

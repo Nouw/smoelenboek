@@ -26,8 +26,8 @@ describe('committee tRPC router', () => {
           sessionId: null,
           orgId: null,
           authType: null,
-      role: null,
-      claims: null,
+          role: null,
+          claims: null,
         })
         .committees.list(),
     ).rejects.toBeInstanceOf(TRPCError);
@@ -38,8 +38,10 @@ describe('committee tRPC router', () => {
       id: '02ac256b-ce8f-44e9-8913-7569c3401264',
       userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
       committeeId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
-      seasonId: 'db20ae5d-414e-4b21-9794-08756e89b765',
+      seasonKey: 2025,
       role: 'voorzitter',
+      startedOn: '2025-08-01',
+      endedOn: null,
       createdAt: '2026-06-28T00:00:00.000Z',
       updatedAt: '2026-06-28T00:00:00.000Z',
     });
@@ -52,13 +54,14 @@ describe('committee tRPC router', () => {
       appRouter.createCaller(authenticatedContext).committees.assignMember({
         userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
         committeeId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
-        seasonId: 'db20ae5d-414e-4b21-9794-08756e89b765',
+        seasonKey: 2025,
         role: 'voorzitter',
       }),
     ).resolves.toEqual(expect.objectContaining({ role: 'voorzitter' }));
     expect(execute).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
+        seasonKey: 2025,
         role: 'voorzitter',
       }),
     );

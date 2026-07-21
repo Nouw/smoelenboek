@@ -19,9 +19,10 @@ export interface CommitteeMembershipDto {
   id: string;
   userId: string;
   committeeId: string;
-  seasonId: string;
+  seasonKey: number;
   role: CommitteeRole;
+  startedOn: string;
+  endedOn: string | null;
   createdAt: string;
   updatedAt: string;
 }
-

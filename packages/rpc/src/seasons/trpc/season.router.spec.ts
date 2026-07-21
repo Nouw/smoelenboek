@@ -26,32 +26,21 @@ describe('season tRPC router', () => {
           sessionId: null,
           orgId: null,
           authType: null,
-      role: null,
-      claims: null,
+          role: null,
+          claims: null,
         })
         .seasons.list(),
     ).rejects.toBeInstanceOf(TRPCError);
   });
 
-  it('dispatches generate through the command bus', async () => {
-    const execute = jest.fn().mockResolvedValue([]);
-    const appRouter = createAppRouter({
-      commandBus: { execute } as never,
-      queryBus: { execute: jest.fn() } as never,
-    });
-
-    await expect(
-      appRouter
-        .createCaller(authenticatedContext)
-        .seasons.generate({ startYear: 2026, endYear: 2027 }),
-    ).resolves.toEqual([]);
-    expect(execute).toHaveBeenCalledWith(
-      expect.objectContaining({ startYear: 2026, endYear: 2027 }),
-    );
-  });
-
   it('dispatches current through the query bus', async () => {
-    const execute = jest.fn().mockResolvedValue(null);
+    const season = {
+      key: 2026,
+      label: '2026/2027',
+      startsOn: '2026-08-01',
+      endsBefore: '2027-08-01',
+    };
+    const execute = jest.fn().mockResolvedValue(season);
     const appRouter = createAppRouter({
       commandBus: { execute: jest.fn() } as never,
       queryBus: { execute } as never,
@@ -61,11 +50,28 @@ describe('season tRPC router', () => {
       appRouter
         .createCaller(authenticatedContext)
         .seasons.current({ at: '2026-08-15T00:00:00.000Z' }),
-    ).resolves.toBeNull();
+    ).resolves.toEqual(season);
     expect(execute).toHaveBeenCalledWith(
       expect.objectContaining({
         at: new Date('2026-08-15T00:00:00.000Z'),
       }),
+    );
+  });
+
+  it('does not expose stored-season write routes', () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+    const procedurePaths = Object.keys(appRouter._def.procedures);
+
+    expect(procedurePaths).not.toEqual(
+      expect.arrayContaining([
+        'seasons.generate',
+        'seasons.create',
+        'seasons.update',
+        'seasons.byId',
+      ]),
     );
   });
 });

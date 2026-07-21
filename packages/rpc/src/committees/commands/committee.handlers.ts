@@ -5,6 +5,11 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
 import {
+  getLocalDate,
+  getSeasonKey,
+  resolveMembershipStart,
+} from '../../seasons/season-policy';
+import {
   toCommitteeDto,
   toCommitteeMembershipDto,
 } from '../dto/committee-output';
@@ -136,12 +141,15 @@ export class AssignCommitteeMemberHandler
   async execute(
     command: AssignCommitteeMemberCommand,
   ): Promise<CommitteeMembershipDto> {
+    const seasonKey = command.seasonKey ?? getSeasonKey(new Date());
     const event = createCommitteeMemberAssignedEvent({
       membershipId: randomUUID(),
       userId: command.userId,
       committeeId: command.committeeId,
-      seasonId: command.seasonId,
+      seasonKey,
       role: command.role,
+      startedOn: resolveMembershipStart(seasonKey, command.startedOn),
+      endedOn: null,
     });
     const membership = await this.eventStoreRepository.appendAndProject(
       event,
@@ -168,10 +176,7 @@ export class RemoveCommitteeMemberHandler
   ): Promise<CommitteeMembershipDto | null> {
     const event = createCommitteeMemberRemovedEvent({
       membershipId: command.membershipId,
-      userId: '',
-      committeeId: '',
-      seasonId: '',
-      role: 'commissielid',
+      removedOn: getLocalDate(new Date()),
     });
     const membership = await this.eventStoreRepository.appendAndProject(
       event,
@@ -182,4 +187,3 @@ export class RemoveCommitteeMemberHandler
     return membership ? toCommitteeMembershipDto(membership) : null;
   }
 }
-

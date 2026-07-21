@@ -17,6 +17,7 @@
     "OCI_TENANCY_OCID",
     "OCI_USER_OCID",
     "PORT",
+    "TEST_SEASON_MIGRATION_DATABASE_URL",
     "WEB_ORIGIN"
   ],
   "tasks": {

@@ -18,11 +18,17 @@ export class CommitteeMembershipEntity {
   @Column({ type: 'uuid' })
   committeeId!: string;
 
-  @Column({ type: 'uuid' })
-  seasonId!: string;
+  @Column({ type: 'smallint' })
+  seasonKey!: number;
 
   @Column({ type: 'varchar' })
   role!: CommitteeRole;
+
+  @Column({ type: 'date' })
+  startedOn!: string;
+
+  @Column({ type: 'date', nullable: true })
+  endedOn!: string | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
@@ -30,4 +36,3 @@ export class CommitteeMembershipEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
 }
-

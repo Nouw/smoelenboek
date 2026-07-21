@@ -19,8 +19,10 @@ export interface TeamMembershipDto {
   id: string;
   userId: string;
   teamId: string;
-  seasonId: string;
+  seasonKey: number;
   role: TeamRole;
+  startedOn: string;
+  endedOn: string | null;
   createdAt: string;
   updatedAt: string;
 }

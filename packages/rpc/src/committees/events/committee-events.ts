@@ -14,12 +14,19 @@ export type CommitteeSnapshotPayload = {
   archivedAt: string | null;
 };
 
-export type CommitteeMembershipPayload = {
+export type CommitteeMembershipAssignedPayload = {
   membershipId: string;
   userId: string;
   committeeId: string;
-  seasonId: string;
+  seasonKey: number;
   role: CommitteeRole;
+  startedOn: string;
+  endedOn: null;
+};
+
+export type CommitteeMembershipEndedPayload = {
+  membershipId: string;
+  removedOn: string;
 };
 
 type ManualMetadata = { source: 'manual' };
@@ -64,28 +71,27 @@ export function createCommitteeArchivedEvent(
 }
 
 export function createCommitteeMemberAssignedEvent(
-  payload: CommitteeMembershipPayload,
-): DomainEvent<CommitteeMembershipPayload, ManualMetadata> {
+  payload: CommitteeMembershipAssignedPayload,
+): DomainEvent<CommitteeMembershipAssignedPayload, ManualMetadata> {
   return {
     aggregateType: 'committee_membership',
     aggregateId: payload.membershipId,
     eventType: COMMITTEE_MEMBER_ASSIGNED_EVENT,
-    eventVersion: 1,
+    eventVersion: 2,
     payload,
     metadata: { source: 'manual' },
   };
 }
 
 export function createCommitteeMemberRemovedEvent(
-  payload: CommitteeMembershipPayload,
-): DomainEvent<CommitteeMembershipPayload, ManualMetadata> {
+  payload: CommitteeMembershipEndedPayload,
+): DomainEvent<CommitteeMembershipEndedPayload, ManualMetadata> {
   return {
     aggregateType: 'committee_membership',
     aggregateId: payload.membershipId,
     eventType: COMMITTEE_MEMBER_REMOVED_EVENT,
-    eventVersion: 1,
+    eventVersion: 2,
     payload,
     metadata: { source: 'manual' },
   };
 }
-
