@@ -1,5 +1,19 @@
 # Getting Started
 
+## Member profile
+
+The authenticated member profile is available at /profile. It combines the
+current user projection, association information, and membership history from
+the tRPC user router. Team and committee catalogs are fetched in parallel so
+membership IDs can be rendered as readable names.
+
+The page uses the shared Shadcn components and includes responsive layouts,
+loading/error/empty states, direct email and phone actions, Google Maps address
+links, and Dutch/English translations.
+
+Run pnpm --filter web test for its gate contract and pnpm --filter web eval for
+the scored UX contract.
+
 First, run the development server:
 
 ```bash

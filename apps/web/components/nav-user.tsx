@@ -1,15 +1,16 @@
-"use client"
+'use client';
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Settings } from "lucide-react"
-import { useState } from "react"
+import { BadgeCheck, ChevronsUpDown, LogOut, Settings } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
-import { authClient } from "@/lib/auth-client"
-import { useI18n } from "@/lib/i18n"
+import { authClient } from '@/lib/auth-client';
+import { useI18n } from '@/lib/i18n';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@repo/ui/components/avatar"
+} from '@repo/ui/components/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,42 +19,48 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/components/dropdown-menu"
+} from '@repo/ui/components/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@repo/ui/components/sidebar"
+} from '@repo/ui/components/sidebar';
 
-import { ProfileEditDialog } from "./profile-edit-dialog"
+import { ProfileEditDialog } from './profile-edit-dialog';
 
-export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header" }) {
-  const { t } = useI18n()
-  const session = authClient.useSession()
-  const user = session.data?.user
-  const { isMobile } = useSidebar()
-  const [profileOpen, setProfileOpen] = useState(false)
-  const displayName = user?.name ?? user?.email ?? t("common.user")
-  const email = user?.email ?? t("common.account")
+export function NavUser({
+  variant = 'sidebar',
+}: {
+  variant?: 'sidebar' | 'header';
+}) {
+  const { t } = useI18n();
+  const session = authClient.useSession();
+  const user = session.data?.user;
+  const { isMobile } = useSidebar();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const displayName = user?.name ?? user?.email ?? t('common.user');
+  const email = user?.email ?? t('common.account');
   const initials = displayName
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((part: string) => part.slice(0, 1).toUpperCase())
-    .join("")
-  const imageUrl = user?.image ?? undefined
-  const isHeader = variant === "header"
+    .join('');
+  const imageUrl = user?.image ?? undefined;
+  const isHeader = variant === 'header';
   const trigger = isHeader ? (
     <button
       type="button"
       className="inline-flex h-9 min-w-9 items-center justify-center gap-2 rounded-md px-2 text-sm font-medium outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
-      aria-label={t("nav.openAccountMenu")}
+      aria-label={t('nav.openAccountMenu')}
     >
       <Settings className="size-4 sm:hidden" />
       <Avatar className="hidden h-8 w-8 rounded-lg sm:flex">
         <AvatarImage src={imageUrl} alt="" />
-        <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
+        <AvatarFallback className="rounded-lg">
+          {initials || 'U'}
+        </AvatarFallback>
       </Avatar>
       <div className="hidden max-w-36 text-left text-sm leading-tight lg:grid">
         <span className="truncate font-medium">{displayName}</span>
@@ -68,7 +75,9 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
     >
       <Avatar className="h-8 w-8 rounded-lg">
         <AvatarImage src={imageUrl} alt="" />
-        <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
+        <AvatarFallback className="rounded-lg">
+          {initials || 'U'}
+        </AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">
         <span className="truncate font-medium">{displayName}</span>
@@ -76,7 +85,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
       </div>
       <ChevronsUpDown className="ml-auto size-4" />
     </SidebarMenuButton>
-  )
+  );
 
   return (
     <SidebarMenu className={isHeader ? 'w-auto' : undefined}>
@@ -105,13 +114,15 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                {t("nav.profile")}
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
+                  <BadgeCheck />
+                  {t('nav.profile')}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
                 <Settings />
-                {t("nav.settings")}
+                {t('nav.settings')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -128,7 +139,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
               }}
             >
               <LogOut />
-              {t("nav.logout")}
+              {t('nav.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
