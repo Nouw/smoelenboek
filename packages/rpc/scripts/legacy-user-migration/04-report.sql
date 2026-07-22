@@ -18,7 +18,9 @@ SELECT
   count(*) FILTER (WHERE a.id IS NULL) AS missing_credentials,
   count(*) FILTER (
     WHERE a.id IS NOT NULL
-      AND a.password IS DISTINCT FROM s."passwordHash"
+      AND a.password IS DISTINCT FROM
+        CASE WHEN btrim(s."passwordHash") = 'reset'
+             THEN 'reset' ELSE s."passwordHash" END
       AND old_a.id IS NULL
   ) AS changed_imported_hashes,
   count(*) FILTER (
@@ -40,7 +42,11 @@ SELECT
   m."userId" AS new_user_id,
   lower(btrim(s.email)) AS email,
   CASE WHEN b.id IS NULL THEN 'created' ELSE 'matched' END AS user_action,
-  CASE WHEN old_a.id IS NULL THEN 'legacy_bcrypt_inserted' ELSE 'existing_credential_preserved' END AS credential_action,
+  CASE
+    WHEN old_a.id IS NOT NULL THEN 'existing_credential_preserved'
+    WHEN btrim(s."passwordHash") = 'reset' THEN 'reset_required'
+    ELSE 'legacy_bcrypt_inserted'
+  END AS credential_action,
   u."passwordMigrationRequired" AS reset_required,
   u.role,
   i."joinDate" AS join_date,

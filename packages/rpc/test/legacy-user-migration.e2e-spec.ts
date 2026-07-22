@@ -44,7 +44,7 @@ describeWithDatabase('legacy user migration PostgreSQL fixture', () => {
     }
   });
 
-  it('maps identities, preserves modern credentials, and imports bcrypt users', async () => {
+  it('maps identities and imports bcrypt and reset users safely', async () => {
     for (const migration of [
       new CreateUsers1766810000000(),
       new CreateBetterAuthTables1767200000000(),
@@ -85,7 +85,9 @@ describeWithDatabase('legacy user migration PostgreSQL fixture', () => {
         (7, 'EXISTING@example.com', '$2b$10$legacy-existing', 'Existing', 'Member',
          'Utrecht', 'NL00EXISTING', '1990-01-01', 'BOND7', '2010-09-01', '7', 'admin'),
         (8, 'new@example.com', '$2b$10$legacy-new', 'New', 'Member',
-         'Zeist', 'NL00NEW', '2000-02-02', 'BOND8', '2020-09-01', '8', 'user')`,
+         'Zeist', 'NL00NEW', '2000-02-02', 'BOND8', '2020-09-01', '8', 'user'),
+        (9, 'never-activated@example.com', 'reset', 'Never', 'Activated',
+         'De Bilt', 'NL00RESET', '2001-03-03', 'BOND9', '2021-09-01', '9', 'user')`,
     );
 
     await runner.query(
@@ -96,7 +98,7 @@ describeWithDatabase('legacy user migration PostgreSQL fixture', () => {
       `SELECT "legacyUserId"::int, "userId"
        FROM legacy_user_migration_map ORDER BY "legacyUserId"`,
     );
-    expect(maps).toHaveLength(2);
+    expect(maps).toHaveLength(3);
     expect(maps[0]).toEqual({ legacyUserId: 7, userId: existingUserId });
 
     const [existingCredential] = await runner.query(
@@ -122,6 +124,20 @@ describeWithDatabase('legacy user migration PostgreSQL fixture', () => {
       bankAccountNumber: 'NL00NEW',
     });
     expect(newUser.id).toMatch(/^[0-9a-f-]{36}$/);
+
+    const [resetUser] = await runner.query(
+      `SELECT u."passwordMigrationRequired", a.password, i.city
+       FROM legacy_user_migration_map m
+       JOIN users u ON u.id = m."userId"
+       JOIN account a ON a."userId" = u.id AND a."providerId" = 'credential'
+       JOIN user_information i ON i."userId" = u.id
+       WHERE m."legacyUserId" = 9`,
+    );
+    expect(resetUser).toEqual({
+      passwordMigrationRequired: true,
+      password: 'reset',
+      city: 'De Bilt',
+    });
 
     const [existingUser] = await runner.query(
       `SELECT "passwordMigrationRequired", role FROM users WHERE id = $1`,

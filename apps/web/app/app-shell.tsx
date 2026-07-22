@@ -13,6 +13,7 @@ import {
 } from '@repo/ui/components/card';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
+import Link from 'next/link';
 import {
   SidebarInset,
   SidebarProvider,
@@ -147,6 +148,9 @@ function LoginLayout() {
             ) : null}
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Logging in...' : 'Log in'}
+            </Button>
+            <Button asChild type="button" variant="ghost" className="w-full">
+              <Link href="/request-password-reset">Wachtwoord vergeten?</Link>
             </Button>
           </form>
         </CardContent>

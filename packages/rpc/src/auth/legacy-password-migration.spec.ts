@@ -5,6 +5,7 @@ import {
   claimPasswordMigrationReset,
   completePasswordMigration,
   isLegacyBcryptHash,
+  isLegacyResetPassword,
   releasePasswordMigrationResetClaim,
   verifyPasswordWithLegacySupport,
 } from './legacy-password-migration';
@@ -15,6 +16,20 @@ describe('legacy password migration', () => {
     expect(isLegacyBcryptHash('$2b$12$abcdefghijklmnopqrstuvwxyz')).toBe(true);
     expect(isLegacyBcryptHash('$2y$08$abcdefghijklmnopqrstuvwxyz')).toBe(true);
     expect(isLegacyBcryptHash('scrypt:modern-password-hash')).toBe(false);
+  });
+
+  it('recognizes the legacy reset sentinel', () => {
+    expect(isLegacyResetPassword('reset')).toBe(true);
+    expect(isLegacyResetPassword('$2b$10$hash')).toBe(false);
+  });
+
+  it('rejects the reset sentinel without passing it to the scrypt verifier', async () => {
+    const verifyModern = jest.fn<() => Promise<boolean>>();
+
+    await expect(
+      verifyPasswordWithLegacySupport('reset', 'reset', verifyModern),
+    ).resolves.toBe(false);
+    expect(verifyModern).not.toHaveBeenCalled();
   });
 
   it('verifies bcrypt hashes without invoking the modern verifier', async () => {

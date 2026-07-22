@@ -9,7 +9,10 @@ WHERE "legacyUserId" IS NULL
    OR NULLIF(btrim("firstName"), '') IS NULL
    OR NULLIF(btrim("lastName"), '') IS NULL
    OR NULLIF(btrim("passwordHash"), '') IS NULL
-   OR "passwordHash" !~ '^\$2[aby]\$[0-9]{2}\$';
+   OR (
+     btrim("passwordHash") <> 'reset'
+     AND "passwordHash" !~ '^\$2[aby]\$[0-9]{2}\$'
+   );
 
 -- Duplicate identities in the export.
 SELECT lower(btrim("email")) AS value, count(*) AS occurrences, 'duplicate email' AS issue

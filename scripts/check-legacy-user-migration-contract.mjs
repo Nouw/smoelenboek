@@ -18,6 +18,7 @@ const [auth, entity, migration, importSql, snapshotSql, reportSql, runbook] =
   ]);
 
 assert.match(auth, /verifyPasswordWithLegacySupport/);
+assert.match(importSql, /btrim\(s\."passwordHash"\) = 'reset'/);
 assert.match(auth, /revokeSessionsOnPasswordReset:\s*true/);
 assert.match(auth, /completePasswordMigration/);
 assert.match(entity, /passwordMigrationRequired/);
@@ -30,5 +31,6 @@ assert.match(reportSql, /overwritten_modern_credentials/);
 assert.match(reportSql, /full-before-after\.csv/);
 assert.match(runbook, /ROLLBACK/);
 assert.match(runbook, /profilePicture/);
+assert.match(runbook, /literal `reset`/);
 
 console.log('Legacy user migration contract checks passed.');

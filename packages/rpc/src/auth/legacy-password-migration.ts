@@ -2,10 +2,15 @@ import { compare } from 'bcryptjs';
 import type { Pool } from 'pg';
 
 export const LEGACY_BCRYPT_PATTERN = /^\$2[aby]\$\d{2}\$/;
+export const LEGACY_RESET_PASSWORD = 'reset';
 export const PASSWORD_RESET_COOLDOWN_MS = 15 * 60 * 1000;
 
 export function isLegacyBcryptHash(hash: string): boolean {
   return LEGACY_BCRYPT_PATTERN.test(hash);
+}
+
+export function isLegacyResetPassword(hash: string): boolean {
+  return hash === LEGACY_RESET_PASSWORD;
 }
 
 export async function verifyPasswordWithLegacySupport(
@@ -13,6 +18,10 @@ export async function verifyPasswordWithLegacySupport(
   hash: string,
   verifyModern: (input: { password: string; hash: string }) => Promise<boolean>,
 ): Promise<boolean> {
+  if (isLegacyResetPassword(hash)) {
+    return false;
+  }
+
   if (isLegacyBcryptHash(hash)) {
     return compare(password, hash);
   }

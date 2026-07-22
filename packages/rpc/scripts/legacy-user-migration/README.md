@@ -1,8 +1,9 @@
 # Legacy MySQL user migration
 
 This runbook migrates the old numeric-ID MySQL users into PostgreSQL without
-changing their bcrypt hashes. New and reset passwords continue to use Better
-Auth's scrypt format.
+changing their bcrypt hashes. It also supports the literal `reset` value used
+for members who never activated their old account. New and reset passwords
+continue to use Better Auth's scrypt format.
 
 ## Safety properties
 
@@ -13,6 +14,9 @@ Auth's scrypt format.
 - An existing Better Auth credential account is never overwritten.
 - A bcrypt credential inserted by this migration sets
   `passwordMigrationRequired = true`.
+- A literal `reset` credential is imported as an unusable sentinel and also
+  requires migration. That member must use **Wachtwoord vergeten?** instead of
+  trying to sign in with `reset`.
 - The migration remains in one transaction until its report has been reviewed.
 - The report excludes password hashes and high-risk personal fields.
 
@@ -98,9 +102,11 @@ first rehearsal.
 10. If the counts and samples are correct, run `COMMIT;`. If anything is wrong,
    run `ROLLBACK;`. Closing the connection also rolls back an uncommitted run.
 
-11. Test one migrated login. The old password should be accepted once, a reset
-    URL should be printed by the RPC console mailer, and application APIs should
-    remain blocked until that URL is used to set a new password.
+11. Test one migrated bcrypt login. The old password should be accepted once, a
+    reset URL should be printed by the RPC console mailer, and application APIs
+    should remain blocked until that URL is used to set a new password. Also
+    test one `reset` member through **Wachtwoord vergeten?**; the sentinel itself
+    must never authenticate.
 
 12. Once signed off, run `05-cleanup.sql` to delete the staging table and its
     password hashes. Keep `legacy_user_migration_map`.

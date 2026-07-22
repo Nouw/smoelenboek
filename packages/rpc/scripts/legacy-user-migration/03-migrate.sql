@@ -14,7 +14,10 @@ BEGIN
        OR NULLIF(btrim("firstName"), '') IS NULL
        OR NULLIF(btrim("lastName"), '') IS NULL
        OR NULLIF(btrim("passwordHash"), '') IS NULL
-       OR "passwordHash" !~ '^\$2[aby]\$[0-9]{2}\$'
+       OR (
+         btrim("passwordHash") <> 'reset'
+         AND "passwordHash" !~ '^\$2[aby]\$[0-9]{2}\$'
+       )
   ) THEN RAISE EXCEPTION 'Preflight failed: missing values or invalid bcrypt hash'; END IF;
   IF EXISTS (
     SELECT 1 FROM legacy_user_import_staging
@@ -142,7 +145,9 @@ WITH inserted_credentials AS (
     id, "accountId", "providerId", "userId", password, "createdAt", "updatedAt"
   )
   SELECT gen_random_uuid(), m."userId"::text, 'credential', m."userId",
-         s."passwordHash", now(), now()
+         CASE WHEN btrim(s."passwordHash") = 'reset'
+              THEN 'reset' ELSE s."passwordHash" END,
+         now(), now()
   FROM legacy_user_import_staging s
   JOIN legacy_user_migration_map m ON m."legacyUserId" = s."legacyUserId"
   WHERE NOT EXISTS (
