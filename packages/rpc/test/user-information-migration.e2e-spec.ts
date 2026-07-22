@@ -3,6 +3,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 
 import { CreateUsers1766810000000 } from '../src/database/migrations/1766810000000-CreateUsers';
 import { CreateUserInformation1768000000000 } from '../src/database/migrations/1768000000000-CreateUserInformation';
+import { NormalizeMissingBondNumbers1768200000000 } from '../src/database/migrations/1768200000000-NormalizeMissingBondNumbers';
 
 const databaseUrl = process.env.TEST_USER_INFORMATION_DATABASE_URL;
 const describeWithDatabase = databaseUrl ? describe : describe.skip;
@@ -38,14 +39,17 @@ describeWithDatabase('user information migration PostgreSQL fixture', () => {
 
     const userId = '11111111-1111-4111-8111-111111111111';
     const secondUserId = '22222222-2222-4222-8222-222222222222';
+    const thirdUserId = '33333333-3333-4333-8333-333333333333';
     await runner.query(
       `INSERT INTO "users" ("id", "clerkUserId")
-       VALUES ($1, $2), ($3, $4)`,
+       VALUES ($1, $2), ($3, $4), ($5, $6)`,
       [
         userId,
         'information-test-user',
         secondUserId,
         'information-second-test-user',
+        thirdUserId,
+        'information-third-test-user',
       ],
     );
     await runner.query(
@@ -105,6 +109,26 @@ describeWithDatabase('user information migration PostgreSQL fixture', () => {
       [secondUserId, -1],
       'CHK_user_information_backNumber',
     );
+
+    await runner.query(
+      'INSERT INTO "user_information" ("userId", "bondNumber") VALUES ($1, $2)',
+      [secondUserId, '-'],
+    );
+    await new NormalizeMissingBondNumbers1768200000000().up(runner);
+    await runner.query(
+      'INSERT INTO "user_information" ("userId", "bondNumber") VALUES ($1, NULL)',
+      [thirdUserId],
+    );
+
+    const missingBondNumbers = await runner.query(
+      `SELECT "bondNumber" FROM "user_information"
+       WHERE "userId" IN ($1, $2) ORDER BY "userId"`,
+      [secondUserId, thirdUserId],
+    );
+    expect(missingBondNumbers).toEqual([
+      { bondNumber: null },
+      { bondNumber: null },
+    ]);
 
     await runner.query('DELETE FROM "users" WHERE "id" = $1', [userId]);
     const [{ count }] = await runner.query(

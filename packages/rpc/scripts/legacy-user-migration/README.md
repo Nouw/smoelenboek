@@ -17,6 +17,9 @@ continue to use Better Auth's scrypt format.
 - A literal `reset` credential is imported as an unusable sentinel and also
   requires migration. That member must use **Wachtwoord vergeten?** instead of
   trying to sign in with `reset`.
+- A bond number containing only `-` is treated as missing and stored as `NULL`.
+  This permits multiple legacy members with that placeholder while real bond
+  numbers remain unique.
 - The migration remains in one transaction until its report has been reviewed.
 - The report excludes password hashes and high-risk personal fields.
 
@@ -100,7 +103,7 @@ first rehearsal.
    ```
 
 10. If the counts and samples are correct, run `COMMIT;`. If anything is wrong,
-   run `ROLLBACK;`. Closing the connection also rolls back an uncommitted run.
+    run `ROLLBACK;`. Closing the connection also rolls back an uncommitted run.
 
 11. Test one migrated bcrypt login. The old password should be accepted once, a
     reset URL should be printed by the RPC console mailer, and application APIs

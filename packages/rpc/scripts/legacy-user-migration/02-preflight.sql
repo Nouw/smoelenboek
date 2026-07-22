@@ -35,6 +35,7 @@ HAVING count(*) > 1;
 SELECT btrim("bondNumber") AS value, count(*) AS occurrences, 'duplicate bond number' AS issue
 FROM legacy_user_import_staging
 WHERE NULLIF(btrim("bondNumber"), '') IS NOT NULL
+  AND btrim("bondNumber") <> '-'
 GROUP BY btrim("bondNumber")
 HAVING count(*) > 1;
 
@@ -60,7 +61,8 @@ WHERE lower(btrim(u.email)) <> lower(btrim(s."email"));
 SELECT s."legacyUserId", s."email", s."bondNumber", i."userId",
        'bond number belongs to another user' AS issue
 FROM legacy_user_import_staging s
-JOIN user_information i ON i."bondNumber" = NULLIF(btrim(s."bondNumber"), '')
+JOIN user_information i
+  ON i."bondNumber" = NULLIF(NULLIF(btrim(s."bondNumber"), ''), '-')
 LEFT JOIN legacy_user_migration_map m ON m."legacyUserId" = s."legacyUserId"
 LEFT JOIN users email_user ON lower(email_user.email) = lower(btrim(s."email"))
 WHERE COALESCE(m."userId", email_user.id) IS NULL

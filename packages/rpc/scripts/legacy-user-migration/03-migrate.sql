@@ -36,6 +36,7 @@ BEGIN
   IF EXISTS (
     SELECT 1 FROM legacy_user_import_staging
     WHERE NULLIF(btrim("bondNumber"), '') IS NOT NULL
+      AND btrim("bondNumber") <> '-'
     GROUP BY btrim("bondNumber") HAVING count(*) > 1
   ) THEN RAISE EXCEPTION 'Preflight failed: duplicate bond number'; END IF;
   IF EXISTS (
@@ -63,7 +64,8 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM legacy_user_import_staging s
-    JOIN user_information i ON i."bondNumber" = NULLIF(btrim(s."bondNumber"), '')
+    JOIN user_information i
+      ON i."bondNumber" = NULLIF(NULLIF(btrim(s."bondNumber"), ''), '-')
     LEFT JOIN legacy_user_migration_map m ON m."legacyUserId" = s."legacyUserId"
     LEFT JOIN users email_user ON lower(email_user.email) = lower(btrim(s.email))
     WHERE COALESCE(m."userId", email_user.id) IS NULL
@@ -119,7 +121,8 @@ SELECT
   m."userId", NULLIF(btrim(s."streetName"), ''), NULLIF(btrim(s."houseNumber"), ''),
   NULLIF(btrim(s.postcode), ''), NULLIF(btrim(s.city), ''),
   NULLIF(btrim(s."phoneNumber"), ''), NULLIF(btrim(s."bankAccountNumber"), ''),
-  NULLIF(btrim(s."birthDate"), '')::date, NULLIF(btrim(s."bondNumber"), ''),
+  NULLIF(btrim(s."birthDate"), '')::date,
+  NULLIF(NULLIF(btrim(s."bondNumber"), ''), '-'),
   NULLIF(btrim(s."joinDate"), '')::date, NULLIF(btrim(s."leaveDate"), '')::date,
   NULLIF(btrim(s."backNumber"), '')::smallint, NULLIF(btrim(s."refereeLicense"), ''),
   now(), now()
