@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { authClient } from '@/lib/auth-client';
 import { useI18n } from '@/lib/i18n';
+import { trpc } from '@/app/trpc';
 import {
   Avatar,
   AvatarFallback,
@@ -36,6 +37,10 @@ export function NavUser({
 }) {
   const { t } = useI18n();
   const session = authClient.useSession();
+  const localUser = trpc.user.me.useQuery(undefined, {
+    enabled: Boolean(session.data),
+    retry: false,
+  });
   const user = session.data?.user;
   const { isMobile } = useSidebar();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -48,6 +53,7 @@ export function NavUser({
     .map((part: string) => part.slice(0, 1).toUpperCase())
     .join('');
   const imageUrl = user?.image ?? undefined;
+  const profileUserId = localUser.data?.id ?? user?.id;
   const isHeader = variant === 'header';
   const trigger = isHeader ? (
     <button
@@ -114,12 +120,19 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/profile">
+              {profileUserId ? (
+                <DropdownMenuItem asChild>
+                  <Link href={'/profile/' + profileUserId}>
+                    <BadgeCheck />
+                    {t('nav.profile')}
+                  </Link>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem disabled>
                   <BadgeCheck />
                   {t('nav.profile')}
-                </Link>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
                 <Settings />
                 {t('nav.settings')}

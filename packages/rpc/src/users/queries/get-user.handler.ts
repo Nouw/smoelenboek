@@ -3,15 +3,15 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { toUserDto } from '../dto/user-output';
 import { UsersRepository } from '../repositories/users.repository';
-import { GetCurrentUserQuery } from './get-current-user.query';
+import { GetUserQuery } from './get-user.query';
 
-@QueryHandler(GetCurrentUserQuery)
-export class GetCurrentUserHandler
-  implements IQueryHandler<GetCurrentUserQuery, UserDto | null>
+@QueryHandler(GetUserQuery)
+export class GetUserHandler
+  implements IQueryHandler<GetUserQuery, UserDto | null>
 {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  async execute(query: GetCurrentUserQuery): Promise<UserDto | null> {
+  async execute(query: GetUserQuery): Promise<UserDto | null> {
     const user = await this.usersRepository.findById(query.userId);
 
     return user ? toUserDto(user) : null;

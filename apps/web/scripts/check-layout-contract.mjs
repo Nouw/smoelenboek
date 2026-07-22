@@ -22,7 +22,7 @@ for (const term of [
   'SidebarInset',
   'type="search"',
   'variant="header"',
-  'href="/profile"',
+  "'/profile/' + profileUserId",
 ]) {
   assert.ok(layoutSurface.includes(term), 'Layout contract missing: ' + term);
 }

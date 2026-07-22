@@ -3,16 +3,18 @@ import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
 const [page, profile, navigation, translations] = await Promise.all([
-  readFile(new URL('app/profile/page.tsx', root), 'utf8'),
+  readFile(new URL('app/profile/[userId]/page.tsx', root), 'utf8'),
   readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
   readFile(new URL('components/nav-user.tsx', root), 'utf8'),
   readFile(new URL('lib/i18n.tsx', root), 'utf8'),
 ]);
 
-assert.match(page, /<ProfileContent\s*\/>/);
-assert.match(navigation, /href="\/profile"/);
+assert.match(page, /params: Promise<\{ userId: string \}>/);
+assert.match(page, /z\.uuid\(\)\.safeParse\(userId\)/);
+assert.match(page, /<ProfileContent userId=\{parsedUserId\.data\}/);
+assert.match(navigation, /'\/profile\/' \+ profileUserId/);
 for (const query of [
-  'trpc.user.me.useQuery',
+  'trpc.user.byId.useQuery',
   'trpc.user.information.useQuery',
   'trpc.user.membershipHistory.useQuery',
   'trpc.teams.list.useQuery',
@@ -20,6 +22,10 @@ for (const query of [
 ]) {
   assert.ok(profile.includes(query), 'Profile page must query ' + query + '.');
 }
+assert.match(profile, /information\.useQuery\(\s*\{ userId \}/);
+assert.match(profile, /membershipHistory\.useQuery\([\s\S]*\{ userId \}/);
+assert.match(profile, /currentUser\.data\?\.id === userId/);
+assert.match(profile, /\{isOwner \? \(/);
 for (const field of [
   "t('profile.email')",
   "t('profile.phoneNumber')",

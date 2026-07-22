@@ -1,15 +1,38 @@
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [profile, navigation, translations] = await Promise.all([
-  readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
-  readFile(new URL('components/nav-user.tsx', root), 'utf8'),
-  readFile(new URL('lib/i18n.tsx', root), 'utf8'),
-]);
+const [page, profile, navigation, translations, userRouter] = await Promise.all(
+  [
+    readFile(new URL('app/profile/[userId]/page.tsx', root), 'utf8'),
+    readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
+    readFile(new URL('components/nav-user.tsx', root), 'utf8'),
+    readFile(new URL('lib/i18n.tsx', root), 'utf8'),
+    readFile(
+      new URL('../../packages/rpc/src/users/trpc/user.router.ts', root),
+      'utf8',
+    ),
+  ],
+);
 const criteria = [
   [
     'Discoverable from account navigation',
-    navigation.includes('href="/profile"'),
+    /'\/profile\/' \+ profileUserId/.test(navigation),
+  ],
+  [
+    'Loads the URL-selected member',
+    /userId/.test(page) &&
+      /user\.byId/.test(profile) &&
+      /information\.useQuery\(\s*\{ userId \}/.test(profile),
+  ],
+  [
+    'Protects profile lookups',
+    /byId: protectedProcedure/.test(userRouter) &&
+      /userId: z\.uuid\(\)/.test(userRouter),
+  ],
+  [
+    'Restricts editing to the profile owner',
+    /currentUser\.data\?\.id === userId/.test(profile) &&
+      /\{isOwner \? \(/.test(profile),
   ],
   [
     'Uses Shadcn surfaces',

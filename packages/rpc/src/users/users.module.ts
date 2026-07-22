@@ -9,7 +9,7 @@ import { UserEntity } from './entities/user.entity';
 import { UserInformationEntity } from './entities/user-information.entity';
 import { UserProjector } from './projectors/user-projector';
 import { UserInformationProjector } from './projectors/user-information-projector';
-import { GetCurrentUserHandler } from './queries/get-current-user.handler';
+import { GetUserHandler } from './queries/get-user.handler';
 import { GetUserInformationHandler } from './queries/get-user-information.handler';
 import { UserInformationRepository } from './repositories/user-information.repository';
 import { UsersRepository } from './repositories/users.repository';
@@ -24,7 +24,7 @@ import { UsersRepository } from './repositories/users.repository';
     UserInformationRepository,
     UserProjector,
     UserInformationProjector,
-    GetCurrentUserHandler,
+    GetUserHandler,
     GetUserInformationHandler,
     SyncUserFromAuthHandler,
     UpdateUserInformationHandler,

@@ -10,7 +10,7 @@ import { GetMembershipHistoryQuery } from '../../memberships/queries/get-members
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
 import { UpdateUserInformationCommand } from '../commands/update-user-information.command';
 import { UpdateUserProfileCommand } from '../commands/update-user-profile.command';
-import { GetCurrentUserQuery } from '../queries/get-current-user.query';
+import { GetUserQuery } from '../queries/get-user.query';
 import { GetUserInformationQuery } from '../queries/get-user-information.query';
 
 export type UserRouterDependencies = {
@@ -117,7 +117,21 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
       })
       .output(userOutputSchema.nullable())
       .query(({ ctx }) =>
-        dependencies.queryBus.execute(new GetCurrentUserQuery(ctx.userId)),
+        dependencies.queryBus.execute(new GetUserQuery(ctx.userId)),
+      ),
+    byId: protectedProcedure
+      .meta({
+        name: 'Get User By ID',
+        docs: {
+          description: 'Get one user projection by its user ID.',
+          tags: ['Users'],
+          auth: true,
+        },
+      })
+      .input(z.object({ userId: z.uuid() }))
+      .output(userOutputSchema.nullable())
+      .query(({ input }) =>
+        dependencies.queryBus.execute(new GetUserQuery(input.userId)),
       ),
     syncFromAuth: protectedProcedure
       .meta({

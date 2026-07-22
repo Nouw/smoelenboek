@@ -94,6 +94,9 @@ const dictionaries = {
       profileUnavailable: 'Profiel nog niet beschikbaar',
       profileUnavailableDescription:
         'Synchroniseer je account om je profiel aan te maken.',
+      profileNotFound: 'Profiel niet gevonden',
+      profileNotFoundDescription:
+        'Deze gebruiker bestaat niet of heeft nog geen profiel.',
       refereeLicense: 'Scheidsrechterslicentie',
       registrationDate: 'Inschrijfdatum',
       retry: 'Opnieuw proberen',
@@ -238,6 +241,9 @@ const dictionaries = {
       profileUnavailable: 'Profile not available yet',
       profileUnavailableDescription:
         'Sync your account to create your profile.',
+      profileNotFound: 'Profile not found',
+      profileNotFoundDescription:
+        'This user does not exist or does not have a profile yet.',
       refereeLicense: 'Referee licence',
       registrationDate: 'Registration date',
       retry: 'Try again',

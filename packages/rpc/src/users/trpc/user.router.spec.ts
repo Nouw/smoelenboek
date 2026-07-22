@@ -42,6 +42,44 @@ describe('user tRPC router', () => {
     );
   });
 
+  it('rejects user.byId without authentication', async () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+    const caller = appRouter.createCaller({
+      userId: null,
+      sessionId: null,
+      orgId: null,
+      authType: null,
+      role: null,
+      claims: null,
+    });
+
+    await expect(
+      caller.user.byId({
+        userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+      }),
+    ).rejects.toBeInstanceOf(TRPCError);
+  });
+
+  it('dispatches user.byId for the requested user ID', async () => {
+    const execute = jest.fn().mockResolvedValue(null);
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute } as never,
+    });
+    const caller = appRouter.createCaller(authenticatedContext('user'));
+    const targetUserId = '6a0d03df-8c89-4309-b4ce-d1344f801b06';
+
+    await expect(
+      caller.user.byId({ userId: targetUserId }),
+    ).resolves.toBeNull();
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: targetUserId }),
+    );
+  });
+
   it('rejects user.updateProfile without authentication', async () => {
     const appRouter = createAppRouter({
       commandBus: { execute: jest.fn() } as never,

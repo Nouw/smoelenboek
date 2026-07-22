@@ -2,10 +2,11 @@
 
 ## Member profile
 
-The authenticated member profile is available at /profile. It combines the
-current user projection, association information, and membership history from
-the tRPC user router. Team and committee catalogs are fetched in parallel so
-membership IDs can be rendered as readable names.
+An authenticated member profile is available at /profile/:userId. It combines
+the selected user projection, association information, and membership history
+from the tRPC user router. Team and committee catalogs are fetched in parallel
+so membership IDs can be rendered as readable names. Profile editing is only
+shown when the URL belongs to the signed-in user.
 
 The page uses the shared Shadcn components and includes responsive layouts,
 loading/error/empty states, direct email and phone actions, Google Maps address

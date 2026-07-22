@@ -1,6 +1,7 @@
 'use client';
 
 import { ProfileEditDialog } from '@/components/profile-edit-dialog';
+import { authClient } from '@/lib/auth-client';
 import { useI18n, type TranslationKey } from '@/lib/i18n';
 import {
   Avatar,
@@ -56,21 +57,28 @@ const roleTranslationKeys = {
   secretaris: 'profile.roles.secretary',
 } satisfies Record<string, TranslationKey>;
 
-export function ProfileContent() {
+export function ProfileContent({ userId }: { userId: string }) {
   const { t } = useI18n();
   const [editOpen, setEditOpen] = useState(false);
-  const profile = trpc.user.me.useQuery(undefined, { retry: false });
-  const information = trpc.user.information.useQuery(undefined, {
-    retry: false,
-  });
-  const membershipHistory = trpc.user.membershipHistory.useQuery(undefined, {
-    retry: false,
-  });
+  const session = authClient.useSession();
+  const currentUser = trpc.user.me.useQuery(undefined, { retry: false });
+  const profile = trpc.user.byId.useQuery({ userId }, { retry: false });
+  const information = trpc.user.information.useQuery(
+    { userId },
+    {
+      retry: false,
+    },
+  );
+  const membershipHistory = trpc.user.membershipHistory.useQuery(
+    { userId },
+    { retry: false },
+  );
   const teams = trpc.teams.list.useQuery(undefined, { retry: false });
   const committees = trpc.committees.list.useQuery(undefined, { retry: false });
   const syncUser = trpc.user.syncFromAuth.useMutation({
     onSuccess: async () => {
       await Promise.all([
+        currentUser.refetch(),
         profile.refetch(),
         information.refetch(),
         membershipHistory.refetch(),
@@ -78,6 +86,7 @@ export function ProfileContent() {
     },
   });
   const firstError = [
+    currentUser.error,
     profile.error,
     information.error,
     membershipHistory.error,
@@ -86,6 +95,7 @@ export function ProfileContent() {
   ].find(Boolean);
 
   if (
+    currentUser.isLoading ||
     profile.isLoading ||
     information.isLoading ||
     membershipHistory.isLoading ||
@@ -102,6 +112,7 @@ export function ProfileContent() {
         onRetry={() => {
           void Promise.all([
             profile.refetch(),
+            currentUser.refetch(),
             information.refetch(),
             membershipHistory.refetch(),
             teams.refetch(),
@@ -112,6 +123,9 @@ export function ProfileContent() {
     );
   }
 
+  const isOwner =
+    currentUser.data?.id === userId || session.data?.user.id === userId;
+
   if (!profile.data) {
     return (
       <Card className="mx-auto w-full max-w-xl shadow-none">
@@ -121,28 +135,36 @@ export function ProfileContent() {
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-semibold">
-              {t('profile.profileUnavailable')}
+              {isOwner
+                ? t('profile.profileUnavailable')
+                : t('profile.profileNotFound')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {t('profile.profileUnavailableDescription')}
+              {isOwner
+                ? t('profile.profileUnavailableDescription')
+                : t('profile.profileNotFoundDescription')}
             </p>
           </div>
-          <Button
-            type="button"
-            onClick={() => syncUser.mutate()}
-            disabled={syncUser.isPending}
-          >
-            <RefreshCw
-              className={syncUser.isPending ? 'animate-spin' : undefined}
-            />
-            {syncUser.isPending
-              ? t('profile.syncingProfile')
-              : t('profile.syncProfile')}
-          </Button>
-          {syncUser.error ? (
-            <p className="text-sm text-destructive" role="alert">
-              {syncUser.error.message}
-            </p>
+          {isOwner ? (
+            <>
+              <Button
+                type="button"
+                onClick={() => syncUser.mutate()}
+                disabled={syncUser.isPending}
+              >
+                <RefreshCw
+                  className={syncUser.isPending ? 'animate-spin' : undefined}
+                />
+                {syncUser.isPending
+                  ? t('profile.syncingProfile')
+                  : t('profile.syncProfile')}
+              </Button>
+              {syncUser.error ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {syncUser.error.message}
+                </p>
+              ) : null}
+            </>
           ) : null}
         </CardContent>
       </Card>
@@ -231,14 +253,16 @@ export function ProfileContent() {
               </p>
             )}
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setEditOpen(true)}
-          >
-            <Settings />
-            {t('profile.editProfile')}
-          </Button>
+          {isOwner ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditOpen(true)}
+            >
+              <Settings />
+              {t('profile.editProfile')}
+            </Button>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -399,15 +423,17 @@ export function ProfileContent() {
         </Card>
       </div>
 
-      <ProfileEditDialog
-        open={editOpen}
-        onOpenChange={(open) => {
-          setEditOpen(open);
-          if (!open) {
-            void profile.refetch();
-          }
-        }}
-      />
+      {isOwner ? (
+        <ProfileEditDialog
+          open={editOpen}
+          onOpenChange={(open) => {
+            setEditOpen(open);
+            if (!open) {
+              void profile.refetch();
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }
