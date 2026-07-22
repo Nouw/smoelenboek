@@ -9,7 +9,6 @@ import { CreateSeasons1767000000000 } from '../src/database/migrations/176700000
 import { CreateTeamsCommitteesMemberships1767100000000 } from '../src/database/migrations/1767100000000-CreateTeamsCommitteesMemberships';
 import { AddTeamImageUrl1767600000000 } from '../src/database/migrations/1767600000000-AddTeamImageUrl';
 import { ReplaceSeasonsWithSeasonKeys1767900000000 } from '../src/database/migrations/1767900000000-ReplaceSeasonsWithSeasonKeys';
-import { AddLegacyUserMigration1768100000000 } from '../src/database/migrations/1768100000000-AddLegacyUserMigration';
 import { AddLegacyTeamMembershipMigration1768300000000 } from '../src/database/migrations/1768300000000-AddLegacyTeamMembershipMigration';
 
 const databaseUrl = process.env.TEST_LEGACY_TEAM_MEMBERSHIP_DATABASE_URL;
@@ -54,22 +53,23 @@ describeWithDatabase('legacy team membership PostgreSQL fixture', () => {
       new CreateTeamsCommitteesMemberships1767100000000(),
       new AddTeamImageUrl1767600000000(),
       new ReplaceSeasonsWithSeasonKeys1767900000000(),
-      new AddLegacyUserMigration1768100000000(),
       new AddLegacyTeamMembershipMigration1768300000000(),
     ]) {
       await migration.up(runner);
     }
 
+    const [legacyUserMap] = await runner.query(
+      `SELECT to_regclass('legacy_user_migration_map') AS relation`,
+    );
+    expect(legacyUserMap).toEqual({ relation: null });
+
     const firstUserId = '11111111-1111-4111-8111-111111111111';
     const secondUserId = '22222222-2222-4222-8222-222222222222';
     await runner.query(
-      `INSERT INTO users (id, "clerkUserId")
-       VALUES ($1, 'legacy-team-user-1'), ($2, 'legacy-team-user-2')`,
-      [firstUserId, secondUserId],
-    );
-    await runner.query(
-      `INSERT INTO legacy_user_migration_map ("legacyUserId", "userId")
-       VALUES (7, $1), (8, $2)`,
+      `INSERT INTO users (id, "clerkUserId", email)
+       VALUES
+         ($1, 'legacy-team-user-1', 'first@example.com'),
+         ($2, 'legacy-team-user-2', 'second@example.com')`,
       [firstUserId, secondUserId],
     );
 
@@ -106,6 +106,17 @@ describeWithDatabase('legacy team membership PostgreSQL fixture', () => {
       [existingMembershipId, firstUserId, herenOneId],
     );
 
+    await runner.query(`
+      CREATE TABLE legacy_team_membership_import_staging (
+        "legacyMembershipId" bigint,
+        "legacyUserId" bigint,
+        "legacyTeamId" bigint,
+        "teamName" text,
+        "legacySeasonId" bigint,
+        "seasonStartsOn" date,
+        "legacyFunction" text
+      )
+    `);
     await runner.query(
       await readFile(
         resolve(scriptsDirectory, '01-create-staging.sql'),
@@ -114,13 +125,13 @@ describeWithDatabase('legacy team membership PostgreSQL fixture', () => {
     );
     await runner.query(`
       INSERT INTO legacy_team_membership_import_staging (
-        "legacyMembershipId", "legacyUserId", "legacyTeamId", "teamName",
-        "legacySeasonId", "seasonStartsOn", "legacyFunction"
+        "legacyMembershipId", "legacyUserId", email, "legacyTeamId",
+        "teamName", "legacySeasonId", "seasonStartsOn", "legacyFunction"
       )
       VALUES
-        (101, 7, 1, 'Heren 1', 20, '2023-08-01', 'Coach / Trainer'),
-        (102, 7, 1, 'Heren 1', 21, '2024-08-15', 'Outside hitter'),
-        (103, 8, 8, 'Dames 1', 21, '2024-08-01', 'Setter')
+        (101, 7, 'FIRST@example.com', 1, 'Heren 1', 20, '2023-08-01', 'Coach / Trainer'),
+        (102, 7, 'first@example.com', 1, 'Heren 1', 21, '2024-08-15', 'Outside hitter'),
+        (103, 8, 'second@example.com', 8, 'Dames 1', 21, '2024-08-01', 'Setter')
     `);
 
     await runner.query(

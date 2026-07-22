@@ -2,12 +2,16 @@
 CREATE TABLE IF NOT EXISTS legacy_team_membership_import_staging (
   "legacyMembershipId" bigint,
   "legacyUserId" bigint,
+  "email" text,
   "legacyTeamId" bigint,
   "teamName" text,
   "legacySeasonId" bigint,
   "seasonStartsOn" date,
   "legacyFunction" text
 );
+
+ALTER TABLE legacy_team_membership_import_staging
+  ADD COLUMN IF NOT EXISTS "email" text;
 
 CREATE TABLE IF NOT EXISTS legacy_team_role_import_map (
   "legacyFunction" text PRIMARY KEY,

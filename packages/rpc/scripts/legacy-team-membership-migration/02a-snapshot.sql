@@ -3,9 +3,10 @@
 SELECT
   s."legacyMembershipId" AS legacy_membership_id,
   s."legacyUserId" AS legacy_user_id,
+  lower(btrim(s.email)) AS email,
   s."legacyTeamId" AS legacy_team_id,
   s."legacySeasonId" AS legacy_season_id,
-  u."userId" AS user_id,
+  app_user.id AS user_id,
   COALESCE(mapped_team."teamId", named_team.id) AS team_id,
   s."teamName" AS team_name,
   CASE WHEN EXTRACT(MONTH FROM s."seasonStartsOn") >= 8
@@ -14,7 +15,8 @@ SELECT
   r.role,
   to_jsonb(existing) AS membership_before
 FROM legacy_team_membership_import_staging s
-LEFT JOIN legacy_user_migration_map u ON u."legacyUserId" = s."legacyUserId"
+LEFT JOIN users app_user
+  ON lower(btrim(app_user.email)) = lower(btrim(s.email))
 LEFT JOIN legacy_team_role_import_map r
   ON r."legacyFunction" = lower(btrim(s."legacyFunction"))
 LEFT JOIN legacy_team_migration_map mapped_team
@@ -23,7 +25,7 @@ LEFT JOIN teams named_team
   ON mapped_team."teamId" IS NULL
  AND lower(btrim(named_team.name)) = lower(btrim(s."teamName"))
 LEFT JOIN team_memberships existing
-  ON existing."userId" = u."userId"
+  ON existing."userId" = app_user.id
  AND existing."teamId" = COALESCE(mapped_team."teamId", named_team.id)
  AND existing."seasonKey" = (
    CASE WHEN EXTRACT(MONTH FROM s."seasonStartsOn") >= 8

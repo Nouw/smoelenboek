@@ -10,6 +10,8 @@ BEGIN
     SELECT 1 FROM legacy_team_membership_import_staging
     WHERE "legacyMembershipId" IS NULL
        OR "legacyUserId" IS NULL
+       OR NULLIF(btrim("email"), '') IS NULL
+       OR btrim("email") !~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$'
        OR "legacyTeamId" IS NULL
        OR NULLIF(btrim("teamName"), '') IS NULL
        OR "legacySeasonId" IS NULL
@@ -26,6 +28,18 @@ BEGIN
     SELECT 1 FROM legacy_team_membership_import_staging
     GROUP BY "legacyMembershipId" HAVING count(*) > 1
   ) THEN RAISE EXCEPTION 'Preflight failed: duplicate legacy membership id'; END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM legacy_team_membership_import_staging
+    GROUP BY "legacyUserId"
+    HAVING count(DISTINCT lower(btrim(email))) > 1
+  ) THEN RAISE EXCEPTION 'Preflight failed: legacy user id has multiple emails'; END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM legacy_team_membership_import_staging
+    GROUP BY lower(btrim(email))
+    HAVING count(DISTINCT "legacyUserId") > 1
+  ) THEN RAISE EXCEPTION 'Preflight failed: email has multiple legacy user ids'; END IF;
 
   IF EXISTS (
     SELECT 1 FROM legacy_team_membership_import_staging
@@ -50,10 +64,11 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM legacy_team_membership_import_staging s
-    LEFT JOIN legacy_user_migration_map u
-      ON u."legacyUserId" = s."legacyUserId"
-    WHERE u."userId" IS NULL
-  ) THEN RAISE EXCEPTION 'Preflight failed: missing legacy user map'; END IF;
+    LEFT JOIN users app_user
+      ON lower(btrim(app_user.email)) = lower(btrim(s.email))
+    GROUP BY s."legacyUserId"
+    HAVING count(DISTINCT app_user.id) <> 1
+  ) THEN RAISE EXCEPTION 'Preflight failed: email does not resolve exactly one user'; END IF;
 
   IF EXISTS (
     SELECT 1
@@ -104,18 +119,19 @@ CREATE TEMP TABLE legacy_team_membership_resolved ON COMMIT DROP AS
 SELECT
   s."legacyMembershipId",
   s."legacyUserId",
+  lower(btrim(s.email)) AS email,
   s."legacyTeamId",
   s."legacySeasonId",
   s."seasonStartsOn",
-  user_map."userId",
+  app_user.id AS "userId",
   team_map."teamId",
   role_map.role,
   CASE WHEN EXTRACT(MONTH FROM s."seasonStartsOn") >= 8
        THEN EXTRACT(YEAR FROM s."seasonStartsOn")
        ELSE EXTRACT(YEAR FROM s."seasonStartsOn") - 1 END::smallint AS "seasonKey"
 FROM legacy_team_membership_import_staging s
-JOIN legacy_user_migration_map user_map
-  ON user_map."legacyUserId" = s."legacyUserId"
+JOIN users app_user
+  ON lower(btrim(app_user.email)) = lower(btrim(s.email))
 JOIN legacy_team_migration_map team_map
   ON team_map."legacyTeamId" = s."legacyTeamId"
 JOIN legacy_team_role_import_map role_map

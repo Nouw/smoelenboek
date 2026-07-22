@@ -61,6 +61,7 @@ SELECT
   resolved."legacyMembershipId" AS legacy_membership_id,
   map."membershipId" AS membership_id,
   resolved."legacyUserId" AS legacy_user_id,
+  resolved.email,
   resolved."userId" AS user_id,
   resolved."legacyTeamId" AS legacy_team_id,
   team.name AS team_name,

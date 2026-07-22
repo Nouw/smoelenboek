@@ -1,8 +1,9 @@
 # Legacy MySQL team membership migration
 
-This runbook migrates `user_team_season` rows after the legacy user migration
-has been committed. Numeric user, team, and membership IDs are retained in
-durable mapping tables so later relation migrations can reuse them.
+This runbook migrates `user_team_season` rows after the legacy users have been
+imported. Users are matched directly by normalized email address, so the
+temporary `legacy_user_migration_map` is not required. Numeric team and
+membership IDs are retained in durable mapping tables for later migrations.
 
 ## Date and season mapping
 
@@ -39,11 +40,18 @@ Unknown functions fail preflight. Do not guess a replacement in production.
    pnpm --filter @repo/rpc migration:run
    ```
 
-2. Confirm the user migration is committed and its durable map is populated:
+2. Confirm the user migration is committed and PostgreSQL user emails are
+   unique when compared case-insensitively:
 
    ```sql
-   SELECT count(*) FROM legacy_user_migration_map;
+   SELECT lower(btrim(email)) AS email, count(*)
+   FROM users
+   WHERE email IS NOT NULL
+   GROUP BY lower(btrim(email))
+   HAVING count(*) > 1;
    ```
+
+   This query must return zero rows.
 
 3. In a PostgreSQL DataGrip console, run `01-create-staging.sql`.
 
@@ -53,12 +61,14 @@ Unknown functions fail preflight. Do not guess a replacement in production.
    SELECT
      membership.id AS legacyMembershipId,
      membership.userId AS legacyUserId,
+     legacy_user.email AS email,
      membership.teamId AS legacyTeamId,
      team.name AS teamName,
      membership.seasonId AS legacySeasonId,
      DATE_FORMAT(season.startDate, '%Y-%m-%d') AS seasonStartsOn,
      membership.function AS legacyFunction
    FROM user_team_season membership
+   JOIN `user` legacy_user ON legacy_user.id = membership.userId
    JOIN team ON team.id = membership.teamId
    JOIN season ON season.id = membership.seasonId
    ORDER BY membership.id;
@@ -122,8 +132,8 @@ Unknown functions fail preflight. Do not guess a replacement in production.
 
 ## Safety properties
 
-- A missing migrated user, unknown function, ambiguous team name, duplicate
-  assignment, or conflicting durable map aborts before inserts.
+- A missing or ambiguous email match, unknown function, ambiguous team name,
+  duplicate assignment, or conflicting durable map aborts before inserts.
 - Existing membership rows and assignment events are preserved.
 - New projection rows and matching version 2 assignment events use the same
   durable membership UUID.
