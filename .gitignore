@@ -24,6 +24,15 @@ playwright-report/
 # Turbo
 .turbo
 
+# Local agent tooling
+/.agents/
+/.tokensave/
+/conversations/
+/skills-lock.json
+
+# Local OCI credentials
+/config/
+
 # Vercel
 .vercel
 
