@@ -157,7 +157,11 @@ export function NavUser({
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-      <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <ProfileEditDialog
+        open={profileOpen}
+        onOpenChange={setProfileOpen}
+        userId={profileUserId}
+      />
     </SidebarMenu>
   );
 }

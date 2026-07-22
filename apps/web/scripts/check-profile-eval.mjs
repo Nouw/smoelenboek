@@ -1,11 +1,11 @@
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [page, profile, informationDialog, currentUserHook, navigation, translations, userRouter, informationPolicy] = await Promise.all(
+const [page, profile, profileDialog, currentUserHook, navigation, translations, userRouter, informationPolicy] = await Promise.all(
   [
     readFile(new URL('app/profile/[userId]/page.tsx', root), 'utf8'),
     readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
-    readFile(new URL('components/user-information-edit-dialog.tsx', root), 'utf8'),
+    readFile(new URL('components/profile-edit-dialog.tsx', root), 'utf8'),
     readFile(new URL('hooks/use-current-user.ts', root), 'utf8'),
     readFile(new URL('components/nav-user.tsx', root), 'utf8'),
     readFile(new URL('lib/i18n.tsx', root), 'utf8'),
@@ -50,12 +50,15 @@ const criteria = [
       /isOwner/.test(currentUserHook),
   ],
   [
-    'Edits requested member information',
-    /updateInformation\.useMutation/.test(informationDialog) &&
-      /streetName/.test(informationDialog) &&
-      /phoneNumber/.test(informationDialog) &&
-      /bankAccountNumber/.test(informationDialog) &&
-      /backNumber/.test(informationDialog),
+    'Combines account and member editing in one dialog',
+    /updateInformation\.useMutation/.test(profileDialog) &&
+      /authClient\.changeEmail/.test(profileDialog) &&
+      /media\/profile-image/.test(profileDialog) &&
+      /streetName/.test(profileDialog) &&
+      /phoneNumber/.test(profileDialog) &&
+      /bankAccountNumber/.test(profileDialog) &&
+      /backNumber/.test(profileDialog) &&
+      !/UserInformationEditDialog/.test(profile),
   ],
   [
     'Renders bank data only when returned by the API',

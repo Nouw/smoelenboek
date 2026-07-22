@@ -65,6 +65,7 @@ const dictionaries = {
       toggle: 'Inklappen of uitklappen',
     },
     profile: {
+      account: 'Account',
       activities: 'Activiteiten',
       activitiesCount: 'activiteiten',
       activitiesDescription: 'Teams en commissies per seizoen.',
@@ -132,6 +133,7 @@ const dictionaries = {
       houseNumber: 'Huisnummer',
       imageDescription: 'Upload een JPG, PNG of WebP-afbeelding.',
       imageLabel: 'Profielfoto',
+      informationUpdated: 'Profielgegevens bijgewerkt.',
       invalidBackNumber: 'Voer een rugnummer van 0 t/m 32767 in.',
       pictureUpdated: 'Profielfoto bijgewerkt.',
       postcode: 'Postcode',
@@ -143,7 +145,8 @@ const dictionaries = {
       updateInformationDescription:
         'Werk de contactgegevens, het rekeningnummer en het rugnummer bij.',
       updateInformationFailed: 'Gegevens bijwerken mislukt.',
-      updateProfileDescription: 'Werk je profielfoto of e-mailadres bij.',
+      updateProfileDescription:
+        'Werk account-, contact- en verenigingsgegevens bij.',
       uploadPicture: 'Profielfoto uploaden',
       uploadingPicture: 'Profielfoto uploaden...',
       uploadPictureFailed: 'Profielfoto uploaden mislukt.',
@@ -223,6 +226,7 @@ const dictionaries = {
       toggle: 'Toggle',
     },
     profile: {
+      account: 'Account',
       activities: 'Activities',
       activitiesCount: 'activities',
       activitiesDescription: 'Teams and committees by season.',
@@ -288,6 +292,7 @@ const dictionaries = {
       houseNumber: 'House number',
       imageDescription: 'Upload a JPG, PNG, or WebP image.',
       imageLabel: 'Profile picture',
+      informationUpdated: 'Profile information updated.',
       invalidBackNumber: 'Enter a shirt number from 0 through 32767.',
       pictureUpdated: 'Profile picture updated.',
       postcode: 'Postcode',
@@ -299,7 +304,8 @@ const dictionaries = {
       updateInformationDescription:
         'Update the contact details, bank account number, and shirt number.',
       updateInformationFailed: 'Failed to update information.',
-      updateProfileDescription: 'Update your profile picture or email address.',
+      updateProfileDescription:
+        'Update account, contact, and association information.',
       uploadPicture: 'Upload profile picture',
       uploadingPicture: 'Uploading profile picture...',
       uploadPictureFailed: 'Failed to upload profile picture.',

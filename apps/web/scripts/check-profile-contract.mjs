@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [page, profile, informationDialog, currentUserHook, navigation, translations] = await Promise.all([
+const [page, profile, profileDialog, currentUserHook, navigation, translations] = await Promise.all([
   readFile(new URL('app/profile/[userId]/page.tsx', root), 'utf8'),
   readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
-  readFile(new URL('components/user-information-edit-dialog.tsx', root), 'utf8'),
+  readFile(new URL('components/profile-edit-dialog.tsx', root), 'utf8'),
   readFile(new URL('hooks/use-current-user.ts', root), 'utf8'),
   readFile(new URL('components/nav-user.tsx', root), 'utf8'),
   readFile(new URL('lib/i18n.tsx', root), 'utf8'),
@@ -52,11 +52,15 @@ assert.match(profile, /<ProfileSkeleton\s*\/>/);
 assert.match(profile, /<ProfileError/);
 assert.match(profile, /profile\.noActivities/);
 assert.match(profile, /<ProfileEditDialog/);
-assert.match(profile, /<UserInformationEditDialog/);
+assert.doesNotMatch(profile, /UserInformationEditDialog/);
 assert.match(profile, /hasOwnProperty\.call\(details, 'bankAccountNumber'\)/);
 assert.match(profile, /details\.bankAccountNumber/);
-assert.match(informationDialog, /trpc\.user\.updateInformation\.useMutation/);
-assert.match(informationDialog, /mutateAsync\(\{\s*userId,/);
+assert.match(profileDialog, /trpc\.user\.updateInformation\.useMutation/);
+assert.match(profileDialog, /authClient\.changeEmail/);
+assert.match(profileDialog, /media\/profile-image/);
+assert.match(profileDialog, /canEditAccount/);
+assert.match(profileDialog, /currentUser\.isAdmin/);
+assert.match(profileDialog, /mutateAsync\(\{\s*userId: targetUserId,/);
 for (const field of [
   'streetName',
   'houseNumber',
@@ -67,8 +71,8 @@ for (const field of [
   'backNumber',
 ]) {
   assert.ok(
-    informationDialog.includes(field),
-    'Information dialog must edit ' + field + '.',
+    profileDialog.includes(field),
+    'Profile dialog must edit ' + field + '.',
   );
 }
 assert.match(profile, /lg:grid-cols-/);

@@ -1,7 +1,6 @@
 'use client';
 
 import { ProfileEditDialog } from '@/components/profile-edit-dialog';
-import { UserInformationEditDialog } from '@/components/user-information-edit-dialog';
 import { useCurrentUser } from '@/hooks/use-current-user';
 import { useI18n, type TranslationKey } from '@/lib/i18n';
 import {
@@ -30,7 +29,6 @@ import {
   Mail,
   MapPin,
   Medal,
-  PencilLine,
   Phone,
   RefreshCw,
   Settings,
@@ -63,7 +61,6 @@ const roleTranslationKeys = {
 export function ProfileContent({ userId }: { userId: string }) {
   const { t } = useI18n();
   const [editOpen, setEditOpen] = useState(false);
-  const [informationEditOpen, setInformationEditOpen] = useState(false);
   const currentUser = useCurrentUser();
   const profile = trpc.user.byId.useQuery({ userId }, { retry: false });
   const information = trpc.user.information.useQuery(
@@ -260,28 +257,16 @@ export function ProfileContent({ userId }: { userId: string }) {
               </p>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            {canEditInformation ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setInformationEditOpen(true)}
-              >
-                <PencilLine />
-                {t('profile.editInformation')}
-              </Button>
-            ) : null}
-            {isOwner ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setEditOpen(true)}
-              >
-                <Settings />
-                {t('profile.editProfile')}
-              </Button>
-            ) : null}
-          </div>
+          {canEditInformation ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditOpen(true)}
+            >
+              <Settings />
+              {t('profile.editProfile')}
+            </Button>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -453,26 +438,18 @@ export function ProfileContent({ userId }: { userId: string }) {
         </Card>
       </div>
 
-      {isOwner ? (
+      {canEditInformation ? (
         <ProfileEditDialog
           open={editOpen}
           onOpenChange={(open) => {
             setEditOpen(open);
             if (!open) {
-              void profile.refetch();
+              void Promise.all([profile.refetch(), information.refetch()]);
             }
           }}
-        />
-      ) : null}
-      {canEditInformation ? (
-        <UserInformationEditDialog
-          open={informationEditOpen}
-          onOpenChange={setInformationEditOpen}
           userId={userId}
-          information={details}
-          canEditBankAccount
           onSaved={async () => {
-            await information.refetch();
+            await Promise.all([profile.refetch(), information.refetch()]);
           }}
         />
       ) : null}

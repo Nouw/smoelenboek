@@ -5,11 +5,13 @@
 An authenticated member profile is available at /profile/:userId. It combines
 the selected user projection, association information, and membership history
 from the tRPC user router. Team and committee catalogs are fetched in parallel
-so membership IDs can be rendered as readable names. Owners can edit their
-account and member information. Administrators can edit member information for
-other users. The server only returns bank-account data to its owner or an
-administrator, and the page renders that field only when it is present in the
-response.
+so membership IDs can be rendered as readable names. One profile dialog lets
+owners edit their email, profile picture, contact details, bank account, and
+back number together. Administrators use the same dialog for another member's
+contact, bank, and back-number fields, without receiving access to that
+member's email or profile-picture controls. The server only returns bank-account
+data to its owner or an administrator, and the page renders that field only
+when it is present in the response.
 
 The page uses the shared Shadcn components and includes responsive layouts,
 loading/error/empty states, direct email and phone actions, Google Maps address
