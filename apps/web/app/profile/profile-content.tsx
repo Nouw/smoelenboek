@@ -1,7 +1,8 @@
 'use client';
 
 import { ProfileEditDialog } from '@/components/profile-edit-dialog';
-import { authClient } from '@/lib/auth-client';
+import { UserInformationEditDialog } from '@/components/user-information-edit-dialog';
+import { useCurrentUser } from '@/hooks/use-current-user';
 import { useI18n, type TranslationKey } from '@/lib/i18n';
 import {
   Avatar,
@@ -25,9 +26,11 @@ import {
   CheckCircle2,
   CircleUserRound,
   ExternalLink,
+  Landmark,
   Mail,
   MapPin,
   Medal,
+  PencilLine,
   Phone,
   RefreshCw,
   Settings,
@@ -60,8 +63,8 @@ const roleTranslationKeys = {
 export function ProfileContent({ userId }: { userId: string }) {
   const { t } = useI18n();
   const [editOpen, setEditOpen] = useState(false);
-  const session = authClient.useSession();
-  const currentUser = trpc.user.me.useQuery(undefined, { retry: false });
+  const [informationEditOpen, setInformationEditOpen] = useState(false);
+  const currentUser = useCurrentUser();
   const profile = trpc.user.byId.useQuery({ userId }, { retry: false });
   const information = trpc.user.information.useQuery(
     { userId },
@@ -123,8 +126,8 @@ export function ProfileContent({ userId }: { userId: string }) {
     );
   }
 
-  const isOwner =
-    currentUser.data?.id === userId || session.data?.user.id === userId;
+  const isOwner = currentUser.isOwner(userId);
+  const canEditInformation = isOwner || currentUser.isAdmin;
 
   if (!profile.data) {
     return (
@@ -197,6 +200,10 @@ export function ProfileContent({ userId }: { userId: string }) {
   const seasons = [...(membershipHistory.data?.seasons ?? [])].sort(
     (left, right) => right.seasonKey - left.seasonKey,
   );
+  const canSeeBankAccount =
+    details !== null &&
+    details !== undefined &&
+    Object.prototype.hasOwnProperty.call(details, 'bankAccountNumber');
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
@@ -253,16 +260,28 @@ export function ProfileContent({ userId }: { userId: string }) {
               </p>
             )}
           </div>
-          {isOwner ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setEditOpen(true)}
-            >
-              <Settings />
-              {t('profile.editProfile')}
-            </Button>
-          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {canEditInformation ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setInformationEditOpen(true)}
+              >
+                <PencilLine />
+                {t('profile.editInformation')}
+              </Button>
+            ) : null}
+            {isOwner ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditOpen(true)}
+              >
+                <Settings />
+                {t('profile.editProfile')}
+              </Button>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
 
@@ -338,6 +357,17 @@ export function ProfileContent({ userId }: { userId: string }) {
               }
               emptyLabel={t('profile.notProvided')}
             />
+            {canSeeBankAccount ? (
+              <>
+                <Separator />
+                <DetailItem
+                  icon={Landmark}
+                  label={t('profile.bankAccountNumber')}
+                  value={details.bankAccountNumber}
+                  emptyLabel={t('profile.notProvided')}
+                />
+              </>
+            ) : null}
             <Separator />
             <DetailItem
               icon={Medal}
@@ -431,6 +461,18 @@ export function ProfileContent({ userId }: { userId: string }) {
             if (!open) {
               void profile.refetch();
             }
+          }}
+        />
+      ) : null}
+      {canEditInformation ? (
+        <UserInformationEditDialog
+          open={informationEditOpen}
+          onOpenChange={setInformationEditOpen}
+          userId={userId}
+          information={details}
+          canEditBankAccount
+          onSaved={async () => {
+            await information.refetch();
           }}
         />
       ) : null}

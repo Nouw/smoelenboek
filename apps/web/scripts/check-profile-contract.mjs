@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [page, profile, navigation, translations] = await Promise.all([
+const [page, profile, informationDialog, currentUserHook, navigation, translations] = await Promise.all([
   readFile(new URL('app/profile/[userId]/page.tsx', root), 'utf8'),
   readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
+  readFile(new URL('components/user-information-edit-dialog.tsx', root), 'utf8'),
+  readFile(new URL('hooks/use-current-user.ts', root), 'utf8'),
   readFile(new URL('components/nav-user.tsx', root), 'utf8'),
   readFile(new URL('lib/i18n.tsx', root), 'utf8'),
 ]);
@@ -24,8 +26,11 @@ for (const query of [
 }
 assert.match(profile, /information\.useQuery\(\s*\{ userId \}/);
 assert.match(profile, /membershipHistory\.useQuery\([\s\S]*\{ userId \}/);
-assert.match(profile, /currentUser\.data\?\.id === userId/);
-assert.match(profile, /\{isOwner \? \(/);
+assert.match(profile, /currentUser\.isOwner\(userId\)/);
+assert.match(profile, /isOwner \|\| currentUser\.isAdmin/);
+assert.match(currentUserHook, /trpc\.user\.me\.useQuery/);
+assert.match(currentUserHook, /role === 'admin'/);
+assert.match(currentUserHook, /isOwner/);
 for (const field of [
   "t('profile.email')",
   "t('profile.phoneNumber')",
@@ -47,10 +52,33 @@ assert.match(profile, /<ProfileSkeleton\s*\/>/);
 assert.match(profile, /<ProfileError/);
 assert.match(profile, /profile\.noActivities/);
 assert.match(profile, /<ProfileEditDialog/);
+assert.match(profile, /<UserInformationEditDialog/);
+assert.match(profile, /hasOwnProperty\.call\(details, 'bankAccountNumber'\)/);
+assert.match(profile, /details\.bankAccountNumber/);
+assert.match(informationDialog, /trpc\.user\.updateInformation\.useMutation/);
+assert.match(informationDialog, /mutateAsync\(\{\s*userId,/);
+for (const field of [
+  'streetName',
+  'houseNumber',
+  'postcode',
+  'city',
+  'phoneNumber',
+  'bankAccountNumber',
+  'backNumber',
+]) {
+  assert.ok(
+    informationDialog.includes(field),
+    'Information dialog must edit ' + field + '.',
+  );
+}
 assert.match(profile, /lg:grid-cols-/);
 for (const [dutch, english] of [
   ["activities: 'Activiteiten'", "activities: 'Activities'"],
   ["birthDate: 'Geboortedatum'", "birthDate: 'Date of birth'"],
+  [
+    "bankAccountNumber: 'Rekeningnummer'",
+    "bankAccountNumber: 'Bank account number'",
+  ],
   ["contact: 'Contact'", "contact: 'Contact'"],
   ["details: 'Verenigingsgegevens'", "details: 'Association details'"],
   [

@@ -5,12 +5,20 @@
 An authenticated member profile is available at /profile/:userId. It combines
 the selected user projection, association information, and membership history
 from the tRPC user router. Team and committee catalogs are fetched in parallel
-so membership IDs can be rendered as readable names. Profile editing is only
-shown when the URL belongs to the signed-in user.
+so membership IDs can be rendered as readable names. Owners can edit their
+account and member information. Administrators can edit member information for
+other users. The server only returns bank-account data to its owner or an
+administrator, and the page renders that field only when it is present in the
+response.
 
 The page uses the shared Shadcn components and includes responsive layouts,
 loading/error/empty states, direct email and phone actions, Google Maps address
 links, and Dutch/English translations.
+
+Use `useCurrentUser` from `hooks/use-current-user.ts` when a client component
+needs the signed-in user's role, the `isAdmin` flag, or an `isOwner(userId)`
+check. These values control presentation only; API policies remain the source
+of truth for authorization.
 
 Run pnpm --filter web test for its gate contract and pnpm --filter web eval for
 the scored UX contract.

@@ -1,14 +1,20 @@
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [page, profile, navigation, translations, userRouter] = await Promise.all(
+const [page, profile, informationDialog, currentUserHook, navigation, translations, userRouter, informationPolicy] = await Promise.all(
   [
     readFile(new URL('app/profile/[userId]/page.tsx', root), 'utf8'),
     readFile(new URL('app/profile/profile-content.tsx', root), 'utf8'),
+    readFile(new URL('components/user-information-edit-dialog.tsx', root), 'utf8'),
+    readFile(new URL('hooks/use-current-user.ts', root), 'utf8'),
     readFile(new URL('components/nav-user.tsx', root), 'utf8'),
     readFile(new URL('lib/i18n.tsx', root), 'utf8'),
     readFile(
       new URL('../../packages/rpc/src/users/trpc/user.router.ts', root),
+      'utf8',
+    ),
+    readFile(
+      new URL('../../packages/rpc/src/users/user-information-policy.ts', root),
       'utf8',
     ),
   ],
@@ -30,9 +36,30 @@ const criteria = [
       /userId: z\.uuid\(\)/.test(userRouter),
   ],
   [
-    'Restricts editing to the profile owner',
-    /currentUser\.data\?\.id === userId/.test(profile) &&
-      /\{isOwner \? \(/.test(profile),
+    'Restricts information editing to owners and admins',
+    /currentUser\.isOwner\(userId\)/.test(profile) &&
+      /isOwner \|\| currentUser\.isAdmin/.test(profile) &&
+      /actorUserId !== targetUserId && actorRole !== 'admin'/.test(
+        informationPolicy,
+      ),
+  ],
+  [
+    'Provides a reusable signed-in role hook',
+    /user\.me\.useQuery/.test(currentUserHook) &&
+      /role === 'admin'/.test(currentUserHook) &&
+      /isOwner/.test(currentUserHook),
+  ],
+  [
+    'Edits requested member information',
+    /updateInformation\.useMutation/.test(informationDialog) &&
+      /streetName/.test(informationDialog) &&
+      /phoneNumber/.test(informationDialog) &&
+      /bankAccountNumber/.test(informationDialog) &&
+      /backNumber/.test(informationDialog),
+  ],
+  [
+    'Renders bank data only when returned by the API',
+    /hasOwnProperty\.call\(details, 'bankAccountNumber'\)/.test(profile),
   ],
   [
     'Uses Shadcn surfaces',
