@@ -1,5 +1,5 @@
-import { AppShell } from './app-shell';
+import { HomeContent } from './home-content';
 
 export default function Home() {
-  return <AppShell />;
+  return <HomeContent />;
 }

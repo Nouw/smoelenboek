@@ -4,6 +4,7 @@ import { BadgeCheck, ChevronsUpDown, LogOut, Settings } from "lucide-react"
 import { useState } from "react"
 
 import { authClient } from "@/lib/auth-client"
+import { useI18n } from "@/lib/i18n"
 import {
   Avatar,
   AvatarFallback,
@@ -28,12 +29,13 @@ import {
 import { ProfileEditDialog } from "./profile-edit-dialog"
 
 export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header" }) {
+  const { t } = useI18n()
   const session = authClient.useSession()
   const user = session.data?.user
   const { isMobile } = useSidebar()
   const [profileOpen, setProfileOpen] = useState(false)
-  const displayName = user?.name ?? user?.email ?? "User"
-  const email = user?.email ?? "Account"
+  const displayName = user?.name ?? user?.email ?? t("common.user")
+  const email = user?.email ?? t("common.account")
   const initials = displayName
     .split(/\s+/)
     .filter(Boolean)
@@ -46,7 +48,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
     <button
       type="button"
       className="inline-flex h-9 min-w-9 items-center justify-center gap-2 rounded-md px-2 text-sm font-medium outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
-      aria-label="Open account menu"
+      aria-label={t("nav.openAccountMenu")}
     >
       <Settings className="size-4 sm:hidden" />
       <Avatar className="hidden h-8 w-8 rounded-lg sm:flex">
@@ -77,15 +79,13 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
   )
 
   return (
-    <SidebarMenu className={isHeader ? "w-auto" : undefined}>
+    <SidebarMenu className={isHeader ? 'w-auto' : undefined}>
       <SidebarMenuItem>
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>
-            {trigger}
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
           <DropdownMenuContent
             className="min-w-56 rounded-lg sm:w-(--radix-dropdown-menu-trigger-width)"
-            side={isMobile || isHeader ? "bottom" : "right"}
+            side={isMobile || isHeader ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >
@@ -93,7 +93,9 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={imageUrl} alt="" />
-                  <AvatarFallback className="rounded-lg">{initials || "U"}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {initials || 'U'}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{displayName}</span>
@@ -103,13 +105,13 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
-                <BadgeCheck />
-                Profile
-              </DropdownMenuItem>
               <DropdownMenuItem>
+                <BadgeCheck />
+                {t("nav.profile")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
                 <Settings />
-                Settings
+                {t("nav.settings")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -119,19 +121,19 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "header
                 void authClient.signOut({
                   fetchOptions: {
                     onSuccess: () => {
-                      window.location.reload()
+                      window.location.reload();
                     },
                   },
-                })
+                });
               }}
             >
               <LogOut />
-              Logout
+              {t("nav.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
       <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
     </SidebarMenu>
-  )
+  );
 }

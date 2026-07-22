@@ -26,6 +26,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { authClient } from '@/lib/auth-client';
+import { useI18n } from '@/lib/i18n';
 import { trpc } from '@/app/trpc';
 
 const profileFormSchema = z.object({
@@ -43,6 +44,7 @@ export function ProfileEditDialog({
   open,
   onOpenChange,
 }: ProfileEditDialogProps) {
+  const { t } = useI18n();
   const [status, setStatus] = useState<
     | { kind: 'idle' }
     | { kind: 'submitting' }
@@ -115,7 +117,7 @@ export function ProfileEditDialog({
       setStatus({
         kind: 'error',
         message:
-          error instanceof Error ? error.message : 'Failed to update profile.',
+          error instanceof Error ? error.message : t('profile.updateFailed'),
       });
     }
   }
@@ -136,7 +138,7 @@ export function ProfileEditDialog({
       const body = (await response.json()) as { imageUrl?: string; message?: string };
 
       if (!response.ok || !body.imageUrl) {
-        throw new Error(body.message ?? 'Failed to upload profile picture.');
+        throw new Error(body.message ?? t('profile.uploadPictureFailed'));
       }
 
       setImageUrl(body.imageUrl);
@@ -149,7 +151,7 @@ export function ProfileEditDialog({
         message:
           error instanceof Error
             ? error.message
-            : 'Failed to upload profile picture.',
+            : t('profile.uploadPictureFailed'),
       });
     } finally {
       if (fileInputRef.current) {
@@ -170,7 +172,7 @@ export function ProfileEditDialog({
 
       if (!response.ok) {
         const body = (await response.json()) as { message?: string };
-        throw new Error(body.message ?? 'Failed to remove profile picture.');
+        throw new Error(body.message ?? t('profile.removePictureFailed'));
       }
 
       setImageUrl(null);
@@ -183,30 +185,28 @@ export function ProfileEditDialog({
         message:
           error instanceof Error
             ? error.message
-            : 'Failed to remove profile picture.',
+            : t('profile.removePictureFailed'),
       });
     }
   }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>{t('profile.editProfile')}</DialogTitle>
           <DialogDescription>
-            Update your profile picture or email address.
+            {t('profile.updateProfileDescription')}
           </DialogDescription>
         </DialogHeader>
 
         {status.kind === 'success' ? (
           <div className="space-y-2 py-4">
             {status.imageUrlChanged && (
-              <p className="text-sm">Profile picture updated.</p>
+              <p className="text-sm">{t('profile.pictureUpdated')}</p>
             )}
             {status.emailChanged && (
               <p className="text-sm">
-                Verification email sent. Click the link to confirm your new
-                address.
+                {t('profile.verificationEmailSent')}
               </p>
             )}
           </div>
@@ -221,7 +221,7 @@ export function ProfileEditDialog({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('profile.emailLabel')}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
@@ -230,8 +230,7 @@ export function ProfileEditDialog({
                       />
                     </FormControl>
                     <FormDescription>
-                      Changing your email sends a verification link to the new
-                      address.
+                      {t('profile.emailDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -239,7 +238,7 @@ export function ProfileEditDialog({
               />
 
               <div className="space-y-2">
-                <FormLabel>Profile picture</FormLabel>
+                <FormLabel>{t('profile.imageLabel')}</FormLabel>
                 <div className="flex flex-col items-start gap-3 rounded-md border p-3 sm:flex-row sm:items-center">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-sm font-medium text-accent-foreground">
                     {imageUrl ? (
@@ -278,7 +277,9 @@ export function ProfileEditDialog({
                       disabled={imageBusy}
                     >
                       <Upload className="size-4" />
-                      {imageStatus.kind === 'uploading' ? 'Uploading...' : 'Upload'}
+                      {imageStatus.kind === 'uploading'
+                        ? t('profile.uploadingPicture')
+                        : t('profile.uploadPicture')}
                     </Button>
                     <Button
                       type="button"
@@ -288,7 +289,9 @@ export function ProfileEditDialog({
                       disabled={!imageUrl || imageBusy}
                     >
                       <Trash2 className="size-4" />
-                      Remove
+                      {imageStatus.kind === 'deleting'
+                        ? t('profile.deletingPicture')
+                        : t('profile.deletePicture')}
                     </Button>
                   </div>
                 </div>
@@ -312,7 +315,7 @@ export function ProfileEditDialog({
                   onClick={() => onOpenChange(false)}
                   disabled={status.kind === 'submitting'}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -320,7 +323,9 @@ export function ProfileEditDialog({
                     status.kind === 'submitting' || imageBusy
                   }
                 >
-                  {status.kind === 'submitting' ? 'Saving...' : 'Save changes'}
+                  {status.kind === 'submitting'
+                    ? t('profile.saving')
+                    : t('profile.saveChanges')}
                 </Button>
               </DialogFooter>
             </form>

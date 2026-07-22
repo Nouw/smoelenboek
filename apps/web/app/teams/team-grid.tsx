@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertCircle, ImageIcon, Loader2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
 import { trpc } from '../trpc';
 import { isMensTeam, isWomensTeam, sortTeamsByNameNumber } from './team-filters';
 
@@ -8,29 +9,19 @@ type TeamGridProps = {
   gender: 'men' | 'women';
 };
 
-const pageCopy = {
-  men: {
-    title: 'Heren teams',
-    empty: 'Geen heren teams gevonden.',
-  },
-  women: {
-    title: 'Dames teams',
-    empty: 'Geen dames teams gevonden.',
-  },
-} satisfies Record<
-  TeamGridProps['gender'],
-  { title: string; empty: string }
->;
-
 export function TeamGrid({ gender }: TeamGridProps) {
+  const { t } = useI18n();
   const teams = trpc.teams.list.useQuery();
-  const copy = pageCopy[gender];
+  const copy =
+    gender === 'men'
+      ? { title: t('teams.menTitle'), empty: t('teams.menEmpty') }
+      : { title: t('teams.womenTitle'), empty: t('teams.womenEmpty') };
 
   if (teams.isLoading) {
     return (
       <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">
         <Loader2 className="mr-2 size-4 animate-spin" />
-        Teams laden
+        {t('teams.loading')}
       </div>
     );
   }
@@ -85,7 +76,7 @@ export function TeamGrid({ gender }: TeamGridProps) {
                 </h2>
                 {team.archivedAt ? (
                   <span className="shrink-0 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-                    Archief
+                    {t('common.archived')}
                   </span>
                 ) : null}
               </div>

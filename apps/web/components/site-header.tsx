@@ -12,10 +12,13 @@ import { Button } from "@repo/ui/components/button"
 import { Input } from "@repo/ui/components/input"
 import { Separator } from "@repo/ui/components/separator"
 import { useSidebar } from "@repo/ui/components/sidebar"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { NavUser } from "@/components/nav-user"
+import { useI18n } from "@/lib/i18n"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
+  const { t } = useI18n()
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -33,7 +36,7 @@ export function SiteHeader() {
           <Breadcrumb className="hidden min-w-0 lg:block">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage>Smoelenboek</BreadcrumbPage>
+                <BreadcrumbPage>{t("common.smoelenboek")}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -44,14 +47,15 @@ export function SiteHeader() {
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search"
+              placeholder={t("common.search")}
               className="h-9 rounded-full bg-muted/40 pl-9 shadow-none"
-              aria-label="Search"
+              aria-label={t("common.search")}
             />
           </div>
         </div>
 
-        <div className="flex min-w-0 justify-end">
+        <div className="flex min-w-0 justify-end gap-1">
+          <LanguageSwitcher />
           <NavUser variant="header" />
         </div>
       </div>

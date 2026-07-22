@@ -18,7 +18,7 @@ const imageExtensionsByMimeType = new Map([
   ['image/gif', 'gif'],
 ]);
 
-const allowedObjectPrefixes = ['profile-images/', 'team-images/', 'photobooks/'];
+const allowedObjectPrefixes = ['profile-images/', 'team-images/', 'photobooks/', 'team/'];
 
 export type UploadedObject = {
   objectName: string;

@@ -4,6 +4,7 @@ import * as React from "react"
 import { FileText, ShieldCheck, Trophy, UsersRound } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
+import { useI18n } from "@/lib/i18n"
 import {
   Sidebar,
   SidebarContent,
@@ -11,43 +12,42 @@ import {
   SidebarHeader,
 } from "@repo/ui/components/sidebar"
 
-const data = {
-  navMain: [
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { t } = useI18n()
+  const navMain = [
     {
-      title: "Teams",
+      title: t("nav.teams"),
       url: "/teams/men",
       icon: UsersRound,
       isActive: true,
       items: [
         {
-          title: "Men",
+          title: t("nav.men"),
           url: "/teams/men",
         },
         {
-          title: "Women",
+          title: t("nav.women"),
           url: "/teams/women",
         },
       ],
     },
     {
-      title: "Committees",
+      title: t("nav.committees"),
       url: "#",
       icon: ShieldCheck,
     },
     {
-      title: "Documents",
+      title: t("nav.documents"),
       url: "#",
       icon: FileText,
     },
     {
-      title: "Protototo",
+      title: t("nav.protototo"),
       url: "#",
       icon: Trophy,
     },
-  ],
-}
+  ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -56,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>

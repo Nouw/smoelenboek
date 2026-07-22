@@ -2,6 +2,7 @@
 
 import { AppSidebar } from '@/components/app-sidebar';
 import { authClient } from '@/lib/auth-client';
+import { useI18n } from '@/lib/i18n';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@repo/ui/components/button';
 import {
@@ -14,56 +15,36 @@ import {
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   SidebarInset,
   SidebarProvider,
 } from '@repo/ui/components/sidebar';
-import {
-  FileText,
-  ShieldCheck,
-  Trophy,
-  UsersRound,
-} from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
-const navigationItems = [
-  {
-    label: 'Teams',
-    description: 'Team membership, roles, and contact context.',
-    icon: UsersRound,
-    active: true,
-  },
-  {
-    label: 'Committees',
-    description: 'Working groups and committee responsibilities.',
-    icon: ShieldCheck,
-    active: false,
-  },
-  {
-    label: 'Documents',
-    description: 'Shared documents and internal references.',
-    icon: FileText,
-    active: false,
-  },
-  {
-    label: 'Protototo',
-    description: 'Competition overview and participation area.',
-    icon: Trophy,
-    active: false,
-  },
-];
 
-export function AppShell() {
+export function AppShell({ children } : Readonly<{
+  children: React.ReactNode;
+}>) {
+  const pathname = usePathname();
   const session = authClient.useSession();
+
+  if (
+    pathname === '/reset-password' ||
+    pathname === '/request-password-reset'
+  ) {
+    return children;
+  }
 
   if (session.isPending) {
     return <AuthLoading />;
   }
 
-  return session.data ? <AuthenticatedLayout /> : <LoginLayout />;
+  return session.data ? <AuthenticatedLayout>{children}</AuthenticatedLayout> : <LoginLayout />;
 }
 
 function LoginLayout() {
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +66,7 @@ function LoginLayout() {
     setIsSubmitting(false);
 
     if (result.error) {
-      setError(result.error.message ?? 'Login failed.');
+      setError(result.error.message ?? t('auth.loginFailed'));
       return;
     }
 
@@ -109,13 +90,13 @@ function LoginLayout() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Smoelenboek</CardTitle>
           <CardDescription>
-            Log in with your existing account to continue.
+            {t('auth.loginSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={onSubmit}>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 autoComplete="email"
@@ -126,7 +107,7 @@ function LoginLayout() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 autoComplete="current-password"
@@ -147,7 +128,7 @@ function LoginLayout() {
               </p>
             ) : null}
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Logging in...' : 'Log in'}
+              {isSubmitting ? t('auth.loggingIn') : t('auth.login')}
             </Button>
             <Button asChild type="button" variant="ghost" className="w-full">
               <Link href="/request-password-reset">Wachtwoord vergeten?</Link>
@@ -159,7 +140,9 @@ function LoginLayout() {
   );
 }
 
-function AuthenticatedLayout() {
+function AuthenticatedLayout({ children } : Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <div className="[--header-height:calc(--spacing(14))]">
       <SidebarProvider className="flex flex-col pt-(--header-height)">
@@ -168,20 +151,8 @@ function AuthenticatedLayout() {
           <AppSidebar />
           <SidebarInset>
             <section className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
-              <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-semibold tracking-normal">
-                  Teams
-                </h1>
-                <p className="text-muted-foreground text-sm">
-                  Layout shell for authenticated member areas.
-                </p>
-              </div>
+              {children}
 
-              <div className="grid gap-4 md:grid-cols-2">
-                {navigationItems.map((item) => (
-                  <SectionPlaceholder key={item.label} item={item} />
-                ))}
-              </div>
             </section>
           </SidebarInset>
         </div>
@@ -190,36 +161,18 @@ function AuthenticatedLayout() {
   );
 }
 
-function SectionPlaceholder({
-  item,
-}: {
-  item: (typeof navigationItems)[number];
-}) {
-  return (
-    <Card className="rounded-lg shadow-none">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <div className="bg-accent text-accent-foreground flex size-10 items-center justify-center rounded-md">
-            <item.icon className="size-5" />
-          </div>
-          <div>
-            <CardTitle>{item.label}</CardTitle>
-            <CardDescription>{item.description}</CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-    </Card>
-  );
-}
+
 
 function AuthLoading() {
+  const { t } = useI18n();
+
   return (
     <main className="bg-background text-foreground flex min-h-svh items-center justify-center px-5 py-10">
       <Card className="w-full max-w-sm rounded-lg">
         <CardHeader>
-          <CardTitle>Loading</CardTitle>
+          <CardTitle>{t('common.loading')}</CardTitle>
           <CardDescription>
-            Checking your session.
+            {t('auth.checkingSession')}
           </CardDescription>
         </CardHeader>
       </Card>

@@ -1,6 +1,7 @@
 'use client';
 
 import { authClient } from '@/lib/auth-client';
+import { useI18n } from '@/lib/i18n';
 import {
   Avatar,
   AvatarFallback,
@@ -24,6 +25,7 @@ export function UserPanel() {
 }
 
 function AuthenticatedUserPanel() {
+  const { t } = useI18n();
   const session = authClient.useSession();
   const user = trpc.user.me.useQuery(undefined, {
     retry: false,
@@ -41,9 +43,9 @@ function AuthenticatedUserPanel() {
     <Card className="w-full max-w-xl">
       {!session.data ? (
         <CardHeader>
-          <CardTitle>Sign in</CardTitle>
+          <CardTitle>{t('userPanel.signIn')}</CardTitle>
           <CardDescription>
-            Use the main login form to sync and inspect your profile.
+            {t('userPanel.signInDescription')}
           </CardDescription>
         </CardHeader>
       ) : (
@@ -56,9 +58,9 @@ function AuthenticatedUserPanel() {
                 <AvatarFallback>{initials || 'U'}</AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle>Profile</CardTitle>
+                <CardTitle>{t('userPanel.profile')}</CardTitle>
                 <CardDescription>
-                  Current auth user projection in the app database.
+                  {t('userPanel.currentUserDescription')}
                 </CardDescription>
               </div>
             </div>
@@ -73,7 +75,7 @@ function AuthenticatedUserPanel() {
                 });
               }}
             >
-              Logout
+              {t('nav.logout')}
             </Button>
           </div>
         </CardHeader>
@@ -84,13 +86,15 @@ function AuthenticatedUserPanel() {
               onClick={() => syncUser.mutate()}
               disabled={syncUser.isPending}
             >
-              {syncUser.isPending ? 'Syncing...' : 'Sync profile'}
+              {syncUser.isPending ? t('userPanel.syncing') : t('userPanel.sync')}
             </Button>
             {user.isFetching ? (
               <Skeleton className="h-4 w-32" />
             ) : (
               <span className="text-muted-foreground text-sm">
-                {user.data ? 'Profile synced' : 'No synced profile yet'}
+                {user.data
+                  ? t('userPanel.synced')
+                  : t('userPanel.noSyncedProfile')}
               </span>
             )}
           </div>
@@ -98,7 +102,7 @@ function AuthenticatedUserPanel() {
           <pre className="bg-muted text-muted-foreground max-h-72 overflow-auto rounded-md p-4 text-left text-xs">
             {user.data
               ? JSON.stringify(user.data, null, 2)
-              : 'No synced user profile yet.'}
+              : t('userPanel.noSyncedProfile')}
           </pre>
         </CardContent>
         </>
