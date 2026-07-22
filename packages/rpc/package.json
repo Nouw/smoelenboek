@@ -15,7 +15,7 @@
     "migration:revert": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
     "auth:create-user": "ts-node -r tsconfig-paths/register src/admin/create-user.ts",
     "auth:create-api-key": "ts-node -r tsconfig-paths/register src/admin/create-api-key.ts",
-    "eval": "node ../../scripts/check-cqrs-boundary.mjs && node ../../scripts/check-season-model-contract.mjs && node ../../scripts/check-user-information-contract.mjs && node ../../scripts/check-legacy-user-migration-contract.mjs && node ../../scripts/check-legacy-team-membership-migration-contract.mjs"
+    "eval": "node ../../scripts/check-cqrs-boundary.mjs && node ../../scripts/check-season-model-contract.mjs && node ../../scripts/check-user-information-contract.mjs && node ../../scripts/check-legacy-user-migration-contract.mjs && node ../../scripts/check-legacy-team-membership-migration-contract.mjs && node ../../scripts/check-legacy-committee-membership-migration-contract.mjs"
   },
   "exports": {
     "./router": {
