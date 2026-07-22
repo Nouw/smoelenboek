@@ -293,6 +293,9 @@ importers:
       '@trpc/server':
         specifier: ^11.7.2
         version: 11.18.0(typescript@5.8.2)
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       better-auth:
         specifier: ^1.6.23
         version: 1.6.23(pg@8.22.0)
@@ -5304,6 +5307,11 @@ packages:
     resolution: {integrity: sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==}
     dependencies:
       tweetnacl: 0.14.5
+    dev: false
+
+  /bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
     dev: false
 
   /better-auth@1.6.23(next@16.2.0)(react-dom@19.2.5)(react@19.2.5):

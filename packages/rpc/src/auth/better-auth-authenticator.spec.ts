@@ -39,6 +39,7 @@ describe('BetterAuthBackendAuthenticator', () => {
       orgId: null,
       authType: null,
       role: null,
+      passwordMigrationRequired: false,
       claims: null,
     });
   });
@@ -58,6 +59,7 @@ describe('BetterAuthBackendAuthenticator', () => {
         role: 'admin',
         firstName: 'Member',
         lastName: 'Example',
+        passwordMigrationRequired: true,
       },
     });
     const authenticator = new BetterAuthBackendAuthenticator();
@@ -72,6 +74,7 @@ describe('BetterAuthBackendAuthenticator', () => {
       orgId: null,
       authType: 'session',
       role: 'admin',
+      passwordMigrationRequired: true,
       claims: {
         sub: 'user_123',
         email: 'member@example.com',
@@ -112,6 +115,7 @@ describe('BetterAuthBackendAuthenticator', () => {
       orgId: null,
       authType: 'api_key',
       role: null,
+      passwordMigrationRequired: false,
       claims: {
         sub: 'user_123',
         api_key_id: 'key_123',

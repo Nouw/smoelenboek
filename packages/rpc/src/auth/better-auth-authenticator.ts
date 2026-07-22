@@ -15,7 +15,7 @@ type BetterAuthSession = {
     id: string;
     userId: string;
   };
-    user: {
+  user: {
       id: string;
       email: string;
       emailVerified: boolean;
@@ -24,6 +24,7 @@ type BetterAuthSession = {
       image?: string | null;
       firstName?: string | null;
       lastName?: string | null;
+      passwordMigrationRequired?: boolean | null;
   };
 };
 
@@ -68,6 +69,8 @@ export class BetterAuthBackendAuthenticator implements BetterAuthAuthenticator {
       orgId: null,
       authType: 'session',
       role: session.user.role ?? 'user',
+      passwordMigrationRequired:
+        session.user.passwordMigrationRequired ?? false,
       claims: {
         sub: session.user.id,
         email: session.user.email,
@@ -105,6 +108,7 @@ export class BetterAuthBackendAuthenticator implements BetterAuthAuthenticator {
       orgId: null,
       authType: 'api_key',
       role: null,
+      passwordMigrationRequired: false,
       claims: {
         sub: result.key.referenceId,
         api_key_id: result.key.id,
@@ -152,6 +156,7 @@ function anonymousContext(): AuthContext {
     orgId: null,
     authType: null,
     role: null,
+    passwordMigrationRequired: false,
     claims: null,
   };
 }

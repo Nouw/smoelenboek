@@ -38,6 +38,12 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   banned!: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  passwordMigrationRequired!: boolean;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  passwordMigrationResetSentAt!: Date | null;
+
   @Column({ type: 'varchar', nullable: true })
   banReason!: string | null;
 

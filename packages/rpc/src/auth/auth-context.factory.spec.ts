@@ -21,6 +21,7 @@ describe('AuthContextFactory', () => {
         orgId: 'org_123',
         authType: 'session',
         role: 'admin',
+        passwordMigrationRequired: false,
         claims: {
           sub: 'user_123',
           sid: 'sess_123',
@@ -37,6 +38,7 @@ describe('AuthContextFactory', () => {
       orgId: 'org_123',
       authType: 'session',
       role: 'admin',
+      passwordMigrationRequired: false,
       claims: {
         sub: 'user_123',
         sid: 'sess_123',

@@ -17,5 +17,6 @@ export type AuthContext = {
   orgId: string | null;
   authType: 'session' | 'api_key' | null;
   role: string | null;
+  passwordMigrationRequired: boolean;
   claims: AuthClaims | null;
 };
