@@ -26,5 +26,6 @@ describe('getDatabaseUrl', () => {
     );
 
     expect(names).not.toContain('SeasonEntity');
+    expect(names).toContain('UserInformationEntity');
   });
 });

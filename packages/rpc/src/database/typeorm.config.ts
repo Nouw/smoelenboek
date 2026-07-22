@@ -7,6 +7,7 @@ import { StoredEventEntity } from '../event-store/entities/stored-event.entity';
 import { TeamMembershipEntity } from '../teams/entities/team-membership.entity';
 import { TeamEntity } from '../teams/entities/team.entity';
 import { UserEntity } from '../users/entities/user.entity';
+import { UserInformationEntity } from '../users/entities/user-information.entity';
 
 export function getDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
   const databaseUrl = env.DATABASE_URL;
@@ -30,6 +31,7 @@ export function createDataSourceOptions(
       StoredEventEntity,
       TeamEntity,
       TeamMembershipEntity,
+      UserInformationEntity,
       UserEntity,
     ],
     migrations: [`${__dirname}/migrations/*{.ts,.js}`],

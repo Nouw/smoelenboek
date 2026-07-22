@@ -54,6 +54,18 @@ remains an audit timestamp and is never used to determine membership history.
 Ending a membership sets `endedOn`; it does not delete the membership. Season
 rosters omit ended memberships, while user history retains them.
 
+## User information
+
+Authentication fields, names, roles, and profile images remain in `users`.
+Association-specific details are stored one-to-one in `user_information` and
+are created when information is first added. No personal information is seeded
+or copied from a legacy database by the migration.
+
+Authenticated members can read another member's association information. A
+bank account number is returned only to that user or an admin. Users can update
+their own information, while admins can update any user. Updates are retained
+as `user.information_updated` events, including bank account changes.
+
 ## Create a login user
 
 Public registration is disabled. Create users through the RPC admin command:

@@ -1,12 +1,17 @@
-import { updateUserProfileSchema } from '@repo/api';
+import {
+  updateUserInformationSchema,
+  updateUserProfileSchema,
+} from '@repo/api';
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
 import { protectedProcedure, router } from '../../trpc/init';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
+import { UpdateUserInformationCommand } from '../commands/update-user-information.command';
 import { UpdateUserProfileCommand } from '../commands/update-user-profile.command';
 import { GetCurrentUserQuery } from '../queries/get-current-user.query';
+import { GetUserInformationQuery } from '../queries/get-user-information.query';
 
 export type UserRouterDependencies = {
   commandBus: CommandBus;
@@ -23,6 +28,24 @@ const userOutputSchema = z.object({
   lastName: z.string().nullable(),
   imageUrl: z.string().nullable(),
   role: z.string(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
+const userInformationOutputSchema = z.object({
+  userId: z.uuid(),
+  streetName: z.string().nullable(),
+  houseNumber: z.string().nullable(),
+  postcode: z.string().nullable(),
+  city: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
+  bankAccountNumber: z.string().nullable().optional(),
+  birthDate: z.iso.date().nullable(),
+  bondNumber: z.string().nullable(),
+  joinDate: z.iso.date().nullable(),
+  leaveDate: z.iso.date().nullable(),
+  backNumber: z.number().int().min(0).max(32767).nullable(),
+  refereeLicense: z.string().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -127,6 +150,54 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
       .mutation(({ ctx, input }) =>
         dependencies.commandBus.execute(
           new UpdateUserProfileCommand(ctx.userId, input),
+        ),
+      ),
+    information: protectedProcedure
+      .meta({
+        name: 'Get User Information',
+        docs: {
+          description:
+            'Get association information. Bank details are visible only to the owner or an admin.',
+          tags: ['Users'],
+          auth: true,
+        },
+      })
+      .input(z.object({ userId: z.uuid().optional() }).optional())
+      .output(userInformationOutputSchema.nullable())
+      .query(({ ctx, input }) =>
+        dependencies.queryBus.execute(
+          new GetUserInformationQuery(
+            ctx.userId,
+            ctx.role,
+            input?.userId ?? ctx.userId,
+          ),
+        ),
+      ),
+    updateInformation: protectedProcedure
+      .meta({
+        name: 'Update User Information',
+        docs: {
+          description:
+            'Update association information for the authenticated user or, as an admin, another user.',
+          tags: ['Users'],
+          auth: true,
+        },
+      })
+      .input(
+        z.object({
+          userId: z.uuid().optional(),
+          changes: updateUserInformationSchema,
+        }),
+      )
+      .output(userInformationOutputSchema)
+      .mutation(({ ctx, input }) =>
+        dependencies.commandBus.execute(
+          new UpdateUserInformationCommand(
+            ctx.userId,
+            ctx.role,
+            input.userId ?? ctx.userId,
+            input.changes,
+          ),
         ),
       ),
     membershipHistory: protectedProcedure
