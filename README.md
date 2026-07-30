@@ -40,6 +40,12 @@ active coaches, and active players. Roster cards link to the existing member
 profile pages. The page loads through the single protected
 `teams.currentRoster` tRPC query.
 
+Administrators manage the team catalog and season rosters at `/teams/admin`.
+The workspace supports men/women classification, optional image URLs,
+archiving and restoring, arbitrary association seasons, searchable member
+assignment, volleyball roles, and effective membership end dates. Team
+mutations and the user picker are enforced by admin-only tRPC procedures.
+
 ### Committee directory
 
 Authenticated users can browse all committees at `/committees` and open a

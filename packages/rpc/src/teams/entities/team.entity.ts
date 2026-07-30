@@ -5,6 +5,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import type { TeamCategory } from '@repo/api';
 
 @Entity({ name: 'teams' })
 export class TeamEntity {
@@ -13,6 +14,9 @@ export class TeamEntity {
 
   @Column({ unique: true })
   name!: string;
+
+  @Column({ type: 'varchar' })
+  category!: TeamCategory;
 
   @Column({ type: 'varchar', nullable: true })
   imageUrl!: string | null;

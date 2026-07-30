@@ -11,6 +11,7 @@ import { UserProjector } from './projectors/user-projector';
 import { UserInformationProjector } from './projectors/user-information-projector';
 import { GetUserHandler } from './queries/get-user.handler';
 import { GetUserInformationHandler } from './queries/get-user-information.handler';
+import { SearchUsersHandler } from './queries/search-users.handler';
 import { UserInformationRepository } from './repositories/user-information.repository';
 import { UsersRepository } from './repositories/users.repository';
 
@@ -26,6 +27,7 @@ import { UsersRepository } from './repositories/users.repository';
     UserInformationProjector,
     GetUserHandler,
     GetUserInformationHandler,
+    SearchUsersHandler,
     SyncUserFromAuthHandler,
     UpdateUserInformationHandler,
     UpdateUserProfileHandler,

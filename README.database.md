@@ -62,6 +62,17 @@ remains an audit timestamp and is never used to determine membership history.
 Ending a membership sets `endedOn`; it does not delete the membership. Season
 rosters omit ended memberships, while user history retains them.
 
+Teams have a required `men` or `women` category. The category migration
+backfills existing `Heren` and `Dames` records and their stored snapshot events.
+It intentionally aborts when a team name cannot be classified so no team is
+silently placed in the wrong directory. Rename unclassified records before
+rerunning the migration.
+
+Administrators may manage any numeric season key from 1900 through 3000. New
+memberships require an explicit start date inside that season. Ending a
+membership requires an explicit date on or after its start and before the next
+season begins.
+
 ## User information
 
 Authentication fields, names, roles, and profile images remain in `users`.

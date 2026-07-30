@@ -56,12 +56,15 @@ export {
 } from './protototo/dto/protototo.dto';
 export type {
   CurrentTeamRosterDto,
+  TeamCategory,
   TeamDto,
   TeamMembershipDto,
   TeamRole,
+  TeamRosterForSeasonDto,
+  TeamRosterMembershipDto,
   TeamRosterMemberDto,
 } from './teams/dto/team.dto';
-export type { UserDto } from './users/dto/user.dto';
+export type { UserDto, UserSummaryDto } from './users/dto/user.dto';
 export type { UserInformationDto } from './users/dto/user-information.dto';
 export {
   updateUserInformationSchema,

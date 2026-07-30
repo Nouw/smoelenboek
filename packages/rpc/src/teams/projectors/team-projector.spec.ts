@@ -19,6 +19,7 @@ describe('TeamProjector', () => {
         {
           teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
           name: 'Heren 1',
+          category: 'men',
           imageUrl: 'https://cdn.example.com/team.png',
           archivedAt: null,
         },
@@ -29,6 +30,7 @@ describe('TeamProjector', () => {
     expect(repository.save).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'Heren 1',
+        category: 'men',
         imageUrl: 'https://cdn.example.com/team.png',
         archivedAt: null,
       }),

@@ -1,5 +1,7 @@
 import type { SeasonDto } from '../../seasons/dto/season.dto';
 
+export type TeamCategory = 'men' | 'women';
+
 export type TeamRole =
   | 'libero'
   | 'middle'
@@ -11,6 +13,7 @@ export type TeamRole =
 export interface TeamDto {
   id: string;
   name: string;
+  category: TeamCategory;
   imageUrl: string | null;
   archivedAt: string | null;
   createdAt: string;
@@ -41,4 +44,19 @@ export interface CurrentTeamRosterDto {
   season: SeasonDto;
   coaches: TeamRosterMemberDto[];
   players: TeamRosterMemberDto[];
+}
+
+export interface TeamRosterMembershipDto extends TeamMembershipDto {
+  user: {
+    id: string;
+    name: string;
+    email: string | null;
+    imageUrl: string | null;
+  };
+}
+
+export interface TeamRosterForSeasonDto {
+  team: TeamDto;
+  season: SeasonDto;
+  memberships: TeamRosterMembershipDto[];
 }

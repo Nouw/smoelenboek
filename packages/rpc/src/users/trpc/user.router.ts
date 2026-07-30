@@ -5,13 +5,14 @@ import {
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
-import { protectedProcedure, router } from '../../trpc/init';
+import { adminProcedure, protectedProcedure, router } from '../../trpc/init';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
 import { UpdateUserInformationCommand } from '../commands/update-user-information.command';
 import { UpdateUserProfileCommand } from '../commands/update-user-profile.command';
 import { GetUserQuery } from '../queries/get-user.query';
 import { GetUserInformationQuery } from '../queries/get-user-information.query';
+import { SearchUsersQuery } from '../queries/search-users.query';
 
 export type UserRouterDependencies = {
   commandBus: CommandBus;
@@ -30,6 +31,13 @@ const userOutputSchema = z.object({
   role: z.string(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+});
+
+const userSummaryOutputSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  email: z.email().nullable(),
+  imageUrl: z.string().nullable(),
 });
 
 const userInformationOutputSchema = z.object({
@@ -106,6 +114,20 @@ const membershipHistoryOutputSchema = z.object({
 
 export function createUserRouter(dependencies: UserRouterDependencies) {
   return router({
+    search: adminProcedure
+      .meta({
+        name: 'Search Users',
+        docs: {
+          description: 'Search users for administrator membership assignment.',
+          tags: ['Users', 'Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ query: z.string().trim().max(100) }))
+      .output(z.array(userSummaryOutputSchema).max(20))
+      .query(({ input }) =>
+        dependencies.queryBus.execute(new SearchUsersQuery(input.query)),
+      ),
     me: protectedProcedure
       .meta({
         name: 'Get Current User',

@@ -1,13 +1,15 @@
 export type TeamListItem = {
   name: string;
+  category: 'men' | 'women';
+  archivedAt: string | null;
 };
 
 export function isMensTeam(team: TeamListItem): boolean {
-  return team.name.startsWith('Heren ');
+  return team.category === 'men' && team.archivedAt === null;
 }
 
 export function isWomensTeam(team: TeamListItem): boolean {
-  return team.name.startsWith('Dames ');
+  return team.category === 'women' && team.archivedAt === null;
 }
 
 export function sortTeamsByNameNumber<T extends TeamListItem>(teams: T[]): T[] {

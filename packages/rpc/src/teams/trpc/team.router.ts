@@ -1,17 +1,19 @@
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
-import { protectedProcedure, router } from '../../trpc/init';
+import { adminProcedure, protectedProcedure, router } from '../../trpc/init';
 import {
   ArchiveTeamCommand,
   AssignTeamMemberCommand,
   CreateTeamCommand,
   RemoveTeamMemberCommand,
+  RestoreTeamCommand,
   UpdateTeamCommand,
 } from '../commands/team.commands';
 import { TEAM_ROLES } from '../team-catalog';
 import {
   GetCurrentTeamRosterQuery,
+  GetTeamRosterForSeasonQuery,
   ListTeamMembershipsBySeasonQuery,
   ListTeamsQuery,
 } from '../queries/team.queries';
@@ -22,10 +24,12 @@ export type TeamRouterDependencies = {
 };
 
 const teamRoleSchema = z.enum(TEAM_ROLES);
+const teamCategorySchema = z.enum(['men', 'women']);
 
 const teamOutputSchema = z.object({
   id: z.uuid(),
   name: z.string(),
+  category: teamCategorySchema,
   imageUrl: z.string().nullable(),
   archivedAt: z.iso.datetime().nullable(),
   createdAt: z.iso.datetime(),
@@ -63,6 +67,26 @@ const currentTeamRosterOutputSchema = z.object({
   players: z.array(teamRosterMemberOutputSchema),
 });
 
+const teamRosterMembershipOutputSchema = teamMembershipOutputSchema.extend({
+  user: z.object({
+    id: z.uuid(),
+    name: z.string(),
+    email: z.email().nullable(),
+    imageUrl: z.string().nullable(),
+  }),
+});
+
+const teamRosterForSeasonOutputSchema = z.object({
+  team: teamOutputSchema,
+  season: z.object({
+    key: z.number().int().min(1900).max(3000),
+    label: z.string(),
+    startsOn: z.iso.date(),
+    endsBefore: z.iso.date(),
+  }),
+  memberships: z.array(teamRosterMembershipOutputSchema),
+});
+
 export function createTeamRouter(dependencies: TeamRouterDependencies) {
   return router({
     list: protectedProcedure
@@ -92,7 +116,7 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           new GetCurrentTeamRosterQuery(input.teamId, new Date()),
         ),
       ),
-    membershipsBySeason: protectedProcedure
+    membershipsBySeason: adminProcedure
       .meta({
         name: 'List Team Memberships By Season',
         docs: {
@@ -108,7 +132,29 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           new ListTeamMembershipsBySeasonQuery(input.seasonKey),
         ),
       ),
-    create: protectedProcedure
+    rosterForSeason: adminProcedure
+      .meta({
+        name: 'Get Team Roster For Season',
+        docs: {
+          description:
+            'Get one team and its active and ended memberships for an administrator-selected season.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(
+        z.object({
+          teamId: z.uuid(),
+          seasonKey: z.number().int().min(1900).max(3000),
+        }),
+      )
+      .output(teamRosterForSeasonOutputSchema.nullable())
+      .query(({ input }) =>
+        dependencies.queryBus.execute(
+          new GetTeamRosterForSeasonQuery(input.teamId, input.seasonKey),
+        ),
+      ),
+    create: adminProcedure
       .meta({
         name: 'Create Team',
         docs: {
@@ -119,17 +165,23 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
       })
       .input(
         z.object({
-          name: z.string().min(1),
+          name: z.string().trim().min(1).max(100),
+          category: teamCategorySchema,
           imageUrl: z.string().url().nullable().optional(),
         }),
       )
       .output(teamOutputSchema)
-      .mutation(({ input }) =>
+      .mutation(({ ctx, input }) =>
         dependencies.commandBus.execute(
-          new CreateTeamCommand(input.name, input.imageUrl ?? null),
+          new CreateTeamCommand(
+            input.name,
+            input.category,
+            ctx.userId,
+            input.imageUrl ?? null,
+          ),
         ),
       ),
-    update: protectedProcedure
+    update: adminProcedure
       .meta({
         name: 'Update Team',
         docs: {
@@ -141,17 +193,24 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
       .input(
         z.object({
           id: z.uuid(),
-          name: z.string().min(1),
+          name: z.string().trim().min(1).max(100),
+          category: teamCategorySchema,
           imageUrl: z.string().url().nullable().optional(),
         }),
       )
       .output(teamOutputSchema)
-      .mutation(({ input }) =>
+      .mutation(({ ctx, input }) =>
         dependencies.commandBus.execute(
-          new UpdateTeamCommand(input.id, input.name, input.imageUrl),
+          new UpdateTeamCommand(
+            input.id,
+            input.name,
+            input.category,
+            ctx.userId,
+            input.imageUrl,
+          ),
         ),
       ),
-    archive: protectedProcedure
+    archive: adminProcedure
       .meta({
         name: 'Archive Team',
         docs: {
@@ -162,10 +221,28 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
       })
       .input(z.object({ id: z.uuid() }))
       .output(teamOutputSchema)
-      .mutation(({ input }) =>
-        dependencies.commandBus.execute(new ArchiveTeamCommand(input.id)),
+      .mutation(({ ctx, input }) =>
+        dependencies.commandBus.execute(
+          new ArchiveTeamCommand(input.id, ctx.userId),
+        ),
       ),
-    assignMember: protectedProcedure
+    restore: adminProcedure
+      .meta({
+        name: 'Restore Team',
+        docs: {
+          description: 'Restore an archived team catalog record.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ id: z.uuid() }))
+      .output(teamOutputSchema)
+      .mutation(({ ctx, input }) =>
+        dependencies.commandBus.execute(
+          new RestoreTeamCommand(input.id, ctx.userId),
+        ),
+      ),
+    assignMember: adminProcedure
       .meta({
         name: 'Assign Team Member',
         docs: {
@@ -178,13 +255,13 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
         z.object({
           userId: z.uuid(),
           teamId: z.uuid(),
-          seasonKey: z.number().int().min(1900).max(3000).optional(),
+          seasonKey: z.number().int().min(1900).max(3000),
           role: teamRoleSchema,
-          startedOn: z.iso.date().optional(),
+          startedOn: z.iso.date(),
         }),
       )
       .output(teamMembershipOutputSchema)
-      .mutation(({ input }) =>
+      .mutation(({ ctx, input }) =>
         dependencies.commandBus.execute(
           new AssignTeamMemberCommand(
             input.userId,
@@ -192,10 +269,11 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
             input.role,
             input.seasonKey,
             input.startedOn,
+            ctx.userId,
           ),
         ),
       ),
-    removeMember: protectedProcedure
+    removeMember: adminProcedure
       .meta({
         name: 'Remove Team Member',
         docs: {
@@ -204,11 +282,15 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           auth: true,
         },
       })
-      .input(z.object({ membershipId: z.uuid() }))
-      .output(teamMembershipOutputSchema.nullable())
-      .mutation(({ input }) =>
+      .input(z.object({ membershipId: z.uuid(), endedOn: z.iso.date() }))
+      .output(teamMembershipOutputSchema)
+      .mutation(({ ctx, input }) =>
         dependencies.commandBus.execute(
-          new RemoveTeamMemberCommand(input.membershipId),
+          new RemoveTeamMemberCommand(
+            input.membershipId,
+            input.endedOn,
+            ctx.userId,
+          ),
         ),
       ),
   });

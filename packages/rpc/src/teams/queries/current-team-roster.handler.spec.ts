@@ -139,6 +139,7 @@ function team(): TeamEntity {
   return {
     id: teamId,
     name: 'Heren 1',
+    category: 'men',
     imageUrl: null,
     archivedAt: null,
     createdAt: now,

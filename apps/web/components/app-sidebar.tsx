@@ -33,6 +33,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: t('nav.women'),
           url: '/teams/women',
         },
+        ...(isAdmin
+          ? [
+              {
+                title: t('nav.manageTeams'),
+                url: '/teams/admin',
+              },
+            ]
+          : []),
       ],
     },
     {

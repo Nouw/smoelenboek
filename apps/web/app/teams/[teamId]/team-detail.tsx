@@ -80,9 +80,7 @@ export function TeamDetail({ teamId }: { teamId: string }) {
   }
 
   const { team, season, coaches, players } = roster.data;
-  const teamsHref = team.name.startsWith('Dames ')
-    ? '/teams/women'
-    : '/teams/men';
+  const teamsHref = team.category === 'women' ? '/teams/women' : '/teams/men';
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-8">

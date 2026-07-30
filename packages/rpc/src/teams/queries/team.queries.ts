@@ -10,3 +10,10 @@ export class GetCurrentTeamRosterQuery {
     public readonly at: Date,
   ) {}
 }
+
+export class GetTeamRosterForSeasonQuery {
+  constructor(
+    public readonly teamId: string,
+    public readonly seasonKey: number,
+  ) {}
+}

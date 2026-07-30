@@ -35,6 +35,7 @@ function team(name: string): TeamEntity {
   return {
     id: `team-${name.toLowerCase().replace(/\s+/g, '-')}`,
     name,
+    category: name.startsWith('Dames ') ? 'women' : 'men',
     imageUrl: null,
     archivedAt: null,
     createdAt: now,

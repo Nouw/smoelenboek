@@ -200,6 +200,37 @@ describe('user information tRPC routes', () => {
   });
 });
 
+describe('user search tRPC route', () => {
+  it('is admin-only and dispatches a trimmed search', async () => {
+    const execute = jest.fn().mockResolvedValue([
+      {
+        id: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+        name: 'Example Member',
+        email: 'member@example.com',
+        imageUrl: null,
+      },
+    ]);
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute } as never,
+    });
+
+    await expect(
+      appRouter.createCaller(authenticatedContext('user')).user.search({
+        query: 'Example',
+      }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(
+      appRouter.createCaller(authenticatedContext('admin')).user.search({
+        query: '  Example  ',
+      }),
+    ).resolves.toHaveLength(1);
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({ query: 'Example' }),
+    );
+  });
+});
+
 function authenticatedContext(role: string) {
   return {
     userId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',

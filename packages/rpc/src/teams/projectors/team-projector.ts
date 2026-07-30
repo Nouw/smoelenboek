@@ -21,6 +21,7 @@ export class TeamProjector {
     const entity = existing ?? repository.create({ id: payload.teamId });
 
     entity.name = payload.name;
+    entity.category = payload.category;
     entity.imageUrl = payload.imageUrl;
     entity.archivedAt = payload.archivedAt
       ? new Date(payload.archivedAt)

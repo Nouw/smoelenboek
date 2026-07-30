@@ -22,9 +22,45 @@ export class TeamsRepository {
     return this.teamsRepository.findOneBy({ id });
   }
 
+  findByNameCaseInsensitive(name: string): Promise<TeamEntity | null> {
+    return this.teamsRepository
+      .createQueryBuilder('team')
+      .where('LOWER(team.name) = LOWER(:name)', { name })
+      .getOne();
+  }
+
   findMembershipsBySeason(seasonKey: number): Promise<TeamMembershipEntity[]> {
     return this.membershipsRepository.find({
       where: { seasonKey, endedOn: IsNull() },
+    });
+  }
+
+  findMembershipsByTeamAndSeason(
+    teamId: string,
+    seasonKey: number,
+  ): Promise<TeamMembershipEntity[]> {
+    return this.membershipsRepository.find({
+      where: { teamId, seasonKey },
+      order: { endedOn: 'ASC', startedOn: 'ASC', createdAt: 'ASC' },
+    });
+  }
+
+  findMembershipById(id: string): Promise<TeamMembershipEntity | null> {
+    return this.membershipsRepository.findOneBy({ id });
+  }
+
+  findActiveAssignment(
+    userId: string,
+    teamId: string,
+    seasonKey: number,
+    role: TeamMembershipEntity['role'],
+  ): Promise<TeamMembershipEntity | null> {
+    return this.membershipsRepository.findOneBy({
+      userId,
+      teamId,
+      seasonKey,
+      role,
+      endedOn: IsNull(),
     });
   }
 

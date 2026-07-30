@@ -3,17 +3,24 @@ import type {
   TeamDto,
   TeamMembershipDto,
   TeamRosterMemberDto,
+  TeamRosterForSeasonDto,
+  TeamRosterMembershipDto,
 } from '@repo/api';
 import { Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { getLocalDate, getSeasonForDate } from '../../seasons/season-policy';
-import type { UserEntity } from '../../users/entities/user.entity';
+import {
+  getLocalDate,
+  getSeason,
+  getSeasonForDate,
+} from '../../seasons/season-policy';
+import { displayUserName } from '../../users/dto/user-output';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { toTeamDto, toTeamMembershipDto } from '../dto/team-output';
 import { TeamsRepository } from '../repositories/teams.repository';
 import {
   GetCurrentTeamRosterQuery,
+  GetTeamRosterForSeasonQuery,
   ListTeamMembershipsBySeasonQuery,
   ListTeamsQuery,
 } from './team.queries';
@@ -57,7 +64,7 @@ export class GetCurrentTeamRosterHandler
         ? [
             {
               userId: user.id,
-              name: displayName(user),
+              name: displayUserName(user),
               imageUrl: user.imageUrl,
               role: membership.role,
             },
@@ -83,20 +90,84 @@ export class GetCurrentTeamRosterHandler
   }
 }
 
-function displayName(user: UserEntity): string {
-  return (
-    [user.firstName, user.lastName].filter(Boolean).join(' ') ||
-    user.name ||
-    user.email ||
-    'Member'
-  );
-}
-
 function compareRosterMembers(
   left: TeamRosterMemberDto,
   right: TeamRosterMemberDto,
 ): number {
   return left.name.localeCompare(right.name, 'nl', { sensitivity: 'base' });
+}
+
+@QueryHandler(GetTeamRosterForSeasonQuery)
+export class GetTeamRosterForSeasonHandler
+  implements
+    IQueryHandler<GetTeamRosterForSeasonQuery, TeamRosterForSeasonDto | null>
+{
+  private readonly logger = new Logger(GetTeamRosterForSeasonHandler.name);
+
+  constructor(
+    private readonly teamsRepository: TeamsRepository,
+    private readonly usersRepository: UsersRepository,
+  ) {}
+
+  async execute(
+    query: GetTeamRosterForSeasonQuery,
+  ): Promise<TeamRosterForSeasonDto | null> {
+    const team = await this.teamsRepository.findById(query.teamId);
+
+    if (!team) {
+      return null;
+    }
+
+    const memberships =
+      await this.teamsRepository.findMembershipsByTeamAndSeason(
+        query.teamId,
+        query.seasonKey,
+      );
+    const users = await this.usersRepository.findByIds(
+      memberships.map(({ userId }) => userId),
+    );
+    const usersById = new Map(users.map((user) => [user.id, user]));
+    const enriched = memberships.flatMap<TeamRosterMembershipDto>(
+      (membership) => {
+        const user = usersById.get(membership.userId);
+
+        return user
+          ? [
+              {
+                ...toTeamMembershipDto(membership),
+                user: {
+                  id: user.id,
+                  name: displayUserName(user),
+                  email: user.email,
+                  imageUrl: user.imageUrl,
+                },
+              },
+            ]
+          : [];
+      },
+    );
+
+    enriched.sort((left, right) =>
+      left.user.name.localeCompare(right.user.name, 'nl', {
+        sensitivity: 'base',
+      }),
+    );
+
+    this.logger.debug({
+      event: 'team_roster_for_season_loaded',
+      teamId: query.teamId,
+      seasonKey: query.seasonKey,
+      membershipCount: enriched.length,
+      endedMembershipCount: enriched.filter(({ endedOn }) => endedOn !== null)
+        .length,
+    });
+
+    return {
+      team: toTeamDto(team),
+      season: getSeason(query.seasonKey),
+      memberships: enriched,
+    };
+  }
 }
 
 @QueryHandler(ListTeamsQuery)

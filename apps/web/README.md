@@ -13,6 +13,12 @@ member's email or profile-picture controls. The server only returns bank-account
 data to its owner or an administrator, and the page renders that field only
 when it is present in the response.
 
+Administrators use `/teams/admin` to create, edit, archive, and restore teams.
+Each team has a season-specific roster workspace with a debounced member picker,
+volleyball roles, effective membership dates, and retained ended history.
+Archived teams are hidden from the men/women directories but remain readable by
+direct link.
+
 The page uses the shared Shadcn components and includes responsive layouts,
 loading/error/empty states, direct email and phone actions, Google Maps address
 links, and Dutch/English translations.

@@ -7,6 +7,7 @@ export function toTeamDto(team: TeamEntity): TeamDto {
   return {
     id: team.id,
     name: team.name,
+    category: team.category,
     imageUrl: team.imageUrl,
     archivedAt: team.archivedAt?.toISOString() ?? null,
     createdAt: team.createdAt.toISOString(),

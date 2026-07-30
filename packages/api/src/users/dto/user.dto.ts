@@ -11,3 +11,10 @@ export interface UserDto {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface UserSummaryDto {
+  id: string;
+  name: string;
+  email: string | null;
+  imageUrl: string | null;
+}

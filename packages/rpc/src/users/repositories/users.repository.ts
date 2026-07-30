@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { ILike, In, Repository } from 'typeorm';
 
 import { UserEntity } from '../entities/user.entity';
 
@@ -21,5 +21,23 @@ export class UsersRepository {
     }
 
     return this.repository.findBy({ id: In(ids) });
+  }
+
+  search(query: string, limit = 20): Promise<UserEntity[]> {
+    const term = query.trim();
+    const where = term
+      ? [
+          { name: ILike(`%${term}%`) },
+          { firstName: ILike(`%${term}%`) },
+          { lastName: ILike(`%${term}%`) },
+          { email: ILike(`%${term}%`) },
+        ]
+      : undefined;
+
+    return this.repository.find({
+      where,
+      order: { firstName: 'ASC', lastName: 'ASC', name: 'ASC' },
+      take: limit,
+    });
   }
 }

@@ -8,6 +8,7 @@ import {
   AssignTeamMemberHandler,
   CreateTeamHandler,
   RemoveTeamMemberHandler,
+  RestoreTeamHandler,
   UpdateTeamHandler,
 } from './commands/team.handlers';
 import { TeamMembershipEntity } from './entities/team-membership.entity';
@@ -15,6 +16,7 @@ import { TeamEntity } from './entities/team.entity';
 import { TeamProjector } from './projectors/team-projector';
 import {
   GetCurrentTeamRosterHandler,
+  GetTeamRosterForSeasonHandler,
   ListTeamMembershipsBySeasonHandler,
   ListTeamsHandler,
 } from './queries/team.handlers';
@@ -34,7 +36,9 @@ import { TeamsRepository } from './repositories/teams.repository';
     ArchiveTeamHandler,
     AssignTeamMemberHandler,
     RemoveTeamMemberHandler,
+    RestoreTeamHandler,
     GetCurrentTeamRosterHandler,
+    GetTeamRosterForSeasonHandler,
     ListTeamsHandler,
     ListTeamMembershipsBySeasonHandler,
   ],
