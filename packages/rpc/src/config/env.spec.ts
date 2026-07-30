@@ -10,7 +10,8 @@ const validEnv = {
   OCI_TENANCY_OCID: 'ocid1.tenancy.oc1..example',
   OCI_USER_OCID: 'ocid1.user.oc1..example',
   OCI_FINGERPRINT: '00:11:22:33',
-  OCI_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\\nkey\\n-----END PRIVATE KEY-----',
+  OCI_PRIVATE_KEY:
+    '-----BEGIN PRIVATE KEY-----\\nkey\\n-----END PRIVATE KEY-----',
   OCI_OBJECT_STORAGE_NAMESPACE: 'namespace',
   OCI_OBJECT_STORAGE_BUCKET: 'bucket',
 };
@@ -59,6 +60,9 @@ describe('validateRpcEnv', () => {
       BETTER_AUTH_URL: 'http://localhost:3002',
       WEB_ORIGIN: 'http://localhost:3001',
       PORT: '3002',
+      NEVOBO_BASE_URL: 'https://api.nevobo.nl',
+      NEVOBO_ASSOCIATION_ID: 'ckl9y0t',
+      PROTOTOTO_SYNC_INTERVAL_MS: '900000',
       OCI_REGION: 'eu-amsterdam-1',
       OCI_TENANCY_OCID: 'ocid1.tenancy.oc1..example',
       OCI_USER_OCID: 'ocid1.user.oc1..example',

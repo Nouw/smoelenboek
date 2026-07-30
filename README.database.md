@@ -40,6 +40,14 @@ TEST_SEASON_MIGRATION_DATABASE_URL=postgresql://... \
   pnpm --filter @repo/rpc test:e2e --runInBand
 ```
 
+The Protototo schema and entry fixture can be verified against another empty,
+disposable PostgreSQL database:
+
+```sh
+TEST_PROTOTOTO_DATABASE_URL=postgresql://... \
+  pnpm --filter @repo/rpc test:e2e --runInBand protototo.e2e-spec.ts
+```
+
 ## Seasons and membership history
 
 Seasons follow one association-wide policy in the `Europe/Amsterdam` calendar:

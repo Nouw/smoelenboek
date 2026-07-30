@@ -30,3 +30,14 @@ export const protectedProcedure = trpc.procedure.use(({ ctx, next }) => {
     },
   });
 });
+
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.role !== 'admin') {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Administrator access is required.',
+    });
+  }
+
+  return next({ ctx });
+});

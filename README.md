@@ -48,6 +48,39 @@ Europe/Amsterdam current season and active committee members, including their
 role and profile link. It loads the roster through the single protected
 `committees.currentRoster` tRPC query.
 
+### Protototo
+
+`/protototo` is public. Anonymous participants enter a first name and email,
+open the round's Tikkie URL, confirm their payment claim, and submit one
+prediction for every active match. Signed-in members use their account and
+never receive Tikkie or payment fields. Both participant types can replace
+their entry until the round deadline.
+
+Members can open a closed round's standings from `/protototo/standings`.
+Admins use `/protototo/admin` to create, publish, reopen, or archive rounds,
+browse Protos teams and matches from Nevobo, change the lineup, synchronize
+results, inspect entries, and download the CSV export. Times are stored in UTC
+and rendered in `Europe/Amsterdam`.
+
+The RPC service polls started, incomplete matches every 15 minutes by default.
+Configure the integration in `packages/rpc/.env.local`:
+
+```sh
+NEVOBO_BASE_URL=https://api.nevobo.nl
+NEVOBO_ASSOCIATION_ID=ckl9y0t
+PROTOTOTO_SYNC_INTERVAL_MS=900000
+```
+
+Run the database migration before starting the feature. Targeted verification
+is available through:
+
+```sh
+pnpm --filter @repo/rpc test -- --runInBand
+pnpm --filter @repo/rpc eval:protototo
+pnpm --filter web test
+pnpm --filter web eval
+```
+
 ### Utilities
 
 This `Turborepo` has some additional tools already set for you:

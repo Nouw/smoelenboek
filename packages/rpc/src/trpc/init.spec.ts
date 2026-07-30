@@ -1,10 +1,11 @@
 import { describe, expect, it } from '@jest/globals';
 
 import type { TrpcContext } from './context';
-import { protectedProcedure, router } from './init';
+import { adminProcedure, protectedProcedure, router } from './init';
 
 const testRouter = router({
   protectedValue: protectedProcedure.query(() => 'available'),
+  adminValue: adminProcedure.query(() => 'available'),
 });
 
 function context(overrides: Partial<TrpcContext> = {}): TrpcContext {
@@ -36,5 +37,14 @@ describe('protectedProcedure', () => {
       code: 'FORBIDDEN',
       message: 'A password reset is required before using the application.',
     });
+  });
+
+  it('allows only administrators through admin procedures', async () => {
+    await expect(
+      testRouter.createCaller(context({ role: 'admin' })).adminValue(),
+    ).resolves.toBe('available');
+    await expect(
+      testRouter.createCaller(context({ role: 'user' })).adminValue(),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 });

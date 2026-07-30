@@ -3,6 +3,7 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { authClient } from '@/lib/auth-client';
 import { useI18n } from '@/lib/i18n';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@repo/ui/components/button';
 import {
@@ -16,18 +17,17 @@ import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  SidebarInset,
-  SidebarProvider,
-} from '@repo/ui/components/sidebar';
+import { SidebarInset, SidebarProvider } from '@repo/ui/components/sidebar';
 import { useState, type FormEvent } from 'react';
 
-
-export function AppShell({ children } : Readonly<{
+export function AppShell({
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
   const session = authClient.useSession();
+  const isPublicProtototo = pathname === '/protototo';
 
   if (
     pathname === '/reset-password' ||
@@ -40,7 +40,39 @@ export function AppShell({ children } : Readonly<{
     return <AuthLoading />;
   }
 
-  return session.data ? <AuthenticatedLayout>{children}</AuthenticatedLayout> : <LoginLayout />;
+  if (session.data) {
+    return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
+  }
+
+  return isPublicProtototo ? (
+    <PublicProtototoLayout>{children}</PublicProtototoLayout>
+  ) : (
+    <LoginLayout />
+  );
+}
+
+function PublicProtototoLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const { t } = useI18n();
+  return (
+    <div className="min-h-svh bg-muted/20">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href="/protototo" className="font-semibold tracking-tight">
+            {t('common.smoelenboek')} · {t('nav.protototo')}
+          </Link>
+          <div className="flex items-center gap-1">
+            <LanguageSwitcher />
+            <Button asChild size="sm" variant="outline">
+              <Link href="/">{t('auth.login')}</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+      <main className="px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+    </div>
+  );
 }
 
 function LoginLayout() {
@@ -89,9 +121,7 @@ function LoginLayout() {
       <Card className="w-full max-w-sm rounded-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Smoelenboek</CardTitle>
-          <CardDescription>
-            {t('auth.loginSubtitle')}
-          </CardDescription>
+          <CardDescription>{t('auth.loginSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={onSubmit}>
@@ -140,7 +170,9 @@ function LoginLayout() {
   );
 }
 
-function AuthenticatedLayout({ children } : Readonly<{
+function AuthenticatedLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -152,7 +184,6 @@ function AuthenticatedLayout({ children } : Readonly<{
           <SidebarInset>
             <section className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
               {children}
-
             </section>
           </SidebarInset>
         </div>
@@ -160,8 +191,6 @@ function AuthenticatedLayout({ children } : Readonly<{
     </div>
   );
 }
-
-
 
 function AuthLoading() {
   const { t } = useI18n();
@@ -171,9 +200,7 @@ function AuthLoading() {
       <Card className="w-full max-w-sm rounded-lg">
         <CardHeader>
           <CardTitle>{t('common.loading')}</CardTitle>
-          <CardDescription>
-            {t('auth.checkingSession')}
-          </CardDescription>
+          <CardDescription>{t('auth.checkingSession')}</CardDescription>
         </CardHeader>
       </Card>
     </main>
