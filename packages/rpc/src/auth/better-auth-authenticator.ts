@@ -39,6 +39,13 @@ type BetterAuthApiKeyVerification = {
   } | null;
 };
 
+type BetterAuthApiKeyOwner = {
+  id: string;
+  role?: string | null;
+  banned?: boolean | null;
+  passwordMigrationRequired?: boolean | null;
+};
+
 @Injectable()
 export class BetterAuthBackendAuthenticator implements BetterAuthAuthenticator {
   async authenticateRequest(request: IncomingMessage): Promise<AuthContext> {
@@ -102,15 +109,29 @@ export class BetterAuthBackendAuthenticator implements BetterAuthAuthenticator {
       return anonymousContext();
     }
 
+    const authContext = (await auth.$context) as unknown as {
+      internalAdapter: {
+        findUserById(id: string): Promise<unknown>;
+      };
+    };
+    const user = (await authContext.internalAdapter.findUserById(
+      result.key.referenceId,
+    )) as BetterAuthApiKeyOwner | null;
+
+    if (!user || user.banned) {
+      return anonymousContext();
+    }
+
     return {
       userId: result.key.referenceId,
       sessionId: null,
       orgId: null,
       authType: 'api_key',
-      role: null,
-      passwordMigrationRequired: false,
+      role: user.role ?? 'user',
+      passwordMigrationRequired: user.passwordMigrationRequired ?? false,
       claims: {
         sub: result.key.referenceId,
+        role: user.role ?? 'user',
         api_key_id: result.key.id,
         api_key_name: result.key.name,
         api_key_permissions: result.key.permissions,

@@ -3,6 +3,7 @@ import { IncomingMessage } from 'http';
 
 const getSession = jest.fn();
 const verifyApiKey = jest.fn();
+const findById = jest.fn();
 
 jest.mock('./better-auth-instance', () => ({
   getBetterAuth: jest.fn(() =>
@@ -11,6 +12,9 @@ jest.mock('./better-auth-instance', () => ({
         getSession,
         verifyApiKey,
       },
+      $context: Promise.resolve({
+        internalAdapter: { findUserById: findById },
+      }),
     }),
   ),
 }));
@@ -31,9 +35,9 @@ function createRequest(headers: IncomingMessage['headers']): IncomingMessage {
 describe('BetterAuthBackendAuthenticator', () => {
   it('returns anonymous context when Better Auth does not authenticate the request', async () => {
     getSession.mockResolvedValue(null);
-    const authenticator = new BetterAuthBackendAuthenticator();
+    const service = new BetterAuthBackendAuthenticator();
 
-    await expect(authenticator.authenticateRequest(createRequest({}))).resolves.toEqual({
+    await expect(service.authenticateRequest(createRequest({}))).resolves.toEqual({
       userId: null,
       sessionId: null,
       orgId: null,
@@ -62,10 +66,10 @@ describe('BetterAuthBackendAuthenticator', () => {
         passwordMigrationRequired: true,
       },
     });
-    const authenticator = new BetterAuthBackendAuthenticator();
+    const service = new BetterAuthBackendAuthenticator();
 
     await expect(
-      authenticator.authenticateRequest(
+      service.authenticateRequest(
         createRequest({ cookie: 'better-auth.session_token=token' }),
       ),
     ).resolves.toEqual({
@@ -103,10 +107,16 @@ describe('BetterAuthBackendAuthenticator', () => {
         metadata: { purpose: 'docs' },
       },
     });
-    const authenticator = new BetterAuthBackendAuthenticator();
+    findById.mockResolvedValue({
+      id: 'user_123',
+      role: 'admin',
+      banned: false,
+      passwordMigrationRequired: false,
+    });
+    const service = new BetterAuthBackendAuthenticator();
 
     await expect(
-      authenticator.authenticateRequest(
+      service.authenticateRequest(
         createRequest({ authorization: 'Bearer docs_api_key' }),
       ),
     ).resolves.toEqual({
@@ -114,10 +124,11 @@ describe('BetterAuthBackendAuthenticator', () => {
       sessionId: null,
       orgId: null,
       authType: 'api_key',
-      role: null,
+      role: 'admin',
       passwordMigrationRequired: false,
       claims: {
         sub: 'user_123',
+        role: 'admin',
         api_key_id: 'key_123',
         api_key_name: 'Docs',
         api_key_permissions: { docs: ['read'] },
@@ -127,6 +138,39 @@ describe('BetterAuthBackendAuthenticator', () => {
     });
     expect(verifyApiKey).toHaveBeenCalledWith({
       body: { key: 'docs_api_key' },
+    });
+    expect(findById).toHaveBeenCalledWith('user_123');
+  });
+
+  it('rejects API keys whose owning user is banned', async () => {
+    getSession.mockResolvedValue(null);
+    verifyApiKey.mockResolvedValue({
+      valid: true,
+      key: {
+        id: 'key_123',
+        name: 'Docs',
+        referenceId: 'user_123',
+      },
+    });
+    findById.mockResolvedValue({
+      id: 'user_123',
+      role: 'admin',
+      banned: true,
+      passwordMigrationRequired: false,
+    });
+
+    await expect(
+      new BetterAuthBackendAuthenticator().authenticateRequest(
+        createRequest({ authorization: 'Bearer docs_api_key' }),
+      ),
+    ).resolves.toEqual({
+      userId: null,
+      sessionId: null,
+      orgId: null,
+      authType: null,
+      role: null,
+      passwordMigrationRequired: false,
+      claims: null,
     });
   });
 });
