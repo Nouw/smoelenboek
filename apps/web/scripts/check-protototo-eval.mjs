@@ -1,22 +1,39 @@
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [participant, standings, admin, model, shell, sidebar, translations] =
-  await Promise.all([
-    readFile(new URL('app/protototo/protototo-content.tsx', root), 'utf8'),
-    readFile(
-      new URL('app/protototo/standings/standings-content.tsx', root),
-      'utf8',
+const [
+  participant,
+  standings,
+  admin,
+  adminRoundPage,
+  repository,
+  model,
+  shell,
+  sidebar,
+  translations,
+] = await Promise.all([
+  readFile(new URL('app/protototo/protototo-content.tsx', root), 'utf8'),
+  readFile(
+    new URL('app/protototo/standings/standings-content.tsx', root),
+    'utf8',
+  ),
+  readFile(
+    new URL('app/protototo/admin/protototo-admin-content.tsx', root),
+    'utf8',
+  ),
+  readFile(new URL('app/protototo/admin/[roundId]/page.tsx', root), 'utf8'),
+  readFile(
+    new URL(
+      '../../packages/rpc/src/protototo/repositories/protototo.repository.ts',
+      root,
     ),
-    readFile(
-      new URL('app/protototo/admin/protototo-admin-content.tsx', root),
-      'utf8',
-    ),
-    readFile(new URL('app/protototo/protototo-model.ts', root), 'utf8'),
-    readFile(new URL('app/app-shell.tsx', root), 'utf8'),
-    readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
-    readFile(new URL('lib/i18n.tsx', root), 'utf8'),
-  ]);
+    'utf8',
+  ),
+  readFile(new URL('app/protototo/protototo-model.ts', root), 'utf8'),
+  readFile(new URL('app/app-shell.tsx', root), 'utf8'),
+  readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
+  readFile(new URL('lib/i18n.tsx', root), 'utf8'),
+]);
 
 const criteria = [
   [
@@ -67,6 +84,13 @@ const criteria = [
       /publishRound/.test(admin) &&
       /listNevoboMatches/.test(admin) &&
       /syncResults/.test(admin),
+  ],
+  [
+    'Admin starts on a newest-first round list and opens round details',
+    /createdAt: 'DESC'/.test(repository) &&
+      admin.includes('href={`/protototo/admin/${round.id}`}') &&
+      /ProtototoAdminContent roundId=/.test(adminRoundPage) &&
+      !/setSelectedRoundId/.test(admin),
   ],
   [
     'Admin CSV includes payment, completeness, per-match points, and total',

@@ -2,22 +2,31 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [participant, standings, admin, model, shell, sidebar, translations] =
-  await Promise.all([
-    readFile(new URL('app/protototo/protototo-content.tsx', root), 'utf8'),
-    readFile(
-      new URL('app/protototo/standings/standings-content.tsx', root),
-      'utf8',
-    ),
-    readFile(
-      new URL('app/protototo/admin/protototo-admin-content.tsx', root),
-      'utf8',
-    ),
-    readFile(new URL('app/protototo/protototo-model.ts', root), 'utf8'),
-    readFile(new URL('app/app-shell.tsx', root), 'utf8'),
-    readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
-    readFile(new URL('lib/i18n.tsx', root), 'utf8'),
-  ]);
+const [
+  participant,
+  standings,
+  admin,
+  adminRoundPage,
+  model,
+  shell,
+  sidebar,
+  translations,
+] = await Promise.all([
+  readFile(new URL('app/protototo/protototo-content.tsx', root), 'utf8'),
+  readFile(
+    new URL('app/protototo/standings/standings-content.tsx', root),
+    'utf8',
+  ),
+  readFile(
+    new URL('app/protototo/admin/protototo-admin-content.tsx', root),
+    'utf8',
+  ),
+  readFile(new URL('app/protototo/admin/[roundId]/page.tsx', root), 'utf8'),
+  readFile(new URL('app/protototo/protototo-model.ts', root), 'utf8'),
+  readFile(new URL('app/app-shell.tsx', root), 'utf8'),
+  readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
+  readFile(new URL('lib/i18n.tsx', root), 'utf8'),
+]);
 
 for (const endpoint of [
   'protototo.current.useQuery',
@@ -68,6 +77,9 @@ assert.match(admin, /currentUser\.isAdmin/);
 assert.match(admin, /new Blob\(\[csv\]/);
 assert.match(admin, /parseAmsterdamDateTime/);
 assert.match(admin, /timeZone: 'Europe\/Amsterdam'/);
+assert.ok(admin.includes('href={`/protototo/admin/${round.id}`}'));
+assert.doesNotMatch(admin, /setSelectedRoundId/);
+assert.match(adminRoundPage, /ProtototoAdminContent roundId=/);
 assert.match(shell, /pathname === '\/protototo'/);
 assert.match(shell, /PublicProtototoLayout/);
 assert.match(sidebar, /url: "\/protototo"/);

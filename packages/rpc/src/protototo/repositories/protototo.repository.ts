@@ -62,7 +62,7 @@ export class ProtototoRepository {
     return this.rounds.find({
       where: admin ? {} : { archivedAt: IsNull() },
       relations: { matches: true },
-      order: { opensAt: 'DESC', matches: { startsAt: 'ASC' } },
+      order: { createdAt: 'DESC', matches: { startsAt: 'ASC' } },
     });
   }
 

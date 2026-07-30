@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import {
   AlertCircle,
   Archive,
+  ArrowLeft,
   CheckCircle2,
+  ChevronRight,
   Download,
   Loader2,
   Plus,
@@ -45,10 +47,10 @@ type NevoboMatch = {
   startsAt: string;
 };
 
-export function ProtototoAdminContent() {
+export function ProtototoAdminContent({ roundId }: { roundId?: string }) {
   const { t } = useI18n();
   const currentUser = useCurrentUser();
-  const [selectedRoundId, setSelectedRoundId] = useState('');
+  const selectedRoundId = roundId ?? '';
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function ProtototoAdminContent() {
   );
   const selectedRound = normalizeRound(roundQuery.data);
   const teamsQuery = trpc.protototo.admin.listNevoboTeams.useQuery(undefined, {
-    enabled: currentUser.isAdmin,
+    enabled: currentUser.isAdmin && Boolean(selectedRoundId),
     retry: false,
   });
   const teams = normalizeNevoboTeams(teamsQuery.data);
@@ -79,10 +81,6 @@ export function ProtototoAdminContent() {
   );
   const entries = normalizeEntries(entriesQuery.data);
   const utils = trpc.useUtils();
-
-  useEffect(() => {
-    if (!selectedRoundId && rounds[0]) setSelectedRoundId(rounds[0].id);
-  }, [rounds, selectedRoundId]);
 
   const refreshRound = async () => {
     await Promise.all([
@@ -223,58 +221,27 @@ export function ProtototoAdminContent() {
         </div>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
-        <aside className="space-y-4">
+      {!selectedRoundId ? (
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <RoundsCard
+            rounds={rounds}
+            loading={listRounds.isLoading}
+            error={listRounds.error?.message}
+          />
           <CreateRoundCard
             onSubmit={submitCreateRound}
             pending={createRound.isPending}
           />
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('protototo.admin.rounds')}</CardTitle>
-              <CardDescription>
-                {t('protototo.admin.selectRound')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {listRounds.isLoading ? (
-                <InlineLoading text={t('protototo.admin.loadingRounds')} />
-              ) : listRounds.isError ? (
-                <InlineError text={listRounds.error.message} />
-              ) : rounds.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  {t('protototo.admin.noRounds')}
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {rounds.map((round) => (
-                    <button
-                      key={round.id}
-                      type="button"
-                      onClick={() => setSelectedRoundId(round.id)}
-                      aria-pressed={round.id === selectedRoundId}
-                      className={`w-full rounded-md border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                        round.id === selectedRoundId
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'hover:bg-accent'
-                      }`}
-                    >
-                      <span className="block font-medium">{round.title}</span>
-                      <span className="mt-1 block text-xs opacity-75">
-                        {t(`protototo.admin.status.${round.status}`)}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </aside>
-
+        </div>
+      ) : (
         <main className="min-w-0 space-y-6">
-          {!selectedRoundId ? (
-            <AdminState icon={Plus} text={t('protototo.admin.createFirst')} />
-          ) : roundQuery.isLoading ? (
+          <Button asChild variant="ghost" className="-ml-3">
+            <Link href="/protototo/admin">
+              <ArrowLeft className="size-4" />
+              {t('protototo.admin.backToRounds')}
+            </Link>
+          </Button>
+          {roundQuery.isLoading ? (
             <AdminState
               icon={Loader2}
               spin
@@ -332,8 +299,71 @@ export function ProtototoAdminContent() {
             </>
           )}
         </main>
-      </div>
+      )}
     </div>
+  );
+}
+
+function RoundsCard({
+  rounds,
+  loading,
+  error,
+}: {
+  rounds: ProtototoRound[];
+  loading: boolean;
+  error?: string;
+}) {
+  const { locale, t } = useI18n();
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('protototo.admin.rounds')}</CardTitle>
+        <CardDescription>{t('protototo.admin.selectRound')}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <InlineLoading text={t('protototo.admin.loadingRounds')} />
+        ) : error ? (
+          <InlineError text={error} />
+        ) : rounds.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {t('protototo.admin.noRounds')}
+          </p>
+        ) : (
+          <ul className="divide-y rounded-lg border">
+            {rounds.map((round) => (
+              <li key={round.id}>
+                <Link
+                  href={`/protototo/admin/${round.id}`}
+                  className="flex items-center gap-4 p-4 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{round.title}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        {t(`protototo.admin.status.${round.status}`)}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {formatDateTime(round.opensAt, locale)} ·{' '}
+                      {
+                        round.matches.filter(({ removedAt }) => !removedAt)
+                          .length
+                      }{' '}
+                      {t('protototo.admin.matchesCount')}
+                    </p>
+                  </div>
+                  <ChevronRight
+                    className="size-5 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
