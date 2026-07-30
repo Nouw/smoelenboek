@@ -51,6 +51,13 @@ import {
 
 type Dependencies = { commandBus: CommandBus; queryBus: QueryBus };
 
+function adminMeta(name: string, description: string) {
+  return {
+    name,
+    docs: { description, tags: ['Protototo'], auth: true },
+  };
+}
+
 export function createProtototoRouter(dependencies: Dependencies) {
   return router({
     current: publicProcedure
@@ -106,7 +113,8 @@ export function createProtototoRouter(dependencies: Dependencies) {
       .meta({
         name: 'Submit Protototo Entry',
         docs: {
-          description: 'Create or replace one complete round entry.',
+          description:
+            'Create or replace one complete round entry as an anonymous visitor or signed-in member.',
           tags: ['Protototo'],
           auth: false,
         },
@@ -176,11 +184,23 @@ export function createProtototoRouter(dependencies: Dependencies) {
       ),
     admin: router({
       listRounds: adminProcedure
+        .meta(
+          adminMeta(
+            'List Protototo Rounds for Administration',
+            'List every Protototo round, including drafts and archived rounds. Administrator access is required.',
+          ),
+        )
         .output(z.array(protototoRoundSchema))
         .query(() =>
           dependencies.queryBus.execute(new ListAdminProtototoRoundsQuery()),
         ),
       getRound: adminProcedure
+        .meta(
+          adminMeta(
+            'Get Protototo Round for Administration',
+            'Get one Protototo round with removed matches and synchronization details. Administrator access is required.',
+          ),
+        )
         .input(z.object({ roundId: z.uuid() }))
         .output(protototoRoundSchema.nullable())
         .query(({ input }) =>
@@ -189,6 +209,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           ),
         ),
       createRound: adminProcedure
+        .meta(
+          adminMeta(
+            'Create Protototo Round',
+            'Create a draft Protototo round. Administrator access is required.',
+          ),
+        )
         .input(createProtototoRoundInputSchema)
         .output(protototoRoundSchema)
         .mutation(async ({ ctx, input }) => {
@@ -207,6 +233,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           return toRoundOutput(round, new Date(), true, true, true);
         }),
       updateRound: adminProcedure
+        .meta(
+          adminMeta(
+            'Update Protototo Round',
+            'Update round details and deadlines, including reopening a published round. Administrator access is required.',
+          ),
+        )
         .input(updateProtototoRoundInputSchema)
         .output(protototoRoundSchema)
         .mutation(async ({ ctx, input }) => {
@@ -226,6 +258,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           return toRoundOutput(round, new Date(), true, true, true);
         }),
       publishRound: adminProcedure
+        .meta(
+          adminMeta(
+            'Publish Protototo Round',
+            'Publish or reopen a Protototo round after validating its lineup. Administrator access is required.',
+          ),
+        )
         .input(z.object({ roundId: z.uuid() }))
         .output(protototoRoundSchema)
         .mutation(async ({ ctx, input }) => {
@@ -236,6 +274,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           return toRoundOutput(round, new Date(), true, true, true);
         }),
       archiveRound: adminProcedure
+        .meta(
+          adminMeta(
+            'Archive Protototo Round',
+            'Archive a Protototo round and remove it from participant history. Administrator access is required.',
+          ),
+        )
         .input(z.object({ roundId: z.uuid() }))
         .output(protototoRoundSchema)
         .mutation(async ({ ctx, input }) => {
@@ -246,9 +290,21 @@ export function createProtototoRouter(dependencies: Dependencies) {
           return toRoundOutput(round, new Date(), true, true, true);
         }),
       listNevoboTeams: adminProcedure
+        .meta(
+          adminMeta(
+            'List Nevobo Protos Teams',
+            'List configured Protos teams from Nevobo for match selection. Administrator access is required.',
+          ),
+        )
         .output(z.array(nevoboTeamSummarySchema))
         .query(() => dependencies.queryBus.execute(new ListNevoboTeamsQuery())),
       listNevoboMatches: adminProcedure
+        .meta(
+          adminMeta(
+            'List Nevobo Team Matches',
+            'List Nevobo matches for a selected Protos team. Administrator access is required.',
+          ),
+        )
         .input(z.object({ selectedTeamIri: z.string().min(1) }))
         .output(z.array(nevoboMatchSummarySchema))
         .query(({ input }) =>
@@ -257,6 +313,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           ),
         ),
       addMatch: adminProcedure
+        .meta(
+          adminMeta(
+            'Add Protototo Match',
+            'Snapshot a Nevobo match and add or restore it in a round. Administrator access is required.',
+          ),
+        )
         .input(
           z.object({
             roundId: z.uuid(),
@@ -280,6 +342,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           return toMatchOutput(match);
         }),
       removeMatch: adminProcedure
+        .meta(
+          adminMeta(
+            'Remove Protototo Match',
+            'Soft-remove a match so it no longer counts toward scoring. Administrator access is required.',
+          ),
+        )
         .input(z.object({ matchId: z.uuid() }))
         .output(protototoMatchSchema)
         .mutation(async ({ ctx, input }) => {
@@ -290,6 +358,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           return toMatchOutput(match);
         }),
       syncResults: adminProcedure
+        .meta(
+          adminMeta(
+            'Synchronize Protototo Results',
+            'Synchronize all active round matches with Nevobo and return a status summary. Administrator access is required.',
+          ),
+        )
         .input(z.object({ roundId: z.uuid() }))
         .output(protototoSyncResultSchema)
         .mutation(({ ctx, input }) =>
@@ -298,6 +372,12 @@ export function createProtototoRouter(dependencies: Dependencies) {
           ),
         ),
       listEntries: adminProcedure
+        .meta(
+          adminMeta(
+            'List Protototo Entries for Administration',
+            'List detailed round entries, payment claims, completeness, and scoring. Administrator access is required.',
+          ),
+        )
         .input(z.object({ roundId: z.uuid() }))
         .output(z.array(protototoAdminEntrySchema))
         .query(({ input }) =>

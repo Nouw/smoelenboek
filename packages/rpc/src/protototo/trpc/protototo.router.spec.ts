@@ -20,6 +20,51 @@ const member = {
 };
 
 describe('Protototo tRPC router', () => {
+  it('documents every procedure with its actual authentication boundary', () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+    const procedures = appRouter._def.procedures as unknown as Record<
+      string,
+      {
+        _def: {
+          meta?: {
+            name?: unknown;
+            docs?: { description?: unknown; auth?: unknown };
+          };
+        };
+      }
+    >;
+    const expectedAuthentication = {
+      'protototo.current': false,
+      'protototo.lookupAnonymousEntry': false,
+      'protototo.submitEntry': false,
+      'protototo.memberRounds': true,
+      'protototo.myEntry': true,
+      'protototo.standings': true,
+      'protototo.admin.listRounds': true,
+      'protototo.admin.getRound': true,
+      'protototo.admin.createRound': true,
+      'protototo.admin.updateRound': true,
+      'protototo.admin.publishRound': true,
+      'protototo.admin.archiveRound': true,
+      'protototo.admin.listNevoboTeams': true,
+      'protototo.admin.listNevoboMatches': true,
+      'protototo.admin.addMatch': true,
+      'protototo.admin.removeMatch': true,
+      'protototo.admin.syncResults': true,
+      'protototo.admin.listEntries': true,
+    } as const;
+
+    for (const [path, auth] of Object.entries(expectedAuthentication)) {
+      const meta = procedures[path]?._def.meta;
+      expect(meta?.name).toEqual(expect.any(String));
+      expect(meta?.docs?.description).toEqual(expect.any(String));
+      expect(meta?.docs?.auth).toBe(auth);
+    }
+  });
+
   it('allows an anonymous complete entry mutation', async () => {
     const execute = jest.fn().mockResolvedValue({
       id: '22222222-2222-4222-8222-222222222222',
