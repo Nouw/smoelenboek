@@ -33,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: t("nav.committees"),
-      url: "#",
+      url: "/committees",
       icon: ShieldCheck,
     },
     {

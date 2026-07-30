@@ -1,3 +1,5 @@
+import type { SeasonDto } from '../../seasons/dto/season.dto';
+
 export type CommitteeRole =
   | 'commissielid'
   | 'commissaris_externe_zaken'
@@ -25,4 +27,17 @@ export interface CommitteeMembershipDto {
   endedOn: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CommitteeRosterMemberDto {
+  userId: string;
+  name: string;
+  imageUrl: string | null;
+  role: CommitteeRole;
+}
+
+export interface CurrentCommitteeRosterDto {
+  committee: CommitteeDto;
+  season: SeasonDto;
+  members: CommitteeRosterMemberDto[];
 }

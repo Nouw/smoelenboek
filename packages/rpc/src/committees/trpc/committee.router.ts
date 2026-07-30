@@ -11,6 +11,7 @@ import {
 } from '../commands/committee.commands';
 import { COMMITTEE_ROLES } from '../committee-catalog';
 import {
+  GetCurrentCommitteeRosterQuery,
   ListCommitteeMembershipsBySeasonQuery,
   ListCommitteesQuery,
 } from '../queries/committee.queries';
@@ -42,6 +43,24 @@ const committeeMembershipOutputSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+const committeeRosterMemberOutputSchema = z.object({
+  userId: z.uuid(),
+  name: z.string(),
+  imageUrl: z.string().nullable(),
+  role: committeeRoleSchema,
+});
+
+const currentCommitteeRosterOutputSchema = z.object({
+  committee: committeeOutputSchema,
+  season: z.object({
+    key: z.number().int().min(1900).max(3000),
+    label: z.string(),
+    startsOn: z.iso.date(),
+    endsBefore: z.iso.date(),
+  }),
+  members: z.array(committeeRosterMemberOutputSchema),
+});
+
 export function createCommitteeRouter(
   dependencies: CommitteeRouterDependencies,
 ) {
@@ -57,6 +76,23 @@ export function createCommitteeRouter(
       })
       .output(z.array(committeeOutputSchema))
       .query(() => dependencies.queryBus.execute(new ListCommitteesQuery())),
+    currentRoster: protectedProcedure
+      .meta({
+        name: 'Get Current Committee Roster',
+        docs: {
+          description:
+            'Get one committee and its active current-season members.',
+          tags: ['Committees'],
+          auth: true,
+        },
+      })
+      .input(z.object({ committeeId: z.uuid() }))
+      .output(currentCommitteeRosterOutputSchema.nullable())
+      .query(({ input }) =>
+        dependencies.queryBus.execute(
+          new GetCurrentCommitteeRosterQuery(input.committeeId, new Date()),
+        ),
+      ),
     membershipsBySeason: protectedProcedure
       .meta({
         name: 'List Committee Memberships By Season',

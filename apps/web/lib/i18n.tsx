@@ -171,6 +171,20 @@ const dictionaries = {
       womenTitle: 'Dames teams',
       womenEmpty: 'Geen dames teams gevonden.',
     },
+    committees: {
+      backToCommittees: 'Terug naar commissies',
+      currentSeason: 'Huidig seizoen',
+      empty: 'Geen commissies gevonden.',
+      loadError: 'Commissie kon niet worden geladen',
+      loading: 'Commissies laden',
+      members: 'Leden',
+      noMembers: 'Geen commissieleden gevonden voor dit seizoen.',
+      notFound: 'Commissie niet gevonden',
+      notFoundDescription:
+        'Deze commissie bestaat niet of is niet beschikbaar.',
+      retry: 'Opnieuw proberen',
+      title: 'Commissies',
+    },
     userPanel: {
       currentUser: 'Huidige gebruiker',
       currentUserDescription:
@@ -340,6 +354,20 @@ const dictionaries = {
       retry: 'Try again',
       womenTitle: 'Women teams',
       womenEmpty: 'No women teams found.',
+    },
+    committees: {
+      backToCommittees: 'Back to committees',
+      currentSeason: 'Current season',
+      empty: 'No committees found.',
+      loadError: 'Committee could not be loaded',
+      loading: 'Loading committees',
+      members: 'Members',
+      noMembers: 'No committee members found for this season.',
+      notFound: 'Committee not found',
+      notFoundDescription:
+        'This committee does not exist or is unavailable.',
+      retry: 'Try again',
+      title: 'Committees',
     },
     userPanel: {
       currentUser: 'Current user',

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
 
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
 import { CommitteeEntity } from '../entities/committee.entity';
@@ -27,6 +27,21 @@ export class CommitteesRepository {
   ): Promise<CommitteeMembershipEntity[]> {
     return this.membershipsRepository.find({
       where: { seasonKey, endedOn: IsNull() },
+    });
+  }
+
+  findActiveMembershipsByCommitteeAndSeason(
+    committeeId: string,
+    seasonKey: number,
+    activeOn: string,
+  ): Promise<CommitteeMembershipEntity[]> {
+    return this.membershipsRepository.find({
+      where: {
+        committeeId,
+        seasonKey,
+        startedOn: LessThanOrEqual(activeOn),
+        endedOn: IsNull(),
+      },
     });
   }
 

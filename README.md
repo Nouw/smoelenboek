@@ -40,6 +40,14 @@ active coaches, and active players. Roster cards link to the existing member
 profile pages. The page loads through the single protected
 `teams.currentRoster` tRPC query.
 
+### Committee directory
+
+Authenticated users can browse all committees at `/committees` and open a
+committee at `/committees/[committeeId]`. The detail page shows the
+Europe/Amsterdam current season and active committee members, including their
+role and profile link. It loads the roster through the single protected
+`committees.currentRoster` tRPC query.
+
 ### Utilities
 
 This `Turborepo` has some additional tools already set for you:
