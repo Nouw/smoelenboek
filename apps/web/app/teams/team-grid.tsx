@@ -1,9 +1,14 @@
 'use client';
 
 import { AlertCircle, ImageIcon, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 import { trpc } from '../trpc';
-import { isMensTeam, isWomensTeam, sortTeamsByNameNumber } from './team-filters';
+import {
+  isMensTeam,
+  isWomensTeam,
+  sortTeamsByNameNumber,
+} from './team-filters';
 
 type TeamGridProps = {
   gender: 'men' | 'women';
@@ -52,9 +57,10 @@ export function TeamGrid({ gender }: TeamGridProps) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visibleTeams.map((team) => (
-            <article
+            <Link
               key={team.id}
-              className="overflow-hidden rounded-lg border bg-card text-card-foreground"
+              href={`/teams/${team.id}`}
+              className="group overflow-hidden rounded-lg border bg-card text-card-foreground transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="aspect-[4/3] bg-muted">
                 {team.imageUrl ? (
@@ -62,7 +68,7 @@ export function TeamGrid({ gender }: TeamGridProps) {
                   <img
                     src={team.imageUrl}
                     alt=""
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-muted-foreground">
@@ -80,7 +86,7 @@ export function TeamGrid({ gender }: TeamGridProps) {
                   </span>
                 ) : null}
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       )}

@@ -9,9 +9,11 @@ export { UpdateLinkDto } from './links/dto/update-link.dto';
 export type { MembershipHistoryDto } from './memberships/dto/membership-history.dto';
 export type { SeasonDto } from './seasons/dto/season.dto';
 export type {
+  CurrentTeamRosterDto,
   TeamDto,
   TeamMembershipDto,
   TeamRole,
+  TeamRosterMemberDto,
 } from './teams/dto/team.dto';
 export type { UserDto } from './users/dto/user.dto';
 export type { UserInformationDto } from './users/dto/user-information.dto';

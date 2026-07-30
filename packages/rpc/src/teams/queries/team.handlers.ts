@@ -1,12 +1,103 @@
-import type { TeamDto, TeamMembershipDto } from '@repo/api';
+import type {
+  CurrentTeamRosterDto,
+  TeamDto,
+  TeamMembershipDto,
+  TeamRosterMemberDto,
+} from '@repo/api';
+import { Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { getLocalDate, getSeasonForDate } from '../../seasons/season-policy';
+import type { UserEntity } from '../../users/entities/user.entity';
+import { UsersRepository } from '../../users/repositories/users.repository';
 import { toTeamDto, toTeamMembershipDto } from '../dto/team-output';
 import { TeamsRepository } from '../repositories/teams.repository';
 import {
+  GetCurrentTeamRosterQuery,
   ListTeamMembershipsBySeasonQuery,
   ListTeamsQuery,
 } from './team.queries';
+
+@QueryHandler(GetCurrentTeamRosterQuery)
+export class GetCurrentTeamRosterHandler
+  implements
+    IQueryHandler<GetCurrentTeamRosterQuery, CurrentTeamRosterDto | null>
+{
+  private readonly logger = new Logger(GetCurrentTeamRosterHandler.name);
+
+  constructor(
+    private readonly teamsRepository: TeamsRepository,
+    private readonly usersRepository: UsersRepository,
+  ) {}
+
+  async execute(
+    query: GetCurrentTeamRosterQuery,
+  ): Promise<CurrentTeamRosterDto | null> {
+    const team = await this.teamsRepository.findById(query.teamId);
+
+    if (!team) {
+      return null;
+    }
+
+    const season = getSeasonForDate(query.at);
+    const memberships =
+      await this.teamsRepository.findActiveMembershipsByTeamAndSeason(
+        query.teamId,
+        season.key,
+        getLocalDate(query.at),
+      );
+    const users = await this.usersRepository.findByIds(
+      memberships.map(({ userId }) => userId),
+    );
+    const usersById = new Map(users.map((user) => [user.id, user]));
+    const members = memberships.flatMap<TeamRosterMemberDto>((membership) => {
+      const user = usersById.get(membership.userId);
+
+      return user
+        ? [
+            {
+              userId: user.id,
+              name: displayName(user),
+              imageUrl: user.imageUrl,
+              role: membership.role,
+            },
+          ]
+        : [];
+    });
+    const coaches = members
+      .filter(({ role }) => role === 'coach_trainer')
+      .sort(compareRosterMembers);
+    const players = members
+      .filter(({ role }) => role !== 'coach_trainer')
+      .sort(compareRosterMembers);
+
+    this.logger.debug({
+      event: 'current_team_roster_loaded',
+      teamId: team.id,
+      seasonKey: season.key,
+      coachCount: coaches.length,
+      playerCount: players.length,
+    });
+
+    return { team: toTeamDto(team), season, coaches, players };
+  }
+}
+
+function displayName(user: UserEntity): string {
+  return (
+    [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+    user.name ||
+    user.email ||
+    'Member'
+  );
+}
+
+function compareRosterMembers(
+  left: TeamRosterMemberDto,
+  right: TeamRosterMemberDto,
+): number {
+  return left.name.localeCompare(right.name, 'nl', { sensitivity: 'base' });
+}
 
 @QueryHandler(ListTeamsQuery)
 export class ListTeamsHandler

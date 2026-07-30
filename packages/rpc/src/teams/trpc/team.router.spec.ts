@@ -33,6 +33,78 @@ describe('team tRPC router', () => {
     ).rejects.toBeInstanceOf(TRPCError);
   });
 
+  it('rejects current roster without authentication', async () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter
+        .createCaller({
+          userId: null,
+          sessionId: null,
+          orgId: null,
+          authType: null,
+          role: null,
+          claims: null,
+        })
+        .teams.currentRoster({
+          teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+        }),
+    ).rejects.toBeInstanceOf(TRPCError);
+  });
+
+  it('validates and dispatches a current roster query', async () => {
+    const execute = jest.fn().mockResolvedValue({
+      team: {
+        id: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+        name: 'Heren 1',
+        imageUrl: null,
+        archivedAt: null,
+        createdAt: '2026-07-30T00:00:00.000Z',
+        updatedAt: '2026-07-30T00:00:00.000Z',
+      },
+      season: {
+        key: 2025,
+        label: '2025/2026',
+        startsOn: '2025-08-01',
+        endsBefore: '2026-08-01',
+      },
+      coaches: [],
+      players: [
+        {
+          userId: 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0',
+          name: 'Example Player',
+          imageUrl: null,
+          role: 'setter',
+        },
+      ],
+    });
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute } as never,
+    });
+
+    await expect(
+      appRouter.createCaller(authenticatedContext).teams.currentRoster({
+        teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      }),
+    ).resolves.toEqual(expect.objectContaining({ players: expect.any(Array) }));
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+        at: expect.any(Date),
+      }),
+    );
+
+    await expect(
+      appRouter
+        .createCaller(authenticatedContext)
+        .teams.currentRoster({ teamId: 'not-a-uuid' }),
+    ).rejects.toBeInstanceOf(TRPCError);
+  });
+
   it('dispatches team assignment through the command bus', async () => {
     const execute = jest.fn().mockResolvedValue({
       id: '02ac256b-ce8f-44e9-8913-7569c3401264',

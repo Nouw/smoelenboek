@@ -11,6 +11,7 @@ import {
 } from '../commands/team.commands';
 import { TEAM_ROLES } from '../team-catalog';
 import {
+  GetCurrentTeamRosterQuery,
   ListTeamMembershipsBySeasonQuery,
   ListTeamsQuery,
 } from '../queries/team.queries';
@@ -43,6 +44,25 @@ const teamMembershipOutputSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+const teamRosterMemberOutputSchema = z.object({
+  userId: z.uuid(),
+  name: z.string(),
+  imageUrl: z.string().nullable(),
+  role: teamRoleSchema,
+});
+
+const currentTeamRosterOutputSchema = z.object({
+  team: teamOutputSchema,
+  season: z.object({
+    key: z.number().int().min(1900).max(3000),
+    label: z.string(),
+    startsOn: z.iso.date(),
+    endsBefore: z.iso.date(),
+  }),
+  coaches: z.array(teamRosterMemberOutputSchema),
+  players: z.array(teamRosterMemberOutputSchema),
+});
+
 export function createTeamRouter(dependencies: TeamRouterDependencies) {
   return router({
     list: protectedProcedure
@@ -56,6 +76,22 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
       })
       .output(z.array(teamOutputSchema))
       .query(() => dependencies.queryBus.execute(new ListTeamsQuery())),
+    currentRoster: protectedProcedure
+      .meta({
+        name: 'Get Current Team Roster',
+        docs: {
+          description: 'Get one team and its active current-season roster.',
+          tags: ['Teams'],
+          auth: true,
+        },
+      })
+      .input(z.object({ teamId: z.uuid() }))
+      .output(currentTeamRosterOutputSchema.nullable())
+      .query(({ input }) =>
+        dependencies.queryBus.execute(
+          new GetCurrentTeamRosterQuery(input.teamId, new Date()),
+        ),
+      ),
     membershipsBySeason: protectedProcedure
       .meta({
         name: 'List Team Memberships By Season',

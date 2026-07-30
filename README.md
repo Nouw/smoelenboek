@@ -32,6 +32,14 @@ This Turborepo includes the following packages & apps:
 
 Each package and application are mostly written in [TypeScript](https://www.typescriptlang.org/).
 
+### Team directory
+
+Authenticated users can open a team from the men or women overview at
+`/teams/[teamId]`. The detail page shows the Europe/Amsterdam current season,
+active coaches, and active players. Roster cards link to the existing member
+profile pages. The page loads through the single protected
+`teams.currentRoster` tRPC query.
+
 ### Utilities
 
 This `Turborepo` has some additional tools already set for you:

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
 
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
 import { TeamEntity } from '../entities/team.entity';
@@ -25,6 +25,21 @@ export class TeamsRepository {
   findMembershipsBySeason(seasonKey: number): Promise<TeamMembershipEntity[]> {
     return this.membershipsRepository.find({
       where: { seasonKey, endedOn: IsNull() },
+    });
+  }
+
+  findActiveMembershipsByTeamAndSeason(
+    teamId: string,
+    seasonKey: number,
+    activeOn: string,
+  ): Promise<TeamMembershipEntity[]> {
+    return this.membershipsRepository.find({
+      where: {
+        teamId,
+        seasonKey,
+        startedOn: LessThanOrEqual(activeOn),
+        endedOn: IsNull(),
+      },
     });
   }
 
