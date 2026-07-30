@@ -93,14 +93,22 @@ export function TeamDetail({ teamId }: { teamId: string }) {
         </Link>
       </Button>
 
-      <Card className="relative min-h-72 overflow-hidden p-0 text-white shadow-none md:min-h-[26rem]">
+      <Card className="relative min-h-[28rem] overflow-hidden bg-slate-950 p-0 text-white shadow-none md:min-h-[38rem]">
         {team.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={team.imageUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          <div className="absolute inset-0 bg-slate-950">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={team.imageUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-45 blur-2xl"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={team.imageUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-contain"
+            />
+          </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-950 text-white/40">
             <ImageIcon className="size-14" aria-hidden="true" />
@@ -108,7 +116,7 @@ export function TeamDetail({ teamId }: { teamId: string }) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
-        <div className="relative flex min-h-72 flex-col justify-end gap-2 p-6 md:min-h-[26rem] md:p-10">
+        <div className="relative flex min-h-[28rem] flex-col justify-end gap-2 p-6 md:min-h-[38rem] md:p-10">
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-white/80">
             <span>{t('teams.currentSeason')}</span>
             {team.archivedAt ? (

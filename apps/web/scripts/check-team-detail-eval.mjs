@@ -30,8 +30,14 @@ const criteria = [
   [
     'Team identity overlays the image banner',
     /absolute inset-0 bg-gradient-to-t/.test(detail) &&
-      /relative flex min-h-72 flex-col justify-end/.test(detail) &&
+      /relative flex min-h-\[28rem\] flex-col justify-end/.test(detail) &&
       /text-white drop-shadow-sm/.test(detail),
+  ],
+  [
+    'Complete team photo remains visible',
+    /md:min-h-\[38rem\]/.test(detail) &&
+      /h-full w-full object-contain/.test(detail) &&
+      /object-cover opacity-45 blur-2xl/.test(detail),
   ],
   [
     'Coaches and players are separate',
