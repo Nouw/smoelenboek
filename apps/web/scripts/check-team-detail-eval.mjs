@@ -29,9 +29,15 @@ const criteria = [
   ],
   [
     'Team identity overlays the image banner',
-    /absolute inset-0 bg-gradient-to-t/.test(detail) &&
+    /absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t/.test(detail) &&
       /relative flex min-h-\[28rem\] flex-col justify-end/.test(detail) &&
       /text-white drop-shadow-sm/.test(detail),
+  ],
+  [
+    'Gradient stays behind the team identity only',
+    /bottom-0 h-48 bg-gradient-to-t/.test(detail) &&
+      /to-transparent md:h-56/.test(detail) &&
+      !/absolute inset-0 bg-gradient-to-t/.test(detail),
   ],
   [
     'Complete team photo remains visible',

@@ -115,7 +115,7 @@ export function TeamDetail({ teamId }: { teamId: string }) {
             <span className="sr-only">{t('teams.noTeamImage')}</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/90 via-black/55 to-transparent md:h-56" />
         <div className="relative flex min-h-[28rem] flex-col justify-end gap-2 p-6 md:min-h-[38rem] md:p-10">
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-white/80">
             <span>{t('teams.currentSeason')}</span>
