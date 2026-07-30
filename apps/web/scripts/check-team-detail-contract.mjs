@@ -27,6 +27,8 @@ assert.doesNotMatch(detail, /absolute inset-0 bg-gradient-to-t/);
 assert.match(detail, /relative flex min-h-\[28rem\] flex-col justify-end/);
 assert.match(detail, /md:min-h-\[38rem\]/);
 assert.match(detail, /h-full w-full object-contain/);
+assert.match(detail, /scale-110 object-cover blur-2xl/);
+assert.doesNotMatch(detail, /object-cover opacity-45/);
 assert.match(router, /currentRoster: protectedProcedure/);
 assert.match(router, /teamId: z\.uuid\(\)/);
 assert.match(translations, /Huidig seizoen/);

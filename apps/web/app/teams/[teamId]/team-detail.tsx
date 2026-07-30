@@ -100,7 +100,7 @@ export function TeamDetail({ teamId }: { teamId: string }) {
             <img
               src={team.imageUrl}
               alt=""
-              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-45 blur-2xl"
+              className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
             />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

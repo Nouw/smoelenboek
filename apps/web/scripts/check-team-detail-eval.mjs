@@ -43,7 +43,12 @@ const criteria = [
     'Complete team photo remains visible',
     /md:min-h-\[38rem\]/.test(detail) &&
       /h-full w-full object-contain/.test(detail) &&
-      /object-cover opacity-45 blur-2xl/.test(detail),
+      /scale-110 object-cover blur-2xl/.test(detail),
+  ],
+  [
+    'Wide banners have an edge-to-edge image backdrop',
+    /scale-110 object-cover blur-2xl/.test(detail) &&
+      !/object-cover opacity-45/.test(detail),
   ],
   [
     'Coaches and players are separate',
