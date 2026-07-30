@@ -42,8 +42,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: t('nav.documents'),
-      url: '#',
+      url: '/documents',
       icon: FileText,
+      isActive: pathname.startsWith('/documents'),
     },
     {
       title: t('nav.protototo'),

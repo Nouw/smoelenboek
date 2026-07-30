@@ -2,7 +2,11 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
 import { Readable } from 'node:stream';
 
-import { type ImageUploadFile, MediaService } from './media.service';
+import {
+  type ImageUploadFile,
+  MediaService,
+  MediaUploadCompensationError,
+} from './media.service';
 
 const originalEnv = process.env;
 
@@ -158,11 +162,127 @@ describe('MediaService', () => {
     const service = new MediaService();
 
     expect(() =>
-      service.assertAllowedObjectName('documents/secret.pdf'),
+      service.assertAllowedObjectName('documents/collection/original/secret.pdf'),
+    ).not.toThrow();
+    expect(() =>
+      service.assertAllowedObjectName('private/secret.pdf'),
     ).toThrow(BadRequestException);
     expect(() =>
       service.assertAllowedObjectName('profile-images/../secret.png'),
     ).toThrow(BadRequestException);
+  });
+
+  it('uploads verified photo originals and generated thumbnails', async () => {
+    const putObject = jest.fn().mockResolvedValue({});
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ putObject, deleteObject: jest.fn() });
+    jest
+      .spyOn(service as never, 'detectFileType')
+      .mockResolvedValue({ ext: 'jpg', mime: 'image/jpeg' } as never);
+    jest
+      .spyOn(service as never, 'createThumbnail')
+      .mockResolvedValue(Buffer.from('thumbnail') as never);
+
+    const result = await service.uploadContentAsset(
+      'photo_album',
+      'collection-1',
+      'asset-1',
+      imageFile({ mimetype: 'image/jpeg', originalname: 'day.jpg' }),
+    );
+
+    expect(result).toEqual({
+      objectName: 'photobooks/collection-1/original/asset-1.jpg',
+      thumbnailObjectName: 'photobooks/collection-1/thumbnail/asset-1.webp',
+      contentType: 'image/jpeg',
+      sizeBytes: 4,
+    });
+    expect(putObject).toHaveBeenCalledTimes(2);
+  });
+
+  it('reports an orphaned original when thumbnail creation and cleanup fail', async () => {
+    const putObject = jest.fn().mockResolvedValue({});
+    const deleteObject = jest.fn().mockRejectedValue(new Error('OCI down'));
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ putObject, deleteObject });
+    jest
+      .spyOn(service as never, 'detectFileType')
+      .mockResolvedValue({ ext: 'jpg', mime: 'image/jpeg' } as never);
+    jest
+      .spyOn(service as never, 'createThumbnail')
+      .mockRejectedValue(new Error('invalid image') as never);
+
+    const upload = service.uploadContentAsset(
+      'photo_album',
+      'collection-1',
+      'asset-1',
+      imageFile({ mimetype: 'image/jpeg', originalname: 'day.jpg' }),
+    );
+
+    await expect(upload).rejects.toMatchObject({
+      name: MediaUploadCompensationError.name,
+      orphanedObjectNames: [
+        'photobooks/collection-1/original/asset-1.jpg',
+      ],
+    });
+    expect(deleteObject).toHaveBeenCalledTimes(1);
+  });
+
+  it('accepts verified PDF documents without creating thumbnails', async () => {
+    const putObject = jest.fn().mockResolvedValue({});
+    const service = new MediaService();
+    (service as unknown as { clientPromise: Promise<unknown> }).clientPromise =
+      Promise.resolve({ putObject });
+    jest
+      .spyOn(service as never, 'detectFileType')
+      .mockResolvedValue({ ext: 'pdf', mime: 'application/pdf' } as never);
+
+    await expect(
+      service.uploadContentAsset(
+        'document_library',
+        'collection-1',
+        'asset-1',
+        imageFile({ mimetype: 'application/pdf', originalname: 'map.pdf' }),
+      ),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        objectName: 'documents/collection-1/original/asset-1.pdf',
+        thumbnailObjectName: null,
+        contentType: 'application/pdf',
+      }),
+    );
+    expect(putObject).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects files whose bytes do not identify an allowed type', async () => {
+    const service = new MediaService();
+    jest.spyOn(service as never, 'detectFileType').mockResolvedValue(undefined as never);
+
+    await expect(
+      service.uploadContentAsset(
+        'document_library',
+        'collection-1',
+        'asset-1',
+        imageFile({ mimetype: 'application/pdf', originalname: 'fake.pdf' }),
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('rejects verified documents in photo albums', async () => {
+    const service = new MediaService();
+    jest
+      .spyOn(service as never, 'detectFileType')
+      .mockResolvedValue({ ext: 'pdf', mime: 'application/pdf' } as never);
+
+    await expect(
+      service.uploadContentAsset(
+        'photo_album',
+        'collection-1',
+        'asset-1',
+        imageFile({ mimetype: 'application/pdf', originalname: 'map.pdf' }),
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('loads objects from OCI with stream metadata', async () => {

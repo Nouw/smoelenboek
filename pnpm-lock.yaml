@@ -308,6 +308,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      file-type:
+        specifier: 21.3.4
+        version: 21.3.4
       multer:
         specifier: ^2.2.0
         version: 2.2.0
@@ -329,6 +332,9 @@ importers:
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
+      sharp:
+        specifier: 0.34.5
+        version: 0.34.5
       trpc-docs-generator:
         specifier: ^0.9.0
         version: 0.9.0

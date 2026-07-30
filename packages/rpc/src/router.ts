@@ -1,6 +1,7 @@
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { createCommitteeRouter } from './committees/trpc/committee.router';
+import { createDocumentsRouter } from './documents/trpc/documents.router';
 import { createSeasonRouter } from './seasons/trpc/season.router';
 import { createProtototoRouter } from './protototo/trpc/protototo.router';
 import { createTeamRouter } from './teams/trpc/team.router';
@@ -15,6 +16,7 @@ export type RouterDependencies = {
 export function createAppRouter(dependencies: RouterDependencies) {
   return router({
     committees: createCommitteeRouter(dependencies),
+    documents: createDocumentsRouter(dependencies),
     protototo: createProtototoRouter(dependencies),
     seasons: createSeasonRouter(dependencies),
     teams: createTeamRouter(dependencies),

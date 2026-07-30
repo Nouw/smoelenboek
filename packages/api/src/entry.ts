@@ -9,6 +9,18 @@ export type {
 export { CreateLinkDto } from './links/dto/create-link.dto';
 export { UpdateLinkDto } from './links/dto/update-link.dto';
 export type { MembershipHistoryDto } from './memberships/dto/membership-history.dto';
+export {
+  contentAssetSchema,
+  contentCollectionDetailSchema,
+  contentCollectionKindSchema,
+  contentCollectionSchema,
+  createContentCollectionInputSchema,
+  updateContentCollectionInputSchema,
+  type ContentAssetDto,
+  type ContentCollectionDetailDto,
+  type ContentCollectionDto,
+  type ContentCollectionKind,
+} from './documents/dto/document.dto';
 export type { SeasonDto } from './seasons/dto/season.dto';
 export {
   createProtototoRoundInputSchema,

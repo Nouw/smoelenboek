@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 import { Readable, Writable } from 'node:stream';
 
@@ -61,6 +61,23 @@ describe('ProfileImageController', () => {
 });
 
 describe('ObjectController', () => {
+  it('does not expose collection objects without active asset metadata', async () => {
+    const execute = jest.fn();
+    const controller = new ObjectController(
+      { create: jest.fn().mockResolvedValue({ userId: 'user_123' }) } as never,
+      { execute } as never,
+    );
+
+    await expect(
+      controller.getObject(
+        { headers: {} } as never,
+        responseDouble() as never,
+        'documents/collection/original/file.pdf',
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(execute).not.toHaveBeenCalled();
+  });
+
   it('rejects unauthenticated object reads', async () => {
     const controller = new ObjectController(
       { create: jest.fn().mockResolvedValue({ userId: null }) } as never,

@@ -4,6 +4,9 @@ import type { DataSourceOptions } from 'typeorm';
 import { CommitteeMembershipEntity } from '../committees/entities/committee-membership.entity';
 import { CommitteeEntity } from '../committees/entities/committee.entity';
 import { StoredEventEntity } from '../event-store/entities/stored-event.entity';
+import { ContentAssetEntity } from '../documents/entities/content-asset.entity';
+import { ContentCollectionEntity } from '../documents/entities/content-collection.entity';
+import { ContentObjectCleanupEntity } from '../documents/entities/content-object-cleanup.entity';
 import { ProtototoEntryEntity } from '../protototo/entities/protototo-entry.entity';
 import { ProtototoMatchEntity } from '../protototo/entities/protototo-match.entity';
 import { ProtototoPredictionEntity } from '../protototo/entities/protototo-prediction.entity';
@@ -33,6 +36,9 @@ export function createDataSourceOptions(
       CommitteeEntity,
       CommitteeMembershipEntity,
       StoredEventEntity,
+      ContentAssetEntity,
+      ContentCollectionEntity,
+      ContentObjectCleanupEntity,
       ProtototoEntryEntity,
       ProtototoMatchEntity,
       ProtototoPredictionEntity,

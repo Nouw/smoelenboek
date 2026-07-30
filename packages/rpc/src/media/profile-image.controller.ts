@@ -4,6 +4,7 @@ import {
   Get,
   Header,
   HttpCode,
+  NotFoundException,
   Post,
   Param,
   Req,
@@ -94,6 +95,12 @@ export class ObjectController {
     const objectName = Array.isArray(objectNameParam)
       ? objectNameParam.join('/')
       : objectNameParam;
+    if (
+      objectName.startsWith('photobooks/') ||
+      objectName.startsWith('documents/')
+    ) {
+      throw new NotFoundException('Object not found.');
+    }
     const object = await this.queryBus.execute<GetObjectQuery, StoredObject>(
       new GetObjectQuery(objectName),
     );

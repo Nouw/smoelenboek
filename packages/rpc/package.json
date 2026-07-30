@@ -12,6 +12,7 @@
     "test": "jest",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "eval:protototo": "node scripts/check-protototo-eval.mjs",
+    "eval:documents": "node -r ts-node/register -r tsconfig-paths/register scripts/check-documents-media-eval.mjs",
     "migration:run": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
     "auth:create-user": "ts-node -r tsconfig-paths/register src/admin/create-user.ts",
@@ -39,6 +40,7 @@
     "better-auth": "^1.6.23",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "file-type": "21.3.4",
     "multer": "^2.2.0",
     "oci-common": "^2.136.0",
     "oci-objectstorage": "^2.136.0",
@@ -46,6 +48,7 @@
     "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sharp": "0.34.5",
     "trpc-docs-generator": "^0.9.0",
     "typeorm": "^0.3.28",
     "zod": "^4.2.1"

@@ -18,7 +18,36 @@ const imageExtensionsByMimeType = new Map([
   ['image/gif', 'gif'],
 ]);
 
-const allowedObjectPrefixes = ['profile-images/', 'team-images/', 'photobooks/', 'team/'];
+const allowedObjectPrefixes = [
+  'profile-images/',
+  'team-images/',
+  'photobooks/',
+  'documents/',
+  'team/',
+];
+
+const maxPhotoBytes = 15 * 1024 * 1024;
+const maxDocumentBytes = 25 * 1024 * 1024;
+
+const contentExtensionsByMimeType = new Map([
+  ...imageExtensionsByMimeType,
+  ['application/pdf', 'pdf'],
+  ['application/msword', 'doc'],
+  [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'docx',
+  ],
+  ['application/vnd.ms-excel', 'xls'],
+  [
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'xlsx',
+  ],
+  ['application/vnd.ms-powerpoint', 'ppt'],
+  [
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'pptx',
+  ],
+]);
 
 export type UploadedObject = {
   objectName: string;
@@ -33,6 +62,26 @@ export type ImageUploadFile = {
   size: number;
   buffer: Buffer;
 };
+
+export type ContentCollectionKind = 'photo_album' | 'document_library';
+
+export type UploadedContentObjects = {
+  objectName: string;
+  thumbnailObjectName: string | null;
+  contentType: string;
+  sizeBytes: number;
+};
+
+export class MediaUploadCompensationError extends Error {
+  constructor(
+    message: string,
+    public readonly orphanedObjectNames: string[],
+    options?: ErrorOptions,
+  ) {
+    super(message, options);
+    this.name = 'MediaUploadCompensationError';
+  }
+}
 
 type OciObjectStorageClient = {
   putObject(input: {
@@ -120,6 +169,110 @@ export class MediaService {
     };
   }
 
+  async uploadContentAsset(
+    kind: ContentCollectionKind,
+    collectionId: string,
+    assetId: string,
+    file: ImageUploadFile,
+  ): Promise<UploadedContentObjects> {
+    if (!file) {
+      throw new BadRequestException('File is required.');
+    }
+
+    if (!file.originalname || file.originalname.length > 255) {
+      throw new BadRequestException('Filename must be between 1 and 255 characters.');
+    }
+
+    const maximumBytes =
+      kind === 'photo_album' ? maxPhotoBytes : maxDocumentBytes;
+
+    if (file.size > maximumBytes) {
+      throw new BadRequestException(
+        `File must be ${maximumBytes / 1024 / 1024} MB or smaller.`,
+      );
+    }
+
+    const detected = this.normalizeLegacyOfficeType(
+      await this.detectFileType(file.buffer),
+      file.originalname,
+    );
+
+    if (!detected || !contentExtensionsByMimeType.has(detected.mime)) {
+      throw new BadRequestException('The file type is not supported.');
+    }
+
+    const isImage = imageExtensionsByMimeType.has(detected.mime);
+
+    if (kind === 'photo_album' && !isImage) {
+      throw new BadRequestException('Photo albums only support image files.');
+    }
+
+    const prefix = kind === 'photo_album' ? 'photobooks' : 'documents';
+    const extension = contentExtensionsByMimeType.get(detected.mime)!;
+    const objectName = `${prefix}/${collectionId}/original/${assetId}.${extension}`;
+    const thumbnailObjectName = isImage
+      ? `${prefix}/${collectionId}/thumbnail/${assetId}.webp`
+      : null;
+    const client = await this.getClient();
+    const storage = {
+      namespaceName: this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
+      bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
+    };
+
+    await client.putObject({
+      ...storage,
+      objectName,
+      putObjectBody: file.buffer,
+      contentType: detected.mime,
+      contentLength: file.buffer.length,
+    });
+
+    if (thumbnailObjectName) {
+      try {
+        const thumbnail = await this.createThumbnail(file.buffer);
+        await client.putObject({
+          ...storage,
+          objectName: thumbnailObjectName,
+          putObjectBody: thumbnail,
+          contentType: 'image/webp',
+          contentLength: thumbnail.length,
+        });
+      } catch (error) {
+        try {
+          await this.deleteObjectByName(objectName);
+        } catch {
+          throw new MediaUploadCompensationError(
+            'Thumbnail creation failed and the uploaded original requires cleanup.',
+            [objectName],
+            { cause: error },
+          );
+        }
+        throw error;
+      }
+    }
+
+    return {
+      objectName,
+      thumbnailObjectName,
+      contentType: detected.mime,
+      sizeBytes: file.buffer.length,
+    };
+  }
+
+  async deleteObjectByName(objectName: string): Promise<void> {
+    this.assertAllowedObjectName(objectName);
+    const client = await this.getClient();
+    try {
+      await client.deleteObject({
+        namespaceName: this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
+        bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
+        objectName,
+      });
+    } catch (error) {
+      if (!this.isOciNotFound(error)) throw error;
+    }
+  }
+
   async deleteObjectByUrl(objectUrl: string | null | undefined): Promise<void> {
     if (!objectUrl) {
       return;
@@ -131,12 +284,7 @@ export class MediaService {
       return;
     }
 
-    const client = await this.getClient();
-    await client.deleteObject({
-      namespaceName: this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
-      bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
-      objectName,
-    });
+    await this.deleteObjectByName(objectName);
   }
 
   async deleteImageByUrl(imageUrl: string | null | undefined): Promise<void> {
@@ -394,6 +542,69 @@ export class MediaService {
 
   private safeExtension(filename: string): string {
     return extname(filename).replace(/^\./, '').toLowerCase() || 'img';
+  }
+
+  private async detectFileType(
+    buffer: Buffer,
+  ): Promise<{ ext: string; mime: string } | undefined> {
+    const module = (await importModule('file-type')) as {
+      fileTypeFromBuffer(value: Uint8Array): Promise<
+        { ext: string; mime: string } | undefined
+      >;
+    };
+
+    return module.fileTypeFromBuffer(buffer);
+  }
+
+  private normalizeLegacyOfficeType(
+    detected: { ext: string; mime: string } | undefined,
+    filename: string,
+  ): { ext: string; mime: string } | undefined {
+    if (detected?.mime !== 'application/x-cfb') return detected;
+
+    const extension = extname(filename).toLowerCase();
+    if (extension === '.doc') return { ext: 'doc', mime: 'application/msword' };
+    if (extension === '.xls') {
+      return { ext: 'xls', mime: 'application/vnd.ms-excel' };
+    }
+    if (extension === '.ppt') {
+      return { ext: 'ppt', mime: 'application/vnd.ms-powerpoint' };
+    }
+    return undefined;
+  }
+
+  private async createThumbnail(buffer: Buffer): Promise<Buffer> {
+    const module = (await importModule('sharp')) as {
+      default?: (input: Buffer, options?: { animated?: boolean }) => {
+        rotate(): unknown;
+      };
+    };
+    const sharp = (module.default ?? module) as unknown as (
+      input: Buffer,
+      options?: { animated?: boolean },
+    ) => {
+      rotate(): {
+        resize(options: {
+          width: number;
+          height: number;
+          fit: 'inside';
+          withoutEnlargement: boolean;
+        }): {
+          webp(options: { quality: number }): { toBuffer(): Promise<Buffer> };
+        };
+      };
+    };
+
+    return sharp(buffer, { animated: false })
+      .rotate()
+      .resize({
+        width: 480,
+        height: 480,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 80 })
+      .toBuffer();
   }
 
   private async getClient(): Promise<OciObjectStorageClient> {
