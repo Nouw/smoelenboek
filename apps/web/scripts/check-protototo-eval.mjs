@@ -94,6 +94,8 @@ const criteria = [
     'Dutch and English copy cover participant and admin flows',
     /De inzending is gesloten/.test(translations) &&
       /Entries are closed/.test(translations) &&
+      /Er is momenteel geen actieve Protototo-ronde/.test(translations) &&
+      /There is currently no active Protototo round/.test(translations) &&
       /Protototo-beheer/.test(translations) &&
       /Protototo management/.test(translations),
   ],

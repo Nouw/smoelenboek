@@ -74,5 +74,7 @@ assert.match(sidebar, /url: "\/protototo"/);
 assert.match(sidebar, /url: "\/protototo\/admin"/);
 assert.match(translations, /Protototo-beheer/);
 assert.match(translations, /Protototo management/);
+assert.match(translations, /Er is momenteel geen actieve Protototo-ronde/);
+assert.match(translations, /There is currently no active Protototo round/);
 
 console.log('Protototo web contract passed.');
