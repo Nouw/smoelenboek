@@ -22,6 +22,8 @@ assert.match(detail, /roster\.isLoading/);
 assert.match(detail, /roster\.isError/);
 assert.match(detail, /!roster\.data/);
 assert.match(detail, /members\.length === 0/);
+assert.match(detail, /absolute inset-0 bg-gradient-to-t/);
+assert.match(detail, /relative flex min-h-72 flex-col justify-end/);
 assert.match(router, /currentRoster: protectedProcedure/);
 assert.match(router, /teamId: z\.uuid\(\)/);
 assert.match(translations, /Huidig seizoen/);

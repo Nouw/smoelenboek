@@ -93,32 +93,34 @@ export function TeamDetail({ teamId }: { teamId: string }) {
         </Link>
       </Button>
 
-      <Card className="overflow-hidden p-0 shadow-none">
-        <div className="grid md:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
-          <div className="aspect-[16/9] bg-muted md:aspect-auto md:min-h-72">
-            {team.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={team.imageUrl}
-                alt={team.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full min-h-56 items-center justify-center text-muted-foreground">
-                <ImageIcon className="size-12" aria-hidden="true" />
-                <span className="sr-only">{t('teams.noTeamImage')}</span>
-              </div>
-            )}
+      <Card className="relative min-h-72 overflow-hidden p-0 text-white shadow-none md:min-h-[26rem]">
+        {team.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={team.imageUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-950 text-white/40">
+            <ImageIcon className="size-14" aria-hidden="true" />
+            <span className="sr-only">{t('teams.noTeamImage')}</span>
           </div>
-          <CardContent className="flex flex-col justify-end gap-2 p-6 md:p-8">
-            <p className="text-sm font-medium text-muted-foreground">
-              {t('teams.currentSeason')}
-            </p>
-            <h1 className="text-3xl font-semibold tracking-tight">
-              {team.name}
-            </h1>
-            <p className="text-base text-muted-foreground">{season.label}</p>
-          </CardContent>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
+        <div className="relative flex min-h-72 flex-col justify-end gap-2 p-6 md:min-h-[26rem] md:p-10">
+          <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-white/80">
+            <span>{t('teams.currentSeason')}</span>
+            {team.archivedAt ? (
+              <span className="rounded-full border border-white/30 bg-black/20 px-2.5 py-1 text-xs text-white">
+                {t('common.archived')}
+              </span>
+            ) : null}
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl">
+            {team.name}
+          </h1>
+          <p className="text-base text-white/80 md:text-lg">{season.label}</p>
         </div>
       </Card>
 

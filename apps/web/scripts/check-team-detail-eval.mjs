@@ -28,6 +28,12 @@ const criteria = [
     /teams\.currentSeason/.test(detail) && /season\.label/.test(detail),
   ],
   [
+    'Team identity overlays the image banner',
+    /absolute inset-0 bg-gradient-to-t/.test(detail) &&
+      /relative flex min-h-72 flex-col justify-end/.test(detail) &&
+      /text-white drop-shadow-sm/.test(detail),
+  ],
+  [
     'Coaches and players are separate',
     /teams\.coaches/.test(detail) && /teams\.players/.test(detail),
   ],
