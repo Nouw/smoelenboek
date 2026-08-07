@@ -59,8 +59,10 @@ committee memberships default to the current season. Imports and advance
 planning can provide an explicit `seasonKey` and `startedOn` date. `createdAt`
 remains an audit timestamp and is never used to determine membership history.
 
-Ending a membership sets `endedOn`; it does not delete the membership. Season
-rosters omit ended memberships, while user history retains them.
+Removing a team membership deletes its roster projection immediately. The
+stored removal event remains as the audit record, but the membership no longer
+appears in team rosters or user history. Committee membership endings continue
+to use `endedOn` and retain their projected history.
 
 Teams have a required `men` or `women` category. The category migration
 backfills existing `Heren` and `Dames` records and their stored snapshot events.
@@ -69,9 +71,8 @@ silently placed in the wrong directory. Rename unclassified records before
 rerunning the migration.
 
 Administrators may manage any numeric season key from 1900 through 3000. New
-memberships require an explicit start date inside that season. Ending a
-membership requires an explicit date on or after its start and before the next
-season begins.
+memberships require an explicit start date inside that season. Removing a team
+member requires only the membership identifier and takes effect immediately.
 
 ## User information
 

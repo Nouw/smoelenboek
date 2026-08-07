@@ -27,9 +27,8 @@ export type TeamMembershipAssignedPayload = {
   endedOn: null;
 };
 
-export type TeamMembershipEndedPayload = {
+export type TeamMembershipRemovedPayload = {
   membershipId: string;
-  removedOn: string;
 };
 
 type ManualMetadata = { source: 'manual'; actorUserId: string };
@@ -105,14 +104,14 @@ export function createTeamMemberAssignedEvent(
 }
 
 export function createTeamMemberRemovedEvent(
-  payload: TeamMembershipEndedPayload,
+  payload: TeamMembershipRemovedPayload,
   actorUserId: string,
-): DomainEvent<TeamMembershipEndedPayload, ManualMetadata> {
+): DomainEvent<TeamMembershipRemovedPayload, ManualMetadata> {
   return {
     aggregateType: 'team_membership',
     aggregateId: payload.membershipId,
     eventType: TEAM_MEMBER_REMOVED_EVENT,
-    eventVersion: 2,
+    eventVersion: 3,
     payload,
     metadata: { source: 'manual', actorUserId },
   };

@@ -43,7 +43,7 @@ profile pages. The page loads through the single protected
 Administrators manage the team catalog and season rosters at `/teams/admin`.
 The workspace supports men/women classification, optional image URLs,
 archiving and restoring, arbitrary association seasons, searchable member
-assignment, volleyball roles, and effective membership end dates. Team
+assignment, volleyball roles, and immediate roster removal. Team
 mutations and the user picker are enforced by admin-only tRPC procedures.
 
 ### Committee directory

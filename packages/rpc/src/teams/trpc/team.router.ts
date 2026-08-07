@@ -282,15 +282,11 @@ export function createTeamRouter(dependencies: TeamRouterDependencies) {
           auth: true,
         },
       })
-      .input(z.object({ membershipId: z.uuid(), endedOn: z.iso.date() }))
+      .input(z.object({ membershipId: z.uuid() }))
       .output(teamMembershipOutputSchema)
       .mutation(({ ctx, input }) =>
         dependencies.commandBus.execute(
-          new RemoveTeamMemberCommand(
-            input.membershipId,
-            input.endedOn,
-            ctx.userId,
-          ),
+          new RemoveTeamMemberCommand(input.membershipId, ctx.userId),
         ),
       ),
   });

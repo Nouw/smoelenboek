@@ -144,6 +144,35 @@ describe('team tRPC router', () => {
     );
   });
 
+  it('dispatches immediate membership removal without an end date', async () => {
+    const membershipId = '02ac256b-ce8f-44e9-8913-7569c3401264';
+    const execute = jest.fn().mockResolvedValue({
+      id: membershipId,
+      userId: authenticatedContext.userId,
+      teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      seasonKey: 2025,
+      role: 'setter',
+      startedOn: '2025-08-01',
+      endedOn: null,
+      createdAt: '2026-06-28T00:00:00.000Z',
+      updatedAt: '2026-06-28T00:00:00.000Z',
+    });
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter.createCaller(adminContext).teams.removeMember({ membershipId }),
+    ).resolves.toMatchObject({ id: membershipId });
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        membershipId,
+        actorUserId: adminContext.userId,
+      }),
+    );
+  });
+
   it('rejects every team mutation for an ordinary member', async () => {
     const execute = jest.fn();
     const appRouter = createAppRouter({
@@ -167,7 +196,7 @@ describe('team tRPC router', () => {
           role: 'setter',
           startedOn: '2025-08-01',
         }),
-      () => caller.removeMember({ membershipId, endedOn: '2026-07-01' }),
+      () => caller.removeMember({ membershipId }),
     ];
 
     for (const mutate of mutations) {

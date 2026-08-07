@@ -9,12 +9,9 @@ import { GetTeamRosterForSeasonQuery } from './team.queries';
 const teamId = '521ccf21-351e-41bd-a06b-8da3af4599d4';
 
 describe('GetTeamRosterForSeasonHandler', () => {
-  it('returns enriched active and ended memberships for any season', async () => {
+  it('returns enriched current memberships for any season', async () => {
     const now = new Date('2026-07-30T00:00:00.000Z');
-    const memberships = [
-      membership('active-membership', 'user-active', null),
-      membership('ended-membership', 'user-ended', '2025-01-10'),
-    ];
+    const memberships = [membership('active-membership', 'user-active')];
     const handler = new GetTeamRosterForSeasonHandler(
       {
         findById: async () =>
@@ -30,10 +27,7 @@ describe('GetTeamRosterForSeasonHandler', () => {
         findMembershipsByTeamAndSeason: async () => memberships,
       } as never,
       {
-        findByIds: async () => [
-          user('user-active', 'Anna Active'),
-          user('user-ended', 'Eva Ended'),
-        ],
+        findByIds: async () => [user('user-active', 'Anna Active')],
       } as never,
     );
 
@@ -48,17 +42,12 @@ describe('GetTeamRosterForSeasonHandler', () => {
           user: { name: 'Anna Active' },
           endedOn: null,
         },
-        {
-          id: 'ended-membership',
-          user: { name: 'Eva Ended' },
-          endedOn: '2025-01-10',
-        },
       ],
     });
   });
 });
 
-function membership(id: string, userId: string, endedOn: string | null) {
+function membership(id: string, userId: string) {
   const now = new Date('2026-07-30T00:00:00.000Z');
   return {
     id,
@@ -67,7 +56,7 @@ function membership(id: string, userId: string, endedOn: string | null) {
     seasonKey: 2024,
     role: 'setter',
     startedOn: '2024-08-01',
-    endedOn,
+    endedOn: null,
     createdAt: now,
     updatedAt: now,
   } as TeamMembershipEntity;

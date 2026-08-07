@@ -94,7 +94,7 @@ export function TeamAdminDetail({
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [endingMembership, setEndingMembership] =
+  const [removingMembership, setRemovingMembership] =
     useState<TeamRosterMembershipDto | null>(null);
 
   useEffect(() => {
@@ -173,17 +173,11 @@ export function TeamAdminDetail({
   }
 
   const { team, season, memberships } = roster.data;
-  const activeMemberships = memberships.filter(
-    ({ endedOn }) => endedOn === null,
-  );
-  const coaches = activeMemberships.filter(
+  const coaches = memberships.filter(
     ({ role }) => role === 'coach_trainer',
   );
-  const players = activeMemberships.filter(
+  const players = memberships.filter(
     ({ role }) => role !== 'coach_trainer',
-  );
-  const endedMemberships = memberships.filter(
-    ({ endedOn }) => endedOn !== null,
   );
 
   function submitUpdate(event: FormEvent<HTMLFormElement>) {
@@ -300,19 +294,13 @@ export function TeamAdminDetail({
               title={t('teams.coaches')}
               empty={t('teams.admin.noCoaches')}
               memberships={coaches}
-              onEnd={setEndingMembership}
+              onRemove={setRemovingMembership}
             />
             <RosterSection
               title={t('teams.players')}
               empty={t('teams.admin.noPlayers')}
               memberships={players}
-              onEnd={setEndingMembership}
-            />
-            <RosterSection
-              title={t('teams.admin.endedMemberships')}
-              empty={t('teams.admin.noEndedMemberships')}
-              memberships={endedMemberships}
-              ended
+              onRemove={setRemovingMembership}
             />
           </CardContent>
         </Card>
@@ -382,15 +370,14 @@ export function TeamAdminDetail({
           await refresh();
         }}
       />
-      <EndMembershipDialog
-        membership={endingMembership}
-        season={season}
+      <RemoveMembershipDialog
+        membership={removingMembership}
         onOpenChange={(open) => {
-          if (!open) setEndingMembership(null);
+          if (!open) setRemovingMembership(null);
         }}
         onChanged={async () => {
-          setEndingMembership(null);
-          setNotice(t('teams.admin.membershipEnded'));
+          setRemovingMembership(null);
+          setNotice(t('teams.admin.memberRemoved'));
           setActionError(null);
           await refresh();
         }}
@@ -403,14 +390,12 @@ function RosterSection({
   title,
   empty,
   memberships,
-  ended = false,
-  onEnd,
+  onRemove,
 }: {
   title: string;
   empty: string;
   memberships: TeamRosterMembershipDto[];
-  ended?: boolean;
-  onEnd?: (membership: TeamRosterMembershipDto) => void;
+  onRemove?: (membership: TeamRosterMembershipDto) => void;
 }) {
   const { t } = useI18n();
 
@@ -453,16 +438,15 @@ function RosterSection({
                   {t(roleTranslationKeys[membership.role])}
                   {' · '}
                   {membership.startedOn}
-                  {membership.endedOn ? ` – ${membership.endedOn}` : ''}
                 </p>
               </div>
-              {!ended && onEnd ? (
+              {onRemove ? (
                 <Button
                   type="button"
                   size="icon"
                   variant="ghost"
-                  aria-label={t('teams.admin.endMembership')}
-                  onClick={() => onEnd(membership)}
+                  aria-label={t('teams.admin.removeMember')}
+                  onClick={() => onRemove(membership)}
                 >
                   <UserRoundMinus />
                 </Button>
@@ -665,19 +649,16 @@ function AddMemberDialog({
   );
 }
 
-function EndMembershipDialog({
+function RemoveMembershipDialog({
   membership,
-  season,
   onOpenChange,
   onChanged,
 }: {
   membership: TeamRosterMembershipDto | null;
-  season: { startsOn: string; endsBefore: string };
   onOpenChange: (open: boolean) => void;
   onChanged: () => Promise<void>;
 }) {
   const { t } = useI18n();
-  const [endedOn, setEndedOn] = useState('');
   const [error, setError] = useState<string | null>(null);
   const removeMember = trpc.teams.removeMember.useMutation({
     async onSuccess() {
@@ -691,15 +672,14 @@ function EndMembershipDialog({
 
   useEffect(() => {
     if (membership) {
-      setEndedOn(defaultEndDate(membership.startedOn, season));
       setError(null);
     }
-  }, [membership, season]);
+  }, [membership]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!membership) return;
-    removeMember.mutate({ membershipId: membership.id, endedOn });
+    removeMember.mutate({ membershipId: membership.id });
   }
 
   return (
@@ -707,25 +687,11 @@ function EndMembershipDialog({
       <DialogContent>
         <form className="space-y-5" onSubmit={submit}>
           <DialogHeader>
-            <DialogTitle>{t('teams.admin.endMembership')}</DialogTitle>
+            <DialogTitle>{t('teams.admin.removeMember')}</DialogTitle>
             <DialogDescription>
-              {t('teams.admin.endMembershipDescription')}
+              {t('teams.admin.removeMemberDescription')}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="membership-ended-on">
-              {t('teams.admin.endedOn')}
-            </Label>
-            <Input
-              id="membership-ended-on"
-              type="date"
-              min={membership?.startedOn ?? season.startsOn}
-              max={dayBefore(season.endsBefore)}
-              value={endedOn}
-              onChange={(event) => setEndedOn(event.target.value)}
-              required
-            />
-          </div>
           {error ? (
             <p className="text-sm text-destructive" role="alert">
               {error}
@@ -746,8 +712,8 @@ function EndMembershipDialog({
                 <UserRoundMinus />
               )}
               {removeMember.isPending
-                ? t('teams.admin.ending')
-                : t('teams.admin.end')}
+                ? t('teams.admin.removing')
+                : t('teams.admin.remove')}
             </Button>
           </DialogFooter>
         </form>
@@ -761,17 +727,6 @@ function defaultStartDate(season: { startsOn: string; endsBefore: string }) {
   return today >= season.startsOn && today < season.endsBefore
     ? today
     : season.startsOn;
-}
-
-function defaultEndDate(
-  startedOn: string,
-  season: { startsOn: string; endsBefore: string },
-) {
-  const today = todayInAmsterdam();
-  const lastSeasonDate = dayBefore(season.endsBefore);
-  if (today < startedOn) return startedOn;
-  if (today > lastSeasonDate) return lastSeasonDate;
-  return today;
 }
 
 function todayInAmsterdam() {

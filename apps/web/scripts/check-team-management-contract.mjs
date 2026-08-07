@@ -72,7 +72,10 @@ assert.match(
   /seasonKey: z\.number\(\).*\.min\(1900\).*\.max\(3000\)/s,
 );
 assert.match(teamRouter, /startedOn: z\.iso\.date\(\)/);
-assert.match(teamRouter, /endedOn: z\.iso\.date\(\)/);
+assert.match(
+  teamRouter,
+  /removeMember: adminProcedure[\s\S]*?\.input\(z\.object\(\{ membershipId: z\.uuid\(\) \}\)\)/,
+);
 assert.match(userRouter, /search: protectedProcedure/);
 assert.match(userRouter, /z\.array\(userSummaryOutputSchema\)\.max\(20\)/);
 
@@ -88,7 +91,12 @@ assert.match(detail, /setTimeout\(\(\) => setDebouncedSearch\(search\), 250\)/);
 assert.match(detail, /type="number"/);
 assert.match(detail, /min=\{1900\}/);
 assert.match(detail, /max=\{3000\}/);
-assert.match(detail, /endedMemberships/);
+assert.match(detail, /RemoveMembershipDialog/);
+assert.match(
+  detail,
+  /removeMember\.mutate\(\{ membershipId: membership\.id \}\)/,
+);
+assert.doesNotMatch(detail, /endedOn/);
 assert.match(detail, /utils\.teams\.invalidate/);
 assert.match(detail, /utils\.user\.membershipHistory\.invalidate/);
 

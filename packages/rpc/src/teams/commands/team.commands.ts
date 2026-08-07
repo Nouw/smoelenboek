@@ -47,7 +47,6 @@ export class AssignTeamMemberCommand {
 export class RemoveTeamMemberCommand {
   constructor(
     public readonly membershipId: string,
-    public readonly endedOn: string,
     public readonly actorUserId: string,
   ) {}
 }

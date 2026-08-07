@@ -72,7 +72,7 @@ describe('TeamProjector', () => {
     );
   });
 
-  it('ends a membership without deleting its history', async () => {
+  it('removes a membership from the roster projection', async () => {
     const entity = Object.assign(new TeamMembershipEntity(), {
       id: '02ac256b-ce8f-44e9-8913-7569c3401264',
       seasonKey: 2025,
@@ -81,43 +81,32 @@ describe('TeamProjector', () => {
     });
     const repository = {
       findOneBy: jest.fn().mockResolvedValue(entity),
-      save: jest.fn().mockResolvedValue(entity),
-      delete: jest.fn(),
+      delete: jest.fn().mockResolvedValue({ affected: 1 }),
     };
     const projector = new TeamProjector();
 
     await expect(
       projector.projectMemberRemoved(
-        {
-          membershipId: entity.id,
-          removedOn: '2026-02-01',
-        },
+        { membershipId: entity.id },
         { getRepository: jest.fn().mockReturnValue(repository) } as never,
       ),
     ).resolves.toBe(entity);
 
-    expect(entity.endedOn).toBe('2026-02-01');
-    expect(repository.save).toHaveBeenCalledWith(entity);
-    expect(repository.delete).not.toHaveBeenCalled();
+    expect(repository.delete).toHaveBeenCalledWith({ id: entity.id });
   });
 
-  it('caps a stale removal at the end of its season', async () => {
-    const entity = Object.assign(new TeamMembershipEntity(), {
-      id: '02ac256b-ce8f-44e9-8913-7569c3401264',
-      seasonKey: 2024,
-      startedOn: '2024-08-01',
-      endedOn: null,
-    });
+  it('treats replay of a missing membership removal as a no-op', async () => {
     const repository = {
-      findOneBy: jest.fn().mockResolvedValue(entity),
-      save: jest.fn().mockResolvedValue(entity),
+      findOneBy: jest.fn().mockResolvedValue(null),
+      delete: jest.fn(),
     };
 
-    await new TeamProjector().projectMemberRemoved(
-      { membershipId: entity.id, removedOn: '2026-07-21' },
-      { getRepository: jest.fn().mockReturnValue(repository) } as never,
-    );
-
-    expect(entity.endedOn).toBe('2025-07-31');
+    await expect(
+      new TeamProjector().projectMemberRemoved(
+        { membershipId: '02ac256b-ce8f-44e9-8913-7569c3401264' },
+        { getRepository: jest.fn().mockReturnValue(repository) } as never,
+      ),
+    ).resolves.toBeNull();
+    expect(repository.delete).not.toHaveBeenCalled();
   });
 });

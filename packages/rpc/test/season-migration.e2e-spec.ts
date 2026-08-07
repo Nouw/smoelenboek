@@ -225,7 +225,7 @@ describeWithDatabase('season migration PostgreSQL fixture', () => {
     ]);
     await replayMembershipEvents(membershipEvents, runner);
 
-    const [replayedTeam] = (await runner.query(
+    const replayedTeams = (await runner.query(
       'SELECT "endedOn" FROM "team_memberships" WHERE "id" = $1',
       [endedTeamMembershipId],
     )) as MigratedMembershipRow[];
@@ -233,9 +233,7 @@ describeWithDatabase('season migration PostgreSQL fixture', () => {
       'SELECT "endedOn" FROM "committee_memberships" WHERE "id" = $1',
       [endedCommitteeMembershipId],
     )) as MigratedMembershipRow[];
-    expect(localDate(replayedTeam.endedOn!)).toBe(
-      localDate(restoredTeam.endedOn),
-    );
+    expect(replayedTeams).toHaveLength(0);
     expect(localDate(replayedCommittee.endedOn!)).toBe(
       localDate(committeeRow.endedOn),
     );

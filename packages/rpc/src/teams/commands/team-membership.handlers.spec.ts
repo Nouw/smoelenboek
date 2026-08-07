@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
@@ -84,61 +84,39 @@ describe('team membership handlers', () => {
     ).rejects.toThrow('already has this active team role');
   });
 
-  it('ends a membership on the explicit valid date without deleting it', async () => {
+  it('removes a membership without an end date and records actor metadata', async () => {
     const entity = membership();
-    const appendAndProject = jest
-      .fn()
-      .mockResolvedValue(membership({ endedOn: '2026-02-01' }));
+    const appendAndProject = jest.fn().mockResolvedValue(entity);
     const handler = new RemoveTeamMemberHandler(
       { appendAndProject } as never,
       {} as never,
       { findMembershipById: jest.fn().mockResolvedValue(entity) } as never,
     );
 
-    await handler.execute(
-      new RemoveTeamMemberCommand(membershipId, '2026-02-01', actorUserId),
-    );
+    await handler.execute(new RemoveTeamMemberCommand(membershipId, actorUserId));
 
     expect(appendAndProject).toHaveBeenCalledWith(
       expect.objectContaining({
         metadata: { source: 'manual', actorUserId },
-        payload: { membershipId, removedOn: '2026-02-01' },
+        eventVersion: 3,
+        payload: { membershipId },
       }),
       expect.any(Function),
     );
   });
 
-  it('rejects an end date outside the membership season', async () => {
+  it('rejects removal of an unknown membership', async () => {
     const handler = new RemoveTeamMemberHandler(
       {} as never,
       {} as never,
       {
-        findMembershipById: jest.fn().mockResolvedValue(membership()),
+        findMembershipById: jest.fn().mockResolvedValue(null),
       } as never,
     );
 
     await expect(
-      handler.execute(
-        new RemoveTeamMemberCommand(membershipId, '2026-08-01', actorUserId),
-      ),
-    ).rejects.toBeInstanceOf(BadRequestException);
-  });
-
-  it('returns an already ended membership without appending another event', async () => {
-    const entity = membership({ endedOn: '2026-02-01' });
-    const appendAndProject = jest.fn();
-    const handler = new RemoveTeamMemberHandler(
-      { appendAndProject } as never,
-      {} as never,
-      { findMembershipById: jest.fn().mockResolvedValue(entity) } as never,
-    );
-
-    await expect(
-      handler.execute(
-        new RemoveTeamMemberCommand(membershipId, '2026-03-01', actorUserId),
-      ),
-    ).resolves.toMatchObject({ endedOn: '2026-02-01' });
-    expect(appendAndProject).not.toHaveBeenCalled();
+      handler.execute(new RemoveTeamMemberCommand(membershipId, actorUserId)),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });
 

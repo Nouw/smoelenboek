@@ -4,6 +4,25 @@ import { IsNull, LessThanOrEqual } from 'typeorm';
 import { TeamsRepository } from './teams.repository';
 
 describe('TeamsRepository', () => {
+  it('loads only current memberships for an admin season roster', async () => {
+    const find = jest.fn().mockResolvedValue([]);
+    const repository = new TeamsRepository({} as never, { find } as never);
+
+    await repository.findMembershipsByTeamAndSeason(
+      '521ccf21-351e-41bd-a06b-8da3af4599d4',
+      2025,
+    );
+
+    expect(find).toHaveBeenCalledWith({
+      where: {
+        teamId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
+        seasonKey: 2025,
+        endedOn: IsNull(),
+      },
+      order: { startedOn: 'ASC', createdAt: 'ASC' },
+    });
+  });
+
   it('filters a team roster by team, season, and active membership', async () => {
     const find = jest.fn().mockResolvedValue([]);
     const repository = new TeamsRepository({} as never, { find } as never);

@@ -9,10 +9,7 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
-import {
-  resolveMembershipStart,
-  validateMembershipEnd,
-} from '../../seasons/season-policy';
+import { resolveMembershipStart } from '../../seasons/season-policy';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { toTeamDto, toTeamMembershipDto } from '../dto/team-output';
 import {
@@ -338,28 +335,8 @@ export class RemoveTeamMemberHandler
     if (!existing) {
       throw new NotFoundException('Team membership not found.');
     }
-    if (existing.endedOn) {
-      return toTeamMembershipDto(existing);
-    }
-
-    let endedOn: string;
-    try {
-      endedOn = validateMembershipEnd(
-        existing.seasonKey,
-        existing.startedOn,
-        command.endedOn,
-      );
-    } catch (error) {
-      throw new BadRequestException(
-        error instanceof Error ? error.message : 'Invalid membership end date.',
-      );
-    }
-
     const event = createTeamMemberRemovedEvent(
-      {
-        membershipId: command.membershipId,
-        removedOn: endedOn,
-      },
+      { membershipId: command.membershipId },
       command.actorUserId,
     );
     const membership = await this.eventStoreRepository.appendAndProject(
@@ -373,9 +350,8 @@ export class RemoveTeamMemberHandler
     }
 
     this.logger.log({
-      event: 'team_membership_ended',
+      event: 'team_membership_removed',
       membershipId: membership.id,
-      endedOn: membership.endedOn,
       actorUserId: command.actorUserId,
     });
 

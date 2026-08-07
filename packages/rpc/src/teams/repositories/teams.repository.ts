@@ -40,8 +40,8 @@ export class TeamsRepository {
     seasonKey: number,
   ): Promise<TeamMembershipEntity[]> {
     return this.membershipsRepository.find({
-      where: { teamId, seasonKey },
-      order: { endedOn: 'ASC', startedOn: 'ASC', createdAt: 'ASC' },
+      where: { teamId, seasonKey, endedOn: IsNull() },
+      order: { startedOn: 'ASC', createdAt: 'ASC' },
     });
   }
 

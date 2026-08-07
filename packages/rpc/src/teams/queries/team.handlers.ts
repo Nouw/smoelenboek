@@ -158,8 +158,6 @@ export class GetTeamRosterForSeasonHandler
       teamId: query.teamId,
       seasonKey: query.seasonKey,
       membershipCount: enriched.length,
-      endedMembershipCount: enriched.filter(({ endedOn }) => endedOn !== null)
-        .length,
     });
 
     return {

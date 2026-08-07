@@ -15,7 +15,7 @@ when it is present in the response.
 
 Administrators use `/teams/admin` to create, edit, archive, and restore teams.
 Each team has a season-specific roster workspace with a debounced member picker,
-volleyball roles, effective membership dates, and retained ended history.
+volleyball roles, explicit assignment start dates, and immediate member removal.
 Archived teams are hidden from the men/women directories but remain readable by
 direct link.
 

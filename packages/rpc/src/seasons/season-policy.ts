@@ -75,20 +75,6 @@ export function resolveMembershipEnd(
   return endedOn >= season.endsBefore ? lastSeasonDate : endedOn;
 }
 
-export function validateMembershipEnd(
-  seasonKey: number,
-  startedOn: string,
-  endedOn: string,
-): string {
-  const resolved = resolveMembershipStart(seasonKey, endedOn);
-
-  if (resolved < startedOn) {
-    throw new RangeError('endedOn must be on or after startedOn.');
-  }
-
-  return resolved;
-}
-
 function isIsoCalendarDate(value: string): boolean {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
 

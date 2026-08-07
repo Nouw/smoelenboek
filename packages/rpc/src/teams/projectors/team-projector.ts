@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 
-import { resolveMembershipEnd } from '../../seasons/season-policy';
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
 import { TeamEntity } from '../entities/team.entity';
 import type {
   TeamMembershipAssignedPayload,
-  TeamMembershipEndedPayload,
+  TeamMembershipRemovedPayload,
   TeamSnapshotPayload,
 } from '../events/team-events';
 
@@ -49,7 +48,7 @@ export class TeamProjector {
   }
 
   async projectMemberRemoved(
-    payload: TeamMembershipEndedPayload,
+    payload: TeamMembershipRemovedPayload,
     manager: EntityManager,
   ): Promise<TeamMembershipEntity | null> {
     const repository = manager.getRepository(TeamMembershipEntity);
@@ -59,15 +58,7 @@ export class TeamProjector {
       return null;
     }
 
-    if (existing.endedOn === null) {
-      existing.endedOn = resolveMembershipEnd(
-        existing.seasonKey,
-        existing.startedOn,
-        payload.removedOn,
-      );
-      await repository.save(existing);
-    }
-
+    await repository.delete({ id: payload.membershipId });
     return existing;
   }
 }

@@ -61,12 +61,14 @@ const criteria = [
     /coach_trainer/.test(detail) && /outside_hitter/.test(detail),
   ],
   [
-    'Active and ended memberships are distinct',
-    /activeMemberships/.test(detail) && /endedMemberships/.test(detail),
+    'Removal is immediate and has no expiry date',
+    /RemoveMembershipDialog/.test(detail) &&
+      /removeMember\.mutate\(\{ membershipId: membership\.id \}\)/.test(detail) &&
+      !/endedOn/.test(detail),
   ],
   [
-    'Effective dates are explicit',
-    /startedOn/.test(detail) && /endedOn/.test(detail),
+    'Assignment start dates are explicit',
+    /startedOn/.test(detail),
   ],
   [
     'History is invalidated after edits',
@@ -78,7 +80,7 @@ const criteria = [
   ],
   [
     'Admin actions are traced',
-    /actorUserId/.test(commands) && /team_membership_ended/.test(commands),
+    /actorUserId/.test(commands) && /team_membership_removed/.test(commands),
   ],
   [
     'Roster load is batched and traced',
