@@ -2,6 +2,14 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventStoreModule } from '../event-store/event-store.module';
+import { EmailModule } from '../email/email.module';
+import { AuthModule } from '../auth/auth.module';
+import { CreateManagedUserHandler, ResendUserInvitationHandler } from './commands/admin-user.handlers';
+import { ListManagedUsersHandler } from './queries/admin-user.handlers';
+import { UserProvisioningService } from './services/user-provisioning.service';
+import { BetterAuthUserAccountAdmin, USER_ACCOUNT_ADMIN } from './user-account-admin';
+import { UserImportController } from './import/user-import.controller';
+import { UserImportService } from './import/user-import.service';
 import { SyncUserFromAuthHandler } from './commands/sync-user-from-auth.handler';
 import { UpdateUserInformationHandler } from './commands/update-user-information.handler';
 import { UpdateUserProfileHandler } from './commands/update-user-profile.handler';
@@ -16,8 +24,11 @@ import { UserInformationRepository } from './repositories/user-information.repos
 import { UsersRepository } from './repositories/users.repository';
 
 @Module({
+  controllers: [UserImportController],
   imports: [
     EventStoreModule,
+    EmailModule,
+    AuthModule,
     TypeOrmModule.forFeature([UserEntity, UserInformationEntity]),
   ],
   providers: [
@@ -31,6 +42,12 @@ import { UsersRepository } from './repositories/users.repository';
     SyncUserFromAuthHandler,
     UpdateUserInformationHandler,
     UpdateUserProfileHandler,
+    CreateManagedUserHandler,
+    ResendUserInvitationHandler,
+    ListManagedUsersHandler,
+    UserProvisioningService,
+    UserImportService,
+    { provide: USER_ACCOUNT_ADMIN, useClass: BetterAuthUserAccountAdmin },
   ],
   exports: [UsersRepository],
 })

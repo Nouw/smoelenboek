@@ -1,11 +1,14 @@
 import {
+  createManagedUserSchema,
   updateUserInformationSchema,
   updateUserProfileSchema,
 } from '@repo/api';
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
-import { protectedProcedure, router } from '../../trpc/init';
+import { adminProcedure, protectedProcedure, router } from '../../trpc/init';
+import { CreateManagedUserCommand, ResendUserInvitationCommand } from '../commands/admin-user.commands';
+import { ListManagedUsersQuery } from '../queries/admin-user.queries';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
 import { UpdateUserInformationCommand } from '../commands/update-user-information.command';
@@ -112,8 +115,28 @@ const membershipHistoryOutputSchema = z.object({
   ),
 });
 
+const managedUserOutputSchema = z.object({
+  id: z.uuid(), email: z.email(), name: z.string(), preferredLocale: z.enum(['nl', 'en']),
+  invitedAt: z.iso.datetime().nullable(), accountActivatedAt: z.iso.datetime().nullable(),
+  invitationStatus: z.enum(['pending', 'sending', 'sent', 'failed', 'active', 'not_queued']),
+});
+
 export function createUserRouter(dependencies: UserRouterDependencies) {
   return router({
+    admin: router({
+      list: adminProcedure
+        .input(z.object({ query: z.string().trim().max(100).default(''), limit: z.number().int().min(1).max(100).default(50), offset: z.number().int().min(0).default(0) }).optional())
+        .output(z.array(managedUserOutputSchema))
+        .query(({ input }) => dependencies.queryBus.execute(new ListManagedUsersQuery(input?.query ?? '', input?.limit ?? 50, input?.offset ?? 0))),
+      create: adminProcedure
+        .input(createManagedUserSchema)
+        .output(managedUserOutputSchema)
+        .mutation(({ ctx, input }) => dependencies.commandBus.execute(new CreateManagedUserCommand(ctx.userId, input))),
+      resendInvitation: adminProcedure
+        .input(z.object({ userId: z.uuid() }))
+        .output(z.object({ queued: z.literal(true) }))
+        .mutation(({ ctx, input }) => dependencies.commandBus.execute(new ResendUserInvitationCommand(ctx.userId, input.userId))),
+    }),
     search: protectedProcedure
       .meta({
         name: 'Search Users',

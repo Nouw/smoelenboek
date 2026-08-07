@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { FileText, ShieldCheck, Trophy, UsersRound } from 'lucide-react';
+import { FileText, ShieldCheck, Trophy, UserCog, UsersRound } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { NavMain } from '@/components/nav-main';
@@ -66,6 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ]
         : undefined,
     },
+    ...(isAdmin ? [{ title: t('nav.manageUsers'), url: '/users/admin', icon: UserCog, isActive: pathname.startsWith('/users/admin') }] : []),
   ];
 
   return (

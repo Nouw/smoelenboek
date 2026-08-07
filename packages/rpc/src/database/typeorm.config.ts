@@ -4,6 +4,7 @@ import type { DataSourceOptions } from 'typeorm';
 import { CommitteeMembershipEntity } from '../committees/entities/committee-membership.entity';
 import { CommitteeEntity } from '../committees/entities/committee.entity';
 import { StoredEventEntity } from '../event-store/entities/stored-event.entity';
+import { EmailOutboxEntity } from '../email/entities/email-outbox.entity';
 import { ContentAssetEntity } from '../documents/entities/content-asset.entity';
 import { ContentCollectionEntity } from '../documents/entities/content-collection.entity';
 import { ContentObjectCleanupEntity } from '../documents/entities/content-object-cleanup.entity';
@@ -36,6 +37,7 @@ export function createDataSourceOptions(
       CommitteeEntity,
       CommitteeMembershipEntity,
       StoredEventEntity,
+      EmailOutboxEntity,
       ContentAssetEntity,
       ContentCollectionEntity,
       ContentObjectCleanupEntity,

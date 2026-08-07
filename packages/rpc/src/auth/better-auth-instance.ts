@@ -7,7 +7,8 @@ import {
   verifyPasswordWithLegacySupport,
 } from './legacy-password-migration';
 import {
-  createConsolePasswordResetMailer,
+  createOutboxPasswordResetMailer,
+  queueAuthEmail,
   type PasswordResetMailer,
 } from './password-reset-mailer';
 
@@ -65,6 +66,7 @@ export type BetterAuthInstance = {
       };
       headers?: Headers;
     }) => Promise<unknown>;
+    removeUser: (context: { body: { userId: string } }) => Promise<unknown>;
   };
 };
 export type BetterAuthNodeHandler = ReturnType<
@@ -114,7 +116,7 @@ async function createBetterAuth(options: {
     connectionString: readRequiredEnv('DATABASE_URL'),
   });
   const webOrigin = readRequiredEnv('WEB_ORIGIN');
-  const passwordResetMailer = createConsolePasswordResetMailer();
+  const passwordResetMailer = createOutboxPasswordResetMailer(database);
 
   return betterAuth({
     baseURL: readRequiredEnv('BETTER_AUTH_URL'),
@@ -148,6 +150,12 @@ async function createBetterAuth(options: {
           required: false,
           input: false,
         },
+        preferredLocale: {
+          type: 'string',
+          required: false,
+          defaultValue: 'nl',
+          input: false,
+        },
       },
       changeEmail: {
         enabled: true,
@@ -155,9 +163,7 @@ async function createBetterAuth(options: {
     },
     emailVerification: {
       sendVerificationEmail: async ({ user, url }) => {
-        console.log(
-          `[email-verification] To: ${user.email}\n            URL: ${url}`,
-        );
+        await queueAuthEmail(database, 'email_verification', user, url);
       },
     },
     emailAndPassword: {
@@ -168,8 +174,12 @@ async function createBetterAuth(options: {
           verifyPasswordWithLegacySupport(password, hash, verifyPassword),
       },
       sendResetPassword: (message) => passwordResetMailer.send(message),
-      onPasswordReset: ({ user }) =>
-        completePasswordMigration(database, user.id),
+      onPasswordReset: async ({ user }) => {
+        await Promise.all([
+          completePasswordMigration(database, user.id),
+          database.query(`UPDATE "users" SET "accountActivatedAt" = COALESCE("accountActivatedAt", now()), "updatedAt" = now() WHERE "id" = $1`, [user.id]),
+        ]);
+      },
       revokeSessionsOnPasswordReset: true,
     },
     hooks: {

@@ -276,3 +276,20 @@ function informationOutput() {
     updatedAt: '2026-07-22T00:00:00.000Z',
   };
 }
+
+describe('user administration tRPC routes', () => {
+  it('rejects member access and dispatches normalized creation for admins', async () => {
+    const appRouter = createAppRouter({ commandBus: { execute: jest.fn() } as never, queryBus: { execute: jest.fn() } as never });
+    await expect(appRouter.createCaller(authenticatedContext('user')).user.admin.list()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+
+    const execute = jest.fn().mockResolvedValue({
+      id: '6a0d03df-8c89-4309-b4ce-d1344f801b06', email: 'member@example.com', name: 'Example Member',
+      preferredLocale: 'nl', invitedAt: '2026-08-07T10:00:00.000Z', accountActivatedAt: null, invitationStatus: 'pending',
+    });
+    const adminRouter = createAppRouter({ commandBus: { execute } as never, queryBus: { execute: jest.fn() } as never });
+    await expect(adminRouter.createCaller(authenticatedContext('admin')).user.admin.create({
+      email: 'MEMBER@example.com', firstName: 'Example', lastName: 'Member', preferredLocale: 'nl',
+    })).resolves.toMatchObject({ email: 'member@example.com', invitationStatus: 'pending' });
+    expect(execute).toHaveBeenCalledWith(expect.objectContaining({ actorUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd', input: expect.objectContaining({ email: 'member@example.com' }) }));
+  });
+});

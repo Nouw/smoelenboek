@@ -35,6 +35,15 @@ export class UserEntity {
   @Column({ type: 'varchar', default: 'user' })
   role!: string;
 
+  @Column({ type: 'varchar', length: 2, default: 'nl' })
+  preferredLocale!: 'nl' | 'en';
+
+  @Column({ type: 'timestamptz', nullable: true })
+  invitedAt!: Date | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  accountActivatedAt!: Date | null;
+
   @Column({ type: 'boolean', default: false })
   banned!: boolean;
 

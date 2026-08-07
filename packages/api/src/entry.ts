@@ -65,6 +65,12 @@ export type {
   TeamRosterMemberDto,
 } from './teams/dto/team.dto';
 export type { UserDto, UserSummaryDto } from './users/dto/user.dto';
+export {
+  createManagedUserSchema,
+  preferredLocaleSchema,
+  type CreateManagedUserInput,
+  type ManagedUserDto,
+} from './users/dto/admin-user.dto';
 export type { UserInformationDto } from './users/dto/user-information.dto';
 export {
   updateUserInformationSchema,
