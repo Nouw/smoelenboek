@@ -73,7 +73,7 @@ assert.match(
 );
 assert.match(teamRouter, /startedOn: z\.iso\.date\(\)/);
 assert.match(teamRouter, /endedOn: z\.iso\.date\(\)/);
-assert.match(userRouter, /search: adminProcedure/);
+assert.match(userRouter, /search: protectedProcedure/);
 assert.match(userRouter, /z\.array\(userSummaryOutputSchema\)\.max\(20\)/);
 
 assert.match(list, /trpc\.teams\.create\.useMutation/);

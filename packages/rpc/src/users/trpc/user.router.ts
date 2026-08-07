@@ -5,7 +5,7 @@ import {
 import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
-import { adminProcedure, protectedProcedure, router } from '../../trpc/init';
+import { protectedProcedure, router } from '../../trpc/init';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
 import { UpdateUserInformationCommand } from '../commands/update-user-information.command';
@@ -114,12 +114,12 @@ const membershipHistoryOutputSchema = z.object({
 
 export function createUserRouter(dependencies: UserRouterDependencies) {
   return router({
-    search: adminProcedure
+    search: protectedProcedure
       .meta({
         name: 'Search Users',
         docs: {
-          description: 'Search users for administrator membership assignment.',
-          tags: ['Users', 'Teams'],
+          description: 'Search users by name or email.',
+          tags: ['Users'],
           auth: true,
         },
       })

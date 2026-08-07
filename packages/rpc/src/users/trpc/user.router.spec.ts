@@ -201,7 +201,27 @@ describe('user information tRPC routes', () => {
 });
 
 describe('user search tRPC route', () => {
-  it('is admin-only and dispatches a trimmed search', async () => {
+  it('rejects searches without authentication', async () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter
+        .createCaller({
+          userId: null,
+          sessionId: null,
+          orgId: null,
+          authType: null,
+          role: null,
+          claims: null,
+        })
+        .user.search({ query: 'Example' }),
+    ).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+  });
+
+  it('allows authenticated members and dispatches a trimmed search', async () => {
     const execute = jest.fn().mockResolvedValue([
       {
         id: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
@@ -217,11 +237,6 @@ describe('user search tRPC route', () => {
 
     await expect(
       appRouter.createCaller(authenticatedContext('user')).user.search({
-        query: 'Example',
-      }),
-    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
-    await expect(
-      appRouter.createCaller(authenticatedContext('admin')).user.search({
         query: '  Example  ',
       }),
     ).resolves.toHaveLength(1);

@@ -2,17 +2,33 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../', import.meta.url);
-const [layout, shell, sidebar, header, navigation, globals, config] =
-  await Promise.all([
-    readFile(new URL('app/layout.tsx', root), 'utf8'),
-    readFile(new URL('app/app-shell.tsx', root), 'utf8'),
-    readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
-    readFile(new URL('components/site-header.tsx', root), 'utf8'),
-    readFile(new URL('components/nav-user.tsx', root), 'utf8'),
-    readFile(new URL('app/globals.css', root), 'utf8'),
-    readFile(new URL('components.json', root), 'utf8'),
-  ]);
-const layoutSurface = [layout, shell, sidebar, header, navigation].join('\n');
+const [
+  layout,
+  shell,
+  sidebar,
+  header,
+  memberSearch,
+  navigation,
+  globals,
+  config,
+] = await Promise.all([
+  readFile(new URL('app/layout.tsx', root), 'utf8'),
+  readFile(new URL('app/app-shell.tsx', root), 'utf8'),
+  readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
+  readFile(new URL('components/site-header.tsx', root), 'utf8'),
+  readFile(new URL('components/member-search.tsx', root), 'utf8'),
+  readFile(new URL('components/nav-user.tsx', root), 'utf8'),
+  readFile(new URL('app/globals.css', root), 'utf8'),
+  readFile(new URL('components.json', root), 'utf8'),
+]);
+const layoutSurface = [
+  layout,
+  shell,
+  sidebar,
+  header,
+  memberSearch,
+  navigation,
+].join('\n');
 
 for (const term of [
   'authClient.useSession',

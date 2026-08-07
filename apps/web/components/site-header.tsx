@@ -1,24 +1,24 @@
-"use client"
+'use client';
 
-import { Search, SidebarIcon } from "lucide-react"
+import { SidebarIcon } from 'lucide-react';
 
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
-} from "@repo/ui/components/breadcrumb"
-import { Button } from "@repo/ui/components/button"
-import { Input } from "@repo/ui/components/input"
-import { Separator } from "@repo/ui/components/separator"
-import { useSidebar } from "@repo/ui/components/sidebar"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { NavUser } from "@/components/nav-user"
-import { useI18n } from "@/lib/i18n"
+} from '@repo/ui/components/breadcrumb';
+import { Button } from '@repo/ui/components/button';
+import { Separator } from '@repo/ui/components/separator';
+import { useSidebar } from '@repo/ui/components/sidebar';
+import { LanguageSwitcher } from '@/components/language-switcher';
+import { MemberSearch } from '@/components/member-search';
+import { NavUser } from '@/components/nav-user';
+import { useI18n } from '@/lib/i18n';
 
 export function SiteHeader() {
-  const { toggleSidebar } = useSidebar()
-  const { t } = useI18n()
+  const { toggleSidebar } = useSidebar();
+  const { t } = useI18n();
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -36,22 +36,14 @@ export function SiteHeader() {
           <Breadcrumb className="hidden min-w-0 lg:block">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage>{t("common.smoelenboek")}</BreadcrumbPage>
+                <BreadcrumbPage>{t('common.smoelenboek')}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
 
         <div className="flex justify-center px-1">
-          <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-xl">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t("common.search")}
-              className="h-9 rounded-full bg-muted/40 pl-9 shadow-none"
-              aria-label={t("common.search")}
-            />
-          </div>
+          <MemberSearch />
         </div>
 
         <div className="flex min-w-0 justify-end gap-1">
@@ -60,5 +52,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

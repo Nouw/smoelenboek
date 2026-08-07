@@ -27,6 +27,14 @@ const dictionaries = {
       smoelenboek: 'Smoelenboek',
       user: 'Gebruiker',
     },
+    memberSearch: {
+      placeholder: 'Zoek leden',
+      label: 'Zoek leden op naam of e-mail',
+      results: 'Zoekresultaten voor leden',
+      searching: 'Leden zoeken...',
+      empty: 'Geen leden gevonden.',
+      error: 'Leden zoeken is mislukt.',
+    },
     auth: {
       checkingSession: 'Je sessie wordt gecontroleerd.',
       email: 'E-mail',
@@ -476,6 +484,14 @@ const dictionaries = {
       search: 'Search',
       smoelenboek: 'Smoelenboek',
       user: 'User',
+    },
+    memberSearch: {
+      placeholder: 'Search members',
+      label: 'Search members by name or email',
+      results: 'Member search results',
+      searching: 'Searching members...',
+      empty: 'No members found.',
+      error: 'Member search failed.',
     },
     auth: {
       checkingSession: 'Checking your session.',
