@@ -45,7 +45,12 @@ const criteria = [
   ],
   [
     'Navigates directly to member profiles',
-    /router\.push\(`\/profile\//.test(search),
+    /router\.push\(`\/profile\//.test(search) &&
+      /href=\{`\/profile\/\$\{user\.id\}`\}/.test(search),
+  ],
+  [
+    'Keeps pointer selection mounted until navigation',
+    /onPointerDown=\{\(event\) => event\.preventDefault\(\)\}/.test(search),
   ],
   [
     'Supports keyboard selection',

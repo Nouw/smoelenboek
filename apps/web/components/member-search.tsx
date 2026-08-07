@@ -7,6 +7,7 @@ import {
 } from '@repo/ui/components/avatar';
 import { Input } from '@repo/ui/components/input';
 import { Loader2, Search, UserRound } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   useEffect,
@@ -50,10 +51,14 @@ export function MemberSearch() {
     setActiveIndex(-1);
   }, [debouncedQuery]);
 
-  function openProfile(userId: string) {
+  function closeSearch() {
     setIsOpen(false);
     setQuery('');
     setDebouncedQuery('');
+  }
+
+  function openProfile(userId: string) {
+    closeSearch();
     router.push(`/profile/${userId}`);
   }
 
@@ -139,15 +144,16 @@ export function MemberSearch() {
             <SearchStatus text={t('memberSearch.empty')} />
           ) : (
             results.map((user, index) => (
-              <button
+              <Link
                 id={`${listboxId}-${user.id}`}
                 key={user.id}
-                type="button"
+                href={`/profile/${user.id}`}
                 role="option"
                 aria-selected={index === activeIndex}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground"
                 onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => openProfile(user.id)}
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={closeSearch}
               >
                 <Avatar className="size-9">
                   <AvatarImage src={user.imageUrl ?? undefined} alt="" />
@@ -165,7 +171,7 @@ export function MemberSearch() {
                     </span>
                   ) : null}
                 </span>
-              </button>
+              </Link>
             ))
           )}
         </div>
