@@ -3,73 +3,11 @@ import { DataSource, EntityManager } from 'typeorm';
 
 import { DomainEventBase } from '../domain-event';
 import { StoredEventEntity } from '../entities/stored-event.entity';
-import type { DomainEvent } from '../events';
-
-export type EventProjector<TResult> = (
-  storedEvent: StoredEventEntity,
-  manager: EntityManager,
-) => Promise<TResult>;
-
-export type PreparedEventProjector<
-  TPayload extends Record<string, unknown>,
-  TMetadata extends Record<string, unknown>,
-  TResult,
-> = (
-  event: DomainEvent<TPayload, TMetadata>,
-  storedEvent: StoredEventEntity,
-  manager: EntityManager,
-) => Promise<TResult>;
 
 @Injectable()
 export class EventStoreRepository {
   constructor(private readonly dataSource: DataSource) {}
 
-  // Legacy: appends + projects in one transaction. Kept until Phase 4 cleanup.
-  appendAndProject<TResult>(
-    event: DomainEvent,
-    projector: EventProjector<TResult>,
-  ): Promise<TResult> {
-    return this.dataSource.transaction((manager) =>
-      this.appendWithManager(event, manager, (_event, stored) =>
-        projector(stored, manager),
-      ),
-    );
-  }
-
-  // Legacy: prepared + projects in one transaction. Kept until Phase 4 cleanup.
-  appendPreparedAndProject<
-    TPayload extends Record<string, unknown>,
-    TMetadata extends Record<string, unknown>,
-    TResult,
-  >(
-    prepare: (
-      manager: EntityManager,
-    ) => Promise<DomainEvent<TPayload, TMetadata>>,
-    projector: PreparedEventProjector<TPayload, TMetadata, TResult>,
-  ): Promise<TResult> {
-    return this.dataSource.transaction(async (manager) => {
-      const event = await prepare(manager);
-      return this.appendWithManager(event, manager, projector);
-    });
-  }
-
-  private async appendWithManager<
-    TPayload extends Record<string, unknown>,
-    TMetadata extends Record<string, unknown>,
-    TResult,
-  >(
-    event: DomainEvent<TPayload, TMetadata>,
-    manager: EntityManager,
-    projector: PreparedEventProjector<TPayload, TMetadata, TResult>,
-  ): Promise<TResult> {
-    const repository = manager.getRepository(StoredEventEntity);
-    const storedEvent = repository.create(event);
-    const savedEvent = await repository.save(storedEvent);
-    return projector(event, savedEvent, manager);
-  }
-
-  // New: appends a domain event class instance in its own transaction (or a
-  // provided manager for composing inside an outer transaction).
   async append(event: DomainEventBase, manager?: EntityManager): Promise<StoredEventEntity> {
     const run = async (em: EntityManager) => {
       const repository = em.getRepository(StoredEventEntity);
@@ -86,8 +24,6 @@ export class EventStoreRepository {
     return manager ? run(manager) : this.dataSource.transaction(run);
   }
 
-  // New: runs prepare(manager) inside a transaction (for in-tx validation),
-  // then appends the returned event class instance in the same transaction.
   async appendPrepared(
     prepare: (manager: EntityManager) => Promise<DomainEventBase>,
   ): Promise<{ stored: StoredEventEntity; event: DomainEventBase }> {
