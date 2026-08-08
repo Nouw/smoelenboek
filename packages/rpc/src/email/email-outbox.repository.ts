@@ -4,10 +4,52 @@ import { randomBytes } from 'node:crypto';
 import { EmailOutboxEntity, type EmailLocale, type EmailMessageType } from './entities/email-outbox.entity';
 
 export type QueueEmailInput =
-  | { messageType: 'invitation'; recipient: string; locale: EmailLocale; name: string; url: string; expiresAt: string; relatedUserId?: string | null; deduplicationKey: string }
-  | { messageType: 'password_reset'; recipient: string; locale: EmailLocale; name: string; url: string; relatedUserId?: string | null; deduplicationKey: string }
-  | { messageType: 'email_verification'; recipient: string; locale: EmailLocale; name: string; url: string; relatedUserId?: string | null; deduplicationKey: string }
-  | { messageType: 'address_update'; recipient: string; locale: EmailLocale; name: string; newAddress: string; relatedUserId?: string | null; deduplicationKey: string };
+  | {
+      messageType: 'invitation';
+      recipient: string;
+      locale: EmailLocale;
+      name: string;
+      url: string;
+      expiresAt: string;
+      relatedUserId?: string | null;
+      deduplicationKey: string;
+    }
+  | {
+      messageType: 'password_reset';
+      recipient: string;
+      locale: EmailLocale;
+      name: string;
+      url: string;
+      relatedUserId?: string | null;
+      deduplicationKey: string;
+    }
+  | {
+      messageType: 'email_verification';
+      recipient: string;
+      locale: EmailLocale;
+      name: string;
+      url: string;
+      relatedUserId?: string | null;
+      deduplicationKey: string;
+    }
+  | {
+      messageType: 'address_update';
+      recipient: string;
+      locale: EmailLocale;
+      name: string;
+      newAddress: string;
+      relatedUserId?: string | null;
+      deduplicationKey: string;
+    }
+  | {
+      messageType: 'bankaccount_update';
+      recipient: string;
+      locale: EmailLocale;
+      name: string;
+      newBankaccount: string;
+      relatedUserId?: string | null;
+      deduplicationKey: string;
+    };
 
 @Injectable()
 export class EmailOutboxRepository {

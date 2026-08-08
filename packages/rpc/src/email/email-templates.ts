@@ -74,30 +74,91 @@ function makeNotificationEmail(copy: {
 }
 
 const renderers = new Map<EmailMessageType, EmailRenderer>([
-  ['invitation', makeActionEmail({
-    nl: ['Activeer je Smoelenboek-account', 'Welkom bij Smoelenboek', 'Je account is aangemaakt. Kies via de knop hieronder je wachtwoord.', 'Wachtwoord instellen'],
-    en: ['Activate your Smoelenboek account', 'Welcome to Smoelenboek', 'Your account is ready. Use the button below to choose your password.', 'Set password'],
-  })],
-  ['password_reset', makeActionEmail({
-    nl: ['Stel je Smoelenboek-wachtwoord opnieuw in', 'Wachtwoord opnieuw instellen', 'We ontvingen een verzoek om je wachtwoord opnieuw in te stellen.', 'Nieuw wachtwoord kiezen'],
-    en: ['Reset your Smoelenboek password', 'Reset password', 'We received a request to reset your password.', 'Choose a new password'],
-  })],
-  ['email_verification', makeActionEmail({
-    nl: ['Bevestig je e-mailadres', 'E-mailadres bevestigen', 'Bevestig via de knop hieronder dat dit jouw e-mailadres is.', 'E-mailadres bevestigen'],
-    en: ['Verify your email address', 'Verify email address', 'Use the button below to confirm that this email address belongs to you.', 'Verify email'],
-  })],
-  ['address_update', makeNotificationEmail({
-    nl: {
-      subject: '[Smoelenboek] Adreswijziging',
-      heading: 'Wijziging van adres',
-      body: (p) => `Je adres is gewijzigd naar: ${String(p.newAddress ?? '')}.`,
-    },
-    en: {
-      subject: '[Smoelenboek] Address update',
-      heading: 'Address update',
-      body: (p) => `Your address has been updated to: ${String(p.newAddress ?? '')}.`,
-    },
-  })],
+  [
+    'invitation',
+    makeActionEmail({
+      nl: [
+        'Activeer je Smoelenboek-account',
+        'Welkom bij Smoelenboek',
+        'Je account is aangemaakt. Kies via de knop hieronder je wachtwoord.',
+        'Wachtwoord instellen',
+      ],
+      en: [
+        'Activate your Smoelenboek account',
+        'Welcome to Smoelenboek',
+        'Your account is ready. Use the button below to choose your password.',
+        'Set password',
+      ],
+    }),
+  ],
+  [
+    'password_reset',
+    makeActionEmail({
+      nl: [
+        'Stel je Smoelenboek-wachtwoord opnieuw in',
+        'Wachtwoord opnieuw instellen',
+        'We ontvingen een verzoek om je wachtwoord opnieuw in te stellen.',
+        'Nieuw wachtwoord kiezen',
+      ],
+      en: [
+        'Reset your Smoelenboek password',
+        'Reset password',
+        'We received a request to reset your password.',
+        'Choose a new password',
+      ],
+    }),
+  ],
+  [
+    'email_verification',
+    makeActionEmail({
+      nl: [
+        'Bevestig je e-mailadres',
+        'E-mailadres bevestigen',
+        'Bevestig via de knop hieronder dat dit jouw e-mailadres is.',
+        'E-mailadres bevestigen',
+      ],
+      en: [
+        'Verify your email address',
+        'Verify email address',
+        'Use the button below to confirm that this email address belongs to you.',
+        'Verify email',
+      ],
+    }),
+  ],
+  [
+    'address_update',
+    makeNotificationEmail({
+      nl: {
+        subject: '[Smoelenboek] Adreswijziging',
+        heading: 'Wijziging van adres',
+        body: (p) =>
+          `Het adres van ${p.name} is gewijzigd naar: ${String(p.newAddress ?? '')}.`,
+      },
+      en: {
+        subject: '[Smoelenboek] Address update',
+        heading: 'Address update',
+        body: (p) =>
+          `The address of ${p.name} has been updated to: ${String(p.newAddress ?? '')}.`,
+      },
+    }),
+  ],
+  [
+    'bankaccount_update',
+    makeNotificationEmail({
+      nl: {
+        subject: '[Smoelenboek] IBAN wijziging',
+        heading: 'Wijziging van IBAN',
+        body: (p) =>
+          `De IBAN van ${p.name} is gewijzigd naar: ${String(p.newBankaccount ?? '')}.`,
+      },
+      en: {
+        subject: '[Smoelenboek] IBAN update',
+        heading: 'IBAN update',
+        body: (p) =>
+          `The IBAN of ${p.name} has been updated to: ${String(p.newBankaccount ?? '')}.`,
+      },
+    }),
+  ],
 ]);
 
 export async function renderEmail(type: EmailMessageType, locale: EmailLocale, payload: Record<string, unknown>): Promise<RenderedEmail> {

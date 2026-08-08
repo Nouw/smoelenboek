@@ -6,54 +6,78 @@ import { UpdateUserInformationInput } from '@repo/api';
 import { EmailOutboxRepository } from '../../email/email-outbox.repository';
 import { UsersRepository } from '../repositories/users.repository';
 import { UserInformationUpdatedEvent } from '../events/user-information-updated.event';
+import { UserInformationRepository } from '../repositories/user-information.repository';
 
 const ADDRESS_KEYS: Array<keyof UpdateUserInformationInput> = ['houseNumber', 'streetName', 'postcode', 'city'];
 
 @EventsHandler(UserInformationUpdatedEvent)
 @Injectable()
-export class UserInformationUpdatedHandler implements IEventHandler<UserInformationUpdatedEvent> {
+export class UserInformationUpdatedHandler
+  implements IEventHandler<UserInformationUpdatedEvent>
+{
   private readonly logger = new Logger(UserInformationUpdatedHandler.name);
 
   constructor(
     private readonly outbox: EmailOutboxRepository,
     private readonly userRepository: UsersRepository,
+    private readonly userInformationRepository: UserInformationRepository,
   ) {}
 
   async handle(event: UserInformationUpdatedEvent): Promise<void> {
     const user = await this.userRepository.findById(event.payload.userId);
+    const userInformation = await this.userInformationRepository.findByUserId(
+      event.payload.userId,
+    );
 
-    if (!user) {
-      throw new NotFoundException(`Could not find user for id: ${event.payload.userId}`);
+    if (!userInformation || !user) {
+      return;
     }
 
-    if (!user.email) return;
-
-    const name = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    const name = `${user.firstName} ${user.lastName}`.trim();
     const changes = event.payload.changes;
 
     if (ADDRESS_KEYS.some((key) => key in changes)) {
-      const newAddress = [
-        changes.streetName,
-        changes.houseNumber,
-        changes.postcode,
-        changes.city,
-      ].filter((part): part is string => typeof part === 'string' && part.length > 0).join(', ');
+      const newAddress = `${changes.streetName ?? userInformation.streetName} ${changes.houseNumber ?? userInformation.houseNumber} ${changes.postcode ?? userInformation.postcode} ${changes.city ?? userInformation.city}`;
 
       await this.outbox.enqueue({
         messageType: 'address_update',
-        recipient: user.email,
-        locale: user.preferredLocale,
+        recipient: 'secretaris@usvprotos.nl',
+        locale: 'nl',
         name,
         newAddress,
         relatedUserId: user.id,
         deduplicationKey: `address_update:${user.id}:${randomUUID()}`,
       });
 
-      this.logger.log(JSON.stringify({ event: 'email.address_update_queued', userId: user.id }));
+
+      await this.outbox.enqueue({
+        messageType: 'address_update',
+        recipient: 'penningmeester@usvprotos.nl',
+        locale: 'nl',
+        name,
+        newAddress,
+        relatedUserId: user.id,
+        deduplicationKey: `address_update:${user.id}:${randomUUID()}`,
+      });
+
+      this.logger.log(
+        JSON.stringify({
+          event: 'email.address_update_queued',
+          userId: user.id,
+        }),
+      );
     }
 
-    if (changes.bankAccountNumber !== undefined) {
-      // TODO: send bank account change notification to penningmeester once role-based email lookup is available
+    if (changes.bankAccountNumber !== undefined && changes.bankAccountNumber !== null) {
+      await this.outbox.enqueue({
+        messageType: 'bankaccount_update',
+        recipient: 'penningmeester@usvprotos.nl',
+        locale: 'nl',
+        name,
+        newBankaccount: changes.bankAccountNumber!,
+        relatedUserId: user.id,
+        deduplicationKey: `bankaccount_update:${user.id}:${randomUUID()}`,
+      });
     }
   }
 }

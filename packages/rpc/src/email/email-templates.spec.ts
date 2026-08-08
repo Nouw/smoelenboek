@@ -26,6 +26,18 @@ describe('email templates', () => {
     expect(email.html).not.toContain('Heb je dit niet aangevraagd');
   });
 
+  it.each([
+    ['nl', '[Smoelenboek] IBAN wijziging', 'NL00TEST0123456789'],
+    ['en', '[Smoelenboek] IBAN update', 'NL00TEST0123456789'],
+  ] as const)('renders a bankaccount_update notification without a CTA button in %s', async (locale, subject, iban) => {
+    const email = await renderEmail('bankaccount_update', locale, { name: 'Test User', newBankaccount: iban });
+    expect(email.subject).toBe(subject);
+    expect(email.html).toContain('Test User');
+    expect(email.html).toContain(iban);
+    expect(email.html).not.toContain('If you did not request this');
+    expect(email.html).not.toContain('Heb je dit niet aangevraagd');
+  });
+
   it('throws for an unregistered email type', async () => {
     await expect(
       renderEmail('unknown_type' as never, 'nl', { name: 'x' }),
