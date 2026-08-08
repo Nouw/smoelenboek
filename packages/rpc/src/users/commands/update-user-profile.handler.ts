@@ -1,10 +1,11 @@
 import type { UserDto } from '@repo/api';
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { toUserDto } from '../dto/user-output';
-import { createUserProfileUpdatedEvent } from '../events/user-profile-updated.event';
-import { UserProjector } from '../projectors/user-projector';
+import { UserProfileUpdatedEvent } from '../events/user-profile-updated.event';
+import { UsersRepository } from '../repositories/users.repository';
 import { UpdateUserProfileCommand } from './update-user-profile.command';
 
 @CommandHandler(UpdateUserProfileCommand)
@@ -12,22 +13,18 @@ export class UpdateUserProfileHandler
   implements ICommandHandler<UpdateUserProfileCommand, UserDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly userProjector: UserProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async execute(command: UpdateUserProfileCommand): Promise<UserDto> {
-    const event = createUserProfileUpdatedEvent({
+    const event = UserProfileUpdatedEvent.create({
       userId: command.userId,
       imageUrl: command.input.imageUrl,
     });
-
-    const user = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.userProjector.projectProfileUpdated(event.payload, manager),
-    );
-
+    await this.eventStorePublisher.appendAndPublish(event);
+    const user = await this.usersRepository.findById(command.userId);
+    if (!user) throw new NotFoundException('User not found.');
     return toUserDto(user);
   }
 }

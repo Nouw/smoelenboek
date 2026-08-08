@@ -1,6 +1,6 @@
 import type { UpdateUserInformationInput } from '@repo/api';
 
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
 
 export const USER_INFORMATION_UPDATED_EVENT = 'user.information_updated';
 
@@ -14,24 +14,23 @@ export type UserInformationUpdatedMetadata = {
   actorUserId: string;
 };
 
-export type UserInformationUpdatedEvent = DomainEvent<
+export class UserInformationUpdatedEvent extends DomainEventBase<
   UserInformationUpdatedPayload,
   UserInformationUpdatedMetadata
->;
-
-export function createUserInformationUpdatedEvent(
-  payload: UserInformationUpdatedPayload,
-  actorUserId: string,
-): UserInformationUpdatedEvent {
-  return {
-    aggregateType: 'user_information',
-    aggregateId: payload.userId,
-    eventType: USER_INFORMATION_UPDATED_EVENT,
-    eventVersion: 1,
-    payload,
-    metadata: {
+> {
+  readonly aggregateType = 'user_information';
+  readonly eventType = USER_INFORMATION_UPDATED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.userId;
+  }
+  static create(
+    payload: UserInformationUpdatedPayload,
+    actorUserId: string,
+  ): UserInformationUpdatedEvent {
+    return new UserInformationUpdatedEvent(payload, {
       source: 'user',
       actorUserId,
-    },
-  };
+    });
+  }
 }

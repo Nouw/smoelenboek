@@ -3,6 +3,11 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 import { TeamEntity } from '../entities/team.entity';
 import {
+  TeamArchivedEvent,
+  TeamCreatedEvent,
+  TeamRestoredEvent,
+} from '../events/team-events';
+import {
   ArchiveTeamCommand,
   CreateTeamCommand,
   RestoreTeamCommand,
@@ -19,30 +24,27 @@ const teamId = '521ccf21-351e-41bd-a06b-8da3af4599d4';
 describe('team lifecycle handlers', () => {
   it('creates a categorized team with actor metadata', async () => {
     const entity = team();
-    const appendAndProject = jest.fn().mockResolvedValue(entity);
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const handler = new CreateTeamHandler(
-      { appendAndProject } as never,
-      {} as never,
-      { findByNameCaseInsensitive: jest.fn().mockResolvedValue(null) } as never,
+      { appendAndPublish } as never,
+      { findByNameCaseInsensitive: jest.fn().mockResolvedValue(null), findById: jest.fn().mockResolvedValue(entity) } as never,
     );
 
     await handler.execute(
       new CreateTeamCommand('Heren 1', 'men', actorUserId, null),
     );
 
-    expect(appendAndProject).toHaveBeenCalledWith(
-      expect.objectContaining({
-        eventVersion: 2,
-        payload: expect.objectContaining({ category: 'men' }),
-        metadata: { source: 'manual', actorUserId },
-      }),
-      expect.any(Function),
-    );
+    expect(appendAndPublish).toHaveBeenCalledWith(expect.any(TeamCreatedEvent));
+    const [event] = (appendAndPublish as jest.MockedFunction<typeof appendAndPublish>).mock.calls[0] as [TeamCreatedEvent];
+    expect(event.toRecord()).toMatchObject({
+      eventVersion: 2,
+      payload: expect.objectContaining({ category: 'men' }),
+      metadata: { source: 'manual', actorUserId },
+    });
   });
 
   it('rejects a case-insensitive duplicate name', async () => {
     const handler = new CreateTeamHandler(
-      {} as never,
       {} as never,
       {
         findByNameCaseInsensitive: jest.fn().mockResolvedValue(team()),
@@ -60,8 +62,7 @@ describe('team lifecycle handlers', () => {
     const archived = team({ archivedAt: new Date('2026-07-30T10:00:00.000Z') });
     const archiveAppend = jest.fn();
     const archiveHandler = new ArchiveTeamHandler(
-      { appendAndProject: archiveAppend } as never,
-      {} as never,
+      { appendAndPublish: archiveAppend } as never,
       { findById: jest.fn().mockResolvedValue(archived) } as never,
     );
 
@@ -71,23 +72,49 @@ describe('team lifecycle handlers', () => {
     expect(archiveAppend).not.toHaveBeenCalled();
 
     const restored = team({ archivedAt: null });
-    const restoreAppend = jest.fn().mockResolvedValue(restored);
+    const restoreAppend = jest.fn().mockResolvedValue({ dispatched: true });
     const restoreHandler = new RestoreTeamHandler(
-      { appendAndProject: restoreAppend } as never,
-      {} as never,
-      { findById: jest.fn().mockResolvedValue(archived) } as never,
+      { appendAndPublish: restoreAppend } as never,
+      { findById: jest.fn().mockResolvedValue(archived).mockResolvedValueOnce(archived).mockResolvedValueOnce(restored) } as never,
     );
 
     await restoreHandler.execute(new RestoreTeamCommand(teamId, actorUserId));
 
-    expect(restoreAppend).toHaveBeenCalledWith(
-      expect.objectContaining({
-        eventType: 'team.restored',
-        payload: expect.objectContaining({ archivedAt: null }),
-        metadata: { source: 'manual', actorUserId },
-      }),
-      expect.any(Function),
+    expect(restoreAppend).toHaveBeenCalledWith(expect.any(TeamRestoredEvent));
+    const [event] = (restoreAppend as jest.MockedFunction<typeof restoreAppend>).mock.calls[0] as [TeamRestoredEvent];
+    expect(event.toRecord()).toMatchObject({
+      eventType: 'team.restored',
+      payload: expect.objectContaining({ archivedAt: null }),
+      metadata: { source: 'manual', actorUserId },
+    });
+  });
+
+  it('returns the archived team DTO on archive without publishing when already archived', async () => {
+    const alreadyArchived = team({ archivedAt: new Date('2026-07-30T10:00:00.000Z') });
+    const appendAndPublish = jest.fn();
+    const handler = new ArchiveTeamHandler(
+      { appendAndPublish } as never,
+      { findById: jest.fn().mockResolvedValue(alreadyArchived) } as never,
     );
+
+    const result = await handler.execute(new ArchiveTeamCommand(teamId, actorUserId));
+
+    expect(appendAndPublish).not.toHaveBeenCalled();
+    expect(result.archivedAt).toBe('2026-07-30T10:00:00.000Z');
+  });
+
+  it('archives a non-archived team', async () => {
+    const entity = team({ archivedAt: null });
+    const archivedEntity = team({ archivedAt: new Date('2026-07-30T10:00:00.000Z') });
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
+    const handler = new ArchiveTeamHandler(
+      { appendAndPublish } as never,
+      { findById: jest.fn().mockResolvedValue(entity).mockResolvedValueOnce(entity).mockResolvedValueOnce(archivedEntity) } as never,
+    );
+
+    await handler.execute(new ArchiveTeamCommand(teamId, actorUserId));
+
+    expect(appendAndPublish).toHaveBeenCalledWith(expect.any(TeamArchivedEvent));
   });
 });
 

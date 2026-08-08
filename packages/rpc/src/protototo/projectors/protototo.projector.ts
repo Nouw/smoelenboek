@@ -1,19 +1,65 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { DataSource, EntityManager } from 'typeorm';
 
+import { DomainEventBase } from '../../event-store/domain-event';
 import { ProtototoEntryEntity } from '../entities/protototo-entry.entity';
 import { ProtototoMatchEntity } from '../entities/protototo-match.entity';
 import { ProtototoPredictionEntity } from '../entities/protototo-prediction.entity';
 import { ProtototoRoundEntity } from '../entities/protototo-round.entity';
-import type {
-  EntrySnapshotPayload,
-  MatchSnapshotPayload,
-  ResultSyncPayload,
-  RoundSnapshotPayload,
+import {
+  ProtototoEntrySubmittedEvent,
+  ProtototoMatchRemovedEvent,
+  ProtototoMatchResultSyncedEvent,
+  ProtototoMatchSavedEvent,
+  ProtototoRoundArchivedEvent,
+  ProtototoRoundPublishedEvent,
+  ProtototoRoundSavedEvent,
+  type EntrySnapshotPayload,
+  type MatchSnapshotPayload,
+  type ResultSyncPayload,
+  type RoundSnapshotPayload,
 } from '../events/protototo.events';
 
+@EventsHandler(
+  ProtototoRoundSavedEvent,
+  ProtototoRoundPublishedEvent,
+  ProtototoRoundArchivedEvent,
+  ProtototoMatchSavedEvent,
+  ProtototoMatchRemovedEvent,
+  ProtototoEntrySubmittedEvent,
+  ProtototoMatchResultSyncedEvent,
+)
 @Injectable()
-export class ProtototoProjector {
+export class ProtototoProjector implements IEventHandler<DomainEventBase> {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async handle(event: DomainEventBase): Promise<void> {
+    if (event instanceof ProtototoEntrySubmittedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.projectEntry(event.payload, manager),
+      );
+    } else if (event instanceof ProtototoMatchResultSyncedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.projectResultSync(event.payload, manager),
+      );
+    } else if (
+      event instanceof ProtototoMatchSavedEvent ||
+      event instanceof ProtototoMatchRemovedEvent
+    ) {
+      await this.dataSource.transaction((manager) =>
+        this.projectMatch(event.payload, manager),
+      );
+    } else {
+      await this.dataSource.transaction((manager) =>
+        this.projectRound(
+          (event as ProtototoRoundSavedEvent).payload,
+          manager,
+        ),
+      );
+    }
+  }
+
   async projectRound(
     payload: RoundSnapshotPayload,
     manager: EntityManager,

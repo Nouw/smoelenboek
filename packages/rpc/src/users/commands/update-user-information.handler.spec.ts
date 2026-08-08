@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 import { UserInformationEntity } from '../entities/user-information.entity';
+import { UserInformationUpdatedEvent } from '../events/user-information-updated.event';
 import { UpdateUserInformationCommand } from './update-user-information.command';
 import { UpdateUserInformationHandler } from './update-user-information.handler';
 
@@ -11,11 +12,8 @@ const otherId = '39f15067-101b-48d8-b6dd-d5b124cee928';
 describe('UpdateUserInformationHandler', () => {
   it('lets the owner update information through an attributed event', async () => {
     const projected = createInformation();
-    const appendAndProject = jest.fn(async (_event, projector) =>
-      projector({ id: 'event_123' }, { manager: true }),
-    );
-    const projectUpdated = jest.fn().mockResolvedValue(projected);
-    const handler = createHandler({ appendAndProject, projectUpdated });
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
+    const handler = createHandler({ appendAndPublish, projected });
 
     await expect(
       handler.execute(
@@ -29,23 +27,25 @@ describe('UpdateUserInformationHandler', () => {
       bankAccountNumber: 'NL00TEST0123456789',
     });
 
-    expect(appendAndProject).toHaveBeenCalledWith(
-      {
-        aggregateType: 'user_information',
-        aggregateId: ownerId,
-        eventType: 'user.information_updated',
-        eventVersion: 1,
-        payload: {
-          userId: ownerId,
-          changes: {
-            city: 'Utrecht',
-            bankAccountNumber: 'NL00TEST0123456789',
-          },
-        },
-        metadata: { source: 'user', actorUserId: ownerId },
-      },
-      expect.any(Function),
+    expect(appendAndPublish).toHaveBeenCalledWith(
+      expect.any(UserInformationUpdatedEvent),
     );
+    const [event] = (
+      appendAndPublish as jest.MockedFunction<typeof appendAndPublish>
+    ).mock.calls[0] as [UserInformationUpdatedEvent];
+    expect(event.toRecord()).toMatchObject({
+      aggregateType: 'user_information',
+      eventType: 'user.information_updated',
+      eventVersion: 1,
+      payload: {
+        userId: ownerId,
+        changes: {
+          city: 'Utrecht',
+          bankAccountNumber: 'NL00TEST0123456789',
+        },
+      },
+      metadata: { source: 'user', actorUserId: ownerId },
+    });
   });
 
   it('lets an admin update another user', async () => {
@@ -108,19 +108,20 @@ describe('UpdateUserInformationHandler', () => {
   });
 });
 
-function createHandler(overrides: Record<string, unknown> = {}) {
-  const projected = createInformation();
-  const appendAndProject =
-    overrides.appendAndProject ??
-    jest.fn(async (_event, projector) =>
-      projector({ id: 'event_123' }, { manager: true }),
-    );
-  const projectUpdated =
-    overrides.projectUpdated ?? jest.fn().mockResolvedValue(projected);
+function createHandler(
+  overrides: {
+    appendAndPublish?: jest.Mock;
+    projected?: UserInformationEntity;
+    usersRepository?: { findById: jest.Mock };
+  } = {},
+) {
+  const projected = overrides.projected ?? createInformation();
+  const appendAndPublish =
+    overrides.appendAndPublish ?? jest.fn().mockResolvedValue({ dispatched: true });
 
   return new UpdateUserInformationHandler(
-    { appendAndProject } as never,
-    { projectUpdated } as never,
+    { appendAndPublish } as never,
+    { findByUserId: jest.fn().mockResolvedValue(projected) } as never,
     (overrides.usersRepository ?? {
       findById: jest.fn().mockResolvedValue({
         id: ownerId,

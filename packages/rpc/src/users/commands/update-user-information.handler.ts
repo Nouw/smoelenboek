@@ -2,10 +2,10 @@ import type { UserInformationDto } from '@repo/api';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { toUserInformationDto } from '../dto/user-information-output';
-import { createUserInformationUpdatedEvent } from '../events/user-information-updated.event';
-import { UserInformationProjector } from '../projectors/user-information-projector';
+import { UserInformationUpdatedEvent } from '../events/user-information-updated.event';
+import { UserInformationRepository } from '../repositories/user-information.repository';
 import { UsersRepository } from '../repositories/users.repository';
 import {
   assertCanUpdateUserInformation,
@@ -18,8 +18,8 @@ export class UpdateUserInformationHandler
   implements ICommandHandler<UpdateUserInformationCommand, UserInformationDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly userInformationProjector: UserInformationProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly userInformationRepository: UserInformationRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -41,19 +41,15 @@ export class UpdateUserInformationHandler
 
     assertValidMembershipDates(targetUser.createdAt, command.changes);
 
-    const event = createUserInformationUpdatedEvent(
-      {
-        userId: command.targetUserId,
-        changes: command.changes,
-      },
+    const event = UserInformationUpdatedEvent.create(
+      { userId: command.targetUserId, changes: command.changes },
       command.actorUserId,
     );
-    const information = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.userInformationProjector.projectUpdated(event.payload, manager),
+    await this.eventStorePublisher.appendAndPublish(event);
+    const information = await this.userInformationRepository.findByUserId(
+      command.targetUserId,
     );
-
+    if (!information) throw new Error('User information projection missing after dispatch.');
     return toUserInformationDto(information, true);
   }
 }

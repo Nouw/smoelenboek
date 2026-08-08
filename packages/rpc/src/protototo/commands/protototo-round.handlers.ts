@@ -6,10 +6,13 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { ProtototoRoundEntity } from '../entities/protototo-round.entity';
-import { roundEvent } from '../events/protototo.events';
-import { ProtototoProjector } from '../projectors/protototo.projector';
+import {
+  ProtototoRoundArchivedEvent,
+  ProtototoRoundPublishedEvent,
+  ProtototoRoundSavedEvent,
+} from '../events/protototo.events';
 import { ProtototoRepository } from '../repositories/protototo.repository';
 import {
   ArchiveProtototoRoundCommand,
@@ -23,16 +26,18 @@ export class CreateProtototoRoundHandler
   implements ICommandHandler<CreateProtototoRoundCommand, ProtototoRoundEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly repository: ProtototoRepository,
   ) {}
 
-  execute(command: CreateProtototoRoundCommand): Promise<ProtototoRoundEntity> {
+  async execute(
+    command: CreateProtototoRoundCommand,
+  ): Promise<ProtototoRoundEntity> {
     validateDates(command.opensAt, command.closesAt);
-    const event = roundEvent(
-      'protototo.round_saved',
+    const roundId = randomUUID();
+    const event = ProtototoRoundSavedEvent.create(
       {
-        roundId: randomUUID(),
+        roundId,
         title: command.title.trim(),
         opensAt: command.opensAt.toISOString(),
         closesAt: command.closesAt.toISOString(),
@@ -42,9 +47,10 @@ export class CreateProtototoRoundHandler
       },
       command.actorId,
     );
-    return this.events.appendAndProject(event, (_stored, manager) =>
-      this.projector.projectRound(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const round = await this.repository.findRound(roundId);
+    if (!round) throw new Error('Round projection missing after dispatch.');
+    return round;
   }
 }
 
@@ -53,8 +59,7 @@ export class UpdateProtototoRoundHandler
   implements ICommandHandler<UpdateProtototoRoundCommand, ProtototoRoundEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: ProtototoRepository,
   ) {}
 
@@ -78,8 +83,7 @@ export class UpdateProtototoRoundHandler
         command.roundId,
       );
     }
-    const event = roundEvent(
-      'protototo.round_saved',
+    const event = ProtototoRoundSavedEvent.create(
       {
         roundId: existing.id,
         title: command.title.trim(),
@@ -91,12 +95,10 @@ export class UpdateProtototoRoundHandler
       },
       command.actorId,
     );
-    const saved = await this.events.appendAndProject(
-      event,
-      (_stored, manager) => this.projector.projectRound(event.payload, manager),
-    );
-    saved.matches = existing.matches;
-    return saved;
+    await this.eventStorePublisher.appendAndPublish(event);
+    const round = await this.repository.findRound(command.roundId);
+    if (!round) throw new Error('Round projection missing after dispatch.');
+    return round;
   }
 }
 
@@ -105,8 +107,7 @@ export class PublishProtototoRoundHandler
   implements ICommandHandler<PublishProtototoRoundCommand, ProtototoRoundEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: ProtototoRepository,
   ) {}
 
@@ -125,8 +126,7 @@ export class PublishProtototoRoundHandler
       existing.closesAt,
       existing.id,
     );
-    const event = roundEvent(
-      'protototo.round_published',
+    const event = ProtototoRoundPublishedEvent.create(
       {
         roundId: existing.id,
         title: existing.title,
@@ -139,12 +139,10 @@ export class PublishProtototoRoundHandler
       },
       command.actorId,
     );
-    const saved = await this.events.appendAndProject(
-      event,
-      (_stored, manager) => this.projector.projectRound(event.payload, manager),
-    );
-    saved.matches = existing.matches;
-    return saved;
+    await this.eventStorePublisher.appendAndPublish(event);
+    const round = await this.repository.findRound(command.roundId);
+    if (!round) throw new Error('Round projection missing after dispatch.');
+    return round;
   }
 }
 
@@ -153,8 +151,7 @@ export class ArchiveProtototoRoundHandler
   implements ICommandHandler<ArchiveProtototoRoundCommand, ProtototoRoundEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: ProtototoRepository,
   ) {}
 
@@ -162,8 +159,7 @@ export class ArchiveProtototoRoundHandler
     command: ArchiveProtototoRoundCommand,
   ): Promise<ProtototoRoundEntity> {
     const existing = await requireRound(this.repository, command.roundId);
-    const event = roundEvent(
-      'protototo.round_archived',
+    const event = ProtototoRoundArchivedEvent.create(
       {
         roundId: existing.id,
         title: existing.title,
@@ -175,12 +171,10 @@ export class ArchiveProtototoRoundHandler
       },
       command.actorId,
     );
-    const saved = await this.events.appendAndProject(
-      event,
-      (_stored, manager) => this.projector.projectRound(event.payload, manager),
-    );
-    saved.matches = existing.matches;
-    return saved;
+    await this.eventStorePublisher.appendAndPublish(event);
+    const round = await this.repository.findRound(command.roundId);
+    if (!round) throw new Error('Round projection missing after dispatch.');
+    return round;
   }
 }
 

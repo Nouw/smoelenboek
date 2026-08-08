@@ -1,17 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { DataSource, EntityManager } from 'typeorm';
 
+import { DomainEventBase } from '../../event-store/domain-event';
 import { resolveMembershipEnd } from '../../seasons/season-policy';
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
 import { CommitteeEntity } from '../entities/committee.entity';
-import type {
-  CommitteeMembershipAssignedPayload,
-  CommitteeMembershipEndedPayload,
-  CommitteeSnapshotPayload,
+import {
+  CommitteeArchivedEvent,
+  CommitteeCreatedEvent,
+  CommitteeMemberAssignedEvent,
+  CommitteeMemberRemovedEvent,
+  CommitteeUpdatedEvent,
+  type CommitteeMembershipAssignedPayload,
+  type CommitteeMembershipEndedPayload,
+  type CommitteeSnapshotPayload,
 } from '../events/committee-events';
 
+@EventsHandler(
+  CommitteeCreatedEvent,
+  CommitteeUpdatedEvent,
+  CommitteeArchivedEvent,
+  CommitteeMemberAssignedEvent,
+  CommitteeMemberRemovedEvent,
+)
 @Injectable()
-export class CommitteeProjector {
+export class CommitteeProjector implements IEventHandler<DomainEventBase> {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async handle(event: DomainEventBase): Promise<void> {
+    const manager = this.dataSource.manager;
+    if (event instanceof CommitteeMemberAssignedEvent) {
+      await this.projectMemberAssigned(event.payload, manager);
+    } else if (event instanceof CommitteeMemberRemovedEvent) {
+      await this.projectMemberRemoved(event.payload, manager);
+    } else {
+      await this.projectCommitteeSnapshot((event as CommitteeCreatedEvent).payload, manager);
+    }
+  }
+
   async projectCommitteeSnapshot(
     payload: CommitteeSnapshotPayload,
     manager: EntityManager,

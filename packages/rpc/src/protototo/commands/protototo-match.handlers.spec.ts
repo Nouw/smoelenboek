@@ -1,6 +1,10 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 import {
+  ProtototoMatchRemovedEvent,
+  ProtototoMatchSavedEvent,
+} from '../events/protototo.events';
+import {
   AddProtototoMatchHandler,
   RemoveProtototoMatchHandler,
 } from './protototo-match.handlers';
@@ -18,60 +22,54 @@ const selectedTeamIri = '/competitie/teams/ckl9y0t/dames/1';
 describe('Protototo match handlers', () => {
   it('revives a removed match under its existing identity', async () => {
     const existing = storedMatch({ removedAt: new Date() });
+    const revived = storedMatch({ removedAt: null });
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const repository = {
       findRound: jest.fn().mockResolvedValue({ id: roundId }),
       findMatchByNevobo: jest.fn().mockResolvedValue(existing),
-    };
-    const events = {
-      appendAndProject: jest.fn().mockResolvedValue(existing),
+      findMatch: jest.fn().mockResolvedValue(revived),
     };
     const handler = new AddProtototoMatchHandler(
-      events as never,
-      {} as never,
+      { appendAndPublish } as never,
       repository as never,
-      {
-        getMatchSnapshot: jest.fn().mockResolvedValue(snapshot()),
-      } as never,
+      { getMatchSnapshot: jest.fn().mockResolvedValue(snapshot()) } as never,
     );
-    await handler.execute(
-      new AddProtototoMatchCommand(
-        actorId,
-        roundId,
-        selectedTeamIri,
-        nevoboMatchId,
-      ),
+
+    const result = await handler.execute(
+      new AddProtototoMatchCommand(actorId, roundId, selectedTeamIri, nevoboMatchId),
     );
-    expect(events.appendAndProject).toHaveBeenCalledWith(
-      expect.objectContaining({
-        aggregateId: matchId,
-        payload: expect.objectContaining({ matchId, removedAt: null }),
-      }),
-      expect.any(Function),
-    );
+
+    expect(appendAndPublish).toHaveBeenCalledWith(expect.any(ProtototoMatchSavedEvent));
+    const [event] = (
+      appendAndPublish as jest.MockedFunction<typeof appendAndPublish>
+    ).mock.calls[0] as [ProtototoMatchSavedEvent];
+    expect(event.toRecord()).toMatchObject({
+      payload: expect.objectContaining({ matchId, removedAt: null }),
+    });
+    expect(result).toBe(revived);
   });
 
   it('soft-removes an active match and makes repeated removal idempotent', async () => {
     const active = storedMatch({ removedAt: null });
-    const events = {
-      appendAndProject: jest.fn().mockResolvedValue({
-        ...active,
-        removedAt: new Date(),
-      }),
+    const removed = storedMatch({ removedAt: new Date() });
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
+    const repository = {
+      findMatch: jest.fn()
+        .mockResolvedValueOnce(active)   // first execute: pre-check
+        .mockResolvedValueOnce(removed)  // first execute: re-read after dispatch
+        .mockResolvedValueOnce(removed), // second execute: pre-check → already removed
     };
-    const repository = { findMatch: jest.fn().mockResolvedValue(active) };
     const handler = new RemoveProtototoMatchHandler(
-      events as never,
-      {} as never,
+      { appendAndPublish } as never,
       repository as never,
     );
-    await handler.execute(new RemoveProtototoMatchCommand(actorId, matchId));
-    expect(events.appendAndProject).toHaveBeenCalledTimes(1);
 
-    repository.findMatch.mockResolvedValue(
-      storedMatch({ removedAt: new Date() }),
-    );
     await handler.execute(new RemoveProtototoMatchCommand(actorId, matchId));
-    expect(events.appendAndProject).toHaveBeenCalledTimes(1);
+    expect(appendAndPublish).toHaveBeenCalledTimes(1);
+    expect(appendAndPublish).toHaveBeenCalledWith(expect.any(ProtototoMatchRemovedEvent));
+
+    await handler.execute(new RemoveProtototoMatchCommand(actorId, matchId));
+    expect(appendAndPublish).toHaveBeenCalledTimes(1);
   });
 });
 

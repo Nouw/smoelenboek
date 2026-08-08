@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 import { ProtototoMatchEntity } from '../entities/protototo-match.entity';
+import { ProtototoMatchResultSyncedEvent } from '../events/protototo.events';
 import { ProtototoResultSyncService } from './protototo-result-sync.service';
 
 describe('ProtototoResultSyncService', () => {
@@ -31,24 +32,21 @@ describe('ProtototoResultSyncService', () => {
         throw new Error('safe upstream failure');
       }),
     };
-    const events = {
-      appendAndProject: jest.fn().mockResolvedValue(matches[0]),
-    };
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const service = new ProtototoResultSyncService(
       repository as never,
       nevobo as never,
-      events as never,
-      {} as never,
+      { appendAndPublish } as never,
     );
 
     await expect(
       service.syncRound('round', 'admin', new Date('2026-10-10T20:00:00.000Z')),
     ).resolves.toEqual({ final: 2, pending: 1, cancelled: 2, failed: 1 });
     expect(nevobo.getResult).toHaveBeenCalledTimes(4);
-    expect(events.appendAndProject).toHaveBeenCalledTimes(4);
-    const storedEvents = events.appendAndProject.mock.calls.map(
-      ([event]) => event,
-    );
+    expect(appendAndPublish).toHaveBeenCalledTimes(4);
+    const storedEvents = (
+      appendAndPublish as jest.MockedFunction<typeof appendAndPublish>
+    ).mock.calls.map(([event]) => event as ProtototoMatchResultSyncedEvent);
     expect(storedEvents).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -66,11 +64,14 @@ describe('ProtototoResultSyncService', () => {
         }),
       ]),
     );
+    for (const event of storedEvents) {
+      expect(event).toBeInstanceOf(ProtototoMatchResultSyncedEvent);
+    }
   });
 
   it('rejects a final sequence incompatible with the snapshotted format', async () => {
     const oneMatch = match('bad-final');
-    const events = { appendAndProject: jest.fn().mockResolvedValue(oneMatch) };
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const service = new ProtototoResultSyncService(
       {
         findRound: jest.fn().mockResolvedValue({ id: 'round' }),
@@ -81,8 +82,7 @@ describe('ProtototoResultSyncService', () => {
           .fn()
           .mockResolvedValue({ status: 'final', setWinners: [true, false] }),
       } as never,
-      events as never,
-      {} as never,
+      { appendAndPublish } as never,
     );
 
     await expect(service.syncRound('round', 'admin')).resolves.toEqual({
@@ -91,18 +91,18 @@ describe('ProtototoResultSyncService', () => {
       cancelled: 0,
       failed: 1,
     });
-    expect(events.appendAndProject).toHaveBeenCalledWith(
+    expect(appendAndPublish).toHaveBeenCalledWith(
       expect.objectContaining({
         payload: expect.objectContaining({
           error: expect.stringContaining('stored match format'),
         }),
       }),
-      expect.any(Function),
     );
   });
 
   it('polls only the repository-selected started incomplete matches', async () => {
     const oneMatch = match('started');
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const repository = {
       findStartedUnfinishedMatches: jest.fn().mockResolvedValue([oneMatch]),
     };
@@ -113,8 +113,7 @@ describe('ProtototoResultSyncService', () => {
           .fn()
           .mockResolvedValue({ status: 'pending', setWinners: null }),
       } as never,
-      { appendAndProject: jest.fn().mockResolvedValue(oneMatch) } as never,
-      {} as never,
+      { appendAndPublish } as never,
     );
     const now = new Date('2026-10-10T20:00:00.000Z');
     await expect(service.syncStarted(now)).resolves.toEqual({

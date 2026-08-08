@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
+import { ProtototoRoundSavedEvent } from '../events/protototo.events';
 import {
   PublishProtototoRoundHandler,
   UpdateProtototoRoundHandler,
@@ -20,7 +21,6 @@ describe('Protototo round handlers', () => {
     ]);
     const handler = new PublishProtototoRoundHandler(
       {} as never,
-      {} as never,
       repository as never,
     );
 
@@ -37,12 +37,9 @@ describe('Protototo round handlers', () => {
     repository.findActiveMatches.mockResolvedValue([
       { startsAt: new Date('2026-10-10T16:00:00.000Z') },
     ]);
-    const events = {
-      appendAndProject: jest.fn().mockResolvedValue({ id: roundId }),
-    };
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const handler = new UpdateProtototoRoundHandler(
-      events as never,
-      {} as never,
+      { appendAndPublish } as never,
       repository as never,
     );
 
@@ -59,15 +56,18 @@ describe('Protototo round handlers', () => {
       ),
     ).resolves.toBeDefined();
     expect(repository.findOverlappingPublishedRound).toHaveBeenCalled();
-    expect(events.appendAndProject).toHaveBeenCalledWith(
-      expect.objectContaining({
-        payload: expect.objectContaining({
-          closesAt: '2026-10-12T16:00:00.000Z',
-          publishedAt: '2026-09-01T00:00:00.000Z',
-        }),
-      }),
-      expect.any(Function),
+    expect(appendAndPublish).toHaveBeenCalledWith(
+      expect.any(ProtototoRoundSavedEvent),
     );
+    const [event] = (
+      appendAndPublish as jest.MockedFunction<typeof appendAndPublish>
+    ).mock.calls[0] as [ProtototoRoundSavedEvent];
+    expect(event.toRecord()).toMatchObject({
+      payload: expect.objectContaining({
+        closesAt: '2026-10-12T16:00:00.000Z',
+        publishedAt: '2026-09-01T00:00:00.000Z',
+      }),
+    });
   });
 
   it('prevents reopened published rounds from overlapping another round', async () => {
@@ -78,7 +78,6 @@ describe('Protototo round handlers', () => {
       id: 'other-round',
     });
     const handler = new UpdateProtototoRoundHandler(
-      {} as never,
       {} as never,
       repository as never,
     );

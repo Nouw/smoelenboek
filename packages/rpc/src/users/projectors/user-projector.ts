@@ -1,12 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { DataSource, EntityManager } from 'typeorm';
 
+import { DomainEventBase } from '../../event-store/domain-event';
 import { UserEntity } from '../entities/user.entity';
-import type { UserProfileUpdatedPayload } from '../events/user-profile-updated.event';
-import type { UserSyncedFromAuthPayload } from '../events/user-synced-from-auth.event';
+import {
+  UserProfileUpdatedEvent,
+  type UserProfileUpdatedPayload,
+} from '../events/user-profile-updated.event';
+import {
+  UserSyncedFromAuthEvent,
+  type UserSyncedFromAuthPayload,
+} from '../events/user-synced-from-auth.event';
 
+@EventsHandler(UserSyncedFromAuthEvent, UserProfileUpdatedEvent)
 @Injectable()
-export class UserProjector {
+export class UserProjector implements IEventHandler<DomainEventBase> {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async handle(event: DomainEventBase): Promise<void> {
+    const manager = this.dataSource.manager;
+    if (event instanceof UserProfileUpdatedEvent) {
+      await this.projectProfileUpdated(event.payload, manager);
+    } else {
+      await this.projectSyncedFromAuth(
+        (event as UserSyncedFromAuthEvent).payload,
+        manager,
+      );
+    }
+  }
+
   async projectSyncedFromAuth(
     payload: UserSyncedFromAuthPayload,
     manager: EntityManager,

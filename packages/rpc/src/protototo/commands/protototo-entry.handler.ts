@@ -7,10 +7,10 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import type { EntityManager } from 'typeorm';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { ProtototoEntryEntity } from '../entities/protototo-entry.entity';
-import { entryEvent } from '../events/protototo.events';
+import { ProtototoEntrySubmittedEvent } from '../events/protototo.events';
 import {
   canonicalFirstName,
   isRoundOpen,
@@ -18,7 +18,6 @@ import {
   normalizeEmail,
   normalizeFirstName,
 } from '../protototo.policy';
-import { ProtototoProjector } from '../projectors/protototo.projector';
 import { ProtototoRepository } from '../repositories/protototo.repository';
 import { SubmitProtototoEntryCommand } from './protototo.commands';
 
@@ -27,8 +26,7 @@ export class SubmitProtototoEntryHandler
   implements ICommandHandler<SubmitProtototoEntryCommand, ProtototoEntryEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: ProtototoRepository,
     private readonly users: UsersRepository,
   ) {}
@@ -36,61 +34,64 @@ export class SubmitProtototoEntryHandler
   async execute(
     command: SubmitProtototoEntryCommand,
   ): Promise<ProtototoEntryEntity> {
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        const round = await this.repository.findRoundForUpdate(
-          command.roundId,
-          manager,
-        );
-        if (!round) {
-          throw new NotFoundException('Protototo round not found.');
-        }
-        if (!isRoundOpen(round, command.now)) {
-          throw new ForbiddenException('Betting is not open for this round.');
-        }
-        const matches = await this.repository.findActiveMatches(
-          round.id,
-          manager,
-        );
-        validatePredictions(command, matches);
+    let entryId: string | null = null;
 
-        const identity = command.actorUserId
-          ? await this.memberIdentity(round.id, command.actorUserId, manager)
-          : await this.anonymousIdentity(
-              command,
-              round.tikkieUrl !== null,
-              manager,
-            );
-        const paymentClaimedAt =
-          identity.existing?.paymentClaimedAt ??
-          (identity.participantType === 'anonymous' && command.paymentClaimed
-            ? command.now
-            : null);
-        const payload = {
-          entryId: identity.existing?.id ?? randomUUID(),
-          roundId: round.id,
-          participantType: identity.participantType,
-          userId: identity.userId,
-          firstName: identity.firstName,
-          email: identity.email,
-          emailNormalized: identity.emailNormalized,
-          firstNameNormalized: identity.firstNameNormalized,
-          paymentClaimedAt: paymentClaimedAt?.toISOString() ?? null,
-          predictions: command.predictions.map((prediction) => ({
-            predictionId: randomUUID(),
-            matchId: prediction.matchId,
-            setWinners: prediction.setWinners,
-          })),
-        };
-        return entryEvent(
-          payload,
-          identity.participantType,
-          command.actorUserId ?? undefined,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.projectEntry(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const round = await this.repository.findRoundForUpdate(
+        command.roundId,
+        manager,
+      );
+      if (!round) {
+        throw new NotFoundException('Protototo round not found.');
+      }
+      if (!isRoundOpen(round, command.now)) {
+        throw new ForbiddenException('Betting is not open for this round.');
+      }
+      const matches = await this.repository.findActiveMatches(
+        round.id,
+        manager,
+      );
+      validatePredictions(command, matches);
+
+      const identity = command.actorUserId
+        ? await this.memberIdentity(round.id, command.actorUserId, manager)
+        : await this.anonymousIdentity(
+            command,
+            round.tikkieUrl !== null,
+            manager,
+          );
+      const paymentClaimedAt =
+        identity.existing?.paymentClaimedAt ??
+        (identity.participantType === 'anonymous' && command.paymentClaimed
+          ? command.now
+          : null);
+      const payload = {
+        entryId: identity.existing?.id ?? randomUUID(),
+        roundId: round.id,
+        participantType: identity.participantType,
+        userId: identity.userId,
+        firstName: identity.firstName,
+        email: identity.email,
+        emailNormalized: identity.emailNormalized,
+        firstNameNormalized: identity.firstNameNormalized,
+        paymentClaimedAt: paymentClaimedAt?.toISOString() ?? null,
+        predictions: command.predictions.map((prediction) => ({
+          predictionId: randomUUID(),
+          matchId: prediction.matchId,
+          setWinners: prediction.setWinners,
+        })),
+      };
+      entryId = payload.entryId;
+      return ProtototoEntrySubmittedEvent.create(
+        payload,
+        identity.participantType,
+        command.actorUserId ?? undefined,
+      );
+    });
+
+    const entry = await this.repository.findEntry(entryId!);
+    if (!entry) throw new Error('Entry projection missing after dispatch.');
+    return entry;
   }
 
   private async memberIdentity(

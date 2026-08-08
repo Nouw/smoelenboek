@@ -1,11 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { DataSource, EntityManager } from 'typeorm';
 
+import { DomainEventBase } from '../../event-store/domain-event';
 import { UserInformationEntity } from '../entities/user-information.entity';
-import type { UserInformationUpdatedPayload } from '../events/user-information-updated.event';
+import {
+  UserInformationUpdatedEvent,
+  type UserInformationUpdatedPayload,
+} from '../events/user-information-updated.event';
 
+@EventsHandler(UserInformationUpdatedEvent)
 @Injectable()
-export class UserInformationProjector {
+export class UserInformationProjector implements IEventHandler<DomainEventBase> {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async handle(event: DomainEventBase): Promise<void> {
+    await this.projectUpdated(
+      (event as UserInformationUpdatedEvent).payload,
+      this.dataSource.manager,
+    );
+  }
+
   async projectUpdated(
     payload: UserInformationUpdatedPayload,
     manager: EntityManager,

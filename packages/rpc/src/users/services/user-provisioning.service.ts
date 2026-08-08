@@ -4,21 +4,23 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 
 import { EmailOutboxRepository } from '../../email/email-outbox.repository';
-import { StoredEventEntity } from '../../event-store/entities/stored-event.entity';
+import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
 import { UserInformationEntity } from '../entities/user-information.entity';
 import { UserEntity } from '../entities/user.entity';
+import { UserProvisionedEvent } from '../events/user-provisioned.event';
 import { InjectUserAccountAdmin, type UserAccountAdmin } from '../user-account-admin';
 
 @Injectable()
 export class UserProvisioningService {
   constructor(
     private readonly dataSource: DataSource,
+    private readonly eventStoreRepository: EventStoreRepository,
     private readonly outbox: EmailOutboxRepository,
     @InjectUserAccountAdmin() private readonly accounts: UserAccountAdmin,
   ) {}
 
   async create(input: CreateManagedUserInput, actorUserId: string): Promise<ManagedUserDto> {
-    const name = input.name ?? [input.firstName, input.lastName].filter(Boolean).join(' ');
+    const name = [input.firstName, input.lastName].join(' ').trim();
     const account = await this.accounts.create({ email: input.email, name, password: randomBytes(32).toString('base64url') });
     try {
       return await this.dataSource.transaction(async (manager) => {
@@ -31,10 +33,11 @@ export class UserProvisioningService {
         if (Object.values(information).some((value, index) => index > 0 && value != null)) {
           await manager.getRepository(UserInformationEntity).save(manager.getRepository(UserInformationEntity).create(information));
         }
-        await manager.getRepository(StoredEventEntity).save(manager.getRepository(StoredEventEntity).create({
-          aggregateType: 'user', aggregateId: account.id, eventType: 'user.provisioned', eventVersion: 1,
-          payload: { email: input.email, name, preferredLocale: input.preferredLocale }, metadata: { source: 'admin', actorId: actorUserId },
-        }));
+        const provisionedEvent = UserProvisionedEvent.create(
+          { userId: account.id, email: input.email, name, preferredLocale: input.preferredLocale },
+          actorUserId,
+        );
+        await this.eventStoreRepository.append(provisionedEvent, manager);
         await this.queueInvitation(account.id, input.email, name, input.preferredLocale, now, manager);
         return { id: account.id, email: input.email, name, preferredLocale: input.preferredLocale, invitedAt: now.toISOString(), accountActivatedAt: null, invitationStatus: 'pending' };
       });
@@ -69,6 +72,6 @@ export class UserProvisioningService {
 }
 
 function informationValues(userId: string, input: CreateManagedUserInput): Partial<UserInformationEntity> & { userId: string } {
-  return { userId, streetName: input.streetName ?? null, houseNumber: input.houseNumber ?? null, postcode: input.postcode ?? null, city: input.city ?? null, phoneNumber: input.phoneNumber ?? null, bankAccountNumber: input.bankAccountNumber ?? null, birthDate: input.birthDate ?? null, bondNumber: input.bondNumber ?? null, leaveDate: input.leaveDate ?? null, backNumber: input.backNumber ?? null, refereeLicense: input.refereeLicense ?? null };
+  return { userId, streetName: input.streetName ?? null, houseNumber: input.houseNumber ?? null, postcode: input.postcode ?? null, city: input.city ?? null, phoneNumber: input.phoneNumber ?? null, bankAccountNumber: input.bankAccountNumber ?? null, birthDate: input.birthDate ?? null, bondNumber: input.bondNumber ?? null, leaveDate: null, backNumber: input.backNumber ?? null, refereeLicense: input.refereeLicense ?? null };
 }
 function errorMessage(error: unknown): string { return error instanceof Error ? error.message : String(error); }

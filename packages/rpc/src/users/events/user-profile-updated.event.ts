@@ -1,4 +1,4 @@
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
 
 export const USER_PROFILE_UPDATED_EVENT = 'user.profile_updated';
 
@@ -11,22 +11,17 @@ export type UserProfileUpdatedMetadata = {
   source: 'user';
 };
 
-export type UserProfileUpdatedEvent = DomainEvent<
+export class UserProfileUpdatedEvent extends DomainEventBase<
   UserProfileUpdatedPayload,
   UserProfileUpdatedMetadata
->;
-
-export function createUserProfileUpdatedEvent(
-  payload: UserProfileUpdatedPayload,
-): UserProfileUpdatedEvent {
-  return {
-    aggregateType: 'user',
-    aggregateId: payload.userId,
-    eventType: USER_PROFILE_UPDATED_EVENT,
-    eventVersion: 1,
-    payload,
-    metadata: {
-      source: 'user',
-    },
-  };
+> {
+  readonly aggregateType = 'user';
+  readonly eventType = USER_PROFILE_UPDATED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.userId;
+  }
+  static create(payload: UserProfileUpdatedPayload): UserProfileUpdatedEvent {
+    return new UserProfileUpdatedEvent(payload, { source: 'user' });
+  }
 }

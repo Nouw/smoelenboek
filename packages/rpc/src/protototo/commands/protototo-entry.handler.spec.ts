@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
+import { ProtototoEntrySubmittedEvent } from '../events/protototo.events';
 import { SubmitProtototoEntryHandler } from './protototo-entry.handler';
 import { SubmitProtototoEntryCommand } from './protototo.commands';
 
@@ -25,21 +26,22 @@ describe('SubmitProtototoEntryHandler', () => {
     const member = harness({ tikkieUrl: 'https://tikkie.me/pay/example' });
     await expect(
       member.handler.execute(
-        command(userId, [
-          { matchId: matchOne, setWinners: [true, true, true] },
-        ]),
+        command(userId, [{ matchId: matchOne, setWinners: [true, true, true] }]),
       ),
     ).resolves.toBeDefined();
-    const memberEvent = member.preparedEvents[0];
-    expect(memberEvent).toEqual(
-      expect.objectContaining({
-        payload: expect.objectContaining({
-          participantType: 'member',
-          email: null,
-          paymentClaimedAt: null,
-        }),
+    const [memberEvent] = (
+      member.appendPreparedAndPublish as jest.MockedFunction<
+        typeof member.appendPreparedAndPublish
+      >
+    ).mock.calls[0] as [(m: unknown) => Promise<ProtototoEntrySubmittedEvent>];
+    const event = await memberEvent({});
+    expect(event.toRecord()).toMatchObject({
+      payload: expect.objectContaining({
+        participantType: 'member',
+        email: null,
+        paymentClaimedAt: null,
       }),
-    );
+    });
   });
 
   it('normalizes and replaces the same anonymous identity atomically', async () => {
@@ -53,11 +55,7 @@ describe('SubmitProtototoEntryHandler', () => {
       command(
         null,
         [{ matchId: matchOne, setWinners: [false, false, false] }],
-        {
-          firstName: '  Ada  ',
-          email: ' ADA@Example.COM ',
-          paymentClaimed: true,
-        },
+        { firstName: '  Ada  ', email: ' ADA@Example.COM ', paymentClaimed: true },
       ),
     );
 
@@ -70,17 +68,21 @@ describe('SubmitProtototoEntryHandler', () => {
       'ada@example.com',
       expect.anything(),
     );
-    expect(state.preparedEvents[0]).toEqual(
-      expect.objectContaining({
-        aggregateId: existing.id,
-        payload: expect.objectContaining({
-          entryId: existing.id,
-          firstName: 'Ada',
-          email: 'ada@example.com',
-          firstNameNormalized: 'ada',
-        }),
+    const [prepare] = (
+      state.appendPreparedAndPublish as jest.MockedFunction<
+        typeof state.appendPreparedAndPublish
+      >
+    ).mock.calls[0] as [(m: unknown) => Promise<ProtototoEntrySubmittedEvent>];
+    const event = await prepare({});
+    expect(event.toRecord()).toMatchObject({
+      payload: expect.objectContaining({
+        entryId: existing.id,
+        firstName: 'Ada',
+        email: 'ada@example.com',
+        firstNameNormalized: 'ada',
       }),
-    );
+    });
+    expect(event.aggregateId).toBe(existing.id);
   });
 
   it('rejects stale lineups and accepts the exact late-added lineup', async () => {
@@ -104,10 +106,7 @@ describe('SubmitProtototoEntryHandler', () => {
           null,
           [
             { matchId: matchOne, setWinners: [true, true, true] },
-            {
-              matchId: matchTwo,
-              setWinners: [true, false, true, false],
-            },
+            { matchId: matchTwo, setWinners: [true, false, true, false] },
           ],
           { firstName: 'Ada', email: 'ada@example.com' },
         ),
@@ -136,11 +135,7 @@ describe('SubmitProtototoEntryHandler', () => {
 function command(
   actorUserId: string | null,
   predictions: Array<{ matchId: string; setWinners: boolean[] }>,
-  anonymous: {
-    firstName?: string;
-    email?: string;
-    paymentClaimed?: boolean;
-  } = {},
+  anonymous: { firstName?: string; email?: string; paymentClaimed?: boolean } = {},
 ) {
   return new SubmitProtototoEntryCommand(
     actorUserId,
@@ -157,10 +152,7 @@ function harness(
   options: {
     tikkieUrl?: string | null;
     closesAt?: Date;
-    matches?: Array<{
-      id: string;
-      format: 'best_of_5' | 'four_sets' | 'four_plus_one';
-    }>;
+    matches?: Array<{ id: string; format: 'best_of_5' | 'four_sets' | 'four_plus_one' }>;
     anonymousEntry?: unknown;
   } = {},
 ) {
@@ -172,36 +164,27 @@ function harness(
     closesAt: options.closesAt ?? new Date('2026-10-02T00:00:00.000Z'),
     tikkieUrl: options.tikkieUrl ?? null,
   };
+  const stubEntry = { id: 'projected-entry', roundId };
   const repository = {
     findRoundForUpdate: jest.fn().mockResolvedValue(round),
-    findActiveMatches: jest
-      .fn()
-      .mockResolvedValue(
-        options.matches ?? [{ id: matchOne, format: 'best_of_5' }],
-      ),
-    findMemberEntry: jest.fn().mockResolvedValue(null),
-    findAnonymousEntry: jest
-      .fn()
-      .mockResolvedValue(options.anonymousEntry ?? null),
-  };
-  const preparedEvents: unknown[] = [];
-  const events = {
-    appendPreparedAndProject: jest.fn(
-      async (prepare: (manager: unknown) => Promise<unknown>) => {
-        const event = await prepare({});
-        preparedEvents.push(event);
-        return { id: 'entry' };
-      },
+    findActiveMatches: jest.fn().mockResolvedValue(
+      options.matches ?? [{ id: matchOne, format: 'best_of_5' }],
     ),
+    findMemberEntry: jest.fn().mockResolvedValue(null),
+    findAnonymousEntry: jest.fn().mockResolvedValue(options.anonymousEntry ?? null),
+    findEntry: jest.fn().mockResolvedValue(stubEntry),
   };
+  const appendPreparedAndPublish = jest.fn(
+    async (prepare: (manager: unknown) => Promise<ProtototoEntrySubmittedEvent>) => {
+      await prepare({});
+    },
+  );
   return {
     round,
     repository,
-    events,
-    preparedEvents,
+    appendPreparedAndPublish,
     handler: new SubmitProtototoEntryHandler(
-      events as never,
-      {} as never,
+      { appendPreparedAndPublish } as never,
       repository as never,
       {
         findById: jest.fn().mockResolvedValue({

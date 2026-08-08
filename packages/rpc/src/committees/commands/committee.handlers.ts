@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import {
   getLocalDate,
   getSeasonKey,
@@ -14,13 +14,12 @@ import {
   toCommitteeMembershipDto,
 } from '../dto/committee-output';
 import {
-  createCommitteeArchivedEvent,
-  createCommitteeCreatedEvent,
-  createCommitteeMemberAssignedEvent,
-  createCommitteeMemberRemovedEvent,
-  createCommitteeUpdatedEvent,
+  CommitteeArchivedEvent,
+  CommitteeCreatedEvent,
+  CommitteeMemberAssignedEvent,
+  CommitteeMemberRemovedEvent,
+  CommitteeUpdatedEvent,
 } from '../events/committee-events';
-import { CommitteeProjector } from '../projectors/committee-projector';
 import { CommitteesRepository } from '../repositories/committees.repository';
 import {
   ArchiveCommitteeCommand,
@@ -35,25 +34,20 @@ export class CreateCommitteeHandler
   implements ICommandHandler<CreateCommitteeCommand, CommitteeDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly committeeProjector: CommitteeProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly committeesRepository: CommitteesRepository,
   ) {}
 
   async execute(command: CreateCommitteeCommand): Promise<CommitteeDto> {
-    const event = createCommitteeCreatedEvent({
-      committeeId: randomUUID(),
+    const committeeId = randomUUID();
+    const event = CommitteeCreatedEvent.create({
+      committeeId,
       name: command.name,
       archivedAt: null,
     });
-    const committee = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.committeeProjector.projectCommitteeSnapshot(
-          event.payload,
-          manager,
-        ),
-    );
-
+    await this.eventStorePublisher.appendAndPublish(event);
+    const committee = await this.committeesRepository.findById(committeeId);
+    if (!committee) throw new Error('Committee projection missing after dispatch.');
     return toCommitteeDto(committee);
   }
 }
@@ -63,32 +57,22 @@ export class UpdateCommitteeHandler
   implements ICommandHandler<UpdateCommitteeCommand, CommitteeDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly committeeProjector: CommitteeProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly committeesRepository: CommitteesRepository,
   ) {}
 
   async execute(command: UpdateCommitteeCommand): Promise<CommitteeDto> {
     const existing = await this.committeesRepository.findById(command.id);
+    if (!existing) throw new NotFoundException('Committee not found.');
 
-    if (!existing) {
-      throw new NotFoundException('Committee not found.');
-    }
-
-    const event = createCommitteeUpdatedEvent({
+    const event = CommitteeUpdatedEvent.create({
       committeeId: command.id,
       name: command.name,
       archivedAt: existing.archivedAt?.toISOString() ?? null,
     });
-    const committee = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.committeeProjector.projectCommitteeSnapshot(
-          event.payload,
-          manager,
-        ),
-    );
-
+    await this.eventStorePublisher.appendAndPublish(event);
+    const committee = await this.committeesRepository.findById(command.id);
+    if (!committee) throw new Error('Committee projection missing after dispatch.');
     return toCommitteeDto(committee);
   }
 }
@@ -98,32 +82,22 @@ export class ArchiveCommitteeHandler
   implements ICommandHandler<ArchiveCommitteeCommand, CommitteeDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly committeeProjector: CommitteeProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly committeesRepository: CommitteesRepository,
   ) {}
 
   async execute(command: ArchiveCommitteeCommand): Promise<CommitteeDto> {
     const existing = await this.committeesRepository.findById(command.id);
+    if (!existing) throw new NotFoundException('Committee not found.');
 
-    if (!existing) {
-      throw new NotFoundException('Committee not found.');
-    }
-
-    const event = createCommitteeArchivedEvent({
+    const event = CommitteeArchivedEvent.create({
       committeeId: command.id,
       name: existing.name,
       archivedAt: new Date().toISOString(),
     });
-    const committee = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.committeeProjector.projectCommitteeSnapshot(
-          event.payload,
-          manager,
-        ),
-    );
-
+    await this.eventStorePublisher.appendAndPublish(event);
+    const committee = await this.committeesRepository.findById(command.id);
+    if (!committee) throw new Error('Committee projection missing after dispatch.');
     return toCommitteeDto(committee);
   }
 }
@@ -134,16 +108,17 @@ export class AssignCommitteeMemberHandler
     ICommandHandler<AssignCommitteeMemberCommand, CommitteeMembershipDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly committeeProjector: CommitteeProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly committeesRepository: CommitteesRepository,
   ) {}
 
   async execute(
     command: AssignCommitteeMemberCommand,
   ): Promise<CommitteeMembershipDto> {
     const seasonKey = command.seasonKey ?? getSeasonKey(new Date());
-    const event = createCommitteeMemberAssignedEvent({
-      membershipId: randomUUID(),
+    const membershipId = randomUUID();
+    const event = CommitteeMemberAssignedEvent.create({
+      membershipId,
       userId: command.userId,
       committeeId: command.committeeId,
       seasonKey,
@@ -151,12 +126,13 @@ export class AssignCommitteeMemberHandler
       startedOn: resolveMembershipStart(seasonKey, command.startedOn),
       endedOn: null,
     });
-    const membership = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.committeeProjector.projectMemberAssigned(event.payload, manager),
-    );
-
+    await this.eventStorePublisher.appendAndPublish(event);
+    const membership =
+      await this.committeesRepository.findMembershipById(membershipId);
+    if (!membership)
+      throw new Error(
+        'Committee membership projection missing after dispatch.',
+      );
     return toCommitteeMembershipDto(membership);
   }
 }
@@ -167,23 +143,21 @@ export class RemoveCommitteeMemberHandler
     ICommandHandler<RemoveCommitteeMemberCommand, CommitteeMembershipDto | null>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly committeeProjector: CommitteeProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly committeesRepository: CommitteesRepository,
   ) {}
 
   async execute(
     command: RemoveCommitteeMemberCommand,
   ): Promise<CommitteeMembershipDto | null> {
-    const event = createCommitteeMemberRemovedEvent({
+    const event = CommitteeMemberRemovedEvent.create({
       membershipId: command.membershipId,
       removedOn: getLocalDate(new Date()),
     });
-    const membership = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.committeeProjector.projectMemberRemoved(event.payload, manager),
+    await this.eventStorePublisher.appendAndPublish(event);
+    const membership = await this.committeesRepository.findMembershipById(
+      command.membershipId,
     );
-
     return membership ? toCommitteeMembershipDto(membership) : null;
   }
 }

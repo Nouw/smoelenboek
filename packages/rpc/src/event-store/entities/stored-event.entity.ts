@@ -4,7 +4,10 @@ import {
   Entity,
   Generated,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+
+export type DispatchStatus = 'pending' | 'dispatching' | 'dispatched' | 'failed';
 
 @Entity({ name: 'stored_events' })
 export class StoredEventEntity {
@@ -35,5 +38,20 @@ export class StoredEventEntity {
 
   @CreateDateColumn({ type: 'timestamptz' })
   occurredAt!: Date;
+
+  @Column({ type: 'varchar', length: 16, default: 'pending' })
+  dispatchStatus!: DispatchStatus;
+
+  @Column({ type: 'integer', default: 0 })
+  dispatchAttempts!: number;
+
+  @Column({ type: 'timestamptz', default: () => 'now()' })
+  nextDispatchAt!: Date;
+
+  @Column({ type: 'text', nullable: true })
+  lastDispatchError!: string | null;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt!: Date;
 }
 

@@ -8,19 +8,18 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { resolveMembershipStart } from '../../seasons/season-policy';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { toTeamDto, toTeamMembershipDto } from '../dto/team-output';
 import {
-  createTeamArchivedEvent,
-  createTeamCreatedEvent,
-  createTeamMemberAssignedEvent,
-  createTeamMemberRemovedEvent,
-  createTeamRestoredEvent,
-  createTeamUpdatedEvent,
+  TeamArchivedEvent,
+  TeamCreatedEvent,
+  TeamMemberAssignedEvent,
+  TeamMemberRemovedEvent,
+  TeamRestoredEvent,
+  TeamUpdatedEvent,
 } from '../events/team-events';
-import { TeamProjector } from '../projectors/team-projector';
 import { TeamsRepository } from '../repositories/teams.repository';
 import {
   ArchiveTeamCommand,
@@ -38,8 +37,7 @@ export class CreateTeamHandler
   private readonly logger = new Logger(CreateTeamHandler.name);
 
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly teamProjector: TeamProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly teamsRepository: TeamsRepository,
   ) {}
 
@@ -52,7 +50,7 @@ export class CreateTeamHandler
       throw new ConflictException('A team with this name already exists.');
     }
 
-    const event = createTeamCreatedEvent(
+    const event = TeamCreatedEvent.create(
       {
         teamId: randomUUID(),
         name: command.name,
@@ -62,11 +60,12 @@ export class CreateTeamHandler
       },
       command.actorUserId,
     );
-    const team = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.teamProjector.projectTeamSnapshot(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const team = await this.teamsRepository.findById(event.payload.teamId);
+
+    if (!team) {
+      throw new Error('Team projection missing after dispatch.');
+    }
 
     this.logger.log({
       event: 'team_created',
@@ -85,8 +84,7 @@ export class UpdateTeamHandler
   private readonly logger = new Logger(UpdateTeamHandler.name);
 
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly teamProjector: TeamProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly teamsRepository: TeamsRepository,
   ) {}
 
@@ -105,7 +103,7 @@ export class UpdateTeamHandler
       throw new ConflictException('A team with this name already exists.');
     }
 
-    const event = createTeamUpdatedEvent(
+    const event = TeamUpdatedEvent.create(
       {
         teamId: command.id,
         name: command.name,
@@ -116,11 +114,12 @@ export class UpdateTeamHandler
       },
       command.actorUserId,
     );
-    const team = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.teamProjector.projectTeamSnapshot(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const team = await this.teamsRepository.findById(command.id);
+
+    if (!team) {
+      throw new Error('Team projection missing after dispatch.');
+    }
 
     this.logger.log({
       event: 'team_updated',
@@ -139,8 +138,7 @@ export class ArchiveTeamHandler
   private readonly logger = new Logger(ArchiveTeamHandler.name);
 
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly teamProjector: TeamProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly teamsRepository: TeamsRepository,
   ) {}
 
@@ -155,7 +153,7 @@ export class ArchiveTeamHandler
       return toTeamDto(existing);
     }
 
-    const event = createTeamArchivedEvent(
+    const event = TeamArchivedEvent.create(
       {
         teamId: command.id,
         name: existing.name,
@@ -165,11 +163,12 @@ export class ArchiveTeamHandler
       },
       command.actorUserId,
     );
-    const team = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.teamProjector.projectTeamSnapshot(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const team = await this.teamsRepository.findById(command.id);
+
+    if (!team) {
+      throw new Error('Team projection missing after dispatch.');
+    }
 
     this.logger.log({
       event: 'team_archived',
@@ -188,8 +187,7 @@ export class RestoreTeamHandler
   private readonly logger = new Logger(RestoreTeamHandler.name);
 
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly teamProjector: TeamProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly teamsRepository: TeamsRepository,
   ) {}
 
@@ -204,7 +202,7 @@ export class RestoreTeamHandler
       return toTeamDto(existing);
     }
 
-    const event = createTeamRestoredEvent(
+    const event = TeamRestoredEvent.create(
       {
         teamId: existing.id,
         name: existing.name,
@@ -214,11 +212,12 @@ export class RestoreTeamHandler
       },
       command.actorUserId,
     );
-    const team = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.teamProjector.projectTeamSnapshot(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const team = await this.teamsRepository.findById(command.id);
+
+    if (!team) {
+      throw new Error('Team projection missing after dispatch.');
+    }
 
     this.logger.log({
       event: 'team_restored',
@@ -237,8 +236,7 @@ export class AssignTeamMemberHandler
   private readonly logger = new Logger(AssignTeamMemberHandler.name);
 
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly teamProjector: TeamProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly teamsRepository: TeamsRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
@@ -283,9 +281,10 @@ export class AssignTeamMemberHandler
       );
     }
 
-    const event = createTeamMemberAssignedEvent(
+    const membershipId = randomUUID();
+    const event = TeamMemberAssignedEvent.create(
       {
-        membershipId: randomUUID(),
+        membershipId,
         userId: command.userId,
         teamId: command.teamId,
         seasonKey: command.seasonKey,
@@ -295,11 +294,12 @@ export class AssignTeamMemberHandler
       },
       command.actorUserId,
     );
-    const membership = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.teamProjector.projectMemberAssigned(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const membership = await this.teamsRepository.findMembershipById(membershipId);
+
+    if (!membership) {
+      throw new Error('Membership projection missing after dispatch.');
+    }
 
     this.logger.log({
       event: 'team_member_assigned',
@@ -322,8 +322,7 @@ export class RemoveTeamMemberHandler
   private readonly logger = new Logger(RemoveTeamMemberHandler.name);
 
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly teamProjector: TeamProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly teamsRepository: TeamsRepository,
   ) {}
 
@@ -335,26 +334,19 @@ export class RemoveTeamMemberHandler
     if (!existing) {
       throw new NotFoundException('Team membership not found.');
     }
-    const event = createTeamMemberRemovedEvent(
+
+    const event = TeamMemberRemovedEvent.create(
       { membershipId: command.membershipId },
       command.actorUserId,
     );
-    const membership = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.teamProjector.projectMemberRemoved(event.payload, manager),
-    );
-
-    if (!membership) {
-      throw new NotFoundException('Team membership not found.');
-    }
+    await this.eventStorePublisher.appendAndPublish(event);
 
     this.logger.log({
       event: 'team_membership_removed',
-      membershipId: membership.id,
+      membershipId: existing.id,
       actorUserId: command.actorUserId,
     });
 
-    return toTeamMembershipDto(membership);
+    return toTeamMembershipDto(existing);
   }
 }

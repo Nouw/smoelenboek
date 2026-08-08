@@ -1,6 +1,6 @@
 import type { TeamCategory, TeamRole } from '@repo/api';
 
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
 
 export const TEAM_CREATED_EVENT = 'team.created';
 export const TEAM_UPDATED_EVENT = 'team.updated';
@@ -31,88 +31,64 @@ export type TeamMembershipRemovedPayload = {
   membershipId: string;
 };
 
-type ManualMetadata = { source: 'manual'; actorUserId: string };
+export type ManualMetadata = { source: 'manual'; actorUserId: string };
 
-export function createTeamCreatedEvent(
-  payload: TeamSnapshotPayload,
-  actorUserId: string,
-): DomainEvent<TeamSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'team',
-    aggregateId: payload.teamId,
-    eventType: TEAM_CREATED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual', actorUserId },
-  };
+export class TeamCreatedEvent extends DomainEventBase<TeamSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'team';
+  readonly eventType = TEAM_CREATED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.teamId; }
+  static create(payload: TeamSnapshotPayload, actorUserId: string): TeamCreatedEvent {
+    return new TeamCreatedEvent(payload, { source: 'manual', actorUserId });
+  }
 }
 
-export function createTeamUpdatedEvent(
-  payload: TeamSnapshotPayload,
-  actorUserId: string,
-): DomainEvent<TeamSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'team',
-    aggregateId: payload.teamId,
-    eventType: TEAM_UPDATED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual', actorUserId },
-  };
+export class TeamUpdatedEvent extends DomainEventBase<TeamSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'team';
+  readonly eventType = TEAM_UPDATED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.teamId; }
+  static create(payload: TeamSnapshotPayload, actorUserId: string): TeamUpdatedEvent {
+    return new TeamUpdatedEvent(payload, { source: 'manual', actorUserId });
+  }
 }
 
-export function createTeamArchivedEvent(
-  payload: TeamSnapshotPayload,
-  actorUserId: string,
-): DomainEvent<TeamSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'team',
-    aggregateId: payload.teamId,
-    eventType: TEAM_ARCHIVED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual', actorUserId },
-  };
+export class TeamArchivedEvent extends DomainEventBase<TeamSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'team';
+  readonly eventType = TEAM_ARCHIVED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.teamId; }
+  static create(payload: TeamSnapshotPayload, actorUserId: string): TeamArchivedEvent {
+    return new TeamArchivedEvent(payload, { source: 'manual', actorUserId });
+  }
 }
 
-export function createTeamRestoredEvent(
-  payload: TeamSnapshotPayload,
-  actorUserId: string,
-): DomainEvent<TeamSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'team',
-    aggregateId: payload.teamId,
-    eventType: TEAM_RESTORED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual', actorUserId },
-  };
+export class TeamRestoredEvent extends DomainEventBase<TeamSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'team';
+  readonly eventType = TEAM_RESTORED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.teamId; }
+  static create(payload: TeamSnapshotPayload, actorUserId: string): TeamRestoredEvent {
+    return new TeamRestoredEvent(payload, { source: 'manual', actorUserId });
+  }
 }
 
-export function createTeamMemberAssignedEvent(
-  payload: TeamMembershipAssignedPayload,
-  actorUserId: string,
-): DomainEvent<TeamMembershipAssignedPayload, ManualMetadata> {
-  return {
-    aggregateType: 'team_membership',
-    aggregateId: payload.membershipId,
-    eventType: TEAM_MEMBER_ASSIGNED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual', actorUserId },
-  };
+export class TeamMemberAssignedEvent extends DomainEventBase<TeamMembershipAssignedPayload, ManualMetadata> {
+  readonly aggregateType = 'team_membership';
+  readonly eventType = TEAM_MEMBER_ASSIGNED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.membershipId; }
+  static create(payload: TeamMembershipAssignedPayload, actorUserId: string): TeamMemberAssignedEvent {
+    return new TeamMemberAssignedEvent(payload, { source: 'manual', actorUserId });
+  }
 }
 
-export function createTeamMemberRemovedEvent(
-  payload: TeamMembershipRemovedPayload,
-  actorUserId: string,
-): DomainEvent<TeamMembershipRemovedPayload, ManualMetadata> {
-  return {
-    aggregateType: 'team_membership',
-    aggregateId: payload.membershipId,
-    eventType: TEAM_MEMBER_REMOVED_EVENT,
-    eventVersion: 3,
-    payload,
-    metadata: { source: 'manual', actorUserId },
-  };
+export class TeamMemberRemovedEvent extends DomainEventBase<TeamMembershipRemovedPayload, ManualMetadata> {
+  readonly aggregateType = 'team_membership';
+  readonly eventType = TEAM_MEMBER_REMOVED_EVENT;
+  readonly eventVersion = 3;
+  get aggregateId(): string { return this.payload.membershipId; }
+  static create(payload: TeamMembershipRemovedPayload, actorUserId: string): TeamMemberRemovedEvent {
+    return new TeamMemberRemovedEvent(payload, { source: 'manual', actorUserId });
+  }
 }

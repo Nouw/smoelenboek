@@ -1,4 +1,4 @@
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
 
 export const USER_SYNCED_FROM_AUTH_EVENT = 'user.synced_from_auth';
 
@@ -18,22 +18,17 @@ export type UserSyncedFromAuthMetadata = {
   source: 'better-auth';
 };
 
-export type UserSyncedFromAuthEvent = DomainEvent<
+export class UserSyncedFromAuthEvent extends DomainEventBase<
   UserSyncedFromAuthPayload,
   UserSyncedFromAuthMetadata
->;
-
-export function createUserSyncedFromAuthEvent(
-  payload: UserSyncedFromAuthPayload,
-): UserSyncedFromAuthEvent {
-  return {
-    aggregateType: 'user',
-    aggregateId: payload.userId,
-    eventType: USER_SYNCED_FROM_AUTH_EVENT,
-    eventVersion: 1,
-    payload,
-    metadata: {
-      source: 'better-auth',
-    },
-  };
+> {
+  readonly aggregateType = 'user';
+  readonly eventType = USER_SYNCED_FROM_AUTH_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.userId;
+  }
+  static create(payload: UserSyncedFromAuthPayload): UserSyncedFromAuthEvent {
+    return new UserSyncedFromAuthEvent(payload, { source: 'better-auth' });
+  }
 }

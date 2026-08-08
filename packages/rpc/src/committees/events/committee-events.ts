@@ -1,6 +1,6 @@
 import type { CommitteeRole } from '@repo/api';
 
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
 
 export const COMMITTEE_CREATED_EVENT = 'committee.created';
 export const COMMITTEE_UPDATED_EVENT = 'committee.updated';
@@ -29,69 +29,54 @@ export type CommitteeMembershipEndedPayload = {
   removedOn: string;
 };
 
-type ManualMetadata = { source: 'manual' };
+export type ManualMetadata = { source: 'manual' };
 
-export function createCommitteeCreatedEvent(
-  payload: CommitteeSnapshotPayload,
-): DomainEvent<CommitteeSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'committee',
-    aggregateId: payload.committeeId,
-    eventType: COMMITTEE_CREATED_EVENT,
-    eventVersion: 1,
-    payload,
-    metadata: { source: 'manual' },
-  };
+export class CommitteeCreatedEvent extends DomainEventBase<CommitteeSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'committee';
+  readonly eventType = COMMITTEE_CREATED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.committeeId; }
+  static create(payload: CommitteeSnapshotPayload): CommitteeCreatedEvent {
+    return new CommitteeCreatedEvent(payload, { source: 'manual' });
+  }
 }
 
-export function createCommitteeUpdatedEvent(
-  payload: CommitteeSnapshotPayload,
-): DomainEvent<CommitteeSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'committee',
-    aggregateId: payload.committeeId,
-    eventType: COMMITTEE_UPDATED_EVENT,
-    eventVersion: 1,
-    payload,
-    metadata: { source: 'manual' },
-  };
+export class CommitteeUpdatedEvent extends DomainEventBase<CommitteeSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'committee';
+  readonly eventType = COMMITTEE_UPDATED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.committeeId; }
+  static create(payload: CommitteeSnapshotPayload): CommitteeUpdatedEvent {
+    return new CommitteeUpdatedEvent(payload, { source: 'manual' });
+  }
 }
 
-export function createCommitteeArchivedEvent(
-  payload: CommitteeSnapshotPayload,
-): DomainEvent<CommitteeSnapshotPayload, ManualMetadata> {
-  return {
-    aggregateType: 'committee',
-    aggregateId: payload.committeeId,
-    eventType: COMMITTEE_ARCHIVED_EVENT,
-    eventVersion: 1,
-    payload,
-    metadata: { source: 'manual' },
-  };
+export class CommitteeArchivedEvent extends DomainEventBase<CommitteeSnapshotPayload, ManualMetadata> {
+  readonly aggregateType = 'committee';
+  readonly eventType = COMMITTEE_ARCHIVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.committeeId; }
+  static create(payload: CommitteeSnapshotPayload): CommitteeArchivedEvent {
+    return new CommitteeArchivedEvent(payload, { source: 'manual' });
+  }
 }
 
-export function createCommitteeMemberAssignedEvent(
-  payload: CommitteeMembershipAssignedPayload,
-): DomainEvent<CommitteeMembershipAssignedPayload, ManualMetadata> {
-  return {
-    aggregateType: 'committee_membership',
-    aggregateId: payload.membershipId,
-    eventType: COMMITTEE_MEMBER_ASSIGNED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual' },
-  };
+export class CommitteeMemberAssignedEvent extends DomainEventBase<CommitteeMembershipAssignedPayload, ManualMetadata> {
+  readonly aggregateType = 'committee_membership';
+  readonly eventType = COMMITTEE_MEMBER_ASSIGNED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.membershipId; }
+  static create(payload: CommitteeMembershipAssignedPayload): CommitteeMemberAssignedEvent {
+    return new CommitteeMemberAssignedEvent(payload, { source: 'manual' });
+  }
 }
 
-export function createCommitteeMemberRemovedEvent(
-  payload: CommitteeMembershipEndedPayload,
-): DomainEvent<CommitteeMembershipEndedPayload, ManualMetadata> {
-  return {
-    aggregateType: 'committee_membership',
-    aggregateId: payload.membershipId,
-    eventType: COMMITTEE_MEMBER_REMOVED_EVENT,
-    eventVersion: 2,
-    payload,
-    metadata: { source: 'manual' },
-  };
+export class CommitteeMemberRemovedEvent extends DomainEventBase<CommitteeMembershipEndedPayload, ManualMetadata> {
+  readonly aggregateType = 'committee_membership';
+  readonly eventType = COMMITTEE_MEMBER_REMOVED_EVENT;
+  readonly eventVersion = 2;
+  get aggregateId(): string { return this.payload.membershipId; }
+  static create(payload: CommitteeMembershipEndedPayload): CommitteeMemberRemovedEvent {
+    return new CommitteeMemberRemovedEvent(payload, { source: 'manual' });
+  }
 }

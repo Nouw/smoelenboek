@@ -3,6 +3,10 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
 import {
+  TeamMemberAssignedEvent,
+  TeamMemberRemovedEvent,
+} from '../events/team-events';
+import {
   AssignTeamMemberCommand,
   RemoveTeamMemberCommand,
 } from './team.commands';
@@ -19,12 +23,11 @@ const now = new Date('2026-07-21T12:00:00.000Z');
 
 describe('team membership handlers', () => {
   it('validates dependencies and records actor metadata on assignment', async () => {
-    const appendAndProject = jest
+    const membershipEntity = membership({ seasonKey: 2025, startedOn: '2026-01-10' });
+    const appendAndPublish = jest
       .fn()
-      .mockResolvedValue(
-        membership({ seasonKey: 2025, startedOn: '2026-01-10' }),
-      );
-    const handler = assignHandler({ appendAndProject });
+      .mockResolvedValue({ dispatched: true });
+    const handler = assignHandler({ appendAndPublish }, {}, null, membershipEntity);
 
     await handler.execute(
       new AssignTeamMemberCommand(
@@ -37,17 +40,16 @@ describe('team membership handlers', () => {
       ),
     );
 
-    expect(appendAndProject).toHaveBeenCalledWith(
-      expect.objectContaining({
-        metadata: { source: 'manual', actorUserId },
-        payload: expect.objectContaining({
-          seasonKey: 2025,
-          startedOn: '2026-01-10',
-          endedOn: null,
-        }),
+    expect(appendAndPublish).toHaveBeenCalledWith(expect.any(TeamMemberAssignedEvent));
+    const [event] = (appendAndPublish as jest.MockedFunction<typeof appendAndPublish>).mock.calls[0] as [TeamMemberAssignedEvent];
+    expect(event.toRecord()).toMatchObject({
+      metadata: { source: 'manual', actorUserId },
+      payload: expect.objectContaining({
+        seasonKey: 2025,
+        startedOn: '2026-01-10',
+        endedOn: null,
       }),
-      expect.any(Function),
-    );
+    });
   });
 
   it('rejects assignment to an archived team', async () => {
@@ -84,30 +86,28 @@ describe('team membership handlers', () => {
     ).rejects.toThrow('already has this active team role');
   });
 
-  it('removes a membership without an end date and records actor metadata', async () => {
+  it('removes a membership and returns DTO from the pre-delete snapshot', async () => {
     const entity = membership();
-    const appendAndProject = jest.fn().mockResolvedValue(entity);
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
     const handler = new RemoveTeamMemberHandler(
-      { appendAndProject } as never,
-      {} as never,
+      { appendAndPublish } as never,
       { findMembershipById: jest.fn().mockResolvedValue(entity) } as never,
     );
 
-    await handler.execute(new RemoveTeamMemberCommand(membershipId, actorUserId));
+    const result = await handler.execute(new RemoveTeamMemberCommand(membershipId, actorUserId));
 
-    expect(appendAndProject).toHaveBeenCalledWith(
-      expect.objectContaining({
-        metadata: { source: 'manual', actorUserId },
-        eventVersion: 3,
-        payload: { membershipId },
-      }),
-      expect.any(Function),
-    );
+    expect(appendAndPublish).toHaveBeenCalledWith(expect.any(TeamMemberRemovedEvent));
+    const [event] = (appendAndPublish as jest.MockedFunction<typeof appendAndPublish>).mock.calls[0] as [TeamMemberRemovedEvent];
+    expect(event.toRecord()).toMatchObject({
+      metadata: { source: 'manual', actorUserId },
+      eventVersion: 3,
+      payload: { membershipId },
+    });
+    expect(result.id).toBe(membershipId);
   });
 
   it('rejects removal of an unknown membership', async () => {
     const handler = new RemoveTeamMemberHandler(
-      {} as never,
       {} as never,
       {
         findMembershipById: jest.fn().mockResolvedValue(null),
@@ -121,15 +121,15 @@ describe('team membership handlers', () => {
 });
 
 function assignHandler(
-  eventStore: { appendAndProject?: jest.Mock } = {},
+  eventStore: { appendAndPublish?: jest.Mock } = {},
   teamOverrides: { archivedAt?: Date | null } = {},
   duplicate: TeamMembershipEntity | null = null,
+  membershipEntity: TeamMembershipEntity | null = null,
 ) {
   return new AssignTeamMemberHandler(
     {
-      appendAndProject: eventStore.appendAndProject ?? jest.fn(),
+      appendAndPublish: eventStore.appendAndPublish ?? jest.fn(),
     } as never,
-    {} as never,
     {
       findById: jest.fn().mockResolvedValue({
         id: teamId,
@@ -137,6 +137,7 @@ function assignHandler(
         ...teamOverrides,
       }),
       findActiveAssignment: jest.fn().mockResolvedValue(duplicate),
+      findMembershipById: jest.fn().mockResolvedValue(membershipEntity),
     } as never,
     { findById: jest.fn().mockResolvedValue({ id: userId }) } as never,
   );

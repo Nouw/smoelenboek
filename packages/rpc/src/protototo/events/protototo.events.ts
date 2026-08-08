@@ -1,6 +1,15 @@
 import type { MatchFormat, SubjectSide } from '@repo/api';
 
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
+
+export const PROTOTOTO_ROUND_SAVED_EVENT = 'protototo.round_saved';
+export const PROTOTOTO_ROUND_PUBLISHED_EVENT = 'protototo.round_published';
+export const PROTOTOTO_ROUND_ARCHIVED_EVENT = 'protototo.round_archived';
+export const PROTOTOTO_MATCH_SAVED_EVENT = 'protototo.match_saved';
+export const PROTOTOTO_MATCH_REMOVED_EVENT = 'protototo.match_removed';
+export const PROTOTOTO_ENTRY_SUBMITTED_EVENT = 'protototo.entry_submitted';
+export const PROTOTOTO_MATCH_RESULT_SYNCED_EVENT =
+  'protototo.match_result_synced';
 
 export type RoundSnapshotPayload = {
   roundId: string;
@@ -54,75 +63,131 @@ export type ResultSyncPayload = {
   error: string | null;
 };
 
-type SourceMetadata = {
-  source:
-    | 'admin'
-    | 'member'
-    | 'anonymous'
-    | 'nevobo_scheduler'
-    | 'nevobo_manual';
+type AdminMetadata = { source: 'admin'; actorId: string };
+type SchedulerMetadata = {
+  source: 'nevobo_scheduler' | 'nevobo_manual';
+  actorId?: string;
+};
+type ParticipantMetadata = {
+  source: 'member' | 'anonymous';
   actorId?: string;
 };
 
-export function roundEvent(
-  eventType:
-    | 'protototo.round_saved'
-    | 'protototo.round_published'
-    | 'protototo.round_archived',
-  payload: RoundSnapshotPayload,
-  actorId: string,
-): DomainEvent<RoundSnapshotPayload, SourceMetadata> {
-  return {
-    aggregateType: 'protototo_round',
-    aggregateId: payload.roundId,
-    eventType,
-    eventVersion: 1,
-    payload,
-    metadata: { source: 'admin', actorId },
-  };
+export class ProtototoRoundSavedEvent extends DomainEventBase<
+  RoundSnapshotPayload,
+  AdminMetadata
+> {
+  readonly aggregateType = 'protototo_round';
+  readonly eventType = PROTOTOTO_ROUND_SAVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.roundId;
+  }
+  static create(payload: RoundSnapshotPayload, actorId: string): ProtototoRoundSavedEvent {
+    return new ProtototoRoundSavedEvent(payload, { source: 'admin', actorId });
+  }
 }
 
-export function matchEvent(
-  eventType: 'protototo.match_saved' | 'protototo.match_removed',
-  payload: MatchSnapshotPayload,
-  actorId: string,
-): DomainEvent<MatchSnapshotPayload, SourceMetadata> {
-  return {
-    aggregateType: 'protototo_match',
-    aggregateId: payload.matchId,
-    eventType,
-    eventVersion: 1,
-    payload,
-    metadata: { source: 'admin', actorId },
-  };
+export class ProtototoRoundPublishedEvent extends DomainEventBase<
+  RoundSnapshotPayload,
+  AdminMetadata
+> {
+  readonly aggregateType = 'protototo_round';
+  readonly eventType = PROTOTOTO_ROUND_PUBLISHED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.roundId;
+  }
+  static create(payload: RoundSnapshotPayload, actorId: string): ProtototoRoundPublishedEvent {
+    return new ProtototoRoundPublishedEvent(payload, { source: 'admin', actorId });
+  }
 }
 
-export function entryEvent(
-  payload: EntrySnapshotPayload,
-  source: 'member' | 'anonymous',
-  actorId?: string,
-): DomainEvent<EntrySnapshotPayload, SourceMetadata> {
-  return {
-    aggregateType: 'protototo_entry',
-    aggregateId: payload.entryId,
-    eventType: 'protototo.entry_submitted',
-    eventVersion: 1,
-    payload,
-    metadata: { source, ...(actorId ? { actorId } : {}) },
-  };
+export class ProtototoRoundArchivedEvent extends DomainEventBase<
+  RoundSnapshotPayload,
+  AdminMetadata
+> {
+  readonly aggregateType = 'protototo_round';
+  readonly eventType = PROTOTOTO_ROUND_ARCHIVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.roundId;
+  }
+  static create(payload: RoundSnapshotPayload, actorId: string): ProtototoRoundArchivedEvent {
+    return new ProtototoRoundArchivedEvent(payload, { source: 'admin', actorId });
+  }
 }
 
-export function resultSyncEvent(
-  payload: ResultSyncPayload,
-  source: 'nevobo_scheduler' | 'nevobo_manual',
-  actorId?: string,
-): DomainEvent<ResultSyncPayload, SourceMetadata> {
-  return {
-    aggregateType: 'protototo_match',
-    aggregateId: payload.matchId,
-    eventType: 'protototo.match_result_synced',
-    eventVersion: 1,
-    payload,
-    metadata: { source, ...(actorId ? { actorId } : {}) },
-  };
+export class ProtototoMatchSavedEvent extends DomainEventBase<
+  MatchSnapshotPayload,
+  AdminMetadata
+> {
+  readonly aggregateType = 'protototo_match';
+  readonly eventType = PROTOTOTO_MATCH_SAVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.matchId;
+  }
+  static create(payload: MatchSnapshotPayload, actorId: string): ProtototoMatchSavedEvent {
+    return new ProtototoMatchSavedEvent(payload, { source: 'admin', actorId });
+  }
+}
+
+export class ProtototoMatchRemovedEvent extends DomainEventBase<
+  MatchSnapshotPayload,
+  AdminMetadata
+> {
+  readonly aggregateType = 'protototo_match';
+  readonly eventType = PROTOTOTO_MATCH_REMOVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.matchId;
+  }
+  static create(payload: MatchSnapshotPayload, actorId: string): ProtototoMatchRemovedEvent {
+    return new ProtototoMatchRemovedEvent(payload, { source: 'admin', actorId });
+  }
+}
+
+export class ProtototoEntrySubmittedEvent extends DomainEventBase<
+  EntrySnapshotPayload,
+  ParticipantMetadata
+> {
+  readonly aggregateType = 'protototo_entry';
+  readonly eventType = PROTOTOTO_ENTRY_SUBMITTED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.entryId;
+  }
+  static create(
+    payload: EntrySnapshotPayload,
+    source: 'member' | 'anonymous',
+    actorId?: string,
+  ): ProtototoEntrySubmittedEvent {
+    return new ProtototoEntrySubmittedEvent(
+      payload,
+      { source, ...(actorId ? { actorId } : {}) },
+    );
+  }
+}
+
+export class ProtototoMatchResultSyncedEvent extends DomainEventBase<
+  ResultSyncPayload,
+  SchedulerMetadata
+> {
+  readonly aggregateType = 'protototo_match';
+  readonly eventType = PROTOTOTO_MATCH_RESULT_SYNCED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string {
+    return this.payload.matchId;
+  }
+  static create(
+    payload: ResultSyncPayload,
+    source: 'nevobo_scheduler' | 'nevobo_manual',
+    actorId?: string,
+  ): ProtototoMatchResultSyncedEvent {
+    return new ProtototoMatchResultSyncedEvent(
+      payload,
+      { source, ...(actorId ? { actorId } : {}) },
+    );
+  }
 }

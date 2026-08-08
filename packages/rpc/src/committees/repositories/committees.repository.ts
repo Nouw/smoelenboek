@@ -45,6 +45,10 @@ export class CommitteesRepository {
     });
   }
 
+  findMembershipById(id: string): Promise<CommitteeMembershipEntity | null> {
+    return this.membershipsRepository.findOneBy({ id });
+  }
+
   findMembershipsByUser(userId: string): Promise<CommitteeMembershipEntity[]> {
     return this.membershipsRepository.find({ where: { userId } });
   }

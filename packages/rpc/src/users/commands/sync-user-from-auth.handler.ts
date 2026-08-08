@@ -1,11 +1,12 @@
 import type { UserDto } from '@repo/api';
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import type { AuthClaims } from '../../auth/auth-context';
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { toUserDto } from '../dto/user-output';
-import { createUserSyncedFromAuthEvent } from '../events/user-synced-from-auth.event';
-import { UserProjector } from '../projectors/user-projector';
+import { UserSyncedFromAuthEvent } from '../events/user-synced-from-auth.event';
+import { UsersRepository } from '../repositories/users.repository';
 import { SyncUserFromAuthCommand } from './sync-user-from-auth.command';
 
 @CommandHandler(SyncUserFromAuthCommand)
@@ -13,12 +14,12 @@ export class SyncUserFromAuthHandler
   implements ICommandHandler<SyncUserFromAuthCommand, UserDto>
 {
   constructor(
-    private readonly eventStoreRepository: EventStoreRepository,
-    private readonly userProjector: UserProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async execute(command: SyncUserFromAuthCommand): Promise<UserDto> {
-    const event = createUserSyncedFromAuthEvent({
+    const event = UserSyncedFromAuthEvent.create({
       userId: command.userId,
       authUserId: this.readStringClaim(command.claims, 'sub'),
       email: this.readStringClaim(command.claims, 'email'),
@@ -33,13 +34,9 @@ export class SyncUserFromAuthHandler
       imageUrl: this.readStringClaim(command.claims, 'image_url'),
       role: this.readStringClaim(command.claims, 'role') ?? 'user',
     });
-
-    const user = await this.eventStoreRepository.appendAndProject(
-      event,
-      (_storedEvent, manager) =>
-        this.userProjector.projectSyncedFromAuth(event.payload, manager),
-    );
-
+    await this.eventStorePublisher.appendAndPublish(event);
+    const user = await this.usersRepository.findById(command.userId);
+    if (!user) throw new NotFoundException('User not found after sync.');
     return toUserDto(user);
   }
 

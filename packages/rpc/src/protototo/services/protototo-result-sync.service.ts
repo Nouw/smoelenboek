@@ -5,12 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { ProtototoMatchEntity } from '../entities/protototo-match.entity';
-import { resultSyncEvent } from '../events/protototo.events';
+import { ProtototoMatchResultSyncedEvent } from '../events/protototo.events';
 import { NevoboClient } from '../nevobo/nevobo.client';
 import { isValidPrediction } from '../protototo.policy';
-import { ProtototoProjector } from '../projectors/protototo.projector';
 import { ProtototoRepository } from '../repositories/protototo.repository';
 
 export type ProtototoSyncSummary = {
@@ -29,8 +28,7 @@ export class ProtototoResultSyncService {
   constructor(
     private readonly repository: ProtototoRepository,
     private readonly nevobo: NevoboClient,
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
   ) {}
 
   async syncRound(
@@ -128,7 +126,7 @@ export class ProtototoResultSyncService {
     return summary;
   }
 
-  private storeAttempt(
+  private async storeAttempt(
     match: ProtototoMatchEntity,
     source: SyncSource,
     actorId: string | undefined,
@@ -136,8 +134,8 @@ export class ProtototoResultSyncService {
     resultStatus: 'pending' | 'final' | 'cancelled' | null,
     resultSetWinners: boolean[] | null,
     error: string | null,
-  ): Promise<ProtototoMatchEntity> {
-    const event = resultSyncEvent(
+  ): Promise<void> {
+    const event = ProtototoMatchResultSyncedEvent.create(
       {
         matchId: match.id,
         resultStatus,
@@ -154,9 +152,7 @@ export class ProtototoResultSyncService {
       source,
       actorId,
     );
-    return this.events.appendAndProject(event, (_stored, manager) =>
-      this.projector.projectResultSync(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
   }
 }
 

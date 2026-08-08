@@ -2,11 +2,13 @@ import { randomUUID } from 'node:crypto';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { ProtototoMatchEntity } from '../entities/protototo-match.entity';
-import { matchEvent } from '../events/protototo.events';
+import {
+  ProtototoMatchRemovedEvent,
+  ProtototoMatchSavedEvent,
+} from '../events/protototo.events';
 import { NevoboClient } from '../nevobo/nevobo.client';
-import { ProtototoProjector } from '../projectors/protototo.projector';
 import { ProtototoRepository } from '../repositories/protototo.repository';
 import {
   AddProtototoMatchCommand,
@@ -18,8 +20,7 @@ export class AddProtototoMatchHandler
   implements ICommandHandler<AddProtototoMatchCommand, ProtototoMatchEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: ProtototoRepository,
     private readonly nevobo: NevoboClient,
   ) {}
@@ -37,10 +38,10 @@ export class AddProtototoMatchHandler
         command.nevoboMatchId,
       ),
     ]);
-    const event = matchEvent(
-      'protototo.match_saved',
+    const matchId = existing?.id ?? randomUUID();
+    const event = ProtototoMatchSavedEvent.create(
       {
-        matchId: existing?.id ?? randomUUID(),
+        matchId,
         roundId: command.roundId,
         ...snapshot,
         startsAt: snapshot.startsAt.toISOString(),
@@ -48,9 +49,10 @@ export class AddProtototoMatchHandler
       },
       command.actorId,
     );
-    return this.events.appendAndProject(event, (_stored, manager) =>
-      this.projector.projectMatch(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const match = await this.repository.findMatch(matchId);
+    if (!match) throw new Error('Match projection missing after dispatch.');
+    return match;
   }
 }
 
@@ -59,8 +61,7 @@ export class RemoveProtototoMatchHandler
   implements ICommandHandler<RemoveProtototoMatchCommand, ProtototoMatchEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: ProtototoProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: ProtototoRepository,
   ) {}
 
@@ -70,8 +71,7 @@ export class RemoveProtototoMatchHandler
     const match = await this.repository.findMatch(command.matchId);
     if (!match) throw new NotFoundException('Protototo match not found.');
     if (match.removedAt) return match;
-    const event = matchEvent(
-      'protototo.match_removed',
+    const event = ProtototoMatchRemovedEvent.create(
       {
         matchId: match.id,
         roundId: match.roundId,
@@ -89,8 +89,9 @@ export class RemoveProtototoMatchHandler
       },
       command.actorId,
     );
-    return this.events.appendAndProject(event, (_stored, manager) =>
-      this.projector.projectMatch(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendAndPublish(event);
+    const removed = await this.repository.findMatch(command.matchId);
+    if (!removed) throw new Error('Match projection missing after dispatch.');
+    return removed;
   }
 }
