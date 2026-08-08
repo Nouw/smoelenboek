@@ -3,6 +3,10 @@
 import type { CreateManagedUserInput } from '@repo/api';
 import { Button } from '@repo/ui/components/button';
 import { Card, CardContent, CardTitle } from '@repo/ui/components/card';
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from '@repo/ui/components/data-table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@repo/ui/components/dialog';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
@@ -33,6 +37,74 @@ export function UserAdminContent() {
   const utils = trpc.useUtils();
   const resend = trpc.user.admin.resendInvitation.useMutation({ onSuccess: () => utils.user.admin.list.invalidate() });
 
+  const userRows = users.data ?? [];
+  const userColumns: DataTableColumnDef<(typeof userRows)[number]>[] = [
+    {
+      accessorKey: 'name',
+      header: text.name,
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.name}</span>
+      ),
+      meta: {
+        headerClassName: 'md:w-[28%]',
+        cellClassName: 'md:w-[28%]',
+      },
+    },
+    {
+      accessorKey: 'email',
+      header: text.email,
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.email}</span>
+      ),
+      meta: {
+        headerClassName: 'md:w-[28%]',
+        cellClassName: 'md:w-[28%]',
+      },
+    },
+    {
+      accessorKey: 'preferredLocale',
+      header: text.language,
+      cell: ({ row }) => row.original.preferredLocale.toUpperCase(),
+      meta: {
+        headerClassName: 'md:w-[12%]',
+        cellClassName: 'md:w-[12%]',
+      },
+    },
+    {
+      accessorKey: 'invitationStatus',
+      header: text.status,
+      cell: ({ row }) => (
+        <span className="inline-block rounded-full bg-muted px-2.5 py-1 text-xs">
+          {statusLabel(row.original.invitationStatus, text)}
+        </span>
+      ),
+      meta: {
+        headerClassName: 'md:w-[16%]',
+        cellClassName: 'md:w-[16%]',
+      },
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) =>
+        row.original.accountActivatedAt === null ? (
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={resend.isPending}
+            onClick={() => resend.mutate({ userId: row.original.id })}
+          >
+            <MailPlus />
+            {text.resend}
+          </Button>
+        ) : null,
+      meta: {
+        headerClassName: 'md:w-[16%]',
+        cellClassName: 'empty:hidden md:w-[16%] md:text-right',
+      },
+    },
+  ];
+
   if (currentUser.isLoading) return <State icon={Loader2} spin title={text.loading} />;
   if (!currentUser.isAdmin) return <State icon={ShieldAlert} title={text.forbidden} detail={text.forbiddenDetail} />;
 
@@ -44,16 +116,15 @@ export function UserAdminContent() {
       </header>
       <div className="relative max-w-md"><Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" /><Input aria-label={text.search} className="pl-9" placeholder={text.search} value={query} onChange={(event) => setQuery(event.target.value)} /></div>
       {users.isLoading ? <State icon={Loader2} spin title={text.loading} /> : users.isError ? <State icon={ShieldAlert} title={text.loadFailed} detail={users.error.message} /> : (
-        <div className="overflow-hidden rounded-xl border">
-          <div className="hidden grid-cols-[1.4fr_1.4fr_.6fr_.8fr_auto] gap-4 bg-muted/40 px-4 py-3 text-xs font-medium uppercase text-muted-foreground md:grid"><span>{text.name}</span><span>{text.email}</span><span>{text.language}</span><span>{text.status}</span><span /></div>
-          {(users.data ?? []).length === 0 ? <p className="p-8 text-center text-sm text-muted-foreground">{text.empty}</p> : users.data?.map((user) => (
-            <div className="grid gap-2 border-t px-4 py-4 first:border-t-0 md:grid-cols-[1.4fr_1.4fr_.6fr_.8fr_auto] md:items-center md:gap-4" key={user.id}>
-              <span className="font-medium">{user.name}</span><span className="text-sm text-muted-foreground">{user.email}</span><span className="text-sm">{user.preferredLocale.toUpperCase()}</span>
-              <span className="w-fit rounded-full bg-muted px-2.5 py-1 text-xs">{statusLabel(user.invitationStatus, text)}</span>
-              {user.accountActivatedAt === null ? <Button size="sm" variant="outline" disabled={resend.isPending} onClick={() => resend.mutate({ userId: user.id })}><MailPlus />{text.resend}</Button> : <span />}
-            </div>
-          ))}
-        </div>
+        userRows.length === 0 ? <p className="rounded-xl border p-8 text-center text-sm text-muted-foreground">{text.empty}</p> : (
+          <DataTable
+            caption={text.title}
+            columns={userColumns}
+            data={userRows}
+            getRowId={(user) => user.id}
+            presentation="stacked"
+          />
+        )
       )}
     </div>
   );

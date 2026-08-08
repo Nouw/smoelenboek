@@ -24,7 +24,7 @@ assert.match(member, /polls\.list\.useQuery/);
 assert.match(member, /polls\.vote\.useMutation/);
 assert.match(
   member,
-  /type=\{poll\.choiceMode === 'single_choice' \? 'radio' : 'checkbox'\}/,
+  /type=\{\s*poll\.choiceMode === 'single_choice'\s*\? 'radio'\s*: 'checkbox'\s*\}/,
 );
 assert.match(member, /poll\.selectedOptionIds/);
 assert.doesNotMatch(member, /ballotCount|percentage|voters/);

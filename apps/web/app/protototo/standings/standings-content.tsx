@@ -14,6 +14,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@repo/ui/components/card';
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from '@repo/ui/components/data-table';
 import { normalizeRounds, normalizeStandings } from '../protototo-model';
 
 export function StandingsContent() {
@@ -34,6 +38,53 @@ export function StandingsContent() {
     { enabled: Boolean(roundId), retry: false },
   );
   const standings = normalizeStandings(standingsQuery.data);
+  const standingColumns: DataTableColumnDef<(typeof standings)[number]>[] = [
+    {
+      accessorKey: 'rank',
+      header: t('protototo.ranking'),
+      cell: ({ row }) => (
+        <span className="flex size-8 items-center justify-center rounded-full bg-muted text-sm font-semibold">
+          {row.original.rank <= 3 ? (
+            <Medal className="size-4" aria-label={`${row.original.rank}`} />
+          ) : (
+            row.original.rank
+          )}
+        </span>
+      ),
+      meta: {
+        headerClassName: 'w-10',
+        cellClassName: 'w-10 pr-3',
+      },
+    },
+    {
+      accessorKey: 'displayName',
+      header: t('protototo.admin.name'),
+      cell: ({ row }) => (
+        <span className="block min-w-0 truncate font-medium">
+          {row.original.displayName}
+        </span>
+      ),
+      meta: {
+        cellClassName: 'max-w-0',
+      },
+    },
+    {
+      accessorKey: 'totalPoints',
+      header: t('protototo.points'),
+      cell: ({ row }) => (
+        <span className="tabular-nums">
+          <strong>{row.original.totalPoints}</strong>{' '}
+          <span className="text-sm text-muted-foreground">
+            {t('protototo.points')}
+          </span>
+        </span>
+      ),
+      meta: {
+        headerClassName: 'w-24 text-right',
+        cellClassName: 'w-24 pl-3 text-right',
+      },
+    },
+  ];
 
   if (roundsQuery.isLoading || (roundId && standingsQuery.isLoading)) {
     return <State icon={Loader2} spin text={t('protototo.loadingStandings')} />;
@@ -100,34 +151,15 @@ export function StandingsContent() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ol className="divide-y" aria-label={t('protototo.ranking')}>
-              {standings.map((standing) => (
-                <li
-                  key={`${standing.rank}-${standing.displayName}`}
-                  className="grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 py-3"
-                >
-                  <span className="flex size-8 items-center justify-center rounded-full bg-muted text-sm font-semibold">
-                    {standing.rank <= 3 ? (
-                      <Medal
-                        className="size-4"
-                        aria-label={`${standing.rank}`}
-                      />
-                    ) : (
-                      standing.rank
-                    )}
-                  </span>
-                  <span className="min-w-0 truncate font-medium">
-                    {standing.displayName}
-                  </span>
-                  <span className="tabular-nums">
-                    <strong>{standing.totalPoints}</strong>{' '}
-                    <span className="text-sm text-muted-foreground">
-                      {t('protototo.points')}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ol>
+            <DataTable
+              caption={t('protototo.ranking')}
+              columns={standingColumns}
+              data={standings}
+              getRowId={(standing, index) =>
+                `${standing.rank}:${standing.displayName}:${index}`
+              }
+              presentation="compact"
+            />
           </CardContent>
         </Card>
       )}

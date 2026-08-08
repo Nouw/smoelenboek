@@ -11,6 +11,7 @@ const [
   shell,
   sidebar,
   translations,
+  dataTable,
 ] = await Promise.all([
   readFile(new URL('app/protototo/protototo-content.tsx', root), 'utf8'),
   readFile(
@@ -33,6 +34,10 @@ const [
   readFile(new URL('app/app-shell.tsx', root), 'utf8'),
   readFile(new URL('components/app-sidebar.tsx', root), 'utf8'),
   readFile(new URL('lib/i18n.tsx', root), 'utf8'),
+  readFile(
+    new URL('../../packages/ui/src/components/data-table.tsx', root),
+    'utf8',
+  ),
 ]);
 
 const criteria = [
@@ -106,7 +111,8 @@ const criteria = [
       /isError/.test(participant) &&
       /noRound/.test(participant) &&
       /sm:grid-cols-2/.test(participant) &&
-      /overflow-x-auto/.test(admin),
+      /presentation="scroll"/.test(admin) &&
+      /overflow-x-auto/.test(dataTable),
   ],
   [
     'Times render and save in the association timezone',

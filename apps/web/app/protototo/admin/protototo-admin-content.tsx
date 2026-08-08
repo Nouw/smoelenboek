@@ -28,6 +28,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@repo/ui/components/card';
+import {
+  DataTable,
+  type DataTableColumnDef,
+} from '@repo/ui/components/data-table';
 import { Input } from '@repo/ui/components/input';
 import { Label } from '@repo/ui/components/label';
 import {
@@ -689,6 +693,54 @@ function EntriesCard({
   error?: string;
 }) {
   const { locale, t } = useI18n();
+  const entryColumns: DataTableColumnDef<(typeof entries)[number]>[] = [
+    {
+      accessorKey: 'displayName',
+      header: t('protototo.admin.name'),
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.displayName}</span>
+      ),
+    },
+    {
+      accessorKey: 'participantType',
+      header: t('protototo.admin.type'),
+      cell: ({ row }) =>
+        t(`protototo.admin.participantType.${row.original.participantType}`),
+    },
+    {
+      accessorKey: 'email',
+      header: t('protototo.email'),
+      cell: ({ row }) => row.original.email ?? '—',
+    },
+    {
+      id: 'paid',
+      header: t('protototo.admin.paid'),
+      cell: ({ row }) =>
+        row.original.participantType === 'member'
+          ? t('protototo.admin.notApplicable')
+          : row.original.paymentClaimed
+            ? t('protototo.admin.yes')
+            : t('protototo.admin.no'),
+    },
+    {
+      accessorKey: 'updatedAt',
+      header: t('protototo.admin.updated'),
+      cell: ({ row }) =>
+        row.original.updatedAt
+          ? formatDateTime(row.original.updatedAt, locale)
+          : '—',
+    },
+    {
+      accessorKey: 'totalPoints',
+      header: t('protototo.admin.score'),
+      cell: ({ row }) => row.original.totalPoints,
+      meta: {
+        headerClassName: 'text-right',
+        cellClassName: 'text-right font-semibold tabular-nums',
+      },
+    },
+  ];
+
   function downloadCsv() {
     const csv = entriesToCsv(
       entries,
@@ -733,58 +785,14 @@ function EntriesCard({
             {t('protototo.admin.noEntries')}
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[44rem] text-left text-sm">
-              <thead className="border-b text-xs text-muted-foreground">
-                <tr>
-                  <th className="pb-3 font-medium">
-                    {t('protototo.admin.name')}
-                  </th>
-                  <th className="pb-3 font-medium">
-                    {t('protototo.admin.type')}
-                  </th>
-                  <th className="pb-3 font-medium">{t('protototo.email')}</th>
-                  <th className="pb-3 font-medium">
-                    {t('protototo.admin.paid')}
-                  </th>
-                  <th className="pb-3 font-medium">
-                    {t('protototo.admin.updated')}
-                  </th>
-                  <th className="pb-3 text-right font-medium">
-                    {t('protototo.admin.score')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {entries.map((entry) => (
-                  <tr key={entry.id}>
-                    <td className="py-3 font-medium">{entry.displayName}</td>
-                    <td className="py-3">
-                      {t(
-                        `protototo.admin.participantType.${entry.participantType}`,
-                      )}
-                    </td>
-                    <td className="py-3">{entry.email ?? '—'}</td>
-                    <td className="py-3">
-                      {entry.participantType === 'member'
-                        ? t('protototo.admin.notApplicable')
-                        : entry.paymentClaimed
-                          ? t('protototo.admin.yes')
-                          : t('protototo.admin.no')}
-                    </td>
-                    <td className="py-3">
-                      {entry.updatedAt
-                        ? formatDateTime(entry.updatedAt, locale)
-                        : '—'}
-                    </td>
-                    <td className="py-3 text-right font-semibold tabular-nums">
-                      {entry.totalPoints}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            caption={t('protototo.admin.entries')}
+            className="min-w-[44rem]"
+            columns={entryColumns}
+            data={entries}
+            getRowId={(entry) => entry.id}
+            presentation="scroll"
+          />
         )}
       </CardContent>
       <CardFooter className="text-xs text-muted-foreground">

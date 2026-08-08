@@ -32,8 +32,8 @@ const criteria = [
   [
     'admin aggregates and identities',
     /percentage/.test(detail) &&
-      /voter\.user\.name/.test(detail) &&
-      /voter\.optionIds/.test(detail),
+      /row\.original\.user\.name/.test(detail) &&
+      /row\.original\.optionIds/.test(detail),
   ],
   [
     'ballot lock affordance',
