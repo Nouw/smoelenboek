@@ -18,7 +18,6 @@ export function toUserInformationDto(
       : {}),
     birthDate: information.birthDate,
     bondNumber: information.bondNumber,
-    joinDate: information.joinDate,
     leaveDate: information.leaveDate,
     backNumber: information.backNumber,
     refereeLicense: information.refereeLicense,

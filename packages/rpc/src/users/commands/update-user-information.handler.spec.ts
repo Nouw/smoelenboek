@@ -88,13 +88,13 @@ describe('UpdateUserInformationHandler', () => {
     ).rejects.toThrow('User not found.');
   });
 
-  it('validates membership dates after merging a partial update', async () => {
-    const existing = createInformation();
-    existing.joinDate = '2020-01-01';
-    existing.leaveDate = null;
+  it('rejects a leave date before the immutable user creation date', async () => {
     const handler = createHandler({
-      informationRepository: {
-        findByUserId: jest.fn().mockResolvedValue(existing),
+      usersRepository: {
+        findById: jest.fn().mockResolvedValue({
+          id: ownerId,
+          createdAt: new Date('2020-01-01T00:00:00.000Z'),
+        }),
       },
     });
 
@@ -104,7 +104,7 @@ describe('UpdateUserInformationHandler', () => {
           leaveDate: '2019-12-31',
         }),
       ),
-    ).rejects.toThrow('leaveDate cannot be before joinDate.');
+    ).rejects.toThrow('leaveDate cannot be before the user creation date.');
   });
 });
 
@@ -121,11 +121,11 @@ function createHandler(overrides: Record<string, unknown> = {}) {
   return new UpdateUserInformationHandler(
     { appendAndProject } as never,
     { projectUpdated } as never,
-    (overrides.informationRepository ?? {
-      findByUserId: jest.fn().mockResolvedValue(null),
-    }) as never,
     (overrides.usersRepository ?? {
-      findById: jest.fn().mockResolvedValue({ id: ownerId }),
+      findById: jest.fn().mockResolvedValue({
+        id: ownerId,
+        createdAt: new Date('2020-01-01T00:00:00.000Z'),
+      }),
     }) as never,
   );
 }
@@ -141,7 +141,6 @@ function createInformation(): UserInformationEntity {
     bankAccountNumber: 'NL00TEST0123456789',
     birthDate: null,
     bondNumber: null,
-    joinDate: null,
     leaveDate: null,
     backNumber: null,
     refereeLicense: null,

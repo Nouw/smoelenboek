@@ -53,7 +53,6 @@ const userInformationOutputSchema = z.object({
   bankAccountNumber: z.string().nullable().optional(),
   birthDate: z.iso.date().nullable(),
   bondNumber: z.string().nullable(),
-  joinDate: z.iso.date().nullable(),
   leaveDate: z.iso.date().nullable(),
   backNumber: z.number().int().min(0).max(32767).nullable(),
   refereeLicense: z.string().nullable(),

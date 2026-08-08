@@ -17,26 +17,14 @@ export const updateUserInformationSchema = z
     bankAccountNumber: optionalText(64),
     birthDate: z.iso.date().nullable().optional(),
     bondNumber: optionalBondNumber,
-    joinDate: z.iso.date().nullable().optional(),
     leaveDate: z.iso.date().nullable().optional(),
     backNumber: z.number().int().min(0).max(32767).nullable().optional(),
     refereeLicense: optionalText(64),
   })
+  .strict()
   .refine(
     (input) => Object.values(input).some((value) => value !== undefined),
     'At least one user information field must be provided.',
-  )
-  .refine(
-    (input) =>
-      input.joinDate === undefined ||
-      input.joinDate === null ||
-      input.leaveDate === undefined ||
-      input.leaveDate === null ||
-      input.leaveDate >= input.joinDate,
-    {
-      message: 'leaveDate cannot be before joinDate.',
-      path: ['leaveDate'],
-    },
   );
 
 export type UpdateUserInformationInput = z.infer<

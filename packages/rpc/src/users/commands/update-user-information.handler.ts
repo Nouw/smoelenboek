@@ -6,7 +6,6 @@ import { EventStoreRepository } from '../../event-store/repositories/event-store
 import { toUserInformationDto } from '../dto/user-information-output';
 import { createUserInformationUpdatedEvent } from '../events/user-information-updated.event';
 import { UserInformationProjector } from '../projectors/user-information-projector';
-import { UserInformationRepository } from '../repositories/user-information.repository';
 import { UsersRepository } from '../repositories/users.repository';
 import {
   assertCanUpdateUserInformation,
@@ -21,7 +20,6 @@ export class UpdateUserInformationHandler
   constructor(
     private readonly eventStoreRepository: EventStoreRepository,
     private readonly userInformationProjector: UserInformationProjector,
-    private readonly userInformationRepository: UserInformationRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
@@ -41,10 +39,7 @@ export class UpdateUserInformationHandler
       throw new NotFoundException('User not found.');
     }
 
-    const existing = await this.userInformationRepository.findByUserId(
-      command.targetUserId,
-    );
-    assertValidMembershipDates(existing, command.changes);
+    assertValidMembershipDates(targetUser.createdAt, command.changes);
 
     const event = createUserInformationUpdatedEvent(
       {

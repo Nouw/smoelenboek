@@ -320,7 +320,7 @@ export function ProfileContent({ userId }: { userId: string }) {
             <DetailItem
               icon={CalendarDays}
               label={t('profile.registrationDate')}
-              value={formatDate(details?.joinDate)}
+              value={formatDate(user.createdAt)}
               emptyLabel={t('profile.notProvided')}
             />
             <Separator />
@@ -623,6 +623,6 @@ function formatDate(value: string | null | undefined): string | undefined {
     return undefined;
   }
 
-  const [year, month, day] = value.split('-');
+  const [year, month, day] = value.slice(0, 10).split('-');
   return year && month && day ? [day, month, year].join('-') : value;
 }

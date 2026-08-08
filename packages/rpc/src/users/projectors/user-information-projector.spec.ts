@@ -64,4 +64,29 @@ describe('UserInformationProjector', () => {
       }),
     );
   });
+
+  it('ignores join dates from historical events', async () => {
+    const entity = Object.assign(new UserInformationEntity(), {
+      userId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
+      city: 'Utrecht',
+    });
+    const repository = {
+      findOneBy: jest.fn().mockResolvedValue(entity),
+      create: jest.fn(),
+      save: jest.fn().mockResolvedValue(entity),
+    };
+
+    await new UserInformationProjector().projectUpdated(
+      {
+        userId: entity.userId,
+        changes: { city: 'Rotterdam', joinDate: '2019-09-06' },
+      } as never,
+      { getRepository: jest.fn().mockReturnValue(repository) } as never,
+    );
+
+    expect(repository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ city: 'Rotterdam' }),
+    );
+    expect(entity).not.toHaveProperty('joinDate');
+  });
 });

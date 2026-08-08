@@ -70,7 +70,6 @@ function createInformation(): UserInformationEntity {
     bankAccountNumber: 'NL00TEST0123456789',
     birthDate: '2002-01-18',
     bondNumber: 'ABC123',
-    joinDate: '2019-09-06',
     leaveDate: null,
     backNumber: 8,
     refereeLicense: 'VS2',

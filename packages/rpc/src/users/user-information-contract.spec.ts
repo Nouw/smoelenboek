@@ -36,6 +36,13 @@ describe('updateUserInformationSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('rejects a separate join date because membership starts at user creation', () => {
+    expect(
+      updateUserInformationSchema.safeParse({ joinDate: '2025-09-01' })
+        .success,
+    ).toBe(false);
+  });
+
   it('normalizes the legacy missing bond number marker to null', () => {
     expect(updateUserInformationSchema.parse({ bondNumber: ' - ' })).toEqual({
       bondNumber: null,

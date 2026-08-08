@@ -4,6 +4,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 import { CreateUsers1766810000000 } from '../src/database/migrations/1766810000000-CreateUsers';
 import { CreateUserInformation1768000000000 } from '../src/database/migrations/1768000000000-CreateUserInformation';
 import { NormalizeMissingBondNumbers1768200000000 } from '../src/database/migrations/1768200000000-NormalizeMissingBondNumbers';
+import { DropUserInformationJoinDate1769200000000 } from '../src/database/migrations/1769200000000-DropUserInformationJoinDate';
 
 const databaseUrl = process.env.TEST_USER_INFORMATION_DATABASE_URL;
 const describeWithDatabase = databaseUrl ? describe : describe.skip;
@@ -129,6 +130,15 @@ describeWithDatabase('user information migration PostgreSQL fixture', () => {
       { bondNumber: null },
       { bondNumber: null },
     ]);
+
+    await new DropUserInformationJoinDate1769200000000().up(runner);
+    const columns = await runner.query(
+      `SELECT "column_name" FROM "information_schema"."columns"
+       WHERE "table_schema" = 'public' AND "table_name" = 'user_information'
+         AND "column_name" IN ('joinDate', 'leaveDate')
+       ORDER BY "column_name"`,
+    );
+    expect(columns).toEqual([{ column_name: 'leaveDate' }]);
 
     await runner.query('DELETE FROM "users" WHERE "id" = $1', [userId]);
     const [{ count }] = await runner.query(

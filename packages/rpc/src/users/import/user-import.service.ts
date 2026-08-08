@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import readXlsxFile, { type CellValue as Cell, type Row } from 'read-excel-file/node';
 import { UserProvisioningService } from '../services/user-provisioning.service';
 
-export const IMPORT_FIELDS = ['email', 'name', 'firstName', 'lastName', 'preferredLocale', 'streetName', 'houseNumber', 'postcode', 'city', 'phoneNumber', 'bankAccountNumber', 'birthDate', 'bondNumber', 'joinDate', 'leaveDate', 'backNumber', 'refereeLicense'] as const;
+export const IMPORT_FIELDS = ['email', 'name', 'firstName', 'lastName', 'preferredLocale', 'streetName', 'houseNumber', 'postcode', 'city', 'phoneNumber', 'bankAccountNumber', 'birthDate', 'bondNumber', 'leaveDate', 'backNumber', 'refereeLicense'] as const;
 export type ImportField = (typeof IMPORT_FIELDS)[number];
 export type ImportMapping = Record<string, ImportField>;
 
@@ -15,7 +15,7 @@ const aliases: Record<ImportField, string[]> = {
   houseNumber: ['house number', 'housenumber', 'huisnummer'], postcode: ['postcode', 'postal code'], city: ['city', 'plaats', 'woonplaats'],
   phoneNumber: ['phone', 'phone number', 'telephone', 'telefoon', 'telefoonnummer'], bankAccountNumber: ['iban', 'bank account', 'rekeningnummer'],
   birthDate: ['birth date', 'date of birth', 'geboortedatum'], bondNumber: ['bond number', 'bondsnummer', 'knkv nummer', 'knkv-nummer'],
-  joinDate: ['join date', 'joined', 'aanmelddatum', 'lid sinds'], leaveDate: ['leave date', 'left', 'afmelddatum', 'lid tot'],
+  leaveDate: ['leave date', 'left', 'afmelddatum', 'lid tot'],
   backNumber: ['back number', 'rugnummer'], refereeLicense: ['referee license', 'scheidsrechterslicentie'],
 };
 
@@ -129,7 +129,7 @@ function normalizeCell(field: ImportField, value: Cell | null): unknown {
     if (['en', 'engels', 'english'].includes(normalized)) return 'en';
     return normalized;
   }
-  if (['birthDate', 'joinDate', 'leaveDate'].includes(field)) return parseDate(value);
+  if (['birthDate', 'leaveDate'].includes(field)) return parseDate(value);
   if (field === 'backNumber') return typeof value === 'number' ? value : Number(value);
   return String(value).trim();
 }

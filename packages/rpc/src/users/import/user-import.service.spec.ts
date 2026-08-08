@@ -9,6 +9,13 @@ describe('user spreadsheet mapping', () => {
     });
   });
 
+  it('never maps a spreadsheet column to a separate join date', () => {
+    expect(suggestMapping(['Email', 'Voornaam', 'Lid sinds'])).toEqual({
+      Email: 'email',
+      Voornaam: 'firstName',
+    });
+  });
+
   it('normalizes locale and supported dates and reports invalid rows', () => {
     const rows = mapRows(['Email', 'Naam', 'Taal', 'Geboortedatum'], [
       ['MEMBER@EXAMPLE.COM', 'Member', 'Engels', '07-08-2000'],

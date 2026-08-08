@@ -20,7 +20,6 @@ export const createManagedUserSchema = z
     bankAccountNumber: optionalText(64),
     birthDate: z.iso.date().nullable().optional(),
     bondNumber: optionalText(32).transform((value) => value === '-' ? null : value),
-    joinDate: z.iso.date().nullable().optional(),
     leaveDate: z.iso.date().nullable().optional(),
     backNumber: z.number().int().min(0).max(32767).nullable().optional(),
     refereeLicense: optionalText(64),
@@ -29,10 +28,7 @@ export const createManagedUserSchema = z
     ({ name, firstName, lastName }) => Boolean(name || firstName || lastName),
     { message: 'A name, first name, or last name is required.', path: ['name'] },
   )
-  .refine(
-    ({ joinDate, leaveDate }) => !joinDate || !leaveDate || leaveDate >= joinDate,
-    { message: 'leaveDate cannot be before joinDate.', path: ['leaveDate'] },
-  );
+  .strict();
 
 export type CreateManagedUserInput = z.infer<typeof createManagedUserSchema>;
 

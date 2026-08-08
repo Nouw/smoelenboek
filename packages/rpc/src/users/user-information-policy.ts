@@ -1,8 +1,6 @@
 import type { UpdateUserInformationInput } from '@repo/api';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
-import type { UserInformationEntity } from './entities/user-information.entity';
-
 export function canViewBankAccountNumber(
   actorUserId: string,
   actorRole: string | null,
@@ -24,19 +22,18 @@ export function assertCanUpdateUserInformation(
 }
 
 export function assertValidMembershipDates(
-  existing: UserInformationEntity | null,
+  userCreatedAt: Date,
   changes: UpdateUserInformationInput,
 ): void {
-  const joinDate =
-    changes.joinDate !== undefined
-      ? changes.joinDate
-      : (existing?.joinDate ?? null);
-  const leaveDate =
-    changes.leaveDate !== undefined
-      ? changes.leaveDate
-      : (existing?.leaveDate ?? null);
-
-  if (joinDate !== null && leaveDate !== null && leaveDate < joinDate) {
-    throw new BadRequestException('leaveDate cannot be before joinDate.');
+  const leaveDate = changes.leaveDate;
+  const membershipStartDate = userCreatedAt.toISOString().slice(0, 10);
+  if (
+    leaveDate !== undefined &&
+    leaveDate !== null &&
+    leaveDate < membershipStartDate
+  ) {
+    throw new BadRequestException(
+      'leaveDate cannot be before the user creation date.',
+    );
   }
 }

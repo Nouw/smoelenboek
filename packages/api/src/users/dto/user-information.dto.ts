@@ -8,7 +8,6 @@ export interface UserInformationDto {
   bankAccountNumber?: string | null;
   birthDate: string | null;
   bondNumber: string | null;
-  joinDate: string | null;
   leaveDate: string | null;
   backNumber: number | null;
   refereeLicense: string | null;

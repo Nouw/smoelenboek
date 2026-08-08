@@ -24,14 +24,13 @@ export class UserInformationProjector {
         bankAccountNumber: null,
         birthDate: null,
         bondNumber: null,
-        joinDate: null,
         leaveDate: null,
         backNumber: null,
         refereeLicense: null,
       });
 
     for (const [field, value] of Object.entries(payload.changes)) {
-      if (value !== undefined) {
+      if (field !== 'joinDate' && value !== undefined) {
         Object.assign(entity, { [field]: value });
       }
     }

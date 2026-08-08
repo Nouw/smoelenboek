@@ -36,9 +36,6 @@ export class UserInformationEntity {
   bondNumber!: string | null;
 
   @Column({ type: 'date', nullable: true })
-  joinDate!: string | null;
-
-  @Column({ type: 'date', nullable: true })
   leaveDate!: string | null;
 
   @Column({ type: 'smallint', nullable: true })

@@ -17,10 +17,10 @@ type ImportField = keyof CreateManagedUserInput;
 type ImportPreview = { fileHash: string; sheets: string[]; selectedSheet: string; headerRow: number; headers: string[]; suggestedMapping: Record<string, ImportField>; sampleRows: unknown[][]; totalRows: number; parsedRows: Array<{ rowNumber: number; errors: string[] }> };
 type ImportResult = { total: number; created: number; invalid: number; skipped: number; failed: number; emailQueued: number; rows: Array<{ rowNumber: number; status: string; userId?: string; errors: string[] }> };
 
-const importFields: ImportField[] = ['email', 'name', 'firstName', 'lastName', 'preferredLocale', 'streetName', 'houseNumber', 'postcode', 'city', 'phoneNumber', 'bankAccountNumber', 'birthDate', 'bondNumber', 'joinDate', 'leaveDate', 'backNumber', 'refereeLicense'];
+const importFields: ImportField[] = ['email', 'name', 'firstName', 'lastName', 'preferredLocale', 'streetName', 'houseNumber', 'postcode', 'city', 'phoneNumber', 'bankAccountNumber', 'birthDate', 'bondNumber', 'leaveDate', 'backNumber', 'refereeLicense'];
 const optionalFields: Array<{ name: keyof CreateManagedUserInput; type?: string }> = [
   { name: 'streetName' }, { name: 'houseNumber' }, { name: 'postcode' }, { name: 'city' }, { name: 'phoneNumber', type: 'tel' },
-  { name: 'bankAccountNumber' }, { name: 'birthDate', type: 'date' }, { name: 'bondNumber' }, { name: 'joinDate', type: 'date' },
+  { name: 'bankAccountNumber' }, { name: 'birthDate', type: 'date' }, { name: 'bondNumber' },
   { name: 'leaveDate', type: 'date' }, { name: 'backNumber', type: 'number' }, { name: 'refereeLicense' },
 ];
 
@@ -120,4 +120,4 @@ const copy = {
 } as const;
 type Text = (typeof copy)[keyof typeof copy];
 function statusLabel(status: string, text: Text) { return text[status as keyof Text] ?? status; }
-function fieldLabel(name: keyof CreateManagedUserInput, text: Text) { const labels: Partial<Record<keyof CreateManagedUserInput, string>> = { streetName: 'Street / Straat', houseNumber: 'House no. / Huisnr.', postcode: 'Postcode', city: 'City / Plaats', phoneNumber: 'Phone / Telefoon', bankAccountNumber: 'IBAN', birthDate: 'Birth date / Geboortedatum', bondNumber: 'Bond number / Bondsnummer', joinDate: 'Join date / Inschrijfdatum', leaveDate: 'Leave date / Uitschrijfdatum', backNumber: 'Back number / Rugnummer', refereeLicense: 'Referee licence / Scheidsrechterslicentie' }; return labels[name] ?? text.name; }
+function fieldLabel(name: keyof CreateManagedUserInput, text: Text) { const labels: Partial<Record<keyof CreateManagedUserInput, string>> = { streetName: 'Street / Straat', houseNumber: 'House no. / Huisnr.', postcode: 'Postcode', city: 'City / Plaats', phoneNumber: 'Phone / Telefoon', bankAccountNumber: 'IBAN', birthDate: 'Birth date / Geboortedatum', bondNumber: 'Bond number / Bondsnummer', leaveDate: 'Leave date / Uitschrijfdatum', backNumber: 'Back number / Rugnummer', refereeLicense: 'Referee licence / Scheidsrechterslicentie' }; return labels[name] ?? text.name; }

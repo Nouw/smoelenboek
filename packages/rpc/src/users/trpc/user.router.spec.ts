@@ -268,7 +268,6 @@ function informationOutput() {
     bankAccountNumber: null,
     birthDate: null,
     bondNumber: null,
-    joinDate: null,
     leaveDate: null,
     backNumber: 8,
     refereeLicense: null,

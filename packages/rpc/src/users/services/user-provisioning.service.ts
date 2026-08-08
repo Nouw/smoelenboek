@@ -69,6 +69,6 @@ export class UserProvisioningService {
 }
 
 function informationValues(userId: string, input: CreateManagedUserInput): Partial<UserInformationEntity> & { userId: string } {
-  return { userId, streetName: input.streetName ?? null, houseNumber: input.houseNumber ?? null, postcode: input.postcode ?? null, city: input.city ?? null, phoneNumber: input.phoneNumber ?? null, bankAccountNumber: input.bankAccountNumber ?? null, birthDate: input.birthDate ?? null, bondNumber: input.bondNumber ?? null, joinDate: input.joinDate ?? null, leaveDate: input.leaveDate ?? null, backNumber: input.backNumber ?? null, refereeLicense: input.refereeLicense ?? null };
+  return { userId, streetName: input.streetName ?? null, houseNumber: input.houseNumber ?? null, postcode: input.postcode ?? null, city: input.city ?? null, phoneNumber: input.phoneNumber ?? null, bankAccountNumber: input.bankAccountNumber ?? null, birthDate: input.birthDate ?? null, bondNumber: input.bondNumber ?? null, leaveDate: input.leaveDate ?? null, backNumber: input.backNumber ?? null, refereeLicense: input.refereeLicense ?? null };
 }
 function errorMessage(error: unknown): string { return error instanceof Error ? error.message : String(error); }
