@@ -18,4 +18,12 @@ describe('EmailOutboxRepository', () => {
     expect(query).toHaveBeenCalledWith(expect.stringContaining("interval '5 minutes'"), [20]);
     expect(query).toHaveBeenCalledWith(expect.stringContaining('FOR UPDATE SKIP LOCKED'), [20]);
   });
+
+  it('returns claimed messages when PostgreSQL wraps UPDATE RETURNING rows with an affected count', async () => {
+    const message = { id: '3adf40dc-09f2-4898-9bce-2a97945c25ca', status: 'sending' };
+    const query = jest.fn().mockResolvedValue([[message], 1]);
+    const repository = new EmailOutboxRepository({ transaction: (callback: (manager: unknown) => unknown) => callback({ query }) } as never);
+
+    await expect(repository.claim()).resolves.toEqual([message]);
+  });
 });

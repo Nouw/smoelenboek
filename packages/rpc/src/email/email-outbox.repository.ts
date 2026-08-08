@@ -23,13 +23,17 @@ export class EmailOutboxRepository {
 
   claim(limit = 20): Promise<EmailOutboxEntity[]> {
     return this.dataSource.transaction(async (manager) => {
-      const rows = await manager.query(
+      const result: unknown = await manager.query(
         `UPDATE "email_outbox" SET "status" = 'sending', "updatedAt" = now()
          WHERE "id" IN (SELECT "id" FROM "email_outbox" WHERE ("status" = 'pending' AND "nextAttemptAt" <= now()) OR ("status" = 'sending' AND "updatedAt" < now() - interval '5 minutes') ORDER BY "createdAt" FOR UPDATE SKIP LOCKED LIMIT $1)
          RETURNING *`,
         [limit],
       );
-      return rows as EmailOutboxEntity[];
+      const rows = unwrapAffectedRows(result);
+      if (!rows.every(isClaimedEmail)) {
+        throw new Error('Email outbox claim returned a row without an id.');
+      }
+      return rows;
     });
   }
 
@@ -62,4 +66,15 @@ export class EmailOutboxRepository {
       return message;
     });
   }
+}
+
+function unwrapAffectedRows(result: unknown): unknown[] {
+  if (!Array.isArray(result)) return [];
+  // TypeORM's PostgreSQL driver wraps UPDATE ... RETURNING as [rows, affectedCount].
+  if (result.length === 2 && Array.isArray(result[0]) && typeof result[1] === 'number') return result[0];
+  return result;
+}
+
+function isClaimedEmail(value: unknown): value is EmailOutboxEntity {
+  return typeof value === 'object' && value !== null && typeof (value as { id?: unknown }).id === 'string';
 }

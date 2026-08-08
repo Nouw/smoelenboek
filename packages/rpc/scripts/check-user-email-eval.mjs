@@ -13,6 +13,7 @@ const checks = [
   ['account failure is compensated', /accounts\.remove/.test(provisioning)],
   ['mail is committed with user data', /this\.outbox\.enqueue/.test(provisioning) && /transaction/.test(provisioning)],
   ['outbox is concurrency-safe and recoverable', /SKIP LOCKED/.test(outbox) && /5 minutes/.test(outbox) && /attempts >= 8/.test(outbox)],
+  ['PostgreSQL affected-row wrappers cannot reach the processor', /unwrapAffectedRows/.test(outbox) && /Array\.isArray\(result\[0\]\)/.test(outbox)],
   ['Dutch and English templates exist', /Activeer je/.test(templates) && /Activate your/.test(templates)],
   ['database constraints protect status and locale', /CHK_email_outbox_status/.test(migration) && /CHK_users_preferredLocale/.test(migration)],
 ];
