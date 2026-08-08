@@ -3,22 +3,21 @@ import { DataSource, EntityManager } from 'typeorm';
 import { randomBytes } from 'node:crypto';
 import { EmailOutboxEntity, type EmailLocale, type EmailMessageType } from './entities/email-outbox.entity';
 
-export type QueueEmailInput = {
-  messageType: EmailMessageType;
-  recipient: string;
-  locale: EmailLocale;
-  payload: Record<string, unknown>;
-  relatedUserId?: string | null;
-  deduplicationKey: string;
-};
+export type QueueEmailInput =
+  | { messageType: 'invitation'; recipient: string; locale: EmailLocale; name: string; url: string; expiresAt: string; relatedUserId?: string | null; deduplicationKey: string }
+  | { messageType: 'password_reset'; recipient: string; locale: EmailLocale; name: string; url: string; relatedUserId?: string | null; deduplicationKey: string }
+  | { messageType: 'email_verification'; recipient: string; locale: EmailLocale; name: string; url: string; relatedUserId?: string | null; deduplicationKey: string }
+  | { messageType: 'address_update'; recipient: string; locale: EmailLocale; name: string; newAddress: string; relatedUserId?: string | null; deduplicationKey: string };
 
 @Injectable()
 export class EmailOutboxRepository {
   constructor(private readonly dataSource: DataSource) {}
 
   async enqueue(input: QueueEmailInput, manager?: EntityManager): Promise<EmailOutboxEntity> {
+    const { messageType, recipient, locale, relatedUserId, deduplicationKey } = input;
+    const payload = extractPayload(input);
     const repository = (manager ?? this.dataSource.manager).getRepository(EmailOutboxEntity);
-    return repository.save(repository.create({ ...input, relatedUserId: input.relatedUserId ?? null }));
+    return repository.save(repository.create({ messageType, recipient, locale, payload, relatedUserId: relatedUserId ?? null, deduplicationKey }));
   }
 
   claim(limit = 20): Promise<EmailOutboxEntity[]> {
@@ -66,6 +65,12 @@ export class EmailOutboxRepository {
       return message;
     });
   }
+}
+
+function extractPayload(input: QueueEmailInput): Record<string, unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { messageType: _mt, recipient: _r, locale: _l, relatedUserId: _ru, deduplicationKey: _dk, ...payload } = input as Record<string, unknown>;
+  return payload;
 }
 
 function unwrapAffectedRows(result: unknown): unknown[] {

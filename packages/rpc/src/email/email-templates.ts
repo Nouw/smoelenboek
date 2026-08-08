@@ -5,46 +5,105 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import type { EmailLocale, EmailMessageType } from './entities/email-outbox.entity';
 
-export type EmailTemplatePayload = { name: string; url: string };
 export type RenderedEmail = { subject: string; html: string; text: string };
 
-const copy = {
-  nl: {
-    invitation: ['Activeer je Smoelenboek-account', 'Welkom bij Smoelenboek', 'Je account is aangemaakt. Kies via de knop hieronder je wachtwoord.', 'Wachtwoord instellen'],
-    password_reset: ['Stel je Smoelenboek-wachtwoord opnieuw in', 'Wachtwoord opnieuw instellen', 'We ontvingen een verzoek om je wachtwoord opnieuw in te stellen.', 'Nieuw wachtwoord kiezen'],
-    email_verification: ['Bevestig je e-mailadres', 'E-mailadres bevestigen', 'Bevestig via de knop hieronder dat dit jouw e-mailadres is.', 'E-mailadres bevestigen'],
-    ignore: 'Heb je dit niet aangevraagd? Dan kun je deze e-mail negeren.',
-  },
-  en: {
-    invitation: ['Activate your Smoelenboek account', 'Welcome to Smoelenboek', 'Your account is ready. Use the button below to choose your password.', 'Set password'],
-    password_reset: ['Reset your Smoelenboek password', 'Reset password', 'We received a request to reset your password.', 'Choose a new password'],
-    email_verification: ['Verify your email address', 'Verify email address', 'Use the button below to confirm that this email address belongs to you.', 'Verify email'],
-    ignore: 'If you did not request this, you can ignore this email.',
-  },
+type EmailRenderer = (locale: EmailLocale, payload: Record<string, unknown>) => Promise<RenderedEmail>;
+
+const ignore = {
+  nl: 'Heb je dit niet aangevraagd? Dan kun je deze e-mail negeren.',
+  en: 'If you did not request this, you can ignore this email.',
 } as const;
 
-export async function renderEmail(type: EmailMessageType, locale: EmailLocale, payload: EmailTemplatePayload): Promise<RenderedEmail> {
-  const language = copy[locale];
-  const [subject, heading, introduction, action] = language[type];
-  const tree = createElement(Html, null,
-    createElement(Head),
-    createElement(Preview, null, subject),
-    createElement(Body, { style: styles.body },
-      createElement(Container, { style: styles.container },
-        createElement(Heading, { style: styles.brand }, 'Smoelenboek'),
-        createElement(Heading, { as: 'h2', style: styles.heading }, heading),
-        createElement(Text, { style: styles.text }, `${locale === 'nl' ? 'Hallo' : 'Hello'} ${payload.name},`),
-        createElement(Text, { style: styles.text }, introduction),
-        createElement(Section, { style: styles.action }, createElement(Button, { href: payload.url, style: styles.button }, action)),
-        createElement(Text, { style: styles.small }, language.ignore),
-        createElement(Hr, { style: styles.rule }),
-        createElement(Text, { style: styles.footer }, 'Smoelenboek'),
+const greeting = { nl: 'Hallo', en: 'Hello' } as const;
+
+function makeActionEmail(copy: {
+  nl: [subject: string, heading: string, intro: string, action: string];
+  en: [subject: string, heading: string, intro: string, action: string];
+}): EmailRenderer {
+  return async (locale, payload) => {
+    const name = String(payload.name ?? '');
+    const url = String(payload.url ?? '');
+    const [subject, heading, intro, action] = copy[locale];
+    const tree = createElement(Html, null,
+      createElement(Head),
+      createElement(Preview, null, subject),
+      createElement(Body, { style: styles.body },
+        createElement(Container, { style: styles.container },
+          createElement(Heading, { style: styles.brand }, 'Smoelenboek'),
+          createElement(Heading, { as: 'h2', style: styles.heading }, heading),
+          createElement(Text, { style: styles.text }, `${greeting[locale]} ${name},`),
+          createElement(Text, { style: styles.text }, intro),
+          createElement(Section, { style: styles.action }, createElement(Button, { href: url, style: styles.button }, action)),
+          createElement(Text, { style: styles.small }, ignore[locale]),
+          createElement(Hr, { style: styles.rule }),
+          createElement(Text, { style: styles.footer }, 'Smoelenboek'),
+        ),
       ),
-    ),
-  );
-  const markup = renderToStaticMarkup(tree);
-  const html = `<!DOCTYPE html>${markup}`;
-  return { subject, html, text: toPlainText(html) };
+    );
+    const markup = renderToStaticMarkup(tree);
+    const html = `<!DOCTYPE html>${markup}`;
+    return { subject, html, text: toPlainText(html) };
+  };
+}
+
+function makeNotificationEmail(copy: {
+  nl: { subject: string; heading: string; body: (payload: Record<string, unknown>) => string };
+  en: { subject: string; heading: string; body: (payload: Record<string, unknown>) => string };
+}): EmailRenderer {
+  return async (locale, payload) => {
+    const name = String(payload.name ?? '');
+    const { subject, heading, body } = copy[locale];
+    const tree = createElement(Html, null,
+      createElement(Head),
+      createElement(Preview, null, subject),
+      createElement(Body, { style: styles.body },
+        createElement(Container, { style: styles.container },
+          createElement(Heading, { style: styles.brand }, 'Smoelenboek'),
+          createElement(Heading, { as: 'h2', style: styles.heading }, heading),
+          createElement(Text, { style: styles.text }, `${greeting[locale]} ${name},`),
+          createElement(Text, { style: styles.text }, body(payload)),
+          createElement(Hr, { style: styles.rule }),
+          createElement(Text, { style: styles.footer }, 'Smoelenboek'),
+        ),
+      ),
+    );
+    const markup = renderToStaticMarkup(tree);
+    const html = `<!DOCTYPE html>${markup}`;
+    return { subject, html, text: toPlainText(html) };
+  };
+}
+
+const renderers = new Map<EmailMessageType, EmailRenderer>([
+  ['invitation', makeActionEmail({
+    nl: ['Activeer je Smoelenboek-account', 'Welkom bij Smoelenboek', 'Je account is aangemaakt. Kies via de knop hieronder je wachtwoord.', 'Wachtwoord instellen'],
+    en: ['Activate your Smoelenboek account', 'Welcome to Smoelenboek', 'Your account is ready. Use the button below to choose your password.', 'Set password'],
+  })],
+  ['password_reset', makeActionEmail({
+    nl: ['Stel je Smoelenboek-wachtwoord opnieuw in', 'Wachtwoord opnieuw instellen', 'We ontvingen een verzoek om je wachtwoord opnieuw in te stellen.', 'Nieuw wachtwoord kiezen'],
+    en: ['Reset your Smoelenboek password', 'Reset password', 'We received a request to reset your password.', 'Choose a new password'],
+  })],
+  ['email_verification', makeActionEmail({
+    nl: ['Bevestig je e-mailadres', 'E-mailadres bevestigen', 'Bevestig via de knop hieronder dat dit jouw e-mailadres is.', 'E-mailadres bevestigen'],
+    en: ['Verify your email address', 'Verify email address', 'Use the button below to confirm that this email address belongs to you.', 'Verify email'],
+  })],
+  ['address_update', makeNotificationEmail({
+    nl: {
+      subject: '[Smoelenboek] Adreswijziging',
+      heading: 'Wijziging van adres',
+      body: (p) => `Je adres is gewijzigd naar: ${String(p.newAddress ?? '')}.`,
+    },
+    en: {
+      subject: '[Smoelenboek] Address update',
+      heading: 'Address update',
+      body: (p) => `Your address has been updated to: ${String(p.newAddress ?? '')}.`,
+    },
+  })],
+]);
+
+export async function renderEmail(type: EmailMessageType, locale: EmailLocale, payload: Record<string, unknown>): Promise<RenderedEmail> {
+  const renderer = renderers.get(type);
+  if (!renderer) throw new Error(`No renderer registered for email type: ${type}`);
+  return renderer(locale, payload);
 }
 
 const styles = {

@@ -67,7 +67,7 @@ export class UserProvisioningService {
     await manager.query(`INSERT INTO "verification" ("identifier", "value", "expiresAt") VALUES ($1, $2, $3)`, [`reset-password:${token}`, userId, expiresAt]);
     const callback = new URL('/reset-password', process.env.WEB_ORIGIN ?? 'http://localhost:3001').toString();
     const url = `${process.env.BETTER_AUTH_URL ?? 'http://localhost:3002/api/auth'}/reset-password/${token}?callbackURL=${encodeURIComponent(callback)}`;
-    await this.outbox.enqueue({ messageType: 'invitation', recipient: email, locale, payload: { name, url, expiresAt: expiresAt.toISOString() }, relatedUserId: userId, deduplicationKey: `invitation:${userId}:${randomUUID()}` }, manager);
+    await this.outbox.enqueue({ messageType: 'invitation', recipient: email, locale, name, url, expiresAt: expiresAt.toISOString(), relatedUserId: userId, deduplicationKey: `invitation:${userId}:${randomUUID()}` }, manager);
   }
 }
 

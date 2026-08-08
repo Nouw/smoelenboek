@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
 
 export type EmailLocale = 'nl' | 'en';
 export type EmailOutboxStatus = 'pending' | 'sending' | 'sent' | 'failed';
-export type EmailMessageType = 'invitation' | 'password_reset' | 'email_verification';
+export type EmailMessageType = 'invitation' | 'password_reset' | 'email_verification' | 'address_update';
 
 @Entity({ name: 'email_outbox' })
 export class EmailOutboxEntity {

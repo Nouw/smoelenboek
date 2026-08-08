@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import nodemailer, { type Transporter } from 'nodemailer';
-import { renderEmail, type EmailTemplatePayload } from './email-templates';
+import { renderEmail } from './email-templates';
 import type { EmailOutboxEntity } from './entities/email-outbox.entity';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class SmtpEmailSender {
     });
   }
   async send(message: EmailOutboxEntity): Promise<void> {
-    const rendered = await renderEmail(message.messageType, message.locale, message.payload as EmailTemplatePayload);
+    const rendered = await renderEmail(message.messageType, message.locale, message.payload);
     await this.transporter.sendMail({ from: process.env.MAIL_FROM ?? 'Smoelenboek <noreply@smoelenboek.local>', to: message.recipient, ...rendered });
   }
 }
