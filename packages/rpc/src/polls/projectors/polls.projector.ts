@@ -1,18 +1,52 @@
 import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import type { EntityManager } from 'typeorm';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { DataSource, EntityManager } from 'typeorm';
 
+import { DomainEventBase } from '../../event-store/domain-event';
 import { PollEntity } from '../entities/poll.entity';
 import { PollOptionEntity } from '../entities/poll-option.entity';
 import { PollResponseEntity } from '../entities/poll-response.entity';
 import { PollSelectionEntity } from '../entities/poll-selection.entity';
-import type {
-  PollResponsePayload,
-  PollSnapshotPayload,
+import {
+  PollArchivedEvent,
+  PollCreatedEvent,
+  PollDraftDeletedEvent,
+  PollPublishedEvent,
+  PollResponseSubmittedEvent,
+  PollUpdatedEvent,
+  type PollResponsePayload,
+  type PollSnapshotPayload,
 } from '../events/poll.events';
 
+@EventsHandler(
+  PollCreatedEvent,
+  PollUpdatedEvent,
+  PollPublishedEvent,
+  PollArchivedEvent,
+  PollDraftDeletedEvent,
+  PollResponseSubmittedEvent,
+)
 @Injectable()
-export class PollsProjector {
+export class PollsProjector implements IEventHandler<DomainEventBase> {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async handle(event: DomainEventBase): Promise<void> {
+    if (event instanceof PollResponseSubmittedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.projectResponse(event.payload, manager),
+      );
+    } else if (event instanceof PollDraftDeletedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.deletePoll(event.payload.pollId, manager),
+      );
+    } else {
+      await this.dataSource.transaction((manager) =>
+        this.projectPoll((event as PollCreatedEvent).payload, manager),
+      );
+    }
+  }
+
   async projectPoll(
     payload: PollSnapshotPayload,
     manager: EntityManager,

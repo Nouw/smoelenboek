@@ -1,6 +1,13 @@
 import type { ContentCollectionKind } from '@repo/api';
 
-import type { DomainEvent } from '../../event-store/events';
+import { DomainEventBase } from '../../event-store/domain-event';
+
+export const COLLECTION_SAVED_EVENT = 'documents.collection_saved';
+export const COLLECTIONS_REORDERED_EVENT = 'documents.collections_reordered';
+export const COLLECTION_DELETED_EVENT = 'documents.collection_deleted';
+export const ASSET_SAVED_EVENT = 'documents.asset_saved';
+export const ASSETS_REORDERED_EVENT = 'documents.assets_reordered';
+export const ASSET_DELETED_EVENT = 'documents.asset_deleted';
 
 export type CollectionSnapshotPayload = {
   collectionId: string;
@@ -38,94 +45,66 @@ export type DeletePayload = {
 
 type AdminMetadata = { source: 'admin' | 'media'; actorId: string };
 
-function event<T extends Record<string, unknown>>(
-  aggregateType: 'content_collection' | 'content_asset',
-  aggregateId: string,
-  eventType: string,
-  payload: T,
-  actorId: string,
-  source: AdminMetadata['source'] = 'admin',
-): DomainEvent<T, AdminMetadata> {
-  return {
-    aggregateType,
-    aggregateId,
-    eventType,
-    eventVersion: 1,
-    payload,
-    metadata: { source, actorId },
-  };
+export class CollectionSavedEvent extends DomainEventBase<CollectionSnapshotPayload, AdminMetadata> {
+  readonly aggregateType = 'content_collection';
+  readonly eventType = COLLECTION_SAVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.collectionId; }
+  static create(payload: CollectionSnapshotPayload, actorId: string): CollectionSavedEvent {
+    return new CollectionSavedEvent(payload, { source: 'admin', actorId });
+  }
 }
 
-export const collectionSavedEvent = (
-  payload: CollectionSnapshotPayload,
-  actorId: string,
-) =>
-  event(
-    'content_collection',
-    payload.collectionId,
-    'documents.collection_saved',
-    payload,
-    actorId,
-  );
+export class CollectionsReorderedEvent extends DomainEventBase<ReorderPayload, AdminMetadata> {
+  readonly aggregateType = 'content_collection';
+  readonly eventType = COLLECTIONS_REORDERED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.scopeId; }
+  static create(payload: ReorderPayload, actorId: string): CollectionsReorderedEvent {
+    return new CollectionsReorderedEvent(payload, { source: 'admin', actorId });
+  }
+}
 
-export const collectionsReorderedEvent = (
-  payload: ReorderPayload,
-  actorId: string,
-) =>
-  event(
-    'content_collection',
-    payload.scopeId,
-    'documents.collections_reordered',
-    payload,
-    actorId,
-  );
+export class CollectionDeletedEvent extends DomainEventBase<DeletePayload, AdminMetadata> {
+  readonly aggregateType = 'content_collection';
+  readonly eventType = COLLECTION_DELETED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.id; }
+  static create(payload: DeletePayload, actorId: string): CollectionDeletedEvent {
+    return new CollectionDeletedEvent(payload, { source: 'admin', actorId });
+  }
+}
 
-export const collectionDeletedEvent = (
-  payload: DeletePayload,
-  actorId: string,
-) =>
-  event(
-    'content_collection',
-    payload.id,
-    'documents.collection_deleted',
-    payload,
-    actorId,
-  );
+export class AssetSavedEvent extends DomainEventBase<AssetSnapshotPayload, AdminMetadata> {
+  readonly aggregateType = 'content_asset';
+  readonly eventType = ASSET_SAVED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.assetId; }
+  static create(
+    payload: AssetSnapshotPayload,
+    actorId: string,
+    source: AdminMetadata['source'] = 'admin',
+  ): AssetSavedEvent {
+    return new AssetSavedEvent(payload, { source, actorId });
+  }
+}
 
-export const assetSavedEvent = (
-  payload: AssetSnapshotPayload,
-  actorId: string,
-  source: AdminMetadata['source'] = 'admin',
-) =>
-  event(
-    'content_asset',
-    payload.assetId,
-    'documents.asset_saved',
-    payload,
-    actorId,
-    source,
-  );
+export class AssetsReorderedEvent extends DomainEventBase<ReorderPayload, AdminMetadata> {
+  readonly aggregateType = 'content_asset';
+  readonly eventType = ASSETS_REORDERED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.scopeId; }
+  static create(payload: ReorderPayload, actorId: string): AssetsReorderedEvent {
+    return new AssetsReorderedEvent(payload, { source: 'admin', actorId });
+  }
+}
 
-export const assetsReorderedEvent = (
-  payload: ReorderPayload,
-  actorId: string,
-) =>
-  event(
-    'content_asset',
-    payload.scopeId,
-    'documents.assets_reordered',
-    payload,
-    actorId,
-  );
-
-export const assetDeletedEvent = (
-  payload: DeletePayload,
-  actorId: string,
-) =>
-  event(
-    'content_asset',
-    payload.id,
-    'documents.asset_deleted',
-    payload,
-    actorId,
-  );
+export class AssetDeletedEvent extends DomainEventBase<DeletePayload, AdminMetadata> {
+  readonly aggregateType = 'content_asset';
+  readonly eventType = ASSET_DELETED_EVENT;
+  readonly eventVersion = 1;
+  get aggregateId(): string { return this.payload.id; }
+  static create(payload: DeletePayload, actorId: string): AssetDeletedEvent {
+    return new AssetDeletedEvent(payload, { source: 'admin', actorId });
+  }
+}

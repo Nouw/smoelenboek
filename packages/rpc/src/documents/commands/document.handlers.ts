@@ -5,19 +5,18 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { EventStoreRepository } from '../../event-store/repositories/event-store.repository';
+import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { assertSeasonKey } from '../../seasons/season-policy';
 import { ContentAssetEntity } from '../entities/content-asset.entity';
 import { ContentCollectionEntity } from '../entities/content-collection.entity';
 import {
-  assetDeletedEvent,
-  assetSavedEvent,
-  assetsReorderedEvent,
-  collectionDeletedEvent,
-  collectionSavedEvent,
-  collectionsReorderedEvent,
+  AssetDeletedEvent,
+  AssetSavedEvent,
+  AssetsReorderedEvent,
+  CollectionDeletedEvent,
+  CollectionSavedEvent,
+  CollectionsReorderedEvent,
 } from '../events/document.events';
-import { DocumentsProjector } from '../projectors/documents.projector';
 import { DocumentsRepository } from '../repositories/documents.repository';
 import {
   AddContentAssetCommand,
@@ -37,44 +36,38 @@ export class CreateContentCollectionHandler
     ICommandHandler<CreateContentCollectionCommand, ContentCollectionEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(
+  async execute(
     command: CreateContentCollectionCommand,
   ): Promise<ContentCollectionEntity> {
     validateSeason(command.seasonKey);
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        await this.repository.lockCollectionGroup(
-          command.seasonKey,
-          command.kind,
-          manager,
-        );
-        const group = await this.repository.listCollectionGroup(
-          command.seasonKey,
-          command.kind,
-          manager,
-          true,
-        );
-        return collectionSavedEvent(
-          {
-            collectionId: randomUUID(),
-            name: command.name.trim(),
-            description: normalizeOptional(command.description),
-            kind: command.kind,
-            seasonKey: command.seasonKey,
-            position: group.length,
-            coverAssetId: null,
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.projectCollection(event.payload, manager),
-    );
+    let collectionId: string | null = null;
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      await this.repository.lockCollectionGroup(command.seasonKey, command.kind, manager);
+      const group = await this.repository.listCollectionGroup(
+        command.seasonKey, command.kind, manager, true,
+      );
+      const id = randomUUID();
+      collectionId = id;
+      return CollectionSavedEvent.create(
+        {
+          collectionId: id,
+          name: command.name.trim(),
+          description: normalizeOptional(command.description),
+          kind: command.kind,
+          seasonKey: command.seasonKey,
+          position: group.length,
+          coverAssetId: null,
+        },
+        command.actorId,
+      );
+    });
+    const collection = await this.repository.findCollection(collectionId!);
+    if (!collection) throw new Error('Collection projection missing after dispatch.');
+    return collection;
   }
 }
 
@@ -84,55 +77,40 @@ export class UpdateContentCollectionHandler
     ICommandHandler<UpdateContentCollectionCommand, ContentCollectionEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(
+  async execute(
     command: UpdateContentCollectionCommand,
   ): Promise<ContentCollectionEntity> {
     validateSeason(command.seasonKey);
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        const existing = await this.repository.findCollection(
-          command.collectionId,
-          manager,
-          true,
-        );
-        if (!existing) throw new NotFoundException('Collection not found.');
-        const moving = existing.seasonKey !== command.seasonKey;
-        if (moving) {
-          await this.repository.lockCollectionGroup(
-            command.seasonKey,
-            existing.kind,
-            manager,
-          );
-        }
-        const target = moving
-          ? await this.repository.listCollectionGroup(
-              command.seasonKey,
-              existing.kind,
-              manager,
-              true,
-            )
-          : [];
-        return collectionSavedEvent(
-          {
-            collectionId: existing.id,
-            name: command.name.trim(),
-            description: normalizeOptional(command.description),
-            kind: existing.kind,
-            seasonKey: command.seasonKey,
-            position: moving ? target.length : existing.position,
-            coverAssetId: existing.coverAssetId,
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.projectCollection(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const existing = await this.repository.findCollection(command.collectionId, manager, true);
+      if (!existing) throw new NotFoundException('Collection not found.');
+      const moving = existing.seasonKey !== command.seasonKey;
+      if (moving) {
+        await this.repository.lockCollectionGroup(command.seasonKey, existing.kind, manager);
+      }
+      const target = moving
+        ? await this.repository.listCollectionGroup(command.seasonKey, existing.kind, manager, true)
+        : [];
+      return CollectionSavedEvent.create(
+        {
+          collectionId: existing.id,
+          name: command.name.trim(),
+          description: normalizeOptional(command.description),
+          kind: existing.kind,
+          seasonKey: command.seasonKey,
+          position: moving ? target.length : existing.position,
+          coverAssetId: existing.coverAssetId,
+        },
+        command.actorId,
+      );
+    });
+    const collection = await this.repository.findCollection(command.collectionId);
+    if (!collection) throw new Error('Collection projection missing after dispatch.');
+    return collection;
   }
 }
 
@@ -145,43 +123,29 @@ export class ReorderContentCollectionsHandler
     >
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(
+  async execute(
     command: ReorderContentCollectionsCommand,
   ): Promise<ContentCollectionEntity[]> {
     validateSeason(command.seasonKey);
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        await this.repository.lockCollectionGroup(
-          command.seasonKey,
-          command.kind,
-          manager,
-        );
-        const group = await this.repository.listCollectionGroup(
-          command.seasonKey,
-          command.kind,
-          manager,
-          true,
-        );
-        assertExactOrder(group.map(({ id }) => id), command.collectionIds);
-        return collectionsReorderedEvent(
-          {
-            scopeId: `${command.seasonKey}:${command.kind}`,
-            positions: command.collectionIds.map((id, position) => ({
-              id,
-              position,
-            })),
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.reorderCollections(event.payload, manager),
-    );
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      await this.repository.lockCollectionGroup(command.seasonKey, command.kind, manager);
+      const group = await this.repository.listCollectionGroup(
+        command.seasonKey, command.kind, manager, true,
+      );
+      assertExactOrder(group.map(({ id }) => id), command.collectionIds);
+      return CollectionsReorderedEvent.create(
+        {
+          scopeId: `${command.seasonKey}:${command.kind}`,
+          positions: command.collectionIds.map((id, position) => ({ id, position })),
+        },
+        command.actorId,
+      );
+    });
+    return this.repository.listCollectionGroup(command.seasonKey, command.kind);
   }
 }
 
@@ -190,50 +154,31 @@ export class DeleteContentCollectionHandler
   implements ICommandHandler<DeleteContentCollectionCommand, string>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
   async execute(command: DeleteContentCollectionCommand): Promise<string> {
-    let deletedAssets: Array<{
-      id: string;
-      mimeType: string;
-      byteSize: string;
-    }> = [];
-    const result = await this.events.appendPreparedAndProject(
-      async (manager) => {
-        const existing = await this.repository.findCollection(
-          command.collectionId,
-          manager,
-          true,
-        );
-        if (!existing) throw new NotFoundException('Collection not found.');
-        const assets = await this.repository.listAssets(
-          existing.id,
-          manager,
-          true,
-        );
-        deletedAssets = assets.map(({ id, mimeType, byteSize }) => ({
-          id,
-          mimeType,
-          byteSize,
-        }));
-        return collectionDeletedEvent(
-          {
-            id: existing.id,
-            objectNames: assets.flatMap((asset) =>
-              [asset.objectName, asset.thumbnailObjectName].filter(
-                (name): name is string => Boolean(name),
-              ),
+    let collectionId: string | null = null;
+    let deletedAssets: Array<{ id: string; mimeType: string; byteSize: string }> = [];
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const existing = await this.repository.findCollection(command.collectionId, manager, true);
+      if (!existing) throw new NotFoundException('Collection not found.');
+      collectionId = existing.id;
+      const assets = await this.repository.listAssets(existing.id, manager, true);
+      deletedAssets = assets.map(({ id, mimeType, byteSize }) => ({ id, mimeType, byteSize }));
+      return CollectionDeletedEvent.create(
+        {
+          id: existing.id,
+          objectNames: assets.flatMap((asset) =>
+            [asset.objectName, asset.thumbnailObjectName].filter(
+              (name): name is string => Boolean(name),
             ),
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.deleteCollection(event.payload, manager),
-    );
+          ),
+        },
+        command.actorId,
+      );
+    });
     console.info(
       JSON.stringify({
         event: 'documents.collection_deleted',
@@ -249,7 +194,7 @@ export class DeleteContentCollectionHandler
         cleanupStatus: 'queued',
       }),
     );
-    return result;
+    return collectionId!;
   }
 }
 
@@ -258,49 +203,42 @@ export class AddContentAssetHandler
   implements ICommandHandler<AddContentAssetCommand, ContentAssetEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(command: AddContentAssetCommand): Promise<ContentAssetEntity> {
+  async execute(command: AddContentAssetCommand): Promise<ContentAssetEntity> {
     if (!Number.isSafeInteger(command.byteSize) || command.byteSize < 0) {
       throw new BadRequestException('Asset byteSize must be non-negative.');
     }
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        const collection = await this.repository.findCollection(
-          command.collectionId,
-          manager,
-          true,
-        );
-        if (!collection) throw new NotFoundException('Collection not found.');
-        const assets = await this.repository.listAssets(
-          collection.id,
-          manager,
-          true,
-        );
-        return assetSavedEvent(
-          {
-            assetId: randomUUID(),
-            collectionId: collection.id,
-            objectName: command.objectName,
-            thumbnailObjectName: command.thumbnailObjectName,
-            originalName: command.originalName,
-            mimeType: command.mimeType,
-            byteSize: String(command.byteSize),
-            title: normalizeOptional(command.title),
-            caption: normalizeOptional(command.caption),
-            position: assets.length,
-            uploadedBy: command.actorId,
-          },
-          command.actorId,
-          'media',
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.projectAsset(event.payload, manager),
-    );
+    let assetId: string | null = null;
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const collection = await this.repository.findCollection(command.collectionId, manager, true);
+      if (!collection) throw new NotFoundException('Collection not found.');
+      const assets = await this.repository.listAssets(collection.id, manager, true);
+      const id = randomUUID();
+      assetId = id;
+      return AssetSavedEvent.create(
+        {
+          assetId: id,
+          collectionId: collection.id,
+          objectName: command.objectName,
+          thumbnailObjectName: command.thumbnailObjectName,
+          originalName: command.originalName,
+          mimeType: command.mimeType,
+          byteSize: String(command.byteSize),
+          title: normalizeOptional(command.title),
+          caption: normalizeOptional(command.caption),
+          position: assets.length,
+          uploadedBy: command.actorId,
+        },
+        command.actorId,
+        'media',
+      );
+    });
+    const asset = await this.repository.findAsset(assetId!);
+    if (!asset) throw new Error('Asset projection missing after dispatch.');
+    return asset;
   }
 }
 
@@ -309,46 +247,34 @@ export class UpdateContentAssetHandler
   implements ICommandHandler<UpdateContentAssetCommand, ContentAssetEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(command: UpdateContentAssetCommand): Promise<ContentAssetEntity> {
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        const asset = await this.repository.findAsset(
-          command.assetId,
-          manager,
-          true,
-        );
-        if (!asset) throw new NotFoundException('Asset not found.');
-        return assetSavedEvent(
-          {
-            assetId: asset.id,
-            collectionId: asset.collectionId,
-            objectName: asset.objectName,
-            thumbnailObjectName: asset.thumbnailObjectName,
-            originalName: asset.originalName,
-            mimeType: asset.mimeType,
-            byteSize: asset.byteSize,
-            title:
-              command.title === undefined
-                ? asset.title
-                : normalizeOptional(command.title),
-            caption:
-              command.caption === undefined
-                ? asset.caption
-                : normalizeOptional(command.caption),
-            position: asset.position,
-            uploadedBy: asset.uploadedBy,
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.projectAsset(event.payload, manager),
-    );
+  async execute(command: UpdateContentAssetCommand): Promise<ContentAssetEntity> {
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const asset = await this.repository.findAsset(command.assetId, manager, true);
+      if (!asset) throw new NotFoundException('Asset not found.');
+      return AssetSavedEvent.create(
+        {
+          assetId: asset.id,
+          collectionId: asset.collectionId,
+          objectName: asset.objectName,
+          thumbnailObjectName: asset.thumbnailObjectName,
+          originalName: asset.originalName,
+          mimeType: asset.mimeType,
+          byteSize: asset.byteSize,
+          title: command.title === undefined ? asset.title : normalizeOptional(command.title),
+          caption: command.caption === undefined ? asset.caption : normalizeOptional(command.caption),
+          position: asset.position,
+          uploadedBy: asset.uploadedBy,
+        },
+        command.actorId,
+      );
+    });
+    const asset = await this.repository.findAsset(command.assetId);
+    if (!asset) throw new Error('Asset projection missing after dispatch.');
+    return asset;
   }
 }
 
@@ -357,40 +283,25 @@ export class ReorderContentAssetsHandler
   implements ICommandHandler<ReorderContentAssetsCommand, ContentAssetEntity[]>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(command: ReorderContentAssetsCommand): Promise<ContentAssetEntity[]> {
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        const collection = await this.repository.findCollection(
-          command.collectionId,
-          manager,
-          true,
-        );
-        if (!collection) throw new NotFoundException('Collection not found.');
-        const assets = await this.repository.listAssets(
-          collection.id,
-          manager,
-          true,
-        );
-        assertExactOrder(assets.map(({ id }) => id), command.assetIds);
-        return assetsReorderedEvent(
-          {
-            scopeId: collection.id,
-            positions: command.assetIds.map((id, position) => ({
-              id,
-              position,
-            })),
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.reorderAssets(event.payload, manager),
-    );
+  async execute(command: ReorderContentAssetsCommand): Promise<ContentAssetEntity[]> {
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const collection = await this.repository.findCollection(command.collectionId, manager, true);
+      if (!collection) throw new NotFoundException('Collection not found.');
+      const assets = await this.repository.listAssets(collection.id, manager, true);
+      assertExactOrder(assets.map(({ id }) => id), command.assetIds);
+      return AssetsReorderedEvent.create(
+        {
+          scopeId: collection.id,
+          positions: command.assetIds.map((id, position) => ({ id, position })),
+        },
+        command.actorId,
+      );
+    });
+    return this.repository.listAssets(command.collectionId);
   }
 }
 
@@ -400,55 +311,41 @@ export class SetContentCollectionCoverHandler
     ICommandHandler<SetContentCollectionCoverCommand, ContentCollectionEntity>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
-  execute(
+  async execute(
     command: SetContentCollectionCoverCommand,
   ): Promise<ContentCollectionEntity> {
-    return this.events.appendPreparedAndProject(
-      async (manager) => {
-        const collection = await this.repository.findCollection(
-          command.collectionId,
-          manager,
-          true,
-        );
-        if (!collection) throw new NotFoundException('Collection not found.');
-        if (command.assetId && collection.kind !== 'photo_album') {
-          throw new BadRequestException(
-            'Only photo albums can have a cover asset.',
-          );
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const collection = await this.repository.findCollection(command.collectionId, manager, true);
+      if (!collection) throw new NotFoundException('Collection not found.');
+      if (command.assetId && collection.kind !== 'photo_album') {
+        throw new BadRequestException('Only photo albums can have a cover asset.');
+      }
+      if (command.assetId) {
+        const asset = await this.repository.findAsset(command.assetId, manager, true);
+        if (!asset || asset.collectionId !== collection.id) {
+          throw new BadRequestException('Cover asset must belong to the target collection.');
         }
-        if (command.assetId) {
-          const asset = await this.repository.findAsset(
-            command.assetId,
-            manager,
-            true,
-          );
-          if (!asset || asset.collectionId !== collection.id) {
-            throw new BadRequestException(
-              'Cover asset must belong to the target collection.',
-            );
-          }
-        }
-        return collectionSavedEvent(
-          {
-            collectionId: collection.id,
-            name: collection.name,
-            description: collection.description,
-            kind: collection.kind,
-            seasonKey: collection.seasonKey,
-            position: collection.position,
-            coverAssetId: command.assetId,
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.projectCollection(event.payload, manager),
-    );
+      }
+      return CollectionSavedEvent.create(
+        {
+          collectionId: collection.id,
+          name: collection.name,
+          description: collection.description,
+          kind: collection.kind,
+          seasonKey: collection.seasonKey,
+          position: collection.position,
+          coverAssetId: command.assetId,
+        },
+        command.actorId,
+      );
+    });
+    const collection = await this.repository.findCollection(command.collectionId);
+    if (!collection) throw new Error('Collection projection missing after dispatch.');
+    return collection;
   }
 }
 
@@ -457,43 +354,32 @@ export class DeleteContentAssetHandler
   implements ICommandHandler<DeleteContentAssetCommand, string>
 {
   constructor(
-    private readonly events: EventStoreRepository,
-    private readonly projector: DocumentsProjector,
+    private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
   ) {}
 
   async execute(command: DeleteContentAssetCommand): Promise<string> {
-    const deletionLog: {
-      collectionId?: string;
-      mimeType?: string;
-      byteSize?: number;
-    } = {};
-    const result = await this.events.appendPreparedAndProject(
-      async (manager) => {
-        const asset = await this.repository.findAsset(
-          command.assetId,
-          manager,
-          true,
-        );
-        if (!asset) throw new NotFoundException('Asset not found.');
-        Object.assign(deletionLog, {
-          collectionId: asset.collectionId,
-          mimeType: asset.mimeType,
-          byteSize: Number(asset.byteSize),
-        });
-        return assetDeletedEvent(
-          {
-            id: asset.id,
-            objectNames: [asset.objectName, asset.thumbnailObjectName].filter(
-              (name): name is string => Boolean(name),
-            ),
-          },
-          command.actorId,
-        );
-      },
-      (event, _stored, manager) =>
-        this.projector.deleteAsset(event.payload, manager),
-    );
+    let assetId: string | null = null;
+    const deletionLog: { collectionId?: string; mimeType?: string; byteSize?: number } = {};
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      const asset = await this.repository.findAsset(command.assetId, manager, true);
+      if (!asset) throw new NotFoundException('Asset not found.');
+      assetId = asset.id;
+      Object.assign(deletionLog, {
+        collectionId: asset.collectionId,
+        mimeType: asset.mimeType,
+        byteSize: Number(asset.byteSize),
+      });
+      return AssetDeletedEvent.create(
+        {
+          id: asset.id,
+          objectNames: [asset.objectName, asset.thumbnailObjectName].filter(
+            (name): name is string => Boolean(name),
+          ),
+        },
+        command.actorId,
+      );
+    });
     console.info(
       JSON.stringify({
         event: 'documents.asset_deleted',
@@ -505,7 +391,7 @@ export class DeleteContentAssetHandler
         cleanupStatus: 'queued',
       }),
     );
-    return result;
+    return assetId!;
   }
 }
 
@@ -517,7 +403,7 @@ function validateSeason(seasonKey: number): void {
   }
 }
 
-function normalizeOptional(value: string | null): string | null {
+function normalizeOptional(value: string | null | undefined): string | null {
   const normalized = value?.trim();
   return normalized ? normalized : null;
 }

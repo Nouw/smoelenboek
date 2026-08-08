@@ -1,18 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { DataSource, EntityManager } from 'typeorm';
 
+import { DomainEventBase } from '../../event-store/domain-event';
 import { ContentAssetEntity } from '../entities/content-asset.entity';
 import { ContentCollectionEntity } from '../entities/content-collection.entity';
 import { ContentObjectCleanupEntity } from '../entities/content-object-cleanup.entity';
-import type {
-  AssetSnapshotPayload,
-  CollectionSnapshotPayload,
-  DeletePayload,
-  ReorderPayload,
+import {
+  AssetDeletedEvent,
+  AssetSavedEvent,
+  AssetsReorderedEvent,
+  CollectionDeletedEvent,
+  CollectionSavedEvent,
+  CollectionsReorderedEvent,
+  type AssetSnapshotPayload,
+  type CollectionSnapshotPayload,
+  type DeletePayload,
+  type ReorderPayload,
 } from '../events/document.events';
 
+@EventsHandler(
+  CollectionSavedEvent,
+  CollectionsReorderedEvent,
+  CollectionDeletedEvent,
+  AssetSavedEvent,
+  AssetsReorderedEvent,
+  AssetDeletedEvent,
+)
 @Injectable()
-export class DocumentsProjector {
+export class DocumentsProjector implements IEventHandler<DomainEventBase> {
+  constructor(private readonly dataSource: DataSource) {}
+
+  async handle(event: DomainEventBase): Promise<void> {
+    if (event instanceof CollectionSavedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.projectCollection(event.payload, manager),
+      );
+    } else if (event instanceof CollectionsReorderedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.reorderCollections(event.payload, manager),
+      );
+    } else if (event instanceof CollectionDeletedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.deleteCollection(event.payload, manager),
+      );
+    } else if (event instanceof AssetSavedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.projectAsset(event.payload, manager),
+      );
+    } else if (event instanceof AssetsReorderedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.reorderAssets(event.payload, manager),
+      );
+    } else if (event instanceof AssetDeletedEvent) {
+      await this.dataSource.transaction((manager) =>
+        this.deleteAsset(event.payload, manager),
+      );
+    }
+  }
+
   async projectCollection(
     payload: CollectionSnapshotPayload,
     manager: EntityManager,

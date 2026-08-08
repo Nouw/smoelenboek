@@ -49,6 +49,38 @@ import {
   UserSyncedFromAuthEvent,
 } from '../users/events/user-synced-from-auth.event';
 
+// Phase 3: polls
+import {
+  POLL_ARCHIVED_EVENT,
+  POLL_CREATED_EVENT,
+  POLL_DRAFT_DELETED_EVENT,
+  POLL_PUBLISHED_EVENT,
+  POLL_RESPONSE_SUBMITTED_EVENT,
+  POLL_UPDATED_EVENT,
+  PollArchivedEvent,
+  PollCreatedEvent,
+  PollDraftDeletedEvent,
+  PollPublishedEvent,
+  PollResponseSubmittedEvent,
+  PollUpdatedEvent,
+} from '../polls/events/poll.events';
+
+// Phase 3: documents
+import {
+  ASSET_DELETED_EVENT,
+  ASSET_SAVED_EVENT,
+  ASSETS_REORDERED_EVENT,
+  COLLECTION_DELETED_EVENT,
+  COLLECTION_SAVED_EVENT,
+  COLLECTIONS_REORDERED_EVENT,
+  AssetDeletedEvent,
+  AssetSavedEvent,
+  AssetsReorderedEvent,
+  CollectionDeletedEvent,
+  CollectionSavedEvent,
+  CollectionsReorderedEvent,
+} from '../documents/events/document.events';
+
 // Phase 2: protototo
 import {
   PROTOTOTO_ENTRY_SUBMITTED_EVENT,
@@ -95,6 +127,18 @@ const EVENT_CLASS_MAP = new Map<string, DomainEventClass>([
   [PROTOTOTO_MATCH_REMOVED_EVENT, ProtototoMatchRemovedEvent],
   [PROTOTOTO_ENTRY_SUBMITTED_EVENT, ProtototoEntrySubmittedEvent],
   [PROTOTOTO_MATCH_RESULT_SYNCED_EVENT, ProtototoMatchResultSyncedEvent],
+  [POLL_CREATED_EVENT, PollCreatedEvent],
+  [POLL_UPDATED_EVENT, PollUpdatedEvent],
+  [POLL_PUBLISHED_EVENT, PollPublishedEvent],
+  [POLL_ARCHIVED_EVENT, PollArchivedEvent],
+  [POLL_DRAFT_DELETED_EVENT, PollDraftDeletedEvent],
+  [POLL_RESPONSE_SUBMITTED_EVENT, PollResponseSubmittedEvent],
+  [COLLECTION_SAVED_EVENT, CollectionSavedEvent],
+  [COLLECTIONS_REORDERED_EVENT, CollectionsReorderedEvent],
+  [COLLECTION_DELETED_EVENT, CollectionDeletedEvent],
+  [ASSET_SAVED_EVENT, AssetSavedEvent],
+  [ASSETS_REORDERED_EVENT, AssetsReorderedEvent],
+  [ASSET_DELETED_EVENT, AssetDeletedEvent],
 ]);
 
 export function rehydrate(row: StoredEventEntity): DomainEventBase | null {
