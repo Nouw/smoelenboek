@@ -24,6 +24,10 @@ const homeCopy = {
     label: 'nav.protototo',
     description: 'home.protototoDescription',
   },
+  polls: {
+    label: 'nav.polls',
+    description: 'home.pollsDescription',
+  },
 } satisfies Record<
   HomeNavigationItem['key'],
   { label: TranslationKey; description: TranslationKey }

@@ -1,4 +1,4 @@
-import { FileText, ShieldCheck, Trophy, UsersRound } from 'lucide-react';
+import { FileText, ShieldCheck, Trophy, UsersRound, Vote } from 'lucide-react';
 
 export const homeNavigationItems = [
   {
@@ -20,6 +20,11 @@ export const homeNavigationItems = [
     key: 'protototo',
     icon: Trophy,
     url: '/protototo',
+  },
+  {
+    key: 'polls',
+    icon: Vote,
+    url: '/polls',
   },
 ] as const;
 

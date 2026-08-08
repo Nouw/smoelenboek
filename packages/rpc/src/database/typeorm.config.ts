@@ -12,6 +12,10 @@ import { ProtototoEntryEntity } from '../protototo/entities/protototo-entry.enti
 import { ProtototoMatchEntity } from '../protototo/entities/protototo-match.entity';
 import { ProtototoPredictionEntity } from '../protototo/entities/protototo-prediction.entity';
 import { ProtototoRoundEntity } from '../protototo/entities/protototo-round.entity';
+import { PollEntity } from '../polls/entities/poll.entity';
+import { PollOptionEntity } from '../polls/entities/poll-option.entity';
+import { PollResponseEntity } from '../polls/entities/poll-response.entity';
+import { PollSelectionEntity } from '../polls/entities/poll-selection.entity';
 import { TeamMembershipEntity } from '../teams/entities/team-membership.entity';
 import { TeamEntity } from '../teams/entities/team.entity';
 import { UserEntity } from '../users/entities/user.entity';
@@ -45,6 +49,10 @@ export function createDataSourceOptions(
       ProtototoMatchEntity,
       ProtototoPredictionEntity,
       ProtototoRoundEntity,
+      PollEntity,
+      PollOptionEntity,
+      PollResponseEntity,
+      PollSelectionEntity,
       TeamEntity,
       TeamMembershipEntity,
       UserInformationEntity,

@@ -23,6 +23,24 @@ export {
 } from './documents/dto/document.dto';
 export type { SeasonDto } from './seasons/dto/season.dto';
 export {
+  createPollInputSchema,
+  pollAdminResultSchema,
+  pollChoiceModeSchema,
+  pollOptionSchema,
+  pollSchema,
+  pollStatusSchema,
+  submitPollVoteInputSchema,
+  updatePollInputSchema,
+  type CreatePollInput,
+  type PollAdminResultDto,
+  type PollChoiceMode,
+  type PollDto,
+  type PollOptionDto,
+  type PollStatus,
+  type SubmitPollVoteInput,
+  type UpdatePollInput,
+} from './polls/dto/poll.dto';
+export {
   createProtototoRoundInputSchema,
   matchFormatSchema,
   nevoboMatchSummarySchema,
