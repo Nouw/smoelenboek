@@ -13,6 +13,11 @@ export class ListManagedUsersHandler implements IQueryHandler<ListManagedUsersQu
           WHEN eo."status" IS NULL THEN 'not_queued' ELSE eo."status" END AS "invitationStatus"
        FROM "users" u LEFT JOIN LATERAL (SELECT "status" FROM "email_outbox" WHERE "relatedUserId" = u."id" AND "messageType" = 'invitation' ORDER BY "createdAt" DESC LIMIT 1) eo ON true
        WHERE ($1 = '' OR u."name" ILIKE '%' || $1 || '%' OR u."email" ILIKE '%' || $1 || '%')
+       AND NOT EXISTS (
+         SELECT 1
+         FROM "user_information" ui
+         WHERE ui."userId" = u."id" AND ui."leaveDate" IS NOT NULL
+       )
        ORDER BY u."name" ASC LIMIT $2 OFFSET $3`, [query.query, query.limit, query.offset]);
     return rows.map((row: Record<string, unknown>) => ({ ...row, invitedAt: row.invitedAt instanceof Date ? row.invitedAt.toISOString() : row.invitedAt, accountActivatedAt: row.accountActivatedAt instanceof Date ? row.accountActivatedAt.toISOString() : row.accountActivatedAt })) as ManagedUserDto[];
   }

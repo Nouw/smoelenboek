@@ -24,11 +24,16 @@ export class DomainEventDispatcher implements IEventPublisher<IEvent>, OnApplica
   ) {}
 
   onApplicationBootstrap(): void {
-    const wrappers = this.discovery.getProviders({ metadataKey: EVENTS_HANDLER_METADATA });
+    // NestJS 11 changed getProviders({ metadataKey }) to only work with decorators created via
+    // DiscoveryService.createDecorator(). @nestjs/cqrs @EventsHandler uses raw Reflect.defineMetadata
+    // so it bypasses DiscoverableMetaHostCollection. We scan all providers and filter manually.
+    const wrappers = this.discovery.getProviders();
     for (const wrapper of wrappers) {
+      const metatype = wrapper.metatype;
+      if (!metatype || !Reflect.getMetadata(EVENTS_HANDLER_METADATA, metatype)) continue;
       const instance = wrapper.instance as IEventHandler<DomainEventBase> | undefined;
       if (!instance || typeof instance.handle !== 'function') continue;
-      const eventClasses: Function[] = Reflect.getMetadata(EVENTS_HANDLER_METADATA, Object.getPrototypeOf(instance).constructor) ?? [];
+      const eventClasses: Function[] = Reflect.getMetadata(EVENTS_HANDLER_METADATA, metatype) ?? [];
       for (const cls of eventClasses) {
         const existing = this.handlerMap.get(cls) ?? [];
         this.handlerMap.set(cls, [...existing, instance]);
@@ -36,6 +41,10 @@ export class DomainEventDispatcher implements IEventPublisher<IEvent>, OnApplica
     }
     // Install ourselves as the EventBus publisher so eventBus.publish() is awaitable.
     this.eventBus.publisher = this;
+    this.logger.log(JSON.stringify({
+      event: 'dispatcher.bootstrap',
+      registeredHandlers: [...this.handlerMap.entries()].map(([cls, hs]) => ({ eventClass: cls.name, handlers: hs.map(h => Object.getPrototypeOf(h).constructor.name) })),
+    }));
   }
 
   async publish(event: IEvent): Promise<void> {

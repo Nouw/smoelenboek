@@ -124,14 +124,38 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
   return router({
     admin: router({
       list: adminProcedure
+        .meta({
+          name: 'List members',
+          docs: {
+            description: 'List all members that are registered',
+            auth: true,
+            tags: ['Users']
+          }
+        })
         .input(z.object({ query: z.string().trim().max(100).default(''), limit: z.number().int().min(1).max(100).default(50), offset: z.number().int().min(0).default(0) }).optional())
         .output(z.array(managedUserOutputSchema))
         .query(({ input }) => dependencies.queryBus.execute(new ListManagedUsersQuery(input?.query ?? '', input?.limit ?? 50, input?.offset ?? 0))),
       create: adminProcedure
+        .meta({
+          name: 'Create member',
+          docs: {
+            description: 'Create a new member',
+            auth: true,
+            tags: ['Users']
+          }
+        })
         .input(createManagedUserSchema)
         .output(managedUserOutputSchema)
         .mutation(({ ctx, input }) => dependencies.commandBus.execute(new CreateManagedUserCommand(ctx.userId, input))),
       resendInvitation: adminProcedure
+        .meta({
+          name: 'Resend invitation',
+          docs: {
+            description: 'Resend an invitation to a member',
+            auth: true,
+            tags: ['Users']
+          }
+        })
         .input(z.object({ userId: z.uuid() }))
         .output(z.object({ queued: z.literal(true) }))
         .mutation(({ ctx, input }) => dependencies.commandBus.execute(new ResendUserInvitationCommand(ctx.userId, input.userId))),

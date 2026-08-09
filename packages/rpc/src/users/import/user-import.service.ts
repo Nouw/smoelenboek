@@ -4,18 +4,17 @@ import { createHash } from 'node:crypto';
 import readXlsxFile, { type CellValue as Cell, type Row } from 'read-excel-file/node';
 import { UserProvisioningService } from '../services/user-provisioning.service';
 
-export const IMPORT_FIELDS = ['email', 'name', 'firstName', 'lastName', 'preferredLocale', 'streetName', 'houseNumber', 'postcode', 'city', 'phoneNumber', 'bankAccountNumber', 'birthDate', 'bondNumber', 'leaveDate', 'backNumber', 'refereeLicense'] as const;
+export const IMPORT_FIELDS = ['email', 'firstName', 'lastName', 'preferredLocale', 'streetName', 'houseNumber', 'postcode', 'city', 'phoneNumber', 'bankAccountNumber', 'birthDate', 'bondNumber', 'backNumber', 'refereeLicense'] as const;
 export type ImportField = (typeof IMPORT_FIELDS)[number];
 export type ImportMapping = Record<string, ImportField>;
 
 const aliases: Record<ImportField, string[]> = {
-  email: ['email', 'e-mail', 'emailadres', 'e-mailadres'], name: ['name', 'naam', 'volledige naam'],
+  email: ['email', 'e-mail', 'emailadres', 'e-mailadres'],
   firstName: ['firstname', 'first name', 'voornaam'], lastName: ['lastname', 'last name', 'achternaam'],
   preferredLocale: ['language', 'language preference', 'taal', 'voorkeurstaal'], streetName: ['street', 'street name', 'straat', 'straatnaam'],
   houseNumber: ['house number', 'housenumber', 'huisnummer'], postcode: ['postcode', 'postal code'], city: ['city', 'plaats', 'woonplaats'],
   phoneNumber: ['phone', 'phone number', 'telephone', 'telefoon', 'telefoonnummer'], bankAccountNumber: ['iban', 'bank account', 'rekeningnummer'],
   birthDate: ['birth date', 'date of birth', 'geboortedatum'], bondNumber: ['bond number', 'bondsnummer', 'knkv nummer', 'knkv-nummer'],
-  leaveDate: ['leave date', 'left', 'afmelddatum', 'lid tot'],
   backNumber: ['back number', 'rugnummer'], refereeLicense: ['referee license', 'scheidsrechterslicentie'],
 };
 
@@ -105,7 +104,7 @@ export function suggestMapping(headers: string[]): ImportMapping {
 function validateMapping(headers: string[], mapping: ImportMapping): void {
   const targets = Object.values(mapping);
   if (!targets.includes('email')) throw new BadRequestException('Email must be mapped.');
-  if (!targets.some((target) => ['name', 'firstName', 'lastName'].includes(target))) throw new BadRequestException('A name field must be mapped.');
+  if (!targets.includes('firstName') || !targets.includes('lastName')) throw new BadRequestException('First name and last name must be mapped.');
   if (new Set(targets).size !== targets.length) throw new BadRequestException('A database field can only be mapped once.');
   if (Object.keys(mapping).some((header) => !headers.includes(header))) throw new BadRequestException('Mapping contains an unknown header.');
 }
@@ -129,7 +128,7 @@ function normalizeCell(field: ImportField, value: Cell | null): unknown {
     if (['en', 'engels', 'english'].includes(normalized)) return 'en';
     return normalized;
   }
-  if (['birthDate', 'leaveDate'].includes(field)) return parseDate(value);
+  if (field === 'birthDate') return parseDate(value);
   if (field === 'backNumber') return typeof value === 'number' ? value : Number(value);
   return String(value).trim();
 }

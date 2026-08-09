@@ -12,7 +12,6 @@ import { Button } from '@repo/ui/components/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@repo/ui/components/card';
@@ -22,7 +21,6 @@ import {
   AlertCircle,
   Cake,
   CalendarDays,
-  CheckCircle2,
   CircleUserRound,
   ExternalLink,
   Landmark,
@@ -204,18 +202,17 @@ export function ProfileContent({ userId }: { userId: string }) {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-normal">
-          {t('profile.title')}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t('profile.description')}
-        </p>
-      </div>
+      {/*<div className="flex flex-col gap-1">*/}
+      {/*  <h1 className="text-2xl font-semibold tracking-normal">*/}
+      {/*    {t('profile.title')}*/}
+      {/*  </h1>*/}
+      {/*  <p className="text-sm text-muted-foreground">*/}
+      {/*    {t('profile.description')}*/}
+      {/*  </p>*/}
+      {/*</div>*/}
 
       <Card className="relative overflow-hidden shadow-none">
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent" />
-        <CardContent className="relative flex flex-col gap-5 p-6 sm:flex-row sm:items-end sm:p-8">
+        <CardContent className="relative flex flex-col gap-5 sm:flex-row sm:items-end">
           <Avatar className="size-28 rounded-2xl border-4 border-background shadow-sm sm:size-36">
             <AvatarImage
               src={user.imageUrl ?? undefined}
@@ -231,12 +228,6 @@ export function ProfileContent({ userId }: { userId: string }) {
               <h2 className="truncate text-2xl font-semibold sm:text-3xl">
                 {displayName}
               </h2>
-              <span className="inline-flex items-center rounded-full border bg-background/80 px-2.5 py-1 text-xs font-medium">
-                <CheckCircle2 className="mr-1 size-3.5" />
-                {user.role === 'admin'
-                  ? t('profile.admin')
-                  : t('profile.member')}
-              </span>
             </div>
             {mapHref ? (
               <a
@@ -274,7 +265,7 @@ export function ProfileContent({ userId }: { userId: string }) {
         <div className="space-y-6">
           <ProfileDetailsCard
             title={t('profile.contact')}
-            description={t('profile.contactDescription')}
+            // description={t('profile.contactDescription')}
           >
             <DetailItem
               icon={Mail}
@@ -308,7 +299,7 @@ export function ProfileContent({ userId }: { userId: string }) {
 
           <ProfileDetailsCard
             title={t('profile.details')}
-            description={t('profile.detailsDescription')}
+            // description={t('profile.detailsDescription')}
           >
             <DetailItem
               icon={Cake}
@@ -367,9 +358,9 @@ export function ProfileContent({ userId }: { userId: string }) {
           <CardHeader className="flex flex-row items-start justify-between gap-4">
             <div className="space-y-1.5">
               <CardTitle>{t('profile.activities')}</CardTitle>
-              <CardDescription>
-                {t('profile.activitiesDescription')}
-              </CardDescription>
+              {/*<CardDescription>*/}
+              {/*  {t('profile.activitiesDescription')}*/}
+              {/*</CardDescription>*/}
             </div>
             <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
               {membershipHistory.data?.seasonCount ?? 0}
@@ -459,18 +450,15 @@ export function ProfileContent({ userId }: { userId: string }) {
 
 function ProfileDetailsCard({
   title,
-  description,
   children,
 }: {
   title: string;
-  description: string;
   children: React.ReactNode;
 }) {
   return (
     <Card className="shadow-none">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-1">{children}</CardContent>
     </Card>
@@ -545,7 +533,7 @@ function ActivityRow({
         <p className="truncate text-sm font-medium">{name}</p>
         <p className="text-xs text-muted-foreground">{kind}</p>
       </div>
-      <span className="max-w-44 rounded-full border px-2.5 py-1 text-right text-xs font-medium">
+      <span className="max-w-56 rounded-full border px-2.5 py-1 text-right text-xs font-medium">
         {role}
       </span>
     </div>

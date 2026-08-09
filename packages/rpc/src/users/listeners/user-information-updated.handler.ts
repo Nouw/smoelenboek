@@ -43,7 +43,7 @@ export class UserInformationUpdatedHandler
         messageType: 'address_update',
         recipient: 'secretaris@usvprotos.nl',
         locale: 'nl',
-        name,
+        name: 'Secretaris',
         newAddress,
         relatedUserId: user.id,
         deduplicationKey: `address_update:${user.id}:${randomUUID()}`,
@@ -54,7 +54,7 @@ export class UserInformationUpdatedHandler
         messageType: 'address_update',
         recipient: 'penningmeester@usvprotos.nl',
         locale: 'nl',
-        name,
+        name: 'Penningmeester',
         newAddress,
         relatedUserId: user.id,
         deduplicationKey: `address_update:${user.id}:${randomUUID()}`,
@@ -73,11 +73,18 @@ export class UserInformationUpdatedHandler
         messageType: 'bankaccount_update',
         recipient: 'penningmeester@usvprotos.nl',
         locale: 'nl',
-        name,
+        name: 'Penningmeester',
         newBankaccount: changes.bankAccountNumber!,
         relatedUserId: user.id,
         deduplicationKey: `bankaccount_update:${user.id}:${randomUUID()}`,
       });
+
+      this.logger.log(
+        JSON.stringify({
+          event: 'email.bankaccount_update_queued',
+          userId: user.id,
+        }),
+      );
     }
   }
 }

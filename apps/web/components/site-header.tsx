@@ -11,7 +11,6 @@ import {
 import { Button } from '@repo/ui/components/button';
 import { Separator } from '@repo/ui/components/separator';
 import { useSidebar } from '@repo/ui/components/sidebar';
-import { LanguageSwitcher } from '@/components/language-switcher';
 import { MemberSearch } from '@/components/member-search';
 import { NavUser } from '@/components/nav-user';
 import { useI18n } from '@/lib/i18n';
@@ -47,7 +46,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex min-w-0 justify-end gap-1">
-          <LanguageSwitcher />
+          {/*<LanguageSwitcher />*/}
           <NavUser variant="header" />
         </div>
       </div>

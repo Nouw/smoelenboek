@@ -22,6 +22,9 @@ import { GetUserInformationHandler } from './queries/get-user-information.handle
 import { SearchUsersHandler } from './queries/search-users.handler';
 import { UserInformationRepository } from './repositories/user-information.repository';
 import { UsersRepository } from './repositories/users.repository';
+import {
+  UserInformationUpdatedHandler
+} from './listeners/user-information-updated.handler';
 
 @Module({
   controllers: [UserImportController],
@@ -47,6 +50,7 @@ import { UsersRepository } from './repositories/users.repository';
     ListManagedUsersHandler,
     UserProvisioningService,
     UserImportService,
+    UserInformationUpdatedHandler,
     { provide: USER_ACCOUNT_ADMIN, useClass: BetterAuthUserAccountAdmin },
   ],
   exports: [UsersRepository],

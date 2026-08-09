@@ -17,10 +17,10 @@ describe('user spreadsheet mapping', () => {
   });
 
   it('normalizes locale and supported dates and reports invalid rows', () => {
-    const rows = mapRows(['Email', 'Naam', 'Taal', 'Geboortedatum'], [
-      ['MEMBER@EXAMPLE.COM', 'Member', 'Engels', '07-08-2000'],
-      ['broken', '', 'nl', '01/02/2000'],
-    ], 1, { Email: 'email', Naam: 'name', Taal: 'preferredLocale', Geboortedatum: 'birthDate' });
+    const rows = mapRows(['Email', 'Voornaam', 'Achternaam', 'Taal', 'Geboortedatum'], [
+      ['MEMBER@EXAMPLE.COM', 'Example', 'Member', 'Engels', '07-08-2000'],
+      ['broken', '', '', 'nl', '01/02/2000'],
+    ], 1, { Email: 'email', Voornaam: 'firstName', Achternaam: 'lastName', Taal: 'preferredLocale', Geboortedatum: 'birthDate' });
     expect(rows[0]?.input).toMatchObject({ email: 'member@example.com', preferredLocale: 'en', birthDate: '2000-08-07' });
     expect(rows[1]?.errors.length).toBeGreaterThan(0);
   });

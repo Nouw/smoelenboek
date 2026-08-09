@@ -178,3 +178,24 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
 - [Configuration Options](https://turborepo.dev/docs/reference/configuration)
 - [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+
+# TODO's
+
+## Most important
+
+- [x] User management
+  - [x] fix the form
+  - [ ] fix the list of users containing every user (not really needed can use search)
+- [x] User search
+- [x] Sending emails
+- [x] Polls
+- [ ] Sponsorhengel
+- [ ] Data page (seeing who is longest member) & Birthdays
+- [ ] Sentry / Posthog
+- [ ] Versioning
+- [ ] Write documentation (docusaurus?)
+- [ ] Auto deployment with github actions
+
+## Nice to have
+
+- [ ] Protototo automatic payments
