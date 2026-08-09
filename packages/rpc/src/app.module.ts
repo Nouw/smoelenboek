@@ -16,6 +16,7 @@ import { MembershipsModule } from './memberships/memberships.module';
 import { ProtototoModule } from './protototo/protototo.module';
 import { PollsModule } from './polls/polls.module';
 import { SeasonsModule } from './seasons/seasons.module';
+import { SponsorhengelModule } from './sponsorhengel/sponsorhengel.module';
 import { TeamsModule } from './teams/teams.module';
 import { TrpcModule } from './trpc/trpc.module';
 import { UsersModule } from './users/users.module';
@@ -42,6 +43,7 @@ import { UsersModule } from './users/users.module';
     PollsModule,
     ProtototoModule,
     SeasonsModule,
+    SponsorhengelModule,
     TeamsModule,
     UsersModule,
     TrpcModule,

@@ -52,6 +52,7 @@ const dictionaries = {
       documentsDescription: 'Gedeelde documenten en interne referenties.',
       protototoDescription: 'Overzicht van Protototo-deelname.',
       pollsDescription: 'Stem op actuele verenigingspeilingen.',
+      sponsorhengelDescription: 'Bekijk de sponsorhengel van de vereniging.',
     },
     language: {
       label: 'Taal',
@@ -74,6 +75,7 @@ const dictionaries = {
       polls: 'Peilingen',
       votePolls: 'Stemmen',
       managePolls: 'Peilingen beheren',
+      sponsorhengel: 'Sponsorhengel',
       profile: 'Profiel',
       settings: 'Instellingen',
       logout: 'Uitloggen',
@@ -524,6 +526,13 @@ const dictionaries = {
         },
       },
     },
+    sponsorhengel: {
+      title: 'Sponsorhengel',
+      empty: 'Er is nog geen PDF geüpload.',
+      upload: 'PDF vervangen',
+      uploading: 'Uploaden...',
+      uploadFailed: 'Uploaden mislukt.',
+    },
     userPanel: {
       currentUser: 'Huidige gebruiker',
       currentUserDescription:
@@ -577,6 +586,7 @@ const dictionaries = {
       documentsDescription: 'Shared documents and internal references.',
       protototoDescription: 'Overview of Protototo participation.',
       pollsDescription: 'Vote in current association polls.',
+      sponsorhengelDescription: 'View the association sponsorhengel.',
     },
     language: {
       label: 'Language',
@@ -599,6 +609,7 @@ const dictionaries = {
       polls: 'Polls',
       votePolls: 'Vote',
       managePolls: 'Manage polls',
+      sponsorhengel: 'Sponsorhengel',
       profile: 'Profile',
       settings: 'Settings',
       logout: 'Logout',
@@ -1039,6 +1050,13 @@ const dictionaries = {
           anonymous: 'Guest',
         },
       },
+    },
+    sponsorhengel: {
+      title: 'Sponsorhengel',
+      empty: 'No PDF has been uploaded yet.',
+      upload: 'Replace PDF',
+      uploading: 'Uploading...',
+      uploadFailed: 'Upload failed.',
     },
     userPanel: {
       currentUser: 'Current user',

@@ -28,6 +28,10 @@ const homeCopy = {
     label: 'nav.polls',
     description: 'home.pollsDescription',
   },
+  sponsorhengel: {
+    label: 'nav.sponsorhengel',
+    description: 'home.sponsorhengelDescription',
+  },
 } satisfies Record<
   HomeNavigationItem['key'],
   { label: TranslationKey; description: TranslationKey }

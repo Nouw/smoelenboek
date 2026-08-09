@@ -5,6 +5,7 @@ import { createDocumentsRouter } from './documents/trpc/documents.router';
 import { createSeasonRouter } from './seasons/trpc/season.router';
 import { createProtototoRouter } from './protototo/trpc/protototo.router';
 import { createPollsRouter } from './polls/trpc/polls.router';
+import { createSponsorhengelRouter } from './sponsorhengel/trpc/sponsorhengel.router';
 import { createTeamRouter } from './teams/trpc/team.router';
 import { router } from './trpc/init';
 import { createUserRouter } from './users/trpc/user.router';
@@ -21,6 +22,7 @@ export function createAppRouter(dependencies: RouterDependencies) {
     polls: createPollsRouter(dependencies),
     protototo: createProtototoRouter(dependencies),
     seasons: createSeasonRouter(dependencies),
+    sponsorhengel: createSponsorhengelRouter(dependencies),
     teams: createTeamRouter(dependencies),
     user: createUserRouter(dependencies),
   });

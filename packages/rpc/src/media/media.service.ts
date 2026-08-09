@@ -24,6 +24,7 @@ const allowedObjectPrefixes = [
   'photobooks/',
   'documents/',
   'team/',
+  'sponsorhengel/',
 ];
 
 const maxPhotoBytes = 15 * 1024 * 1024;
@@ -257,6 +258,34 @@ export class MediaService {
       contentType: detected.mime,
       sizeBytes: file.buffer.length,
     };
+  }
+
+  async uploadPdfObject(
+    objectName: string,
+    file: ImageUploadFile,
+  ): Promise<{ sizeBytes: number }> {
+    this.assertAllowedObjectName(objectName);
+    if (!file) throw new BadRequestException('File is required.');
+    if (!file.originalname || file.originalname.length > 255) {
+      throw new BadRequestException('Filename must be between 1 and 255 characters.');
+    }
+    if (file.size > maxDocumentBytes) {
+      throw new BadRequestException('File must be 25 MB or smaller.');
+    }
+    const detected = await this.detectFileType(file.buffer);
+    if (detected?.mime !== 'application/pdf') {
+      throw new BadRequestException('Only PDF files are supported.');
+    }
+    const client = await this.getClient();
+    await client.putObject({
+      namespaceName: this.requiredEnv('OCI_OBJECT_STORAGE_NAMESPACE'),
+      bucketName: this.requiredEnv('OCI_OBJECT_STORAGE_BUCKET'),
+      objectName,
+      putObjectBody: file.buffer,
+      contentType: 'application/pdf',
+      contentLength: file.buffer.length,
+    });
+    return { sizeBytes: file.buffer.length };
   }
 
   async deleteObjectByName(objectName: string): Promise<void> {

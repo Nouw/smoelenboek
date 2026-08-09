@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { FileText, ShieldCheck, Trophy, UserCog, UsersRound, Vote } from 'lucide-react';
+import { FileText, Handshake, ShieldCheck, Trophy, UserCog, UsersRound, Vote } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { NavMain } from '@/components/nav-main';
@@ -77,6 +77,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             { title: t('nav.manageProtototo'), url: "/protototo/admin" },
           ]
         : undefined,
+    },
+    {
+      title: t('nav.sponsorhengel'),
+      url: '/sponsorhengel',
+      icon: Handshake,
+      isActive: pathname.startsWith('/sponsorhengel'),
     },
     ...(isAdmin ? [{ title: t('nav.manageUsers'), url: '/users/admin', icon: UserCog, isActive: pathname.startsWith('/users/admin') }] : []),
   ];

@@ -18,6 +18,7 @@ import { PollResponseEntity } from '../polls/entities/poll-response.entity';
 import { PollSelectionEntity } from '../polls/entities/poll-selection.entity';
 import { TeamMembershipEntity } from '../teams/entities/team-membership.entity';
 import { TeamEntity } from '../teams/entities/team.entity';
+import { SponsorhengelEntity } from '../sponsorhengel/entities/sponsorhengel.entity';
 import { UserEntity } from '../users/entities/user.entity';
 import { UserInformationEntity } from '../users/entities/user-information.entity';
 
@@ -53,6 +54,7 @@ export function createDataSourceOptions(
       PollOptionEntity,
       PollResponseEntity,
       PollSelectionEntity,
+      SponsorhengelEntity,
       TeamEntity,
       TeamMembershipEntity,
       UserInformationEntity,
