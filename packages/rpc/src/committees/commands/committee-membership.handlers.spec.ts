@@ -1,3 +1,8 @@
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
@@ -19,99 +24,165 @@ const membershipId = '02ac256b-ce8f-44e9-8913-7569c3401264';
 const userId = 'af9b8be8-b5a5-4d05-8965-e17337f3a0f0';
 const committeeId = '521ccf21-351e-41bd-a06b-8da3af4599d4';
 
-function membership(
-  overrides: Partial<CommitteeMembershipEntity> = {},
-): CommitteeMembershipEntity {
+function membership(): CommitteeMembershipEntity {
   return Object.assign(new CommitteeMembershipEntity(), {
     id: membershipId,
     userId,
     committeeId,
-    seasonKey: 2023,
+    seasonKey: 2025,
     role: 'voorzitter',
-    startedOn: '2023-09-15',
+    startedOn: '2025-09-15',
     endedOn: null,
     createdAt: now,
     updatedAt: now,
-    ...overrides,
   });
 }
 
-describe('committee membership handlers', () => {
-  describe('AssignCommitteeMemberHandler', () => {
-    it('preserves an explicitly selected season and effective start date', async () => {
-      const entity = membership();
-      const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
-      const handler = new AssignCommitteeMemberHandler(
-        { appendAndPublish } as never,
-        { findMembershipById: jest.fn().mockResolvedValue(entity) } as never,
-      );
+function assignmentHandler(overrides: Record<string, unknown> = {}) {
+  const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
+  const repository = {
+    findById: jest
+      .fn()
+      .mockResolvedValue({ id: committeeId, archivedAt: null }),
+    findActiveAssignment: jest.fn().mockResolvedValue(null),
+    findMembershipById: jest.fn().mockResolvedValue(membership()),
+    ...overrides,
+  };
+  const usersRepository = {
+    findById: jest.fn().mockResolvedValue({ id: userId }),
+  };
+  return {
+    appendAndPublish,
+    repository,
+    usersRepository,
+    handler: new AssignCommitteeMemberHandler(
+      { appendAndPublish } as never,
+      repository as never,
+      usersRepository as never,
+    ),
+  };
+}
 
-      await handler.execute(
+describe('committee membership handlers', () => {
+  it('assigns a member for an explicit season with actor metadata', async () => {
+    const { handler, appendAndPublish } = assignmentHandler();
+
+    await handler.execute(
+      new AssignCommitteeMemberCommand(
+        userId,
+        committeeId,
+        'voorzitter',
+        2025,
+        '2025-09-15',
+        'admin-user',
+      ),
+    );
+
+    expect(appendAndPublish).toHaveBeenCalledWith(
+      expect.any(CommitteeMemberAssignedEvent),
+    );
+    expect((appendAndPublish as jest.Mock).mock.calls[0]?.[0]).toMatchObject({
+      payload: {
+        seasonKey: 2025,
+        startedOn: '2025-09-15',
+        endedOn: null,
+      },
+      metadata: { actorUserId: 'admin-user' },
+    });
+  });
+
+  it('rejects missing, archived, duplicate, and invalid assignments', async () => {
+    const command = new AssignCommitteeMemberCommand(
+      userId,
+      committeeId,
+      'voorzitter',
+      2025,
+      '2025-09-15',
+      'admin-user',
+    );
+
+    await expect(
+      assignmentHandler({
+        findById: jest.fn().mockResolvedValue(null),
+      }).handler.execute(command),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    await expect(
+      assignmentHandler({
+        findById: jest
+          .fn()
+          .mockResolvedValue({ id: committeeId, archivedAt: now }),
+      }).handler.execute(command),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
+      assignmentHandler({
+        findActiveAssignment: jest.fn().mockResolvedValue(membership()),
+      }).handler.execute(command),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
+      assignmentHandler().handler.execute(
         new AssignCommitteeMemberCommand(
           userId,
           committeeId,
           'voorzitter',
-          2023,
-          '2023-09-15',
+          2025,
+          '2024-01-01',
+          'admin-user',
         ),
-      );
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
 
-      expect(appendAndPublish).toHaveBeenCalledWith(
-        expect.any(CommitteeMemberAssignedEvent),
-      );
-      const [event] = (
-        appendAndPublish as jest.MockedFunction<typeof appendAndPublish>
-      ).mock.calls[0] as [CommitteeMemberAssignedEvent];
-      expect(event.toRecord()).toMatchObject({
-        eventVersion: 2,
-        payload: expect.objectContaining({
-          seasonKey: 2023,
-          startedOn: '2023-09-15',
-          endedOn: null,
-        }),
-      });
+  it('rejects an unknown user', async () => {
+    const setup = assignmentHandler();
+    setup.usersRepository.findById.mockResolvedValue(null);
+
+    await expect(
+      setup.handler.execute(
+        new AssignCommitteeMemberCommand(
+          userId,
+          committeeId,
+          'voorzitter',
+          2025,
+          '2025-09-15',
+          'admin-user',
+        ),
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('removes an existing membership immediately and returns its DTO', async () => {
+    const entity = membership();
+    const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
+    const handler = new RemoveCommitteeMemberHandler(
+      { appendAndPublish } as never,
+      { findMembershipById: jest.fn().mockResolvedValue(entity) } as never,
+    );
+
+    await expect(
+      handler.execute(
+        new RemoveCommitteeMemberCommand(membershipId, 'admin-user'),
+      ),
+    ).resolves.toMatchObject({ id: membershipId });
+    expect(appendAndPublish).toHaveBeenCalledWith(
+      expect.any(CommitteeMemberRemovedEvent),
+    );
+    expect((appendAndPublish as jest.Mock).mock.calls[0]?.[0]).toMatchObject({
+      eventVersion: 3,
+      payload: { membershipId },
+      metadata: { actorUserId: 'admin-user' },
     });
   });
 
-  describe('RemoveCommitteeMemberHandler', () => {
-    it('publishes CommitteeMemberRemovedEvent and returns DTO from re-read', async () => {
-      const entity = membership({ endedOn: '2026-02-01' });
-      const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
-      const handler = new RemoveCommitteeMemberHandler(
-        { appendAndPublish } as never,
-        { findMembershipById: jest.fn().mockResolvedValue(entity) } as never,
-      );
+  it('rejects removal of an unknown membership', async () => {
+    const handler = new RemoveCommitteeMemberHandler(
+      {} as never,
+      { findMembershipById: jest.fn().mockResolvedValue(null) } as never,
+    );
 
-      const result = await handler.execute(
-        new RemoveCommitteeMemberCommand(membershipId),
-      );
-
-      expect(appendAndPublish).toHaveBeenCalledWith(
-        expect.any(CommitteeMemberRemovedEvent),
-      );
-      const [event] = (
-        appendAndPublish as jest.MockedFunction<typeof appendAndPublish>
-      ).mock.calls[0] as [CommitteeMemberRemovedEvent];
-      expect(event.toRecord()).toMatchObject({
-        eventVersion: 2,
-        payload: { membershipId },
-      });
-      expect(result?.id).toBe(membershipId);
-      expect(result?.endedOn).toBe('2026-02-01');
-    });
-
-    it('returns null when membership is not found after dispatch', async () => {
-      const appendAndPublish = jest.fn().mockResolvedValue({ dispatched: true });
-      const handler = new RemoveCommitteeMemberHandler(
-        { appendAndPublish } as never,
-        { findMembershipById: jest.fn().mockResolvedValue(null) } as never,
-      );
-
-      const result = await handler.execute(
-        new RemoveCommitteeMemberCommand(membershipId),
-      );
-
-      expect(result).toBeNull();
-    });
+    await expect(
+      handler.execute(
+        new RemoveCommitteeMemberCommand(membershipId, 'admin-user'),
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

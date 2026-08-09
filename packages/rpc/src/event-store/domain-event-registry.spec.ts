@@ -32,6 +32,7 @@ import {
   COMMITTEE_CREATED_EVENT,
   COMMITTEE_MEMBER_ASSIGNED_EVENT,
   COMMITTEE_MEMBER_REMOVED_EVENT,
+  COMMITTEE_RESTORED_EVENT,
   COMMITTEE_UPDATED_EVENT,
 } from '../committees/events/committee-events';
 import {
@@ -61,6 +62,7 @@ const ALL_KNOWN_EVENT_TYPES = [
   COMMITTEE_CREATED_EVENT,
   COMMITTEE_UPDATED_EVENT,
   COMMITTEE_ARCHIVED_EVENT,
+  COMMITTEE_RESTORED_EVENT,
   COMMITTEE_MEMBER_ASSIGNED_EVENT,
   COMMITTEE_MEMBER_REMOVED_EVENT,
   // Users
@@ -93,8 +95,8 @@ const ALL_KNOWN_EVENT_TYPES = [
 ];
 
 describe('domain-event-registry totality gate', () => {
-  it('covers all 34 known non-legacy event types', () => {
-    expect(registeredEventTypes()).toHaveLength(34);
+  it('covers all 35 known non-legacy event types', () => {
+    expect(registeredEventTypes()).toHaveLength(35);
   });
 
   it('every known event type is in the registry', () => {
@@ -129,7 +131,11 @@ describe('domain-event-registry totality gate', () => {
   });
 
   it('returns null for an unregistered (legacy) event type', () => {
-    const row = { eventType: 'legacy.unknown_type', payload: {}, metadata: {} } as StoredEventEntity;
+    const row = {
+      eventType: 'legacy.unknown_type',
+      payload: {},
+      metadata: {},
+    } as StoredEventEntity;
     expect(rehydrate(row)).toBeNull();
   });
 });
@@ -147,7 +153,11 @@ describe('appendAndProject grep gate', () => {
         if (stat.isDirectory()) {
           if (entry === 'node_modules' || entry === 'dist') continue;
           scan(full);
-        } else if (entry.endsWith('.ts') && !entry.endsWith('.spec.ts') && !entry.endsWith('.d.ts')) {
+        } else if (
+          entry.endsWith('.ts') &&
+          !entry.endsWith('.spec.ts') &&
+          !entry.endsWith('.d.ts')
+        ) {
           // Skip the repository definition itself (it defines, not calls)
           if (full.includes('event-store.repository.ts')) continue;
           const content = readFileSync(full, 'utf8');

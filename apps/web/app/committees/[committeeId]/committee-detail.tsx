@@ -70,9 +70,7 @@ export function CommitteeDetail({ committeeId }: { committeeId: string }) {
       <Card className="mx-auto max-w-xl shadow-none">
         <CardContent className="flex min-h-72 flex-col items-center justify-center gap-3 p-8 text-center">
           <UsersRound className="size-10 text-muted-foreground" />
-          <h1 className="text-xl font-semibold">
-            {t('committees.notFound')}
-          </h1>
+          <h1 className="text-xl font-semibold">{t('committees.notFound')}</h1>
           <p className="text-sm text-muted-foreground">
             {t('committees.notFoundDescription')}
           </p>
@@ -95,26 +93,42 @@ export function CommitteeDetail({ committeeId }: { committeeId: string }) {
         </Link>
       </Button>
 
-      <Card className="overflow-hidden bg-gradient-to-br from-primary/15 via-card to-card py-0 shadow-none">
-        <CardContent className="flex min-h-64 flex-col justify-end gap-4 p-6 md:min-h-72 md:p-10">
-          <div className="flex size-14 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <ShieldCheck className="size-8" aria-hidden="true" />
+      <Card className="relative min-h-72 overflow-hidden p-0 text-white shadow-none md:min-h-[26rem]">
+        {committee.imageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={committee.imageUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full scale-105 object-cover blur-xl"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={committee.imageUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-contain"
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-950 text-white/40">
+            <ShieldCheck className="size-14" aria-hidden="true" />
           </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
+        <CardContent className="relative flex min-h-72 flex-col justify-end gap-2 p-6 md:min-h-[26rem] md:p-10">
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-white/80">
               <span>{t('committees.currentSeason')}</span>
               {committee.archivedAt ? (
-                <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
+                <span className="rounded-full border border-white/30 bg-black/20 px-2.5 py-1 text-xs text-white">
                   {t('common.archived')}
                 </span>
               ) : null}
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl">
               {committee.name}
             </h1>
-            <p className="text-base text-muted-foreground md:text-lg">
-              {season.label}
-            </p>
+            <p className="text-base text-white/80 md:text-lg">{season.label}</p>
           </div>
         </CardContent>
       </Card>

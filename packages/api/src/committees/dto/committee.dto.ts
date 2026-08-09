@@ -12,6 +12,7 @@ export type CommitteeRole =
 export interface CommitteeDto {
   id: string;
   name: string;
+  imageUrl: string | null;
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -40,4 +41,19 @@ export interface CurrentCommitteeRosterDto {
   committee: CommitteeDto;
   season: SeasonDto;
   members: CommitteeRosterMemberDto[];
+}
+
+export interface CommitteeRosterMembershipDto extends CommitteeMembershipDto {
+  user: {
+    id: string;
+    name: string;
+    email: string | null;
+    imageUrl: string | null;
+  };
+}
+
+export interface CommitteeRosterForSeasonDto {
+  committee: CommitteeDto;
+  season: SeasonDto;
+  memberships: CommitteeRosterMembershipDto[];
 }

@@ -19,6 +19,12 @@ volleyball roles, explicit assignment start dates, and immediate member removal.
 Archived teams are hidden from the men/women directories but remain readable by
 direct link.
 
+Administrators use `/committees/admin` to create, edit, archive, and restore
+committees, update their banner image URL, and manage committee members for any
+season. Assignments require an explicit committee role and start date. Removing
+a member takes effect immediately. Archived committees are hidden from the
+public directory but remain readable by direct link.
+
 The page uses the shared Shadcn components and includes responsive layouts,
 loading/error/empty states, direct email and phone actions, Google Maps address
 links, and Dutch/English translations.

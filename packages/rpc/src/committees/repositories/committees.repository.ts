@@ -22,6 +22,13 @@ export class CommitteesRepository {
     return this.committeesRepository.findOneBy({ id });
   }
 
+  findByNameCaseInsensitive(name: string): Promise<CommitteeEntity | null> {
+    return this.committeesRepository
+      .createQueryBuilder('committee')
+      .where('LOWER(committee.name) = LOWER(:name)', { name })
+      .getOne();
+  }
+
   findMembershipsBySeason(
     seasonKey: number,
   ): Promise<CommitteeMembershipEntity[]> {
@@ -45,8 +52,33 @@ export class CommitteesRepository {
     });
   }
 
+  findMembershipsByCommitteeAndSeason(
+    committeeId: string,
+    seasonKey: number,
+  ): Promise<CommitteeMembershipEntity[]> {
+    return this.membershipsRepository.find({
+      where: { committeeId, seasonKey, endedOn: IsNull() },
+      order: { startedOn: 'ASC', createdAt: 'ASC' },
+    });
+  }
+
   findMembershipById(id: string): Promise<CommitteeMembershipEntity | null> {
     return this.membershipsRepository.findOneBy({ id });
+  }
+
+  findActiveAssignment(
+    userId: string,
+    committeeId: string,
+    seasonKey: number,
+    role: CommitteeMembershipEntity['role'],
+  ): Promise<CommitteeMembershipEntity | null> {
+    return this.membershipsRepository.findOneBy({
+      userId,
+      committeeId,
+      seasonKey,
+      role,
+      endedOn: IsNull(),
+    });
   }
 
   findMembershipsByUser(userId: string): Promise<CommitteeMembershipEntity[]> {

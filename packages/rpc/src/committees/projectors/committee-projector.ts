@@ -3,7 +3,6 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { DataSource, EntityManager } from 'typeorm';
 
 import { DomainEventBase } from '../../event-store/domain-event';
-import { resolveMembershipEnd } from '../../seasons/season-policy';
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
 import { CommitteeEntity } from '../entities/committee.entity';
 import {
@@ -11,9 +10,10 @@ import {
   CommitteeCreatedEvent,
   CommitteeMemberAssignedEvent,
   CommitteeMemberRemovedEvent,
+  CommitteeRestoredEvent,
   CommitteeUpdatedEvent,
   type CommitteeMembershipAssignedPayload,
-  type CommitteeMembershipEndedPayload,
+  type CommitteeMembershipRemovedPayload,
   type CommitteeSnapshotPayload,
 } from '../events/committee-events';
 
@@ -21,6 +21,7 @@ import {
   CommitteeCreatedEvent,
   CommitteeUpdatedEvent,
   CommitteeArchivedEvent,
+  CommitteeRestoredEvent,
   CommitteeMemberAssignedEvent,
   CommitteeMemberRemovedEvent,
 )
@@ -35,7 +36,10 @@ export class CommitteeProjector implements IEventHandler<DomainEventBase> {
     } else if (event instanceof CommitteeMemberRemovedEvent) {
       await this.projectMemberRemoved(event.payload, manager);
     } else {
-      await this.projectCommitteeSnapshot((event as CommitteeCreatedEvent).payload, manager);
+      await this.projectCommitteeSnapshot(
+        (event as CommitteeCreatedEvent).payload,
+        manager,
+      );
     }
   }
 
@@ -48,6 +52,7 @@ export class CommitteeProjector implements IEventHandler<DomainEventBase> {
     const entity = existing ?? repository.create({ id: payload.committeeId });
 
     entity.name = payload.name;
+    entity.imageUrl = payload.imageUrl;
     entity.archivedAt = payload.archivedAt
       ? new Date(payload.archivedAt)
       : null;
@@ -74,7 +79,7 @@ export class CommitteeProjector implements IEventHandler<DomainEventBase> {
   }
 
   async projectMemberRemoved(
-    payload: CommitteeMembershipEndedPayload,
+    payload: CommitteeMembershipRemovedPayload,
     manager: EntityManager,
   ): Promise<CommitteeMembershipEntity | null> {
     const repository = manager.getRepository(CommitteeMembershipEntity);
@@ -84,15 +89,7 @@ export class CommitteeProjector implements IEventHandler<DomainEventBase> {
       return null;
     }
 
-    if (existing.endedOn === null) {
-      existing.endedOn = resolveMembershipEnd(
-        existing.seasonKey,
-        existing.startedOn,
-        payload.removedOn,
-      );
-      await repository.save(existing);
-    }
-
+    await repository.delete({ id: payload.membershipId });
     return existing;
   }
 }

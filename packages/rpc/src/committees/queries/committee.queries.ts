@@ -7,6 +7,13 @@ export class GetCurrentCommitteeRosterQuery {
   ) {}
 }
 
+export class GetCommitteeRosterForSeasonQuery {
+  constructor(
+    public readonly committeeId: string,
+    public readonly seasonKey: number,
+  ) {}
+}
+
 export class ListCommitteeMembershipsBySeasonQuery {
   constructor(public readonly seasonKey: number) {}
 }

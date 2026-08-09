@@ -23,11 +23,13 @@ import {
   COMMITTEE_CREATED_EVENT,
   COMMITTEE_MEMBER_ASSIGNED_EVENT,
   COMMITTEE_MEMBER_REMOVED_EVENT,
+  COMMITTEE_RESTORED_EVENT,
   COMMITTEE_UPDATED_EVENT,
   CommitteeArchivedEvent,
   CommitteeCreatedEvent,
   CommitteeMemberAssignedEvent,
   CommitteeMemberRemovedEvent,
+  CommitteeRestoredEvent,
   CommitteeUpdatedEvent,
 } from '../committees/events/committee-events';
 
@@ -114,6 +116,7 @@ const EVENT_CLASS_MAP = new Map<string, DomainEventClass>([
   [COMMITTEE_CREATED_EVENT, CommitteeCreatedEvent],
   [COMMITTEE_UPDATED_EVENT, CommitteeUpdatedEvent],
   [COMMITTEE_ARCHIVED_EVENT, CommitteeArchivedEvent],
+  [COMMITTEE_RESTORED_EVENT, CommitteeRestoredEvent],
   [COMMITTEE_MEMBER_ASSIGNED_EVENT, CommitteeMemberAssignedEvent],
   [COMMITTEE_MEMBER_REMOVED_EVENT, CommitteeMemberRemovedEvent],
   [USER_PROVISIONED_EVENT, UserProvisionedEvent],

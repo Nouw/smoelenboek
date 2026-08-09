@@ -32,7 +32,9 @@ assert.match(detail, /!roster\.data/);
 assert.match(detail, /members\.length === 0/);
 assert.match(router, /currentRoster: protectedProcedure/);
 assert.match(router, /committeeId: z\.uuid\(\)/);
-assert.match(sidebar, /url: "\/committees"/);
+assert.match(sidebar, /url: '\/committees'/);
+assert.match(grid, /committee\.imageUrl/);
+assert.match(detail, /committee\.imageUrl/);
 assert.match(translations, /Geen commissieleden/);
 assert.match(translations, /No committee members/);
 

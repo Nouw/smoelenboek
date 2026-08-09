@@ -47,6 +47,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: t('nav.committees'),
       url: "/committees",
       icon: ShieldCheck,
+      isActive: pathname.startsWith('/committees'),
+      items: isAdmin
+        ? [
+            { title: t('nav.committees'), url: '/committees' },
+            {
+              title: t('nav.manageCommittees'),
+              url: '/committees/admin',
+            },
+          ]
+        : undefined,
     },
     {
       title: t('nav.documents'),

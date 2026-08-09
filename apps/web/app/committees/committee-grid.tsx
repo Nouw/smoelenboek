@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ImageIcon, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 import { useI18n } from '@/lib/i18n';
@@ -28,9 +28,11 @@ export function CommitteeGrid() {
     );
   }
 
-  const visibleCommittees = [...(committees.data ?? [])].sort((left, right) =>
-    left.name.localeCompare(right.name, 'nl', { sensitivity: 'base' }),
-  );
+  const visibleCommittees = [...(committees.data ?? [])]
+    .filter(({ archivedAt }) => archivedAt === null)
+    .sort((left, right) =>
+      left.name.localeCompare(right.name, 'nl', { sensitivity: 'base' }),
+    );
 
   return (
     <div className="space-y-5">
@@ -48,19 +50,23 @@ export function CommitteeGrid() {
             <Link
               key={committee.id}
               href={`/committees/${committee.id}`}
-              className="group flex min-h-40 flex-col justify-between rounded-lg border bg-card p-5 text-card-foreground transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="group overflow-hidden rounded-lg border bg-card text-card-foreground transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <div className="flex items-start justify-between gap-3">
-                <span className="rounded-lg bg-primary/10 p-3 text-primary">
-                  <ShieldCheck className="size-6" aria-hidden="true" />
-                </span>
-                {committee.archivedAt ? (
-                  <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-                    {t('common.archived')}
-                  </span>
-                ) : null}
+              <div className="aspect-[4/3] bg-muted">
+                {committee.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={committee.imageUrl}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                    <ImageIcon className="size-8" />
+                  </div>
+                )}
               </div>
-              <h2 className="mt-6 text-lg font-semibold">{committee.name}</h2>
+              <h2 className="p-4 text-lg font-semibold">{committee.name}</h2>
             </Link>
           ))}
         </div>

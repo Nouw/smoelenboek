@@ -7,6 +7,7 @@ export function toCommitteeDto(committee: CommitteeEntity): CommitteeDto {
   return {
     id: committee.id,
     name: committee.name,
+    imageUrl: committee.imageUrl,
     archivedAt: committee.archivedAt?.toISOString() ?? null,
     createdAt: committee.createdAt.toISOString(),
     updatedAt: committee.updatedAt.toISOString(),

@@ -2,6 +2,8 @@ export { Link } from './links/entities/link.entity';
 export type {
   CommitteeDto,
   CommitteeMembershipDto,
+  CommitteeRosterForSeasonDto,
+  CommitteeRosterMembershipDto,
   CommitteeRosterMemberDto,
   CommitteeRole,
   CurrentCommitteeRosterDto,

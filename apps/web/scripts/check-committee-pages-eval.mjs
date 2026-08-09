@@ -20,10 +20,7 @@ const [detail, grid, page, translations, handler, sidebar] = await Promise.all([
 ]);
 
 const criteria = [
-  [
-    'Committee navigation opens the list',
-    /url: "\/committees"/.test(sidebar),
-  ],
+  ['Committee navigation opens the list', /url: '\/committees'/.test(sidebar)],
   [
     'Committee list handles loading, errors, and no results',
     /committees\.isLoading/.test(grid) &&
@@ -48,6 +45,10 @@ const criteria = [
     /committees\.currentSeason/.test(detail) &&
       /committee\.name/.test(detail) &&
       /season\.label/.test(detail),
+  ],
+  [
+    'Committee banners render in list and detail views',
+    /committee\.imageUrl/.test(grid) && /committee\.imageUrl/.test(detail),
   ],
   [
     'Member cards open profiles and show roles',

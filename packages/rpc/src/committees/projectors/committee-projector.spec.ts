@@ -12,6 +12,7 @@ import { CommitteeProjector } from './committee-projector';
 const snapshotPayload = {
   committeeId: '521ccf21-351e-41bd-a06b-8da3af4599d4',
   name: 'Bestuur',
+  imageUrl: 'https://example.com/banner.jpg',
   archivedAt: null as null,
 };
 
@@ -38,13 +39,14 @@ describe('CommitteeProjector', () => {
       create: jest.fn().mockReturnValue(entity),
       save: jest.fn().mockResolvedValue(entity),
     };
-    const projector = makeProjector({ getRepository: jest.fn().mockReturnValue(repository) });
+    const projector = makeProjector({
+      getRepository: jest.fn().mockReturnValue(repository),
+    });
 
     await expect(
-      projector.projectMemberAssigned(
-        assignedPayload,
-        { getRepository: jest.fn().mockReturnValue(repository) } as never,
-      ),
+      projector.projectMemberAssigned(assignedPayload, {
+        getRepository: jest.fn().mockReturnValue(repository),
+      } as never),
     ).resolves.toBe(entity);
 
     expect(repository.save).toHaveBeenCalledWith(
@@ -58,7 +60,7 @@ describe('CommitteeProjector', () => {
     );
   });
 
-  it('ends a membership without deleting its history', async () => {
+  it('deletes a removed membership immediately', async () => {
     const entity = Object.assign(new CommitteeMembershipEntity(), {
       id: '02ac256b-ce8f-44e9-8913-7569c3401264',
       seasonKey: 2025,
@@ -67,21 +69,19 @@ describe('CommitteeProjector', () => {
     });
     const repository = {
       findOneBy: jest.fn().mockResolvedValue(entity),
-      save: jest.fn().mockResolvedValue(entity),
       delete: jest.fn(),
     };
-    const projector = makeProjector({ getRepository: jest.fn().mockReturnValue(repository) });
+    const projector = makeProjector({
+      getRepository: jest.fn().mockReturnValue(repository),
+    });
 
     await expect(
-      projector.projectMemberRemoved(
-        { membershipId: entity.id, removedOn: '2026-02-01' },
-        { getRepository: jest.fn().mockReturnValue(repository) } as never,
-      ),
+      projector.projectMemberRemoved({ membershipId: entity.id }, {
+        getRepository: jest.fn().mockReturnValue(repository),
+      } as never),
     ).resolves.toBe(entity);
 
-    expect(entity.endedOn).toBe('2026-02-01');
-    expect(repository.save).toHaveBeenCalledWith(entity);
-    expect(repository.delete).not.toHaveBeenCalled();
+    expect(repository.delete).toHaveBeenCalledWith({ id: entity.id });
   });
 
   describe('handle() — EventsHandler routing', () => {
@@ -95,10 +95,18 @@ describe('CommitteeProjector', () => {
       const manager = { getRepository: jest.fn().mockReturnValue(repository) };
       const projector = makeProjector(manager);
 
-      await projector.handle(new CommitteeCreatedEvent(snapshotPayload, { source: 'manual' }));
+      await projector.handle(
+        new CommitteeCreatedEvent(snapshotPayload, {
+          source: 'manual',
+          actorUserId: 'admin-user',
+        }),
+      );
 
       expect(repository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Bestuur' }),
+        expect.objectContaining({
+          name: 'Bestuur',
+          imageUrl: 'https://example.com/banner.jpg',
+        }),
       );
     });
 
@@ -113,7 +121,10 @@ describe('CommitteeProjector', () => {
       const projector = makeProjector(manager);
 
       await projector.handle(
-        new CommitteeMemberAssignedEvent(assignedPayload, { source: 'manual' }),
+        new CommitteeMemberAssignedEvent(assignedPayload, {
+          source: 'manual',
+          actorUserId: 'admin-user',
+        }),
       );
 
       expect(repository.save).toHaveBeenCalledWith(
@@ -130,7 +141,6 @@ describe('CommitteeProjector', () => {
       });
       const repository = {
         findOneBy: jest.fn().mockResolvedValue(entity),
-        save: jest.fn().mockResolvedValue(entity),
         delete: jest.fn(),
       };
       const manager = { getRepository: jest.fn().mockReturnValue(repository) };
@@ -138,14 +148,14 @@ describe('CommitteeProjector', () => {
 
       await projector.handle(
         new CommitteeMemberRemovedEvent(
-          { membershipId: assignedPayload.membershipId, removedOn: '2026-02-01' },
-          { source: 'manual' },
+          { membershipId: assignedPayload.membershipId },
+          { source: 'manual', actorUserId: 'admin-user' },
         ),
       );
 
-      expect(repository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ endedOn: expect.any(String) }),
-      );
+      expect(repository.delete).toHaveBeenCalledWith({
+        id: assignedPayload.membershipId,
+      });
     });
 
     describe('idempotency — handle() twice produces same state', () => {
@@ -159,9 +169,14 @@ describe('CommitteeProjector', () => {
           create: jest.fn(),
           save: jest.fn().mockResolvedValue(entity),
         };
-        const manager = { getRepository: jest.fn().mockReturnValue(repository) };
+        const manager = {
+          getRepository: jest.fn().mockReturnValue(repository),
+        };
         const projector = makeProjector(manager);
-        const event = new CommitteeCreatedEvent(snapshotPayload, { source: 'manual' });
+        const event = new CommitteeCreatedEvent(snapshotPayload, {
+          source: 'manual',
+          actorUserId: 'admin-user',
+        });
 
         await projector.handle(event);
         await projector.handle(event);
@@ -170,30 +185,24 @@ describe('CommitteeProjector', () => {
         expect(repository.create).not.toHaveBeenCalled();
       });
 
-      it('projectMemberRemoved is idempotent — endedOn not reset once set', async () => {
-        const entity = Object.assign(new CommitteeMembershipEntity(), {
-          id: assignedPayload.membershipId,
-          seasonKey: 2025,
-          startedOn: '2025-08-01',
-          endedOn: '2026-02-01',
-        });
+      it('projectMemberRemoved is idempotent when the projection is already gone', async () => {
         const repository = {
-          findOneBy: jest.fn().mockResolvedValue(entity),
-          save: jest.fn().mockResolvedValue(entity),
+          findOneBy: jest.fn().mockResolvedValue(null),
           delete: jest.fn(),
         };
-        const manager = { getRepository: jest.fn().mockReturnValue(repository) };
+        const manager = {
+          getRepository: jest.fn().mockReturnValue(repository),
+        };
         const projector = makeProjector(manager);
         const event = new CommitteeMemberRemovedEvent(
-          { membershipId: assignedPayload.membershipId, removedOn: '2026-03-01' },
-          { source: 'manual' },
+          { membershipId: assignedPayload.membershipId },
+          { source: 'manual', actorUserId: 'admin-user' },
         );
 
         await projector.handle(event);
         await projector.handle(event);
 
-        // endedOn already set — save called only once (first call no-op because endedOn !== null)
-        expect(repository.save).not.toHaveBeenCalled();
+        expect(repository.delete).not.toHaveBeenCalled();
       });
     });
   });

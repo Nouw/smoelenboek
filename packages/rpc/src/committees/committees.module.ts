@@ -8,6 +8,7 @@ import {
   AssignCommitteeMemberHandler,
   CreateCommitteeHandler,
   RemoveCommitteeMemberHandler,
+  RestoreCommitteeHandler,
   UpdateCommitteeHandler,
 } from './commands/committee.handlers';
 import { CommitteeMembershipEntity } from './entities/committee-membership.entity';
@@ -15,6 +16,7 @@ import { CommitteeEntity } from './entities/committee.entity';
 import { CommitteeProjector } from './projectors/committee-projector';
 import {
   GetCurrentCommitteeRosterHandler,
+  GetCommitteeRosterForSeasonHandler,
   ListCommitteeMembershipsBySeasonHandler,
   ListCommitteesHandler,
 } from './queries/committee.handlers';
@@ -34,7 +36,9 @@ import { CommitteesRepository } from './repositories/committees.repository';
     ArchiveCommitteeHandler,
     AssignCommitteeMemberHandler,
     RemoveCommitteeMemberHandler,
+    RestoreCommitteeHandler,
     GetCurrentCommitteeRosterHandler,
+    GetCommitteeRosterForSeasonHandler,
     ListCommitteesHandler,
     ListCommitteeMembershipsBySeasonHandler,
   ],
