@@ -25,6 +25,7 @@ const allowedObjectPrefixes = [
   'documents/',
   'team/',
   'sponsorhengel/',
+  'committee/'
 ];
 
 const maxPhotoBytes = 15 * 1024 * 1024;
