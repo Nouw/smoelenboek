@@ -12,6 +12,9 @@ const [
   env,
   smtpConfig,
   smtpSender,
+  legacyPassword,
+  betterAuth,
+  legacyPasswordMigration,
 ] = await Promise.all([
   readFile(new URL('src/users/trpc/user.router.ts', root), 'utf8'),
   readFile(new URL('src/users/import/user-import.service.ts', root), 'utf8'),
@@ -31,6 +34,15 @@ const [
   readFile(new URL('src/config/env.ts', root), 'utf8'),
   readFile(new URL('src/email/smtp-email.config.ts', root), 'utf8'),
   readFile(new URL('src/email/smtp-email.sender.ts', root), 'utf8'),
+  readFile(new URL('src/auth/legacy-password-migration.ts', root), 'utf8'),
+  readFile(new URL('src/auth/better-auth-instance.ts', root), 'utf8'),
+  readFile(
+    new URL(
+      'src/database/migrations/1769700000000-AddLegacyPasswordMigrationState.ts',
+      root,
+    ),
+    'utf8',
+  ),
 ]);
 const checks = [
   [
@@ -91,6 +103,27 @@ const checks = [
   [
     'SMTP delivery failures are sanitized before outbox persistence',
     /SMTP delivery failed/.test(smtpSender) && !/throw error/.test(smtpSender),
+  ],
+  [
+    'legacy bcrypt is verified without bypassing Better Auth for modern hashes',
+    /compare\(password, hash\)/.test(legacyPassword) &&
+      /return verifyModern\(\{ password, hash \}\)/.test(legacyPassword),
+  ],
+  [
+    'legacy login is converted into a forced Better Auth reset',
+    /passwordMigrationRequired/.test(betterAuth) &&
+      /deleteSession/.test(betterAuth) &&
+      /onPasswordReset/.test(betterAuth) &&
+      /completePasswordMigration/.test(betterAuth),
+  ],
+  [
+    'legacy credential state is restored and backfilled by a forward migration',
+    /ADD COLUMN IF NOT EXISTS "passwordMigrationRequired"/.test(
+      legacyPasswordMigration,
+    ) &&
+      /account\."providerId" = 'credential'/.test(legacyPasswordMigration) &&
+      /account\."password" ~/.test(legacyPasswordMigration) &&
+      !/legacy_user_migration_map/.test(legacyPasswordMigration),
   ],
 ];
 for (const [name, passed] of checks)

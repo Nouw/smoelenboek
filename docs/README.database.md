@@ -97,6 +97,26 @@ pnpm --filter @repo/rpc auth:create-user -- --email fabio@example.com --password
 The command uses Better Auth's email/password flow and prints the created user
 without printing the password.
 
+## Legacy passwords
+
+Credential accounts may temporarily contain a bcrypt hash copied from the
+previous application. Migration `1769700000000` detects `$2a$`, `$2b$`, and
+`$2y$` bcrypt hashes, plus the old `reset` sentinel, and marks those users as
+requiring password migration.
+
+A correct legacy password is accepted only to identify the user. The temporary
+session is immediately revoked and a Better Auth password-reset email is
+queued. The migration flag remains set when the email is requested or sent. It
+is cleared only after Better Auth successfully stores the replacement password,
+at which point all existing sessions are revoked and future logins use Better
+Auth's current password verifier. Failed or abandoned reset attempts therefore
+cannot leave a bcrypt account marked as migrated.
+
+Legacy credential records must use `account.providerId = 'credential'` and keep
+the original bcrypt value in `account.password`. Do not pre-hash the bcrypt
+value again. Run the normal database migrations after importing those records
+so the migration state is backfilled.
+
 ## Create an API key
 
 Create API keys through the RPC admin command. You can target a user by email:
