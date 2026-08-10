@@ -16,6 +16,7 @@ jobs:
     outputs:
       version: ${{ steps.semantic.outputs.new_release_version }}
       released: ${{ steps.semantic.outputs.new_release_published }}
+      image_owner: ${{ steps.semantic.outputs.image_owner }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,6 +42,7 @@ jobs:
           set -euo pipefail
 
           before="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          echo "image_owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
           pnpm exec semantic-release
 
@@ -87,8 +89,8 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/smoelenboek-${{ matrix.name }}:${{ needs.release.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/smoelenboek-${{ matrix.name }}:latest
+            ghcr.io/${{ needs.release.outputs.image_owner }}/smoelenboek-${{ matrix.name }}:${{ needs.release.outputs.version }}
+            ghcr.io/${{ needs.release.outputs.image_owner }}/smoelenboek-${{ matrix.name }}:latest
 
   deploy:
     name: Deploy to Proxmox
@@ -114,7 +116,7 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
           VERSION: ${{ needs.release.outputs.version }}
-          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_OWNER: ${{ needs.release.outputs.image_owner }}
         with:
           host: ${{ secrets.DEPLOY_SSH_HOST }}
           username: ${{ secrets.DEPLOY_SSH_USER }}
