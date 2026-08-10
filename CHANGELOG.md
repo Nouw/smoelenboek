@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/Nouw/smoelenboek/compare/v1.0.4...v1.0.5) (2026-08-10)
+
+
+### Bug Fixes
+
+* postgres volume naming ([5411537](https://github.com/Nouw/smoelenboek/commit/54115376311a631ad0ed1181e236067f00cc5fa5))
+
 ## [1.0.4](https://github.com/Nouw/smoelenboek/compare/v1.0.3...v1.0.4) (2026-08-10)
 
 
