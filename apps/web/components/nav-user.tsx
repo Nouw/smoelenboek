@@ -1,6 +1,12 @@
 'use client';
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Settings } from 'lucide-react';
+import {
+  BadgeCheck,
+  ChevronsUpDown,
+  Languages,
+  LogOut,
+  Settings,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -29,13 +35,16 @@ import {
 } from '@repo/ui/components/sidebar';
 
 import { ProfileEditDialog } from './profile-edit-dialog';
+import { LanguageSwitcher } from './language-switcher';
+import { Locale } from '../lib/i18n';
 
 export function NavUser({
   variant = 'sidebar',
 }: {
   variant?: 'sidebar' | 'header';
 }) {
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
+  const nextLocale: Locale = locale === 'nl' ? 'en' : 'nl';
   const session = authClient.useSession();
   const localUser = trpc.user.me.useQuery(undefined, {
     enabled: Boolean(session.data),
@@ -136,6 +145,10 @@ export function NavUser({
               <DropdownMenuItem onSelect={() => setProfileOpen(true)}>
                 <Settings />
                 {t('nav.settings')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLocale(nextLocale)}>
+                <Languages className="size-4" />
+                <span className="text-xs font-medium uppercase">{locale}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

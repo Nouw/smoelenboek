@@ -162,13 +162,11 @@ export function UserAdminContent() {
     },
     {
       id: 'actions',
-      header: '',
+      header: text.options,
       cell: ({ row }) => (
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="outline" size="icon">
-              <EllipsisVertical />
-            </Button>
+          <DropdownMenuTrigger asChild className="ml-auto">
+            <EllipsisVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
@@ -177,8 +175,8 @@ export function UserAdminContent() {
             </DropdownMenuItem>
             {row.original.accountActivatedAt === null && (
               <DropdownMenuItem
-                  disabled={resend.isPending}
-                  onClick={() => resend.mutate({ userId: row.original.id })}
+                disabled={resend.isPending}
+                onClick={() => resend.mutate({ userId: row.original.id })}
               >
                 <MailPlus />
                 {text.resend}
@@ -198,8 +196,8 @@ export function UserAdminContent() {
       //   </Button>
       // ) : null,
       meta: {
-        headerClassName: 'md:w-[16%]',
-        cellClassName: 'empty:hidden md:w-[16%] md:text-right',
+        headerClassName: 'w-[5%] text-right',
+        cellClassName: 'empty:hidden w-[5%] text-right',
       },
     },
   ];
@@ -712,6 +710,7 @@ const copy = {
     sent: 'Verstuurd',
     sending: 'Wordt verstuurd',
     not_queued: 'Niet ingepland',
+    options: 'Opties',
   },
   en: {
     title: 'Manage users',
@@ -762,6 +761,7 @@ const copy = {
     sent: 'Sent',
     sending: 'Sending',
     not_queued: 'Not queued',
+    options: 'Options'
   },
 } as const;
 type Text = (typeof copy)[keyof typeof copy];

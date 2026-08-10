@@ -189,7 +189,7 @@ Learn more about the power of Turborepo:
 - [x] User search
 - [x] Sending emails
 - [x] Polls
-- [ ] Sponsorhengel
+- [x] Sponsorhengel
 - [ ] Data page (seeing who is longest member) & Birthdays
 - [ ] Sentry / Posthog
 - [ ] Versioning
