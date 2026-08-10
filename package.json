@@ -8,9 +8,10 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "node --test scripts/release-workflow.test.mjs && turbo run test",
+    "test:release-workflow": "node --test scripts/release-workflow.test.mjs",
     "test:e2e": "turbo run test:e2e",
-    "eval": "turbo run eval",
+    "eval": "node scripts/check-release-workflow-eval.mjs && turbo run eval",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },

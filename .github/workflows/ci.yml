@@ -30,5 +30,8 @@ jobs:
       - name: Test (rpc)
         run: pnpm --filter @repo/rpc test
 
+      - name: Test release workflow
+        run: pnpm test:release-workflow
+
       - name: Type check (web)
         run: pnpm --filter web check-types

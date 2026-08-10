@@ -36,7 +36,22 @@ jobs:
 
       - name: Release
         id: semantic
-        run: pnpm exec semantic-release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          before="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+
+          pnpm exec semantic-release
+
+          after="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          if [[ -n "$after" && "$after" != "$before" ]]; then
+            echo "new_release_published=true" >> "$GITHUB_OUTPUT"
+            echo "new_release_version=${after#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_release_published=false" >> "$GITHUB_OUTPUT"
+            echo "new_release_version=" >> "$GITHUB_OUTPUT"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -117,10 +132,8 @@ jobs:
 
             docker compose -f docker-compose.prod.yml pull
 
-            docker run --rm \
-              --env-file .env.rpc \
-              "ghcr.io/${REPO_OWNER}/smoelenboek-rpc:${VERSION}" \
-              node dist/migrate.js
+            docker compose -f docker-compose.prod.yml up -d --wait db
+            docker compose -f docker-compose.prod.yml run --rm --no-deps rpc node dist/migrate.js
 
             docker compose -f docker-compose.prod.yml up -d
 
