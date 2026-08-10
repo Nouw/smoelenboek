@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/Nouw/smoelenboek/compare/v1.0.3...v1.0.4) (2026-08-10)
+
+
+### Bug Fixes
+
+* **web:** include workspace deps in image ([b1523b4](https://github.com/Nouw/smoelenboek/commit/b1523b4fd7f5030cef6b9be559e039b174febea6))
+
 ## [1.0.3](https://github.com/Nouw/smoelenboek/compare/v1.0.2...v1.0.3) (2026-08-10)
 
 
