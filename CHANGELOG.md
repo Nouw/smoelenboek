@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Nouw/smoelenboek/compare/v1.0.6...v1.1.0) (2026-08-10)
+
+
+### Features
+
+* **email:** harden production SMTP ([92561f7](https://github.com/Nouw/smoelenboek/commit/92561f74f0882865a4bf452465871b42d74f8bcb))
+
 ## [1.0.6](https://github.com/Nouw/smoelenboek/compare/v1.0.5...v1.0.6) (2026-08-10)
 
 
