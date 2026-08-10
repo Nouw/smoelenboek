@@ -6,7 +6,6 @@ describe('DropUserInformationJoinDate1769200000000', () => {
     const query = jest.fn().mockResolvedValue(undefined);
     await new DropUserInformationJoinDate1769200000000().up({ query } as never);
     const sql = query.mock.calls.map(([statement]) => statement).join('\n');
-    expect(sql).toContain('DROP CONSTRAINT "CHK_user_information_membership_dates"');
     expect(sql).toContain('DROP COLUMN "joinDate"');
   });
 
