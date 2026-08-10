@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/Nouw/smoelenboek/compare/v1.1.0...v1.1.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* added committee allowed object ([31c5fed](https://github.com/Nouw/smoelenboek/commit/31c5fed5fb0d9de993902d8397aa81537d4d3895))
+* **auth:** restore legacy password migration ([cdc3bb2](https://github.com/Nouw/smoelenboek/commit/cdc3bb2f9d6d4844fbf79e6f1a4b5469d39e4db5))
+
 # [1.1.0](https://github.com/Nouw/smoelenboek/compare/v1.0.6...v1.1.0) (2026-08-10)
 
 
