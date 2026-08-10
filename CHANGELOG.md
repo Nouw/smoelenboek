@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Nouw/smoelenboek/compare/v1.0.0...v1.0.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* removed consteraint from unit test ([9b03b7a](https://github.com/Nouw/smoelenboek/commit/9b03b7aab6967e00eeea8d859450d2b370810850))
+
 # 1.0.0 (2026-08-10)
 
 
