@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/Nouw/smoelenboek/compare/v1.0.2...v1.0.3) (2026-08-10)
+
+
+### Bug Fixes
+
+* **ci:** normalize GHCR image owner ([3508193](https://github.com/Nouw/smoelenboek/commit/3508193f252cc4b95b14e391d3834e2a45a90354))
+
 ## [1.0.2](https://github.com/Nouw/smoelenboek/compare/v1.0.1...v1.0.2) (2026-08-10)
 
 
