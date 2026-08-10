@@ -54,7 +54,8 @@ export class ContentAssetUploadController {
     @UploadedFile() file: ImageUploadFile,
   ) {
     const actorId = await this.requireAdmin(request);
-    const collection = await this.documentsRepository.findCollection(collectionId);
+    const collection =
+      await this.documentsRepository.findCollection(collectionId);
 
     if (!collection) throw new NotFoundException('Collection not found.');
 
@@ -151,10 +152,7 @@ export class ContentAssetUploadController {
     return 'completed';
   }
 
-  private logUpload(
-    result: 'failed',
-    details: Record<string, unknown>,
-  ): void {
+  private logUpload(result: 'failed', details: Record<string, unknown>): void {
     console.error(
       JSON.stringify({
         event: 'documents.asset_upload_failed',
@@ -170,7 +168,7 @@ export class ContentAssetUploadController {
     if (!context.userId) {
       throw new UnauthorizedException('Authentication is required.');
     }
-    if (context.passwordMigrationRequired || context.role !== 'admin') {
+    if (context.role !== 'admin') {
       throw new ForbiddenException('Administrator access is required.');
     }
     return context.userId;
@@ -229,11 +227,6 @@ export class ContentAssetController {
     if (!context.userId) {
       throw new UnauthorizedException('Authentication is required.');
     }
-    if (context.passwordMigrationRequired) {
-      throw new ForbiddenException(
-        'A password reset is required before using the application.',
-      );
-    }
   }
 }
 
@@ -256,10 +249,11 @@ async function streamObject(
 }
 
 function contentDisposition(filename: string, download: boolean): string {
-  const ascii = filename
-    .replace(/[\r\n]/g, '')
-    .replace(/[^\x20-\x7e]/g, '_')
-    .replace(/["\\]/g, '_') || 'download';
+  const ascii =
+    filename
+      .replace(/[\r\n]/g, '')
+      .replace(/[^\x20-\x7e]/g, '_')
+      .replace(/["\\]/g, '_') || 'download';
   return `${download ? 'attachment' : 'inline'}; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(filename.replace(/[\r\n]/g, ''))}`;
 }
 

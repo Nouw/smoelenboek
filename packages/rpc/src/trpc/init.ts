@@ -16,13 +16,6 @@ export const protectedProcedure = trpc.procedure.use(({ ctx, next }) => {
     });
   }
 
-  if (ctx.passwordMigrationRequired) {
-    throw new TRPCError({
-      code: 'FORBIDDEN',
-      message: 'A password reset is required before using the application.',
-    });
-  }
-
   return next({
     ctx: {
       ...ctx,

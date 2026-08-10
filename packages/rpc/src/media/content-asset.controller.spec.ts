@@ -46,10 +46,12 @@ describe('ContentAssetUploadController', () => {
         create: jest.fn().mockResolvedValue({
           userId: 'admin-1',
           role: 'admin',
-          passwordMigrationRequired: false,
+          passwordMigrationRequired: true,
         }),
       } as never,
-      { execute: jest.fn().mockRejectedValue(new Error('database failed')) } as never,
+      {
+        execute: jest.fn().mockRejectedValue(new Error('database failed')),
+      } as never,
       {
         findCollection: jest.fn().mockResolvedValue({
           id: 'collection-1',
@@ -59,8 +61,7 @@ describe('ContentAssetUploadController', () => {
       {
         uploadContentAsset: jest.fn().mockResolvedValue({
           objectName: 'photobooks/collection-1/original/object.jpg',
-          thumbnailObjectName:
-            'photobooks/collection-1/thumbnail/object.webp',
+          thumbnailObjectName: 'photobooks/collection-1/thumbnail/object.webp',
           contentType: 'image/jpeg',
           sizeBytes: 4,
         }),
@@ -69,16 +70,12 @@ describe('ContentAssetUploadController', () => {
     );
 
     await expect(
-      controller.upload(
-        {} as never,
-        'collection-1',
-        {
-          originalname: 'photo.jpg',
-          mimetype: 'image/jpeg',
-          size: 4,
-          buffer: Buffer.from('test'),
-        },
-      ),
+      controller.upload({} as never, 'collection-1', {
+        originalname: 'photo.jpg',
+        mimetype: 'image/jpeg',
+        size: 4,
+        buffer: Buffer.from('test'),
+      }),
     ).rejects.toThrow('database failed');
     expect(deleteObjectByName).toHaveBeenCalledTimes(2);
   });
@@ -93,7 +90,9 @@ describe('ContentAssetUploadController', () => {
           passwordMigrationRequired: false,
         }),
       } as never,
-      { execute: jest.fn().mockRejectedValue(new Error('database failed')) } as never,
+      {
+        execute: jest.fn().mockRejectedValue(new Error('database failed')),
+      } as never,
       {
         findCollection: jest.fn().mockResolvedValue({
           id: 'collection-1',
@@ -113,16 +112,12 @@ describe('ContentAssetUploadController', () => {
     );
 
     await expect(
-      controller.upload(
-        {} as never,
-        'collection-1',
-        {
-          originalname: 'map.pdf',
-          mimetype: 'application/pdf',
-          size: 4,
-          buffer: Buffer.from('test'),
-        },
-      ),
+      controller.upload({} as never, 'collection-1', {
+        originalname: 'map.pdf',
+        mimetype: 'application/pdf',
+        size: 4,
+        buffer: Buffer.from('test'),
+      }),
     ).rejects.toThrow('database failed');
     expect(enqueueObjectCleanup).toHaveBeenCalledWith([
       'documents/collection-1/original/object.pdf',
@@ -131,12 +126,12 @@ describe('ContentAssetUploadController', () => {
 });
 
 describe('ContentAssetController', () => {
-  it('returns 404 when an authenticated member requests a deleted asset', async () => {
+  it('allows a member with a legacy credential to request protected content', async () => {
     const controller = new ContentAssetController(
       {
         create: jest.fn().mockResolvedValue({
           userId: 'member-1',
-          passwordMigrationRequired: false,
+          passwordMigrationRequired: true,
         }),
       } as never,
       { findAsset: jest.fn().mockResolvedValue(null) } as never,

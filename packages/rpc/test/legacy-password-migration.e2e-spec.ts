@@ -3,13 +3,13 @@ import { hashSync } from 'bcryptjs';
 import { DataSource, QueryRunner } from 'typeorm';
 
 import {
-  claimPasswordMigrationReset,
   completePasswordMigration,
   verifyPasswordWithLegacySupport,
 } from '../src/auth/legacy-password-migration';
 import { CreateUsers1766810000000 } from '../src/database/migrations/1766810000000-CreateUsers';
 import { CreateBetterAuthTables1767200000000 } from '../src/database/migrations/1767200000000-CreateBetterAuthTables';
 import { AddLegacyPasswordMigrationState1769700000000 } from '../src/database/migrations/1769700000000-AddLegacyPasswordMigrationState';
+import { DropLegacyPasswordResetDeliveryState1769800000000 } from '../src/database/migrations/1769800000000-DropLegacyPasswordResetDeliveryState';
 
 const databaseUrl = process.env.TEST_USER_INFORMATION_DATABASE_URL;
 const describeWithDatabase = databaseUrl ? describe : describe.skip;
@@ -17,12 +17,6 @@ const describeWithDatabase = databaseUrl ? describe : describe.skip;
 describeWithDatabase('legacy password migration PostgreSQL fixture', () => {
   let dataSource: DataSource;
   let runner: QueryRunner;
-  const passwordMigrationDatabase = {
-    query: async (sql: string, parameters?: unknown[]) => {
-      const result = await runner.query(sql, parameters, true);
-      return { rowCount: result.affected ?? 0, rows: result.records };
-    },
-  };
 
   beforeAll(async () => {
     if (!databaseUrl) {
@@ -60,6 +54,7 @@ describeWithDatabase('legacy password migration PostgreSQL fixture', () => {
     );
 
     await new AddLegacyPasswordMigrationState1769700000000().up(runner);
+    await new DropLegacyPasswordResetDeliveryState1769800000000().up(runner);
 
     const [flagged] = await runner.query(
       `SELECT "passwordMigrationRequired" FROM "users" WHERE "id" = $1`,
@@ -74,30 +69,25 @@ describeWithDatabase('legacy password migration PostgreSQL fixture', () => {
       ),
     ).resolves.toBe(true);
 
-    await expect(
-      claimPasswordMigrationReset(passwordMigrationDatabase as never, userId),
-    ).resolves.toBe(true);
-    const [afterRequest] = await runner.query(
-      `SELECT "passwordMigrationRequired", "passwordMigrationResetSentAt" FROM "users" WHERE "id" = $1`,
+    const [duringLegacyAccess] = await runner.query(
+      `SELECT "passwordMigrationRequired" FROM "users" WHERE "id" = $1`,
       [userId],
     );
-    expect(afterRequest.passwordMigrationRequired).toBe(true);
-    expect(afterRequest.passwordMigrationResetSentAt).toBeInstanceOf(Date);
+    expect(duringLegacyAccess.passwordMigrationRequired).toBe(true);
 
     const modernHash = 'better-auth-scrypt-hash';
     await runner.query(
       `UPDATE "account" SET "password" = $2 WHERE "userId" = $1 AND "providerId" = 'credential'`,
       [userId, modernHash],
     );
-    await completePasswordMigration(passwordMigrationDatabase as never, userId);
+    await completePasswordMigration(runner as never, userId);
 
     const [migrated] = await runner.query(
-      `SELECT "passwordMigrationRequired", "passwordMigrationResetSentAt" FROM "users" WHERE "id" = $1`,
+      `SELECT "passwordMigrationRequired" FROM "users" WHERE "id" = $1`,
       [userId],
     );
     expect(migrated).toEqual({
       passwordMigrationRequired: false,
-      passwordMigrationResetSentAt: null,
     });
     const verifyModern = async ({ hash }: { hash: string }) =>
       hash === modernHash;
@@ -123,6 +113,7 @@ describeWithDatabase('legacy password migration PostgreSQL fixture', () => {
     );
 
     await new AddLegacyPasswordMigrationState1769700000000().up(runner);
+    await new DropLegacyPasswordResetDeliveryState1769800000000().up(runner);
 
     const users = await runner.query(
       `SELECT "id", "passwordMigrationRequired" FROM "users" WHERE "id" IN ($1, $2) ORDER BY "id"`,

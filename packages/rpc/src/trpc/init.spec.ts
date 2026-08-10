@@ -28,20 +28,22 @@ describe('protectedProcedure', () => {
     ).resolves.toBe('available');
   });
 
-  it('blocks migrated users until their password is reset', async () => {
+  it('allows authenticated users whose credential still uses a legacy hash', async () => {
     await expect(
       testRouter
         .createCaller(context({ passwordMigrationRequired: true }))
         .protectedValue(),
-    ).rejects.toMatchObject({
-      code: 'FORBIDDEN',
-      message: 'A password reset is required before using the application.',
-    });
+    ).resolves.toBe('available');
   });
 
   it('allows only administrators through admin procedures', async () => {
     await expect(
-      testRouter.createCaller(context({ role: 'admin' })).adminValue(),
+      testRouter
+        .createCaller({
+          ...context({ role: 'admin' }),
+          passwordMigrationRequired: true,
+        })
+        .adminValue(),
     ).resolves.toBe('available');
     await expect(
       testRouter.createCaller(context({ role: 'user' })).adminValue(),

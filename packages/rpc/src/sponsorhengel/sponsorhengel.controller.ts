@@ -30,10 +30,16 @@ export class SponsorhengelController {
 
   @Get('content')
   @HttpCode(200)
-  async content(@Req() request: Request, @Res() response: Response): Promise<void> {
+  async content(
+    @Req() request: Request,
+    @Res() response: Response,
+  ): Promise<void> {
     await this.requireAuthenticated(request);
     const row = await this.repository.find();
-    if (!row) throw new NotFoundException('No sponsorhengel PDF has been uploaded yet.');
+    if (!row)
+      throw new NotFoundException(
+        'No sponsorhengel PDF has been uploaded yet.',
+      );
     const object = await this.mediaService.getObjectByName(row.objectName);
 
     if (object.etag && request.headers['if-none-match'] === object.etag) {
@@ -54,14 +60,21 @@ export class SponsorhengelController {
   }
 
   @Put()
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 25 * 1024 * 1024, files: 1 } }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 25 * 1024 * 1024, files: 1 },
+    }),
+  )
   async replace(
     @Req() request: Request,
     @UploadedFile() file: ImageUploadFile,
   ): Promise<{ originalName: string; byteSize: number; updatedAt: string }> {
     const actorId = await this.requireAdmin(request);
     const objectName = `sponsorhengel/${randomUUID()}.pdf`;
-    const { sizeBytes } = await this.mediaService.uploadPdfObject(objectName, file);
+    const { sizeBytes } = await this.mediaService.uploadPdfObject(
+      objectName,
+      file,
+    );
     const oldObjectName = await this.repository.upsert({
       objectName,
       originalName: file.originalname,
@@ -69,22 +82,28 @@ export class SponsorhengelController {
       byteSize: sizeBytes,
     });
     if (oldObjectName) {
-      this.mediaService.deleteObjectByName(oldObjectName).catch((err: unknown) => {
-        console.error(JSON.stringify({
-          event: 'sponsorhengel.old_object_cleanup_failed',
-          actorId,
-          objectName: oldObjectName,
-          error: err instanceof Error ? err.message : String(err),
-        }));
-      });
+      this.mediaService
+        .deleteObjectByName(oldObjectName)
+        .catch((err: unknown) => {
+          console.error(
+            JSON.stringify({
+              event: 'sponsorhengel.old_object_cleanup_failed',
+              actorId,
+              objectName: oldObjectName,
+              error: err instanceof Error ? err.message : String(err),
+            }),
+          );
+        });
     }
-    console.info(JSON.stringify({
-      event: 'sponsorhengel.replaced',
-      actorId,
-      objectName,
-      originalName: file.originalname,
-      byteSize: sizeBytes,
-    }));
+    console.info(
+      JSON.stringify({
+        event: 'sponsorhengel.replaced',
+        actorId,
+        objectName,
+        originalName: file.originalname,
+        byteSize: sizeBytes,
+      }),
+    );
     const row = await this.repository.find();
     return {
       originalName: row!.originalName,
@@ -95,8 +114,9 @@ export class SponsorhengelController {
 
   private async requireAdmin(request: Request): Promise<string> {
     const context = await this.authContextFactory.create(request);
-    if (!context.userId) throw new UnauthorizedException('Authentication is required.');
-    if (context.passwordMigrationRequired || context.role !== 'admin') {
+    if (!context.userId)
+      throw new UnauthorizedException('Authentication is required.');
+    if (context.role !== 'admin') {
       throw new ForbiddenException('Administrator access is required.');
     }
     return context.userId;
@@ -104,9 +124,7 @@ export class SponsorhengelController {
 
   private async requireAuthenticated(request: Request): Promise<void> {
     const context = await this.authContextFactory.create(request);
-    if (!context.userId) throw new UnauthorizedException('Authentication is required.');
-    if (context.passwordMigrationRequired) {
-      throw new ForbiddenException('A password reset is required before using the application.');
-    }
+    if (!context.userId)
+      throw new UnauthorizedException('Authentication is required.');
   }
 }

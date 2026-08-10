@@ -2,11 +2,9 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { hashSync } from 'bcryptjs';
 
 import {
-  claimPasswordMigrationReset,
   completePasswordMigration,
   isLegacyBcryptHash,
   isLegacyResetPassword,
-  releasePasswordMigrationResetClaim,
   verifyPasswordWithLegacySupport,
 } from './legacy-password-migration';
 
@@ -61,32 +59,11 @@ describe('legacy password migration', () => {
     });
   });
 
-  it('claims reset delivery atomically using a cooldown boundary', async () => {
+  it('clears migration state after Better Auth stores a new password', async () => {
     const query = jest.fn(async () => ({ rowCount: 1 }));
-    const now = new Date('2026-07-22T10:00:00.000Z');
-
-    await expect(
-      claimPasswordMigrationReset({ query } as never, 'user-id', now, 60_000),
-    ).resolves.toBe(true);
-    expect(query).toHaveBeenCalledWith(
-      expect.stringContaining('UPDATE "users"'),
-      ['user-id', now, new Date('2026-07-22T09:59:00.000Z')],
-    );
-  });
-
-  it('releases a failed delivery claim and clears state after reset', async () => {
-    const query = jest.fn(async () => ({ rowCount: 1 }));
-    const claimedAt = new Date('2026-07-22T10:00:00.000Z');
-
-    await releasePasswordMigrationResetClaim(
-      { query } as never,
-      'user-id',
-      claimedAt,
-    );
     await completePasswordMigration({ query } as never, 'user-id');
 
-    expect(query).toHaveBeenCalledTimes(2);
-    expect(query.mock.calls[0]?.[1]).toEqual(['user-id', claimedAt]);
-    expect(query.mock.calls[1]?.[1]).toEqual(['user-id']);
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(query.mock.calls[0]?.[1]).toEqual(['user-id']);
   });
 });

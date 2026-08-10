@@ -15,6 +15,11 @@ const [
   legacyPassword,
   betterAuth,
   legacyPasswordMigration,
+  legacyPasswordResetCleanup,
+  authorization,
+  webShell,
+  mediaAssets,
+  sponsorhengel,
 ] = await Promise.all([
   readFile(new URL('src/users/trpc/user.router.ts', root), 'utf8'),
   readFile(new URL('src/users/import/user-import.service.ts', root), 'utf8'),
@@ -41,6 +46,20 @@ const [
       'src/database/migrations/1769700000000-AddLegacyPasswordMigrationState.ts',
       root,
     ),
+    'utf8',
+  ),
+  readFile(
+    new URL(
+      'src/database/migrations/1769800000000-DropLegacyPasswordResetDeliveryState.ts',
+      root,
+    ),
+    'utf8',
+  ),
+  readFile(new URL('src/trpc/init.ts', root), 'utf8'),
+  readFile(new URL('../../apps/web/app/app-shell.tsx', root), 'utf8'),
+  readFile(new URL('src/media/content-asset.controller.ts', root), 'utf8'),
+  readFile(
+    new URL('src/sponsorhengel/sponsorhengel.controller.ts', root),
     'utf8',
   ),
 ]);
@@ -110,11 +129,12 @@ const checks = [
       /return verifyModern\(\{ password, hash \}\)/.test(legacyPassword),
   ],
   [
-    'legacy login is converted into a forced Better Auth reset',
+    'legacy login keeps its Better Auth session',
     /passwordMigrationRequired/.test(betterAuth) &&
-      /deleteSession/.test(betterAuth) &&
       /onPasswordReset/.test(betterAuth) &&
-      /completePasswordMigration/.test(betterAuth),
+      /completePasswordMigration/.test(betterAuth) &&
+      !/sendMigrationResetIfDue/.test(betterAuth) &&
+      !/deleteSession/.test(betterAuth),
   ],
   [
     'legacy credential state is restored and backfilled by a forward migration',
@@ -124,6 +144,19 @@ const checks = [
       /account\."providerId" = 'credential'/.test(legacyPasswordMigration) &&
       /account\."password" ~/.test(legacyPasswordMigration) &&
       !/legacy_user_migration_map/.test(legacyPasswordMigration),
+  ],
+  [
+    'forced-reset delivery state is removed',
+    /DROP COLUMN IF EXISTS "passwordMigrationResetSentAt"/.test(
+      legacyPasswordResetCleanup,
+    ),
+  ],
+  [
+    'legacy sessions retain application access',
+    !/if \(ctx\.passwordMigrationRequired\)/.test(authorization) &&
+      !/migratedUser/.test(webShell) &&
+      !/context\.passwordMigrationRequired/.test(mediaAssets) &&
+      !/context\.passwordMigrationRequired/.test(sponsorhengel),
   ],
 ];
 for (const [name, passed] of checks)

@@ -104,13 +104,16 @@ previous application. Migration `1769700000000` detects `$2a$`, `$2b$`, and
 `$2y$` bcrypt hashes, plus the old `reset` sentinel, and marks those users as
 requiring password migration.
 
-A correct legacy password is accepted only to identify the user. The temporary
-session is immediately revoked and a Better Auth password-reset email is
-queued. The migration flag remains set when the email is requested or sent. It
-is cleared only after Better Auth successfully stores the replacement password,
-at which point all existing sessions are revoked and future logins use Better
-Auth's current password verifier. Failed or abandoned reset attempts therefore
-cannot leave a bcrypt account marked as migrated.
+A correct legacy password creates a normal Better Auth session with the same
+application access and role checks as a modern credential. Signing in does not
+send a password-reset email. The migration flag remains set while the bcrypt
+credential is in use, but it does not restrict application access.
+
+When the user requests a password reset, the normal email flow is used. The
+migration flag is cleared only after Better Auth successfully stores the
+replacement password, at which point all existing sessions are revoked and
+future logins use Better Auth's current password verifier. Failed or abandoned
+reset attempts therefore leave the working bcrypt credential unchanged.
 
 Legacy credential records must use `account.providerId = 'credential'` and keep
 the original bcrypt value in `account.password`. Do not pre-hash the bcrypt

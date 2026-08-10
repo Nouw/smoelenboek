@@ -80,13 +80,11 @@ function LoginLayout() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setNotice(null);
     setIsSubmitting(true);
 
     const result = await authClient.signIn.email({
@@ -99,17 +97,6 @@ function LoginLayout() {
 
     if (result.error) {
       setError(result.error.message ?? t('auth.loginFailed'));
-      return;
-    }
-
-    const migratedUser = result.data?.user as
-      | { passwordMigrationRequired?: boolean }
-      | undefined;
-    if (migratedUser?.passwordMigrationRequired) {
-      setPassword('');
-      setNotice(
-        'Je oude wachtwoord klopt. Gebruik de resetlink die zojuist is verstuurd om een nieuw wachtwoord in te stellen.',
-      );
       return;
     }
 
@@ -150,11 +137,6 @@ function LoginLayout() {
             {error ? (
               <p className="text-destructive text-sm" role="alert">
                 {error}
-              </p>
-            ) : null}
-            {notice ? (
-              <p className="text-sm text-emerald-700" role="status">
-                {notice}
               </p>
             ) : null}
             <Button type="submit" className="w-full" disabled={isSubmitting}>

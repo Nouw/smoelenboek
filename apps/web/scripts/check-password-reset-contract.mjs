@@ -8,7 +8,8 @@ const [shell, requestPage, resetPage] = await Promise.all([
   readFile(new URL('app/reset-password/page.tsx', root), 'utf8'),
 ]);
 
-assert.match(shell, /passwordMigrationRequired/);
+assert.doesNotMatch(shell, /migratedUser/);
+assert.match(shell, /window\.location\.reload\(\)/);
 assert.match(shell, /request-password-reset/);
 assert.match(requestPage, /authClient\.requestPasswordReset/);
 assert.match(requestPage, /redirectTo/);
