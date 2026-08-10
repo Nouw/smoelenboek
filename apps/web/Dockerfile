@@ -17,6 +17,11 @@ RUN pnpm install --frozen-lockfile
 # Build
 FROM base AS builder
 WORKDIR /repo
+ARG NEXT_PUBLIC_AUTH_URL
+ARG NEXT_PUBLIC_TRPC_URL
+ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
+ENV NEXT_PUBLIC_TRPC_URL=${NEXT_PUBLIC_TRPC_URL}
+RUN test -n "$NEXT_PUBLIC_AUTH_URL" && test -n "$NEXT_PUBLIC_TRPC_URL"
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /repo/packages/api/node_modules ./packages/api/node_modules

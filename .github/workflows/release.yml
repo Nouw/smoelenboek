@@ -67,8 +67,12 @@ jobs:
         include:
           - name: rpc
             file: packages/rpc/Dockerfile
+            build_args: ''
           - name: web
             file: apps/web/Dockerfile
+            build_args: |
+              NEXT_PUBLIC_AUTH_URL=https://api.smoelenboek.usvprotos.nl
+              NEXT_PUBLIC_TRPC_URL=https://api.smoelenboek.usvprotos.nl/trpc
 
     steps:
       - uses: actions/checkout@v4
@@ -85,6 +89,7 @@ jobs:
         with:
           context: .
           file: ${{ matrix.file }}
+          build-args: ${{ matrix.build_args }}
           push: true
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}

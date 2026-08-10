@@ -37,5 +37,6 @@ test('web image includes dependency links for imported workspace packages', () =
   const result = validateWebDockerfile(webDockerfile);
 
   assert.deepEqual(result.missing, []);
+  assert.equal(result.validatesBeforeBuild, true);
   assert.equal(result.valid, true);
 });

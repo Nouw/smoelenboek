@@ -7,6 +7,9 @@ const REQUIRED_FRAGMENTS = [
   'ghcr.io/${{ needs.release.outputs.image_owner }}/smoelenboek-${{ matrix.name }}',
   'docker compose -f docker-compose.prod.yml up -d --wait db',
   'docker compose -f docker-compose.prod.yml run --rm --no-deps rpc node dist/migrate.js',
+  'build-args: ${{ matrix.build_args }}',
+  'NEXT_PUBLIC_AUTH_URL=https://api.smoelenboek.usvprotos.nl',
+  'NEXT_PUBLIC_TRPC_URL=https://api.smoelenboek.usvprotos.nl/trpc',
 ];
 
 export function validateReleaseWorkflow(workflow) {
@@ -46,15 +49,34 @@ const REQUIRED_WEB_DEPENDENCY_LINKS = [
   'COPY --from=deps /repo/packages/ui/node_modules ./packages/ui/node_modules',
 ];
 
+const REQUIRED_WEB_PUBLIC_ENV_BUILD_FRAGMENTS = [
+  'ARG NEXT_PUBLIC_AUTH_URL',
+  'ARG NEXT_PUBLIC_TRPC_URL',
+  'ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}',
+  'ENV NEXT_PUBLIC_TRPC_URL=${NEXT_PUBLIC_TRPC_URL}',
+  'RUN test -n "$NEXT_PUBLIC_AUTH_URL" && test -n "$NEXT_PUBLIC_TRPC_URL"',
+];
+
 export function validateWebDockerfile(dockerfile) {
-  const missing = REQUIRED_WEB_DEPENDENCY_LINKS.filter(
+  const required = [
+    ...REQUIRED_WEB_DEPENDENCY_LINKS,
+    ...REQUIRED_WEB_PUBLIC_ENV_BUILD_FRAGMENTS,
+  ];
+  const missing = required.filter(
     (fragment) => !dockerfile.includes(fragment),
   );
 
+  const validation = dockerfile.indexOf(
+    'RUN test -n "$NEXT_PUBLIC_AUTH_URL" && test -n "$NEXT_PUBLIC_TRPC_URL"',
+  );
+  const webBuild = dockerfile.indexOf('RUN pnpm --filter web build');
+  const validatesBeforeBuild = validation >= 0 && webBuild > validation;
+
   return {
-    checks: REQUIRED_WEB_DEPENDENCY_LINKS.length,
+    checks: required.length + 1,
     missing,
-    valid: missing.length === 0,
+    validatesBeforeBuild,
+    valid: missing.length === 0 && validatesBeforeBuild,
   };
 }
 

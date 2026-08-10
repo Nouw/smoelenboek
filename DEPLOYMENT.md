@@ -74,6 +74,21 @@ BETTER_AUTH_SECRET=your-secret-here
 BETTER_AUTH_URL=https://api.your-domain.com/api/auth
 ```
 
+`NEXT_PUBLIC_*` values are embedded into the browser bundle during
+`next build`. The production values are passed as Docker build arguments in
+`.github/workflows/release.yml`; setting them only in `.env.web` cannot change
+an image that has already been built. Keep the two locations aligned when the
+API hostname changes.
+
+For a manual web image build, pass both required arguments:
+
+```bash
+docker build -f apps/web/Dockerfile \
+  --build-arg NEXT_PUBLIC_AUTH_URL=https://api.your-domain.com \
+  --build-arg NEXT_PUBLIC_TRPC_URL=https://api.your-domain.com/trpc \
+  .
+```
+
 **`.env.db`**
 
 ```env
