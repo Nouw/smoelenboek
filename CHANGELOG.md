@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Nouw/smoelenboek/compare/v1.1.1...v1.2.0) (2026-08-10)
+
+
+### Features
+
+* **auth:** allow legacy password sessions ([474c921](https://github.com/Nouw/smoelenboek/commit/474c92154fc66303f50562cbb5ceff457d90e6bc))
+
 ## [1.1.1](https://github.com/Nouw/smoelenboek/compare/v1.1.0...v1.1.1) (2026-08-10)
 
 
