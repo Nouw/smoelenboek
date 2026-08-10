@@ -20,6 +20,8 @@ WORKDIR /repo
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /repo/packages/api/node_modules ./packages/api/node_modules
+COPY --from=deps /repo/packages/rpc/node_modules ./packages/rpc/node_modules
+COPY --from=deps /repo/packages/ui/node_modules ./packages/ui/node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @repo/api build

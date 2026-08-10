@@ -40,3 +40,33 @@ export function validateReleaseWorkflow(workflow) {
     valid: missing.length === 0 && forbidden.length === 0 && ordered,
   };
 }
+
+const REQUIRED_WEB_DEPENDENCY_LINKS = [
+  'COPY --from=deps /repo/packages/rpc/node_modules ./packages/rpc/node_modules',
+  'COPY --from=deps /repo/packages/ui/node_modules ./packages/ui/node_modules',
+];
+
+export function validateWebDockerfile(dockerfile) {
+  const missing = REQUIRED_WEB_DEPENDENCY_LINKS.filter(
+    (fragment) => !dockerfile.includes(fragment),
+  );
+
+  return {
+    checks: REQUIRED_WEB_DEPENDENCY_LINKS.length,
+    missing,
+    valid: missing.length === 0,
+  };
+}
+
+export function validateNextConfig(config) {
+  const hasTracingRoot = config.includes('outputFileTracingRoot:');
+  const usesLegacyPlacement =
+    /experimental\s*:\s*\{\s*outputFileTracingRoot:/m.test(config);
+
+  return {
+    checks: 2,
+    hasTracingRoot,
+    usesLegacyPlacement,
+    valid: hasTracingRoot && !usesLegacyPlacement,
+  };
+}
