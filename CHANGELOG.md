@@ -1,3 +1,11 @@
+## [1.0.6](https://github.com/Nouw/smoelenboek/compare/v1.0.5...v1.0.6) (2026-08-10)
+
+
+### Bug Fixes
+
+* port on production database ([4f94fa8](https://github.com/Nouw/smoelenboek/commit/4f94fa817311d991e2b6343c4cd9ed6604fff63d))
+* **web:** inject production client URLs ([1e90e1a](https://github.com/Nouw/smoelenboek/commit/1e90e1a5c051ceb9cf65316c3e9aa08fa3e8ef2f))
+
 ## [1.0.5](https://github.com/Nouw/smoelenboek/compare/v1.0.4...v1.0.5) (2026-08-10)
 
 
