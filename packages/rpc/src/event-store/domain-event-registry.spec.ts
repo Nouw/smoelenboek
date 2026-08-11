@@ -47,6 +47,7 @@ import { USER_INFORMATION_UPDATED_EVENT } from '../users/events/user-information
 import { USER_PROFILE_UPDATED_EVENT } from '../users/events/user-profile-updated.event';
 import { USER_PROVISIONED_EVENT } from '../users/events/user-provisioned.event';
 import { USER_SYNCED_FROM_AUTH_EVENT } from '../users/events/user-synced-from-auth.event';
+import { USER_ROLE_CHANGED_EVENT } from '../users/events/user-role-changed.event';
 import { StoredEventEntity } from './entities/stored-event.entity';
 import { rehydrate, registeredEventTypes } from './domain-event-registry';
 
@@ -70,6 +71,7 @@ const ALL_KNOWN_EVENT_TYPES = [
   USER_SYNCED_FROM_AUTH_EVENT,
   USER_PROFILE_UPDATED_EVENT,
   USER_INFORMATION_UPDATED_EVENT,
+  USER_ROLE_CHANGED_EVENT,
   // Protototo
   PROTOTOTO_ROUND_SAVED_EVENT,
   PROTOTOTO_ROUND_PUBLISHED_EVENT,
@@ -95,8 +97,8 @@ const ALL_KNOWN_EVENT_TYPES = [
 ];
 
 describe('domain-event-registry totality gate', () => {
-  it('covers all 35 known non-legacy event types', () => {
-    expect(registeredEventTypes()).toHaveLength(35);
+  it('covers all 36 known non-legacy event types', () => {
+    expect(registeredEventTypes()).toHaveLength(ALL_KNOWN_EVENT_TYPES.length);
   });
 
   it('every known event type is in the registry', () => {

@@ -50,6 +50,10 @@ import {
   USER_SYNCED_FROM_AUTH_EVENT,
   UserSyncedFromAuthEvent,
 } from '../users/events/user-synced-from-auth.event';
+import {
+  USER_ROLE_CHANGED_EVENT,
+  UserRoleChangedEvent,
+} from '../users/events/user-role-changed.event';
 
 // Phase 3: polls
 import {
@@ -123,6 +127,7 @@ const EVENT_CLASS_MAP = new Map<string, DomainEventClass>([
   [USER_SYNCED_FROM_AUTH_EVENT, UserSyncedFromAuthEvent],
   [USER_PROFILE_UPDATED_EVENT, UserProfileUpdatedEvent],
   [USER_INFORMATION_UPDATED_EVENT, UserInformationUpdatedEvent],
+  [USER_ROLE_CHANGED_EVENT, UserRoleChangedEvent],
   [PROTOTOTO_ROUND_SAVED_EVENT, ProtototoRoundSavedEvent],
   [PROTOTOTO_ROUND_PUBLISHED_EVENT, ProtototoRoundPublishedEvent],
   [PROTOTOTO_ROUND_ARCHIVED_EVENT, ProtototoRoundArchivedEvent],

@@ -25,6 +25,15 @@ season. Assignments require an explicit committee role and start date. Removing
 a member takes effect immediately. Archived committees are hidden from the
 public directory but remain readable by direct link.
 
+Administrators use `/users/admin` to create and import members, resend
+invitations, and grant or revoke administrator rights. Every row shows its
+current role. Role changes require confirmation and take effect on the target
+user's next request. Administrators cannot revoke their own rights, stale admin
+requests are rejected, and serialized server-side validation prevents the last
+administrator from being removed. Each accepted role change records a
+`user.role_changed` event with the acting administrator's user ID, providing an
+auditable count and history of privilege changes.
+
 The page uses the shared Shadcn components and includes responsive layouts,
 loading/error/empty states, direct email and phone actions, Google Maps address
 links, and Dutch/English translations.

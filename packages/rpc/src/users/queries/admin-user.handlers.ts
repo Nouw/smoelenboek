@@ -8,7 +8,7 @@ export class ListManagedUsersHandler implements IQueryHandler<ListManagedUsersQu
   constructor(private readonly dataSource: DataSource) {}
   async execute(query: ListManagedUsersQuery): Promise<ManagedUserDto[]> {
     const rows = await this.dataSource.query(
-      `SELECT u."id", u."email", u."name", u."preferredLocale", u."invitedAt", u."accountActivatedAt",
+      `SELECT u."id", u."email", u."name", u."preferredLocale", u."role", u."invitedAt", u."accountActivatedAt",
         CASE WHEN u."accountActivatedAt" IS NOT NULL THEN 'active'
           WHEN eo."status" IS NULL THEN 'not_queued' ELSE eo."status" END AS "invitationStatus"
        FROM "users" u LEFT JOIN LATERAL (SELECT "status" FROM "email_outbox" WHERE "relatedUserId" = u."id" AND "messageType" = 'invitation' ORDER BY "createdAt" DESC LIMIT 1) eo ON true

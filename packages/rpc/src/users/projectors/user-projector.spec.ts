@@ -7,6 +7,7 @@ import {
 import {
   UserSyncedFromAuthEvent,
 } from '../events/user-synced-from-auth.event';
+import { UserRoleChangedEvent } from '../events/user-role-changed.event';
 import { UserProjector } from './user-projector';
 
 const userId = '5e3fb53f-6bb6-456d-9100-8513c76d1fdd';
@@ -123,6 +124,34 @@ describe('UserProjector', () => {
         authUserId: 'auth_123',
         email: 'julien@example.com',
         imageUrl: 'https://example.com/new-avatar.png',
+      }),
+    );
+  });
+
+  it('patches only the role when projecting an administrator role change', async () => {
+    const entity = Object.assign(new UserEntity(), {
+      id: userId,
+      email: 'julien@example.com',
+      name: 'Julien',
+      role: 'user',
+    });
+    const repository = {
+      findOneBy: jest.fn().mockResolvedValue(entity),
+      save: jest.fn().mockResolvedValue(entity),
+    };
+    const manager = { getRepository: jest.fn().mockReturnValue(repository) };
+    const projector = makeProjector(manager);
+
+    await projector.handle(
+      UserRoleChangedEvent.create({ userId, role: 'admin' }, 'admin-id'),
+    );
+
+    expect(repository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: userId,
+        email: 'julien@example.com',
+        name: 'Julien',
+        role: 'admin',
       }),
     );
   });

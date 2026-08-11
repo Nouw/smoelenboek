@@ -39,7 +39,7 @@ export class UserProvisioningService {
         );
         await this.eventStoreRepository.append(provisionedEvent, manager);
         await this.queueInvitation(account.id, input.email, name, input.preferredLocale, now, manager);
-        return { id: account.id, email: input.email, name, preferredLocale: input.preferredLocale, invitedAt: now.toISOString(), accountActivatedAt: null, invitationStatus: 'pending' };
+        return { id: account.id, email: input.email, name, preferredLocale: input.preferredLocale, role: 'user', invitedAt: now.toISOString(), accountActivatedAt: null, invitationStatus: 'pending' };
       });
     } catch (error) {
       try { await this.accounts.remove(account.id); } catch (compensationError) {

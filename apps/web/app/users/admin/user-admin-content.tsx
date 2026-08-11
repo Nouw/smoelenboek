@@ -27,7 +27,8 @@ import {
   Plus,
   Search,
   ShieldAlert,
-  Trash2,
+  ShieldCheck,
+  ShieldOff,
   Users,
 } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -106,6 +107,11 @@ export function UserAdminContent() {
   const text = copy[locale];
   const currentUser = useCurrentUser();
   const [query, setQuery] = useState('');
+  const [roleChange, setRoleChange] = useState<{
+    userId: string;
+    name: string;
+    role: 'user' | 'admin';
+  } | null>(null);
   const users = trpc.user.admin.list.useQuery(
     { query, limit: 100, offset: 0 },
     { enabled: currentUser.isAdmin, retry: false },
@@ -113,6 +119,12 @@ export function UserAdminContent() {
   const utils = trpc.useUtils();
   const resend = trpc.user.admin.resendInvitation.useMutation({
     onSuccess: () => utils.user.admin.list.invalidate(),
+  });
+  const setRole = trpc.user.admin.setRole.useMutation({
+    onSuccess: async () => {
+      await utils.user.admin.list.invalidate();
+      setRoleChange(null);
+    },
   });
   const userRows = users.data ?? [];
   const userColumns: DataTableColumnDef<(typeof userRows)[number]>[] = [
@@ -148,6 +160,20 @@ export function UserAdminContent() {
       },
     },
     {
+      accessorKey: 'role',
+      header: text.role,
+      cell: ({ row }) => (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs">
+          {row.original.role === 'admin' && <ShieldCheck className="size-3" />}
+          {row.original.role === 'admin' ? text.administrator : text.member}
+        </span>
+      ),
+      meta: {
+        headerClassName: 'md:w-[14%]',
+        cellClassName: 'md:w-[14%]',
+      },
+    },
+    {
       accessorKey: 'invitationStatus',
       header: text.status,
       cell: ({ row }) => (
@@ -169,10 +195,41 @@ export function UserAdminContent() {
             <EllipsisVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
-              <Trash2 />
-              Delete
-            </DropdownMenuItem>
+            {row.original.role === 'admin' ? (
+              <DropdownMenuItem
+                disabled={
+                  setRole.isPending || currentUser.isOwner(row.original.id)
+                }
+                onClick={() => {
+                  setRole.reset();
+                  setRoleChange({
+                    userId: row.original.id,
+                    name: row.original.name,
+                    role: 'user',
+                  });
+                }}
+              >
+                <ShieldOff />
+                {currentUser.isOwner(row.original.id)
+                  ? text.cannotRevokeSelf
+                  : text.revokeAdmin}
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                disabled={setRole.isPending}
+                onClick={() => {
+                  setRole.reset();
+                  setRoleChange({
+                    userId: row.original.id,
+                    name: row.original.name,
+                    role: 'admin',
+                  });
+                }}
+              >
+                <ShieldCheck />
+                {text.grantAdmin}
+              </DropdownMenuItem>
+            )}
             {row.original.accountActivatedAt === null && (
               <DropdownMenuItem
                 disabled={resend.isPending}
@@ -260,6 +317,63 @@ export function UserAdminContent() {
           presentation="stacked"
         />
       )}
+      <Dialog
+        open={roleChange !== null}
+        onOpenChange={(open) => {
+          if (!open && !setRole.isPending) setRoleChange(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {roleChange?.role === 'admin'
+                ? text.grantAdminTitle
+                : text.revokeAdminTitle}
+            </DialogTitle>
+            <DialogDescription>
+              {roleChange
+                ? (roleChange.role === 'admin'
+                    ? text.grantAdminDetail
+                    : text.revokeAdminDetail
+                  ).replace('{name}', roleChange.name)
+                : ''}
+            </DialogDescription>
+          </DialogHeader>
+          {setRole.error ? (
+            <p role="alert" className="text-sm text-destructive">
+              {setRole.error.message}
+            </p>
+          ) : null}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={setRole.isPending}
+              onClick={() => setRoleChange(null)}
+            >
+              {text.cancel}
+            </Button>
+            <Button
+              type="button"
+              variant={roleChange?.role === 'user' ? 'destructive' : 'default'}
+              disabled={!roleChange || setRole.isPending}
+              onClick={() => {
+                if (roleChange) {
+                  setRole.mutate({
+                    userId: roleChange.userId,
+                    role: roleChange.role,
+                  });
+                }
+              }}
+            >
+              {setRole.isPending && <Loader2 className="animate-spin" />}
+              {roleChange?.role === 'admin'
+                ? text.confirmGrantAdmin
+                : text.confirmRevokeAdmin}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -675,6 +789,20 @@ const copy = {
     email: 'E-mail',
     language: 'Taal',
     status: 'Status',
+    role: 'Rol',
+    administrator: 'Beheerder',
+    member: 'Lid',
+    grantAdmin: 'Beheerdersrechten geven',
+    revokeAdmin: 'Beheerdersrechten intrekken',
+    cannotRevokeSelf: 'Eigen beheerdersrechten kunnen niet worden ingetrokken',
+    grantAdminTitle: 'Beheerdersrechten geven?',
+    grantAdminDetail:
+      '{name} krijgt volledige toegang tot alle beheerfuncties.',
+    revokeAdminTitle: 'Beheerdersrechten intrekken?',
+    revokeAdminDetail:
+      '{name} verliest direct toegang tot alle beheerfuncties.',
+    confirmGrantAdmin: 'Rechten geven',
+    confirmRevokeAdmin: 'Rechten intrekken',
     resend: 'Opnieuw uitnodigen',
     newUser: 'Gebruiker toevoegen',
     createTitle: 'Nieuwe gebruiker',
@@ -726,6 +854,20 @@ const copy = {
     email: 'Email',
     language: 'Language',
     status: 'Status',
+    role: 'Role',
+    administrator: 'Administrator',
+    member: 'Member',
+    grantAdmin: 'Grant administrator rights',
+    revokeAdmin: 'Revoke administrator rights',
+    cannotRevokeSelf: 'You cannot revoke your own administrator rights',
+    grantAdminTitle: 'Grant administrator rights?',
+    grantAdminDetail:
+      '{name} will receive full access to all administration features.',
+    revokeAdminTitle: 'Revoke administrator rights?',
+    revokeAdminDetail:
+      '{name} will immediately lose access to all administration features.',
+    confirmGrantAdmin: 'Grant rights',
+    confirmRevokeAdmin: 'Revoke rights',
     resend: 'Resend invitation',
     newUser: 'Add user',
     createTitle: 'New user',

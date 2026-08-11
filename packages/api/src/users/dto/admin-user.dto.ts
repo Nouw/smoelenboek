@@ -4,6 +4,17 @@ const optionalText = (max: number) =>
   z.string().trim().max(max).transform((value) => value || null).nullable().optional();
 
 export const preferredLocaleSchema = z.enum(['nl', 'en']);
+export const managedUserRoleSchema = z.enum(['user', 'admin']);
+
+export const setManagedUserRoleSchema = z
+  .object({
+    userId: z.uuid(),
+    role: managedUserRoleSchema,
+  })
+  .strict();
+
+export type ManagedUserRole = z.infer<typeof managedUserRoleSchema>;
+export type SetManagedUserRoleInput = z.infer<typeof setManagedUserRoleSchema>;
 
 export const createManagedUserSchema = z
   .object({
@@ -31,6 +42,7 @@ export type ManagedUserDto = {
   email: string;
   name: string;
   preferredLocale: 'nl' | 'en';
+  role: ManagedUserRole;
   invitedAt: string | null;
   accountActivatedAt: string | null;
   invitationStatus: 'pending' | 'sending' | 'sent' | 'failed' | 'active' | 'not_queued';
