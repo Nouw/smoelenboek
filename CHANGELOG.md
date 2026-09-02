@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/Nouw/smoelenboek/compare/v1.2.0...v1.3.0) (2026-09-02)
+
+
+### Bug Fixes
+
+* fixed wrong name ([e3cd0ec](https://github.com/Nouw/smoelenboek/commit/e3cd0ec984ec6f4939debd233d2d263504836ef3))
+* updated package.json ([8a246f1](https://github.com/Nouw/smoelenboek/commit/8a246f1a3becd60640cf9d89f43319bf099fb77e))
+
+
+### Features
+
+* **users:** manage administrator rights ([714203a](https://github.com/Nouw/smoelenboek/commit/714203a2c9e72a891482da7d788b3013ffee19d2))
+
 # [1.2.0](https://github.com/Nouw/smoelenboek/compare/v1.1.1...v1.2.0) (2026-08-10)
 
 
