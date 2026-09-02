@@ -20,7 +20,8 @@
     "migration:revert": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
     "auth:create-user": "ts-node -r tsconfig-paths/register src/admin/create-user.ts",
     "auth:create-api-key": "ts-node -r tsconfig-paths/register src/admin/create-api-key.ts",
-    "eval": "node ../../scripts/check-cqrs-boundary.mjs && node ../../scripts/check-season-model-contract.mjs && node ../../scripts/check-user-information-contract.mjs && node ../../scripts/check-database-hygiene-contract.mjs && node scripts/check-polls-eval.mjs"
+    "eval": "node ../../scripts/check-cqrs-boundary.mjs && node ../../scripts/check-season-model-contract.mjs && node ../../scripts/check-user-information-contract.mjs && node ../../scripts/check-database-hygiene-contract.mjs && node scripts/check-polls-eval.mjs",
+    "fix:photos": "ts-node -r tsconfig-paths/register scripts/repair-collection-images.ts"
   },
   "exports": {
     "./router": {
@@ -47,6 +48,7 @@
     "express": "^5.2.1",
     "file-type": "21.3.4",
     "multer": "^2.2.0",
+    "mysql2": "^3.24.2",
     "nodemailer": "^9.0.5",
     "oci-common": "^2.136.0",
     "oci-objectstorage": "^2.136.0",
