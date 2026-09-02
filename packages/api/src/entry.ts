@@ -87,9 +87,13 @@ export type {
 export type { UserDto, UserSummaryDto } from './users/dto/user.dto';
 export {
   createManagedUserSchema,
+  managedUserRoleSchema,
   preferredLocaleSchema,
+  setManagedUserRoleSchema,
   type CreateManagedUserInput,
   type ManagedUserDto,
+  type ManagedUserRole,
+  type SetManagedUserRoleInput,
 } from './users/dto/admin-user.dto';
 export type { UserInformationDto } from './users/dto/user-information.dto';
 export {

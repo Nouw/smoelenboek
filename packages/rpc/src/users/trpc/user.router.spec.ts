@@ -283,12 +283,74 @@ describe('user administration tRPC routes', () => {
 
     const execute = jest.fn().mockResolvedValue({
       id: '6a0d03df-8c89-4309-b4ce-d1344f801b06', email: 'member@example.com', name: 'Example Member',
-      preferredLocale: 'nl', invitedAt: '2026-08-07T10:00:00.000Z', accountActivatedAt: null, invitationStatus: 'pending',
+      preferredLocale: 'nl', role: 'user', invitedAt: '2026-08-07T10:00:00.000Z', accountActivatedAt: null, invitationStatus: 'pending',
     });
     const adminRouter = createAppRouter({ commandBus: { execute } as never, queryBus: { execute: jest.fn() } as never });
     await expect(adminRouter.createCaller(authenticatedContext('admin')).user.admin.create({
       email: 'MEMBER@example.com', firstName: 'Example', lastName: 'Member', preferredLocale: 'nl',
     })).resolves.toMatchObject({ email: 'member@example.com', invitationStatus: 'pending' });
     expect(execute).toHaveBeenCalledWith(expect.objectContaining({ actorUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd', input: expect.objectContaining({ email: 'member@example.com' }) }));
+  });
+
+  it('rejects role changes by members', async () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter
+        .createCaller(authenticatedContext('user'))
+        .user.admin.setRole({
+          userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+          role: 'admin',
+        }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('dispatches validated administrator role changes with the actor', async () => {
+    const execute = jest.fn().mockResolvedValue({
+      userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+      role: 'admin',
+    });
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter
+        .createCaller(authenticatedContext('admin'))
+        .user.admin.setRole({
+          userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+          role: 'admin',
+        }),
+    ).resolves.toEqual({
+      userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+      role: 'admin',
+    });
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
+        targetUserId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+        role: 'admin',
+      }),
+    );
+  });
+
+  it('rejects unsupported role values', async () => {
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+
+    await expect(
+      appRouter
+        .createCaller(authenticatedContext('admin'))
+        .user.admin.setRole({
+          userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+          role: 'owner' as never,
+        }),
+    ).rejects.toBeInstanceOf(TRPCError);
   });
 });

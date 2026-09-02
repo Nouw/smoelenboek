@@ -1,5 +1,6 @@
 import {
   createManagedUserSchema,
+  setManagedUserRoleSchema,
   updateUserInformationSchema,
   updateUserProfileSchema,
 } from '@repo/api';
@@ -7,7 +8,11 @@ import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { z } from 'zod';
 
 import { adminProcedure, protectedProcedure, router } from '../../trpc/init';
-import { CreateManagedUserCommand, ResendUserInvitationCommand } from '../commands/admin-user.commands';
+import {
+  CreateManagedUserCommand,
+  ResendUserInvitationCommand,
+  SetManagedUserRoleCommand,
+} from '../commands/admin-user.commands';
 import { ListManagedUsersQuery } from '../queries/admin-user.queries';
 import { GetMembershipHistoryQuery } from '../../memberships/queries/get-membership-history.query';
 import { SyncUserFromAuthCommand } from '../commands/sync-user-from-auth.command';
@@ -116,6 +121,7 @@ const membershipHistoryOutputSchema = z.object({
 
 const managedUserOutputSchema = z.object({
   id: z.uuid(), email: z.email(), name: z.string(), preferredLocale: z.enum(['nl', 'en']),
+  role: z.enum(['user', 'admin']),
   invitedAt: z.iso.datetime().nullable(), accountActivatedAt: z.iso.datetime().nullable(),
   invitationStatus: z.enum(['pending', 'sending', 'sent', 'failed', 'active', 'not_queued']),
 });
@@ -159,6 +165,28 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
         .input(z.object({ userId: z.uuid() }))
         .output(z.object({ queued: z.literal(true) }))
         .mutation(({ ctx, input }) => dependencies.commandBus.execute(new ResendUserInvitationCommand(ctx.userId, input.userId))),
+      setRole: adminProcedure
+        .meta({
+          name: 'Set member administrator role',
+          docs: {
+            description:
+              'Grant or revoke administrator rights for a member. Self-revocation and removing the final administrator are rejected.',
+            auth: true,
+            tags: ['Users'],
+          },
+        })
+        .input(setManagedUserRoleSchema)
+        .output(
+          z.object({
+            userId: z.uuid(),
+            role: z.enum(['user', 'admin']),
+          }),
+        )
+        .mutation(({ ctx, input }) =>
+          dependencies.commandBus.execute(
+            new SetManagedUserRoleCommand(ctx.userId, input.userId, input.role),
+          ),
+        ),
     }),
     search: protectedProcedure
       .meta({

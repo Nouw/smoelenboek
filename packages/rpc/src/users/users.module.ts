@@ -4,7 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventStoreModule } from '../event-store/event-store.module';
 import { EmailModule } from '../email/email.module';
 import { AuthModule } from '../auth/auth.module';
-import { CreateManagedUserHandler, ResendUserInvitationHandler } from './commands/admin-user.handlers';
+import {
+  CreateManagedUserHandler,
+  ResendUserInvitationHandler,
+  SetManagedUserRoleHandler,
+} from './commands/admin-user.handlers';
 import { ListManagedUsersHandler } from './queries/admin-user.handlers';
 import { UserProvisioningService } from './services/user-provisioning.service';
 import { BetterAuthUserAccountAdmin, USER_ACCOUNT_ADMIN } from './user-account-admin';
@@ -47,6 +51,7 @@ import {
     UpdateUserProfileHandler,
     CreateManagedUserHandler,
     ResendUserInvitationHandler,
+    SetManagedUserRoleHandler,
     ListManagedUsersHandler,
     UserProvisioningService,
     UserImportService,
