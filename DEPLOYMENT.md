@@ -49,6 +49,7 @@ Create environment files in `/opt/smoelenboek/`:
 
 ```env
 DATABASE_URL=postgresql://smoelenboek:YOURPASSWORD@db:5432/smoelenboek
+ONEUPTIME_STATUS_PAGE_URL=https://status.home.nouw.net/status-page/adb4476a-3032-43e6-a826-c6e3a3208e18
 BETTER_AUTH_SECRET=your-secret-here
 BETTER_AUTH_URL=https://api.your-domain.com/api/auth
 WEB_ORIGIN=https://your-domain.com
@@ -121,6 +122,13 @@ NEXT_PUBLIC_AUTH_URL=https://api.your-domain.com
 BETTER_AUTH_SECRET=your-secret-here
 BETTER_AUTH_URL=https://api.your-domain.com/api/auth
 ```
+
+`ONEUPTIME_STATUS_PAGE_URL` enables in-app status alerts. The web service polls
+OneUptime once per minute and shows active incidents, announcements, and
+upcoming or ongoing scheduled maintenance above public and authenticated
+pages. Each alert links to its OneUptime detail page. This uses the public
+status-page API and does not require a telemetry ingestion key. If OneUptime is
+unavailable, the application continues without a banner.
 
 `NEXT_PUBLIC_*` values are embedded into the browser bundle during
 `next build`. The production values are passed as Docker build arguments in

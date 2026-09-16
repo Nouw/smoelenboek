@@ -27,6 +27,12 @@ const dictionaries = {
       smoelenboek: 'Smoelenboek',
       user: 'Gebruiker',
     },
+    status: {
+      announcement: 'Mededeling',
+      incident: 'Storing',
+      maintenance: 'Gepland onderhoud',
+      viewDetails: 'Bekijk de statusdetails',
+    },
     memberSearch: {
       placeholder: 'Zoek leden',
       label: 'Zoek leden op naam of e-mail',
@@ -615,6 +621,12 @@ const dictionaries = {
       search: 'Search',
       smoelenboek: 'Smoelenboek',
       user: 'User',
+    },
+    status: {
+      announcement: 'Announcement',
+      incident: 'Incident',
+      maintenance: 'Scheduled maintenance',
+      viewDetails: 'View status details',
     },
     memberSearch: {
       placeholder: 'Search members',

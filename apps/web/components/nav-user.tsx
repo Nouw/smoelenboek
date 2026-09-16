@@ -35,7 +35,6 @@ import {
 } from '@repo/ui/components/sidebar';
 
 import { ProfileEditDialog } from './profile-edit-dialog';
-import { LanguageSwitcher } from './language-switcher';
 import { Locale } from '../lib/i18n';
 
 export function NavUser({

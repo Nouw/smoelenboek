@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { authClient } from '@/lib/auth-client';
 import { useI18n } from '@/lib/i18n';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { OneUptimeAlerts } from '@/components/oneuptime-alerts';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@repo/ui/components/button';
 import {
@@ -33,11 +34,21 @@ export function AppShell({
     pathname === '/reset-password' ||
     pathname === '/request-password-reset'
   ) {
-    return children;
+    return (
+      <>
+        <OneUptimeAlerts />
+        {children}
+      </>
+    );
   }
 
   if (session.isPending) {
-    return <AuthLoading />;
+    return (
+      <>
+        <OneUptimeAlerts />
+        <AuthLoading />
+      </>
+    );
   }
 
   if (session.data) {
@@ -70,6 +81,7 @@ function PublicProtototoLayout({
           </div>
         </div>
       </header>
+      <OneUptimeAlerts />
       <main className="px-4 py-6 sm:px-6 sm:py-8">{children}</main>
     </div>
   );
@@ -104,51 +116,54 @@ function LoginLayout() {
   }
 
   return (
-    <main className="bg-background text-foreground flex min-h-svh items-center justify-center px-5 py-10">
-      <Card className="w-full max-w-sm rounded-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Smoelenboek</CardTitle>
-          <CardDescription>{t('auth.loginSubtitle')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={onSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('auth.email')}</Label>
-              <Input
-                id="email"
-                autoComplete="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t('auth.password')}</Label>
-              <Input
-                id="password"
-                autoComplete="current-password"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </div>
-            {error ? (
-              <p className="text-destructive text-sm" role="alert">
-                {error}
-              </p>
-            ) : null}
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? t('auth.loggingIn') : t('auth.login')}
-            </Button>
-            <Button asChild type="button" variant="ghost" className="w-full">
-              <Link href="/request-password-reset">Wachtwoord vergeten?</Link>
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+    <>
+      <OneUptimeAlerts />
+      <main className="bg-background text-foreground flex min-h-svh items-center justify-center px-5 py-10">
+        <Card className="w-full max-w-sm rounded-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Smoelenboek</CardTitle>
+            <CardDescription>{t('auth.loginSubtitle')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={onSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Input
+                  id="email"
+                  autoComplete="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Input
+                  id="password"
+                  autoComplete="current-password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                />
+              </div>
+              {error ? (
+                <p className="text-destructive text-sm" role="alert">
+                  {error}
+                </p>
+              ) : null}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? t('auth.loggingIn') : t('auth.login')}
+              </Button>
+              <Button asChild type="button" variant="ghost" className="w-full">
+                <Link href="/request-password-reset">Wachtwoord vergeten?</Link>
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
+    </>
   );
 }
 
@@ -161,6 +176,7 @@ function AuthenticatedLayout({
     <div className="[--header-height:calc(--spacing(14))]">
       <SidebarProvider className="flex flex-col pt-(--header-height)">
         <SiteHeader />
+        <OneUptimeAlerts />
         <div className="flex flex-1">
           <AppSidebar />
           <SidebarInset>
