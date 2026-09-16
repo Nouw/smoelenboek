@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/Nouw/smoelenboek/compare/v1.3.0...v1.4.0) (2026-09-16)
+
+
+### Bug Fixes
+
+* **web:** preserve touch search activation ([9a017b1](https://github.com/Nouw/smoelenboek/commit/9a017b1e156455979980cfcd5c75954339ece5b2))
+
+
+### Features
+
+* observability ([d21a693](https://github.com/Nouw/smoelenboek/commit/d21a69347b495fcc1d590cd870ebdf3c3176c110))
+
 # [1.3.0](https://github.com/Nouw/smoelenboek/compare/v1.2.0...v1.3.0) (2026-09-02)
 
 
