@@ -23,17 +23,14 @@ function event(changes: Record<string, unknown>): UserInformationUpdatedEvent {
 }
 
 describe('UserInformationUpdatedHandler', () => {
-  it('queues address_update for secretaris and penningmeester when a street address field changes', async () => {
+  it('queues address_update for secretaris when a street address field changes', async () => {
     const { handler, enqueue } = makeHandler();
 
     await handler.handle(event({ city: 'Amsterdam' }));
 
-    expect(enqueue).toHaveBeenCalledTimes(2);
+    expect(enqueue).toHaveBeenCalledTimes(1);
     expect(enqueue).toHaveBeenCalledWith(
       expect.objectContaining({ messageType: 'address_update', recipient: 'secretaris@usvprotos.nl' }),
-    );
-    expect(enqueue).toHaveBeenCalledWith(
-      expect.objectContaining({ messageType: 'address_update', recipient: 'penningmeester@usvprotos.nl' }),
     );
   });
 
@@ -69,11 +66,11 @@ describe('UserInformationUpdatedHandler', () => {
 
     await handler.handle(event({ streetName: 'Weerdsingel', bankAccountNumber: 'NL00TEST9999999999' }));
 
-    expect(enqueue).toHaveBeenCalledTimes(3);
+    expect(enqueue).toHaveBeenCalledTimes(2);
     const types = (enqueue as jest.MockedFunction<typeof enqueue>).mock.calls.map(
       ([input]) => (input as { messageType: string }).messageType,
     );
-    expect(types.filter((t) => t === 'address_update')).toHaveLength(2);
+    expect(types.filter((t) => t === 'address_update')).toHaveLength(1);
     expect(types.filter((t) => t === 'bankaccount_update')).toHaveLength(1);
   });
 
