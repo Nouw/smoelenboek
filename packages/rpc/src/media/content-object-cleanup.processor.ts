@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 
 import { DocumentsRepository } from '../documents/repositories/documents.repository';
 import { MediaService } from './media.service';
@@ -9,6 +9,7 @@ const cleanupIntervalMs = 60_000;
 export class ContentObjectCleanupProcessor
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly logger = new Logger(ContentObjectCleanupProcessor.name);
   private timer: NodeJS.Timeout | null = null;
   private running = false;
 
@@ -25,7 +26,7 @@ export class ContentObjectCleanupProcessor
 
   private triggerDrain(): void {
     void this.drain().catch((error) => {
-      console.error(
+      this.logger.error(
         JSON.stringify({
           event: 'documents.object_cleanup_sweep_failed',
           error: error instanceof Error ? error.message : String(error),
@@ -52,7 +53,7 @@ export class ContentObjectCleanupProcessor
         try {
           await this.mediaService.deleteObjectByName(cleanup.objectName);
           await this.documentsRepository.completeCleanup(cleanup.id);
-          console.info(
+          this.logger.log(
             JSON.stringify({
               event: 'documents.object_cleanup_completed',
               objectName: cleanup.objectName,
@@ -68,7 +69,7 @@ export class ContentObjectCleanupProcessor
             message,
             new Date(Date.now() + delayMs),
           );
-          console.warn(
+          this.logger.warn(
             JSON.stringify({
               event: 'documents.object_cleanup_failed',
               objectName: cleanup.objectName,

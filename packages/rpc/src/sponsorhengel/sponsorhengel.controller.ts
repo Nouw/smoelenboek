@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Get,
   HttpCode,
+  Logger,
   NotFoundException,
   Put,
   Req,
@@ -22,6 +23,8 @@ import { SponsorhengelRepository } from './repositories/sponsorhengel.repository
 
 @Controller('media/sponsorhengel')
 export class SponsorhengelController {
+  private readonly logger = new Logger(SponsorhengelController.name);
+
   constructor(
     private readonly authContextFactory: AuthContextFactory,
     private readonly mediaService: MediaService,
@@ -85,7 +88,7 @@ export class SponsorhengelController {
       this.mediaService
         .deleteObjectByName(oldObjectName)
         .catch((err: unknown) => {
-          console.error(
+          this.logger.error(
             JSON.stringify({
               event: 'sponsorhengel.old_object_cleanup_failed',
               actorId,
@@ -95,7 +98,7 @@ export class SponsorhengelController {
           );
         });
     }
-    console.info(
+    this.logger.log(
       JSON.stringify({
         event: 'sponsorhengel.replaced',
         actorId,

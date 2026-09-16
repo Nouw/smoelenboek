@@ -53,6 +53,9 @@ BETTER_AUTH_SECRET=your-secret-here
 BETTER_AUTH_URL=https://api.your-domain.com/api/auth
 WEB_ORIGIN=https://your-domain.com
 PORT=3000
+OTEL_EXPORTER_OTLP_ENDPOINT=https://status.home.nouw.net/otlp
+OTEL_EXPORTER_OTLP_HEADERS=x-oneuptime-token=YOUR_TELEMETRY_INGESTION_KEY
+OTEL_SERVICE_NAME=smoelenboek-rpc
 NEVOBO_BASE_URL=https://api.nevobo.nl
 NEVOBO_ASSOCIATION_ID=ckl9y0t
 PROTOTOTO_SYNC_INTERVAL_MS=900000
@@ -64,6 +67,51 @@ OCI_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----\n...
 OCI_OBJECT_STORAGE_NAMESPACE=your-namespace
 OCI_OBJECT_STORAGE_BUCKET=your-bucket
 ```
+
+Log telemetry is optional. With no `OTEL_EXPORTER_OTLP_ENDPOINT`, the RPC service keeps its
+normal console logging and does not create an exporter. To enable OneUptime logs:
+
+1. In the OneUptime project, open **Project Settings > Telemetry Ingestion Key** and create a key.
+2. Put that key in `OTEL_EXPORTER_OTLP_HEADERS`. The public status-page UUID is not an ingestion
+   key.
+3. Use the main self-hosted OneUptime ingress for `OTEL_EXPORTER_OTLP_ENDPOINT`. The configured
+   base URL resolves log requests to `/otlp/v1/logs`. If `status.home.nouw.net` only serves the
+   public status-page virtual host, use the hostname that serves the OneUptime dashboard instead.
+4. Redeploy the `rpc` container and confirm records appear under the `smoelenboek-rpc` service.
+
+Reference: [OneUptime OpenTelemetry setup](https://oneuptime.com/docs/en/telemetry/open-telemetry).
+
+The exporter batches records, keeps console output intact, and flushes during Nest shutdown.
+Existing RPC application logs are exported; this does not add HTTP access logs, traces, metrics,
+or frontend telemetry.
+
+## OneUptime backend monitor
+
+Create an API monitor in OneUptime with:
+
+- Method: `GET`
+- URL: `https://YOUR-PUBLIC-RPC-HOST/health`
+- Expected status code: `200`
+- Optional body check: `"status":"ok"`
+
+The endpoint returns `503` when its PostgreSQL dependency is unavailable, so the monitor reflects
+whether the backend can serve database-backed requests. It sends `Cache-Control: no-store` and a
+response shaped like:
+
+```json
+{
+  "checks": { "database": { "status": "up" } },
+  "service": "smoelenboek-rpc",
+  "status": "ok",
+  "timestamp": "2026-09-04T12:00:00.000Z"
+}
+```
+
+After the monitor is healthy, add it to the existing status page under **Status Page > Resources**
+and name the resource `Backend`.
+
+References: [OneUptime API monitors](https://oneuptime.com/docs/en/monitor/api-monitor) and
+[status page resources](https://oneuptime.com/docs/en/status-pages/resources-and-groups).
 
 **`.env.web`**
 

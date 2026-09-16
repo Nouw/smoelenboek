@@ -152,7 +152,8 @@ export function MemberSearch() {
                 aria-selected={index === activeIndex}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground"
                 onMouseEnter={() => setActiveIndex(index)}
-                onPointerDown={(event) => event.preventDefault()}
+                // Keep focus until click without cancelling native touch gestures.
+                onMouseDown={(event) => event.preventDefault()}
                 onClick={closeSearch}
               >
                 <Avatar className="size-9">

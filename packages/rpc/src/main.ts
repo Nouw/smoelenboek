@@ -5,10 +5,18 @@ import { json, urlencoded } from 'express';
 
 import { AppModule } from './app.module';
 import { getBetterAuthNodeHandler } from './auth/better-auth-instance';
+import { loadRpcEnv } from './config/env';
+import { initializeRpcTelemetry } from './observability/rpc-telemetry';
 import { TrpcHost } from './trpc/trpc.host';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  loadRpcEnv();
+  const telemetry = initializeRpcTelemetry();
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false,
+    logger: telemetry.logger,
+  });
+  app.enableShutdownHooks();
   app.enableCors({
     origin: process.env.WEB_ORIGIN ?? 'http://localhost:3001',
     credentials: true,

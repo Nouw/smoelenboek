@@ -1,5 +1,5 @@
 import type { CreateManagedUserInput, ManagedUserDto } from '@repo/api';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 
@@ -12,6 +12,8 @@ import { InjectUserAccountAdmin, type UserAccountAdmin } from '../user-account-a
 
 @Injectable()
 export class UserProvisioningService {
+  private readonly logger = new Logger(UserProvisioningService.name);
+
   constructor(
     private readonly dataSource: DataSource,
     private readonly eventStoreRepository: EventStoreRepository,
@@ -43,7 +45,7 @@ export class UserProvisioningService {
       });
     } catch (error) {
       try { await this.accounts.remove(account.id); } catch (compensationError) {
-        console.error(JSON.stringify({ event: 'users.provisioning_compensation_failed', userId: account.id, error: errorMessage(compensationError) }));
+        this.logger.error(JSON.stringify({ event: 'users.provisioning_compensation_failed', userId: account.id, error: errorMessage(compensationError) }));
       }
       throw error;
     }

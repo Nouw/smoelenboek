@@ -1,6 +1,7 @@
 import {
   Inject,
   Injectable,
+  Logger,
   type OnModuleDestroy,
   type OnModuleInit,
 } from '@nestjs/common';
@@ -16,6 +17,8 @@ import {
 
 @Injectable()
 export class SmtpEmailSender implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(SmtpEmailSender.name);
+
   constructor(
     @Inject(SMTP_CONFIGURATION)
     private readonly config: SmtpEmailConfiguration,
@@ -27,7 +30,7 @@ export class SmtpEmailSender implements OnModuleInit, OnModuleDestroy {
 
     try {
       await this.transporter.verify();
-      console.info(
+      this.logger.log(
         JSON.stringify({
           event: 'email.smtp_verified',
           host: this.config.host,

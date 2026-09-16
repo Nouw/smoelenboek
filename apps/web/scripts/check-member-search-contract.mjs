@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { evaluateMemberSearchInteraction } from './member-search-interaction.mjs';
 
 const root = new URL('../', import.meta.url);
 const [header, search, translations, userRouter] = await Promise.all([
@@ -20,11 +21,7 @@ assert.match(search, /enabled: canSearch/);
 assert.match(search, /debounceMilliseconds = 250/);
 assert.match(search, /router\.push\(`\/profile\/\$\{userId\}`\)/);
 assert.match(search, /<Link[\s\S]*href=\{`\/profile\/\$\{user\.id\}`\}/);
-assert.match(
-  search,
-  /onPointerDown=\{\(event\) => event\.preventDefault\(\)\}/,
-  'Pointer-down must not blur the input and unmount a result before its click navigates.',
-);
+await evaluateMemberSearchInteraction();
 assert.match(search, /role="combobox"/);
 assert.match(search, /role="listbox"/);
 assert.match(search, /role="option"/);
