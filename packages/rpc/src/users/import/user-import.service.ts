@@ -1,5 +1,5 @@
 import { createManagedUserSchema, type CreateManagedUserInput } from '@repo/api';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import readXlsxFile, { type CellValue as Cell, type Row } from 'read-excel-file/node';
 import { UserProvisioningService } from '../services/user-provisioning.service';
@@ -22,6 +22,8 @@ export type ParsedImportRow = { rowNumber: number; input?: CreateManagedUserInpu
 
 @Injectable()
 export class UserImportService {
+  private readonly logger = new Logger(UserImportService.name);
+
   constructor(private readonly provisioning: UserProvisioningService) {}
 
   hash(file: Buffer): string { return createHash('sha256').update(file).digest('hex'); }
@@ -76,7 +78,7 @@ export class UserImportService {
       })));
     }
     const count = (status: string) => results.filter((result) => result.status === status).length;
-    console.info(JSON.stringify({ event: 'users.import_completed', total: results.length, created: count('created'), invalid: count('invalid'), skipped: count('skipped'), failed: count('failed') }));
+    this.logger.log(JSON.stringify({ event: 'users.import_completed', total: results.length, created: count('created'), invalid: count('invalid'), skipped: count('skipped'), failed: count('failed') }));
     return { total: results.length, created: count('created'), invalid: count('invalid'), skipped: count('skipped'), failed: count('failed'), emailQueued: count('created'), rows: results };
   }
 }

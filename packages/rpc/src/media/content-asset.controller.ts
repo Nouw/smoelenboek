@@ -3,6 +3,7 @@ import {
   Get,
   Header,
   HttpCode,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -35,6 +36,8 @@ import {
 
 @Controller('media/collections')
 export class ContentAssetUploadController {
+  private readonly logger = new Logger(ContentAssetUploadController.name);
+
   constructor(
     private readonly authContextFactory: AuthContextFactory,
     private readonly commandBus: CommandBus,
@@ -102,7 +105,7 @@ export class ContentAssetUploadController {
           uploaded.sizeBytes,
         ),
       );
-      console.info(
+      this.logger.log(
         JSON.stringify({
           event: 'documents.asset_uploaded',
           actorId,
@@ -153,7 +156,7 @@ export class ContentAssetUploadController {
   }
 
   private logUpload(result: 'failed', details: Record<string, unknown>): void {
-    console.error(
+    this.logger.error(
       JSON.stringify({
         event: 'documents.asset_upload_failed',
         source: 'media',

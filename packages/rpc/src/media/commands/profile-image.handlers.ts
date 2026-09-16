@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { UpdateUserProfileCommand } from '../../users/commands/update-user-profile.command';
@@ -16,6 +17,8 @@ type ProfileImageResponse = {
 export class UploadProfileImageHandler
   implements ICommandHandler<UploadProfileImageCommand, ProfileImageResponse>
 {
+  private readonly logger = new Logger(UploadProfileImageHandler.name);
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly mediaService: MediaService,
@@ -51,7 +54,7 @@ export class UploadProfileImageHandler
     try {
       await this.mediaService.deleteObjectByUrl(objectUrl);
     } catch (error) {
-      console.warn(
+      this.logger.warn(
         `[media] Failed to delete previous profile object: ${
           error instanceof Error ? error.message : String(error)
         }`,
@@ -64,6 +67,8 @@ export class UploadProfileImageHandler
 export class DeleteProfileImageHandler
   implements ICommandHandler<DeleteProfileImageCommand, ProfileImageResponse>
 {
+  private readonly logger = new Logger(DeleteProfileImageHandler.name);
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly mediaService: MediaService,
@@ -86,7 +91,7 @@ export class DeleteProfileImageHandler
     try {
       await this.mediaService.deleteObjectByUrl(objectUrl);
     } catch (error) {
-      console.warn(
+      this.logger.warn(
         `[media] Failed to delete previous profile object: ${
           error instanceof Error ? error.message : String(error)
         }`,

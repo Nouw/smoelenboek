@@ -11,10 +11,12 @@ import { createTypeOrmOptions } from './database/typeorm.config';
 import { EventStoreModule } from './event-store/event-store.module';
 import { EmailModule } from './email/email.module';
 import { DocumentsModule } from './documents/documents.module';
+import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
 import { MembershipsModule } from './memberships/memberships.module';
 import { ProtototoModule } from './protototo/protototo.module';
 import { PollsModule } from './polls/polls.module';
+import { ObservabilityModule } from './observability/observability.module';
 import { SeasonsModule } from './seasons/seasons.module';
 import { SponsorhengelModule } from './sponsorhengel/sponsorhengel.module';
 import { TeamsModule } from './teams/teams.module';
@@ -38,10 +40,12 @@ import { UsersModule } from './users/users.module';
     DocumentsModule,
     EventStoreModule,
     EmailModule,
+    HealthModule,
     MediaModule,
     MembershipsModule,
-    PollsModule,
     ProtototoModule,
+    PollsModule,
+    ObservabilityModule,
     SeasonsModule,
     SponsorhengelModule,
     TeamsModule,

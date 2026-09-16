@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   BadRequestException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
@@ -153,6 +154,8 @@ export class ReorderContentCollectionsHandler
 export class DeleteContentCollectionHandler
   implements ICommandHandler<DeleteContentCollectionCommand, string>
 {
+  private readonly logger = new Logger(DeleteContentCollectionHandler.name);
+
   constructor(
     private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
@@ -179,7 +182,7 @@ export class DeleteContentCollectionHandler
         command.actorId,
       );
     });
-    console.info(
+    this.logger.log(
       JSON.stringify({
         event: 'documents.collection_deleted',
         source: 'admin',
@@ -353,6 +356,8 @@ export class SetContentCollectionCoverHandler
 export class DeleteContentAssetHandler
   implements ICommandHandler<DeleteContentAssetCommand, string>
 {
+  private readonly logger = new Logger(DeleteContentAssetHandler.name);
+
   constructor(
     private readonly eventStorePublisher: EventStorePublisher,
     private readonly repository: DocumentsRepository,
@@ -380,7 +385,7 @@ export class DeleteContentAssetHandler
         command.actorId,
       );
     });
-    console.info(
+    this.logger.log(
       JSON.stringify({
         event: 'documents.asset_deleted',
         source: 'admin',
