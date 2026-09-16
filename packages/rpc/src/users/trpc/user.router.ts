@@ -59,7 +59,7 @@ const userInformationOutputSchema = z.object({
   birthDate: z.iso.date().nullable(),
   bondNumber: z.string().nullable(),
   leaveDate: z.iso.date().nullable(),
-  backNumber: z.number().int().min(0).max(32767).nullable(),
+  backNumber: z.number().int().min(1).max(999).nullable(),
   refereeLicense: z.string().nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

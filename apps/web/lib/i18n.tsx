@@ -205,7 +205,7 @@ const dictionaries = {
         matchSecretary: 'Wedstrijdsecretaris',
         middle: 'Middenaanvaller',
         oppositeHitter: 'Diagonaal',
-        outsideHitter: 'Hoekaanvaller',
+        outsideHitter: 'Passer/Loper',
         refereeingOfficer: 'Commissaris zaalwacht en arbitrage',
         secretary: 'Secretaris',
         setter: 'Spelverdeler',

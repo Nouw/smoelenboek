@@ -420,6 +420,12 @@ export function ProfileEditDialog({
                   type="tel"
                   autoComplete="tel"
                 />
+                <TextField
+                  control={form.control}
+                  name="bankAccountNumber"
+                  label={t('profile.bankAccountNumber')}
+                  autoComplete="off"
+                />
               </fieldset>
 
               <fieldset className="space-y-4 border-t pt-5">
@@ -428,18 +434,12 @@ export function ProfileEditDialog({
                 </legend>
                 <TextField
                   control={form.control}
-                  name="bankAccountNumber"
-                  label={t('profile.bankAccountNumber')}
-                  autoComplete="off"
-                />
-                <TextField
-                  control={form.control}
                   name="backNumber"
                   label={t('profile.backNumber')}
                   type="number"
                   inputMode="numeric"
-                  min={0}
-                  max={32767}
+                  min={1}
+                  max={999}
                 />
               </fieldset>
 
