@@ -73,3 +73,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Member search interaction regression
+
+Search result links preserve native touch/pointer events. Focus protection uses
+`mousedown`, including compatibility mouse events after a tap, so input blur
+cannot remove a result before its click opens the profile. Do not cancel
+`pointerdown`: doing so interferes with touch activation and compatibility events.
+
+Run `pnpm --filter web test` and `pnpm --filter web eval`. The member-search
+interaction harness executes the real component handlers with deterministic
+React/query adapters for touch, pen, mouse, keyboard, and outside blur. It models
+event ordering; it is not a browser-engine or physical-device test.
+
+For iPhone release verification: focus search, type at least two characters, tap
+a result with the keyboard visible, and confirm its profile opens. Also scroll
+the result list without navigating, and check desktop click and ArrowDown/Enter.

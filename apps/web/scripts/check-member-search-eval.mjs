@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { evaluateMemberSearchInteraction } from './member-search-interaction.mjs';
 
 const root = new URL('../', import.meta.url);
 const [header, search, translations, userRouter, routerTests, searchHandler] =
@@ -48,10 +49,7 @@ const criteria = [
     /router\.push\(`\/profile\//.test(search) &&
       /href=\{`\/profile\/\$\{user\.id\}`\}/.test(search),
   ],
-  [
-    'Keeps pointer selection mounted until navigation',
-    /onPointerDown=\{\(event\) => event\.preventDefault\(\)\}/.test(search),
-  ],
+  ...(await evaluateMemberSearchInteraction()),
   [
     'Supports keyboard selection',
     /ArrowDown/.test(search) &&
