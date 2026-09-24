@@ -61,8 +61,9 @@ const criteria = [
       !/UserInformationEditDialog/.test(profile),
   ],
   [
-    'Renders bank data only when returned by the API',
-    /hasOwnProperty\.call\(details, 'bankAccountNumber'\)/.test(profile),
+    'Renders bank data only for an owner or admin when returned by the API',
+    /const canSeeBankAccount\s*=\s*canEditInformation\s*&&[\s\S]*?hasOwnProperty\.call\(details, 'bankAccountNumber'\)/.test(profile) &&
+      /const canEditInformation\s*=\s*isOwner \|\| currentUser\.isAdmin/.test(profile),
   ],
   [
     'Uses Shadcn surfaces',

@@ -53,7 +53,27 @@ assert.match(profile, /<ProfileError/);
 assert.match(profile, /profile\.noActivities/);
 assert.match(profile, /<ProfileEditDialog/);
 assert.doesNotMatch(profile, /UserInformationEditDialog/);
-assert.match(profile, /hasOwnProperty\.call\(details, 'bankAccountNumber'\)/);
+const canEditInformationExpression = profile.match(
+  /const canEditInformation\s*=\s*([^;]+);/,
+)?.[1];
+const canSeeBankAccountExpression = profile.match(
+  /const canSeeBankAccount\s*=\s*([^;]+);/,
+)?.[1];
+assert.ok(canEditInformationExpression, 'Profile must define information access.');
+assert.ok(canSeeBankAccountExpression, 'Profile must define bank visibility.');
+const canSeeBankAccount = new Function(
+  'isOwner',
+  'currentUser',
+  'details',
+  `const canEditInformation = ${canEditInformationExpression}; return ${canSeeBankAccountExpression};`,
+);
+const bankDetails = { bankAccountNumber: 'NL00TEST0123456789' };
+assert.equal(canSeeBankAccount(true, { isAdmin: false }, bankDetails), true);
+assert.equal(canSeeBankAccount(false, { isAdmin: true }, bankDetails), true);
+assert.equal(canSeeBankAccount(false, { isAdmin: false }, bankDetails), false);
+assert.equal(canSeeBankAccount(true, { isAdmin: false }, null), false);
+assert.equal(canSeeBankAccount(true, { isAdmin: false }, {}), false);
+assert.match(profile, /\{canSeeBankAccount\s*\?/);
 assert.match(profile, /details\.bankAccountNumber/);
 assert.match(profileDialog, /trpc\.user\.updateInformation\.useMutation/);
 assert.match(profileDialog, /authClient\.changeEmail/);
