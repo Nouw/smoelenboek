@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/Nouw/smoelenboek/compare/v1.4.0...v1.4.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* **web:** restrict bank account visibility ([127c0d4](https://github.com/Nouw/smoelenboek/commit/127c0d41bf3f0b1e283d3268a1969258dcf2f9dc))
+
 # [1.4.0](https://github.com/Nouw/smoelenboek/compare/v1.3.0...v1.4.0) (2026-09-16)
 
 
