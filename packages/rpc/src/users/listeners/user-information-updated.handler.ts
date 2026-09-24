@@ -49,17 +49,6 @@ export class UserInformationUpdatedHandler
         deduplicationKey: `address_update:${user.id}:${randomUUID()}`,
       });
 
-
-      await this.outbox.enqueue({
-        messageType: 'address_update',
-        recipient: 'penningmeester@usvprotos.nl',
-        locale: 'nl',
-        name,
-        newAddress,
-        relatedUserId: user.id,
-        deduplicationKey: `address_update:${user.id}:${randomUUID()}`,
-      });
-
       this.logger.log(
         JSON.stringify({
           event: 'email.address_update_queued',
