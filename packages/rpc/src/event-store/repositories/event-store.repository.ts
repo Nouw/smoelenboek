@@ -34,6 +34,19 @@ export class EventStoreRepository {
     });
   }
 
+  async appendPreparedBatch(
+    prepare: (manager: EntityManager) => Promise<DomainEventBase[]>,
+  ): Promise<Array<{ stored: StoredEventEntity; event: DomainEventBase }>> {
+    return this.dataSource.transaction(async (manager) => {
+      const events = await prepare(manager);
+      const entries: Array<{ stored: StoredEventEntity; event: DomainEventBase }> = [];
+      for (const event of events) {
+        entries.push({ stored: await this.append(event, manager), event });
+      }
+      return entries;
+    });
+  }
+
   async markDispatched(id: string): Promise<void> {
     await this.dataSource.getRepository(StoredEventEntity).update(id, {
       dispatchStatus: 'dispatched',

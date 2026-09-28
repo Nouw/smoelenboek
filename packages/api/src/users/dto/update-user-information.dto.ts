@@ -17,7 +17,6 @@ export const updateUserInformationSchema = z
     bankAccountNumber: optionalText(64),
     birthDate: z.iso.date().nullable().optional(),
     bondNumber: optionalBondNumber,
-    leaveDate: z.iso.date().nullable().optional(),
     backNumber: z.number().int().min(0).max(32767).nullable().optional(),
     refereeLicense: optionalText(64),
   })

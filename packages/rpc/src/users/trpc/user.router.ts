@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { adminProcedure, protectedProcedure, router } from '../../trpc/init';
 import {
   CreateManagedUserCommand,
+  DeregisterManagedUserCommand,
+  ReactivateManagedUserCommand,
   ResendUserInvitationCommand,
   SetManagedUserRoleCommand,
 } from '../commands/admin-user.commands';
@@ -123,7 +125,8 @@ const managedUserOutputSchema = z.object({
   id: z.uuid(), email: z.email(), name: z.string(), preferredLocale: z.enum(['nl', 'en']),
   role: z.enum(['user', 'admin']),
   invitedAt: z.iso.datetime().nullable(), accountActivatedAt: z.iso.datetime().nullable(),
-  invitationStatus: z.enum(['pending', 'sending', 'sent', 'failed', 'active', 'not_queued']),
+  leaveDate: z.iso.date().nullable(),
+  invitationStatus: z.enum(['pending', 'sending', 'sent', 'failed', 'cancelled', 'active', 'not_queued']),
 });
 
 export function createUserRouter(dependencies: UserRouterDependencies) {
@@ -138,9 +141,9 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
             tags: ['Users']
           }
         })
-        .input(z.object({ query: z.string().trim().max(100).default(''), limit: z.number().int().min(1).max(100).default(50), offset: z.number().int().min(0).default(0) }).optional())
+        .input(z.object({ query: z.string().trim().max(100).default(''), limit: z.number().int().min(1).max(100).default(50), offset: z.number().int().min(0).default(0), status: z.enum(['active', 'inactive']).default('active') }).optional())
         .output(z.array(managedUserOutputSchema))
-        .query(({ input }) => dependencies.queryBus.execute(new ListManagedUsersQuery(input?.query ?? '', input?.limit ?? 50, input?.offset ?? 0))),
+        .query(({ input }) => dependencies.queryBus.execute(new ListManagedUsersQuery(input?.query ?? '', input?.limit ?? 50, input?.offset ?? 0, input?.status ?? 'active'))),
       create: adminProcedure
         .meta({
           name: 'Create member',
@@ -187,6 +190,16 @@ export function createUserRouter(dependencies: UserRouterDependencies) {
             new SetManagedUserRoleCommand(ctx.userId, input.userId, input.role),
           ),
         ),
+      deregister: adminProcedure
+        .meta({ name: 'Deregister member', docs: { description: 'End membership and revoke account access while preserving history.', auth: true, tags: ['Users'] } })
+        .input(z.object({ userId: z.uuid() }))
+        .output(z.object({ userId: z.uuid(), leaveDate: z.iso.date(), role: z.literal('user') }))
+        .mutation(({ ctx, input }) => dependencies.commandBus.execute(new DeregisterManagedUserCommand(ctx.userId, input.userId))),
+      reactivate: adminProcedure
+        .meta({ name: 'Reactivate member', docs: { description: 'Restore membership and account access as a regular member.', auth: true, tags: ['Users'] } })
+        .input(z.object({ userId: z.uuid() }))
+        .output(z.object({ userId: z.uuid(), leaveDate: z.null(), role: z.literal('user') }))
+        .mutation(({ ctx, input }) => dependencies.commandBus.execute(new ReactivateManagedUserCommand(ctx.userId, input.userId))),
     }),
     search: protectedProcedure
       .meta({

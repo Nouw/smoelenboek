@@ -9,7 +9,6 @@ import { UserInformationRepository } from '../repositories/user-information.repo
 import { UsersRepository } from '../repositories/users.repository';
 import {
   assertCanUpdateUserInformation,
-  assertValidMembershipDates,
 } from '../user-information-policy';
 import { UpdateUserInformationCommand } from './update-user-information.command';
 
@@ -38,8 +37,6 @@ export class UpdateUserInformationHandler
     if (!targetUser) {
       throw new NotFoundException('User not found.');
     }
-
-    assertValidMembershipDates(targetUser.createdAt, command.changes);
 
     const event = UserInformationUpdatedEvent.create(
       { userId: command.targetUserId, changes: command.changes },

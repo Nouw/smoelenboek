@@ -88,24 +88,6 @@ describe('UpdateUserInformationHandler', () => {
     ).rejects.toThrow('User not found.');
   });
 
-  it('rejects a leave date before the immutable user creation date', async () => {
-    const handler = createHandler({
-      usersRepository: {
-        findById: jest.fn().mockResolvedValue({
-          id: ownerId,
-          createdAt: new Date('2020-01-01T00:00:00.000Z'),
-        }),
-      },
-    });
-
-    await expect(
-      handler.execute(
-        new UpdateUserInformationCommand(ownerId, 'user', ownerId, {
-          leaveDate: '2019-12-31',
-        }),
-      ),
-    ).rejects.toThrow('leaveDate cannot be before the user creation date.');
-  });
 });
 
 function createHandler(

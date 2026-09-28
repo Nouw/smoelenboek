@@ -196,6 +196,7 @@ export function ProfileContent({ userId }: { userId: string }) {
     (left, right) => right.seasonKey - left.seasonKey,
   );
   const canSeeBankAccount =
+    canEditInformation &&
     details !== null &&
     details !== undefined &&
     Object.prototype.hasOwnProperty.call(details, 'bankAccountNumber');

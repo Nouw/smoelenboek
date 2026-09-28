@@ -8,21 +8,24 @@ import {
   UserInformationUpdatedEvent,
   type UserInformationUpdatedPayload,
 } from '../events/user-information-updated.event';
+import { UserMembershipStatusChangedEvent } from '../events/user-membership-status-changed.event';
 
-@EventsHandler(UserInformationUpdatedEvent)
+@EventsHandler(UserInformationUpdatedEvent, UserMembershipStatusChangedEvent)
 @Injectable()
 export class UserInformationProjector implements IEventHandler<DomainEventBase> {
   constructor(private readonly dataSource: DataSource) {}
 
   async handle(event: DomainEventBase): Promise<void> {
     await this.projectUpdated(
-      (event as UserInformationUpdatedEvent).payload,
+      event instanceof UserMembershipStatusChangedEvent
+        ? { userId: event.payload.userId, changes: { leaveDate: event.payload.leaveDate } }
+        : (event as UserInformationUpdatedEvent).payload,
       this.dataSource.manager,
     );
   }
 
   async projectUpdated(
-    payload: UserInformationUpdatedPayload,
+    payload: UserInformationUpdatedPayload | { userId: string; changes: { leaveDate: string | null } },
     manager: EntityManager,
   ): Promise<UserInformationEntity> {
     const repository = manager.getRepository(UserInformationEntity);

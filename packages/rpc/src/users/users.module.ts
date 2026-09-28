@@ -9,6 +9,7 @@ import {
   ResendUserInvitationHandler,
   SetManagedUserRoleHandler,
 } from './commands/admin-user.handlers';
+import { DeregisterManagedUserHandler, ReactivateManagedUserHandler } from './commands/admin-user-lifecycle.handlers';
 import { ListManagedUsersHandler } from './queries/admin-user.handlers';
 import { UserProvisioningService } from './services/user-provisioning.service';
 import { BetterAuthUserAccountAdmin, USER_ACCOUNT_ADMIN } from './user-account-admin';
@@ -52,6 +53,8 @@ import {
     CreateManagedUserHandler,
     ResendUserInvitationHandler,
     SetManagedUserRoleHandler,
+    DeregisterManagedUserHandler,
+    ReactivateManagedUserHandler,
     ListManagedUsersHandler,
     UserProvisioningService,
     UserImportService,

@@ -22,6 +22,7 @@ import { SponsorhengelModule } from './sponsorhengel/sponsorhengel.module';
 import { TeamsModule } from './teams/teams.module';
 import { TrpcModule } from './trpc/trpc.module';
 import { UsersModule } from './users/users.module';
+import { DataModule } from './data/data.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UsersModule } from './users/users.module';
     TeamsModule,
     UsersModule,
     TrpcModule,
+    DataModule,
   ],
 })
 export class AppModule {}

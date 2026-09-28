@@ -44,6 +44,7 @@ import {
   TEAM_UPDATED_EVENT,
 } from '../teams/events/team-events';
 import { USER_INFORMATION_UPDATED_EVENT } from '../users/events/user-information-updated.event';
+import { USER_MEMBERSHIP_STATUS_CHANGED_EVENT } from '../users/events/user-membership-status-changed.event';
 import { USER_PROFILE_UPDATED_EVENT } from '../users/events/user-profile-updated.event';
 import { USER_PROVISIONED_EVENT } from '../users/events/user-provisioned.event';
 import { USER_SYNCED_FROM_AUTH_EVENT } from '../users/events/user-synced-from-auth.event';
@@ -71,6 +72,7 @@ const ALL_KNOWN_EVENT_TYPES = [
   USER_SYNCED_FROM_AUTH_EVENT,
   USER_PROFILE_UPDATED_EVENT,
   USER_INFORMATION_UPDATED_EVENT,
+  USER_MEMBERSHIP_STATUS_CHANGED_EVENT,
   USER_ROLE_CHANGED_EVENT,
   // Protototo
   PROTOTOTO_ROUND_SAVED_EVENT,
@@ -97,7 +99,7 @@ const ALL_KNOWN_EVENT_TYPES = [
 ];
 
 describe('domain-event-registry totality gate', () => {
-  it('covers all 36 known non-legacy event types', () => {
+  it('covers all 37 known non-legacy event types', () => {
     expect(registeredEventTypes()).toHaveLength(ALL_KNOWN_EVENT_TYPES.length);
   });
 

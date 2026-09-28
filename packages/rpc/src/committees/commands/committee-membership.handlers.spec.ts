@@ -56,7 +56,12 @@ function assignmentHandler(overrides: Record<string, unknown> = {}) {
     repository,
     usersRepository,
     handler: new AssignCommitteeMemberHandler(
-      { appendAndPublish } as never,
+      {
+        appendPreparedAndPublish: async (prepare: (manager: unknown) => Promise<CommitteeMemberAssignedEvent>) => {
+          const event = await prepare({ query: async () => [{ id: userId, banned: false, leaveDate: null }] });
+          await appendAndPublish(event);
+        },
+      } as never,
       repository as never,
       usersRepository as never,
     ),

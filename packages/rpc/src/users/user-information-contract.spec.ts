@@ -6,12 +6,10 @@ describe('updateUserInformationSchema', () => {
     expect(
       updateUserInformationSchema.parse({
         streetName: '  Example street  ',
-        leaveDate: null,
         backNumber: 8,
       }),
     ).toEqual({
       streetName: 'Example street',
-      leaveDate: null,
       backNumber: 8,
     });
   });
@@ -27,13 +25,8 @@ describe('updateUserInformationSchema', () => {
     ).toBe(false);
   });
 
-  it('rejects contradictory membership dates supplied together', () => {
-    const result = updateUserInformationSchema.safeParse({
-      joinDate: '2025-09-01',
-      leaveDate: '2025-08-31',
-    });
-
-    expect(result.success).toBe(false);
+  it('rejects leave date updates outside admin lifecycle actions', () => {
+    expect(updateUserInformationSchema.safeParse({ leaveDate: '2025-08-31' }).success).toBe(false);
   });
 
   it('rejects a separate join date because membership starts at user creation', () => {

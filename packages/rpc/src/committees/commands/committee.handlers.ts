@@ -11,6 +11,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EventStorePublisher } from '../../event-store/event-store.publisher';
 import { resolveMembershipStart } from '../../seasons/season-policy';
 import { UsersRepository } from '../../users/repositories/users.repository';
+import { assertActiveUserForAssignment } from '../../users/user-assignment-access';
 import {
   toCommitteeDto,
   toCommitteeMembershipDto,
@@ -296,7 +297,10 @@ export class AssignCommitteeMemberHandler
       },
       command.actorUserId,
     );
-    await this.eventStorePublisher.appendAndPublish(event);
+    await this.eventStorePublisher.appendPreparedAndPublish(async (manager) => {
+      await assertActiveUserForAssignment(manager, command.userId);
+      return event;
+    });
     const membership =
       await this.committeesRepository.findMembershipById(membershipId);
 

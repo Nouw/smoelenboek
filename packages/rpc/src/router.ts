@@ -9,6 +9,7 @@ import { createSponsorhengelRouter } from './sponsorhengel/trpc/sponsorhengel.ro
 import { createTeamRouter } from './teams/trpc/team.router';
 import { router } from './trpc/init';
 import { createUserRouter } from './users/trpc/user.router';
+import { createDataRouter } from './data/trpc/data.router';
 
 export type RouterDependencies = {
   commandBus: CommandBus;
@@ -25,6 +26,7 @@ export function createAppRouter(dependencies: RouterDependencies) {
     sponsorhengel: createSponsorhengelRouter(dependencies),
     teams: createTeamRouter(dependencies),
     user: createUserRouter(dependencies),
+    data: createDataRouter(dependencies),
   });
 }
 

@@ -1,5 +1,5 @@
 import type { CreateManagedUserInput, ManagedUserDto } from '@repo/api';
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 
@@ -41,7 +41,7 @@ export class UserProvisioningService {
         );
         await this.eventStoreRepository.append(provisionedEvent, manager);
         await this.queueInvitation(account.id, input.email, name, input.preferredLocale, now, manager);
-        return { id: account.id, email: input.email, name, preferredLocale: input.preferredLocale, role: 'user', invitedAt: now.toISOString(), accountActivatedAt: null, invitationStatus: 'pending' };
+        return { id: account.id, email: input.email, name, preferredLocale: input.preferredLocale, role: 'user', invitedAt: now.toISOString(), accountActivatedAt: null, leaveDate: null, invitationStatus: 'pending' };
       });
     } catch (error) {
       try { await this.accounts.remove(account.id); } catch (compensationError) {
@@ -52,15 +52,30 @@ export class UserProvisioningService {
   }
 
   async resend(userId: string): Promise<{ queued: true }> {
-    const user = await this.dataSource.getRepository(UserEntity).findOneBy({ id: userId });
-    if (!user?.email) throw new Error('User not found or has no email address.');
-    const now = new Date();
     await this.dataSource.transaction(async (manager) => {
-      await manager.query(`DELETE FROM "verification" WHERE "value" = $1 AND "identifier" LIKE 'reset-password:%'`, [userId]);
-      await manager.getRepository(UserEntity).update(userId, { invitedAt: now });
-      await this.queueInvitation(userId, user.email!, user.name, user.preferredLocale, now, manager);
+      const rows = await manager.query(
+        `SELECT u."id", u."email", u."name", u."preferredLocale", u."banned", ui."leaveDate"
+         FROM "users" u LEFT JOIN "user_information" ui ON ui."userId" = u."id"
+         WHERE u."id" = $1 FOR UPDATE OF u`,
+        [userId],
+      ) as Array<{ id: string; email: string | null; name: string; preferredLocale: 'nl' | 'en'; banned: boolean; leaveDate: string | null }>;
+      const user = rows[0];
+      if (!user?.email) throw new NotFoundException('User not found or has no email address.');
+      if (user.banned || user.leaveDate !== null) throw new ConflictException('Inactive users cannot be invited.');
+      await this.queueReactivationInvitation({ ...user, email: user.email }, manager);
     });
     return { queued: true };
+  }
+
+  async queueReactivationInvitation(
+    user: { id: string; email: string; name: string; preferredLocale: 'nl' | 'en' },
+    manager: import('typeorm').EntityManager,
+  ): Promise<Date> {
+    const now = new Date();
+    await manager.query(`DELETE FROM "verification" WHERE "value" = $1 AND "identifier" LIKE 'reset-password:%'`, [user.id]);
+    await manager.getRepository(UserEntity).update(user.id, { invitedAt: now });
+    await this.queueInvitation(user.id, user.email, user.name, user.preferredLocale, now, manager);
+    return now;
   }
 
   private async queueInvitation(userId: string, email: string, name: string, locale: 'nl' | 'en', now: Date, manager: import('typeorm').EntityManager): Promise<void> {

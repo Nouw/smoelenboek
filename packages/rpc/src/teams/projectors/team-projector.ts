@@ -3,6 +3,8 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { DataSource, EntityManager } from 'typeorm';
 
 import { DomainEventBase } from '../../event-store/domain-event';
+import { getSeasonKey } from '../../seasons/season-policy';
+import { lockUserMembershipState } from '../../users/user-assignment-access';
 import { TeamMembershipEntity } from '../entities/team-membership.entity';
 import { TeamEntity } from '../entities/team.entity';
 import {
@@ -32,7 +34,13 @@ export class TeamProjector implements IEventHandler<DomainEventBase> {
   async handle(event: DomainEventBase): Promise<void> {
     const manager = this.dataSource.manager;
     if (event instanceof TeamMemberAssignedEvent) {
-      await this.projectMemberAssigned(event.payload, manager);
+      if (event.payload.seasonKey >= getSeasonKey(new Date())) {
+        await this.dataSource.transaction(async (lockedManager) => {
+          await this.projectMemberAssigned(event.payload, lockedManager);
+        });
+      } else {
+        await this.projectMemberAssigned(event.payload, manager);
+      }
     } else if (event instanceof TeamMemberRemovedEvent) {
       await this.projectMemberRemoved(event.payload, manager);
     } else {
@@ -61,7 +69,11 @@ export class TeamProjector implements IEventHandler<DomainEventBase> {
   async projectMemberAssigned(
     payload: TeamMembershipAssignedPayload,
     manager: EntityManager,
-  ): Promise<TeamMembershipEntity> {
+  ): Promise<TeamMembershipEntity | null> {
+    if (payload.seasonKey >= getSeasonKey(new Date())) {
+      const state = await lockUserMembershipState(manager, payload.userId);
+      if (!state.active) return null;
+    }
     const repository = manager.getRepository(TeamMembershipEntity);
     const existing = await repository.findOneBy({ id: payload.membershipId });
     const entity = existing ?? repository.create({ id: payload.membershipId });

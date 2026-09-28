@@ -17,7 +17,12 @@ export class EmailOutboxProcessor implements OnModuleInit, OnModuleDestroy {
     try {
       for (const message of await this.outbox.claim()) {
         try {
+          if (!(await this.outbox.canDeliverAccessMessage(message))) {
+            this.logger.log(JSON.stringify({ event: 'email.cancelled', messageId: message.id, messageType: message.messageType }));
+            continue;
+          }
           const deliverable = await this.outbox.refreshExpiringInvitation(message);
+          if (!deliverable) continue;
           await this.sender.send(deliverable);
           await this.outbox.markSent(message.id);
         this.logger.log(JSON.stringify({ event: 'email.sent', messageId: message.id, messageType: message.messageType, attempts: message.attempts + 1 }));

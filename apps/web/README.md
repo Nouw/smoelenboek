@@ -59,6 +59,13 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
 
+Admin user management now has Active and Inactive tabs. Deregistration blocks
+sign-in and API keys, removes current team and committee assignments, and keeps
+the account and past activity for reactivation. Reactivated users return as
+regular members with existing credentials; old assignments and API keys stay
+inactive. The server rejects self-deregistration and removal of the final
+active administrator. Membership status changes are actor-attributed events.
+
 ## Learn More
 
 Learn more about `Next.js` with the following resources:

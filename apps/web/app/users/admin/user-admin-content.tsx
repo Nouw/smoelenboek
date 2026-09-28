@@ -29,6 +29,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   ShieldOff,
+  UserRoundCheck,
+  UserRoundX,
   Users,
 } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -107,13 +109,19 @@ export function UserAdminContent() {
   const text = copy[locale];
   const currentUser = useCurrentUser();
   const [query, setQuery] = useState('');
+  const [status, setStatus] = useState<'active' | 'inactive'>('active');
+  const [membershipChange, setMembershipChange] = useState<{
+    userId: string;
+    name: string;
+    action: 'deregister' | 'reactivate';
+  } | null>(null);
   const [roleChange, setRoleChange] = useState<{
     userId: string;
     name: string;
     role: 'user' | 'admin';
   } | null>(null);
   const users = trpc.user.admin.list.useQuery(
-    { query, limit: 100, offset: 0 },
+    { query, limit: 100, offset: 0, status },
     { enabled: currentUser.isAdmin, retry: false },
   );
   const utils = trpc.useUtils();
@@ -126,6 +134,20 @@ export function UserAdminContent() {
       setRoleChange(null);
     },
   });
+  const deregister = trpc.user.admin.deregister.useMutation({
+    onSuccess: async () => {
+      await utils.user.admin.list.invalidate();
+      setMembershipChange(null);
+    },
+  });
+  const reactivate = trpc.user.admin.reactivate.useMutation({
+    onSuccess: async () => {
+      await utils.user.admin.list.invalidate();
+      setMembershipChange(null);
+    },
+  });
+  const membershipPending = deregister.isPending || reactivate.isPending;
+  const membershipError = deregister.error ?? reactivate.error;
   const userRows = users.data ?? [];
   const userColumns: DataTableColumnDef<(typeof userRows)[number]>[] = [
     {
@@ -176,11 +198,18 @@ export function UserAdminContent() {
     {
       accessorKey: 'invitationStatus',
       header: text.status,
-      cell: ({ row }) => (
-        <span className="inline-block rounded-full bg-muted px-2.5 py-1 text-xs">
-          {statusLabel(row.original.invitationStatus, text)}
-        </span>
-      ),
+      cell: ({ row }) =>
+        status === 'inactive' ? (
+          <span className="text-muted-foreground">
+            {row.original.leaveDate
+              ? `${text.deregisteredOn} ${row.original.leaveDate}`
+              : text.inactive}
+          </span>
+        ) : (
+          <span className="inline-block rounded-full bg-muted px-2.5 py-1 text-xs">
+            {statusLabel(row.original.invitationStatus, text)}
+          </span>
+        ),
       meta: {
         headerClassName: 'md:w-[16%]',
         cellClassName: 'md:w-[16%]',
@@ -195,49 +224,88 @@ export function UserAdminContent() {
             <EllipsisVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {row.original.role === 'admin' ? (
+            {status === 'inactive' ? (
               <DropdownMenuItem
-                disabled={
-                  setRole.isPending || currentUser.isOwner(row.original.id)
-                }
+                disabled={membershipPending}
                 onClick={() => {
-                  setRole.reset();
-                  setRoleChange({
+                  deregister.reset();
+                  reactivate.reset();
+                  setMembershipChange({
                     userId: row.original.id,
                     name: row.original.name,
-                    role: 'user',
+                    action: 'reactivate',
                   });
                 }}
               >
-                <ShieldOff />
-                {currentUser.isOwner(row.original.id)
-                  ? text.cannotRevokeSelf
-                  : text.revokeAdmin}
+                <UserRoundCheck />
+                {text.reactivate}
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem
-                disabled={setRole.isPending}
-                onClick={() => {
-                  setRole.reset();
-                  setRoleChange({
-                    userId: row.original.id,
-                    name: row.original.name,
-                    role: 'admin',
-                  });
-                }}
-              >
-                <ShieldCheck />
-                {text.grantAdmin}
-              </DropdownMenuItem>
-            )}
-            {row.original.accountActivatedAt === null && (
-              <DropdownMenuItem
-                disabled={resend.isPending}
-                onClick={() => resend.mutate({ userId: row.original.id })}
-              >
-                <MailPlus />
-                {text.resend}
-              </DropdownMenuItem>
+              <>
+                {row.original.role === 'admin' ? (
+                  <DropdownMenuItem
+                    disabled={
+                      setRole.isPending || currentUser.isOwner(row.original.id)
+                    }
+                    onClick={() => {
+                      setRole.reset();
+                      setRoleChange({
+                        userId: row.original.id,
+                        name: row.original.name,
+                        role: 'user',
+                      });
+                    }}
+                  >
+                    <ShieldOff />
+                    {currentUser.isOwner(row.original.id)
+                      ? text.cannotRevokeSelf
+                      : text.revokeAdmin}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    disabled={setRole.isPending}
+                    onClick={() => {
+                      setRole.reset();
+                      setRoleChange({
+                        userId: row.original.id,
+                        name: row.original.name,
+                        role: 'admin',
+                      });
+                    }}
+                  >
+                    <ShieldCheck />
+                    {text.grantAdmin}
+                  </DropdownMenuItem>
+                )}
+                {row.original.accountActivatedAt === null && (
+                  <DropdownMenuItem
+                    disabled={resend.isPending}
+                    onClick={() => resend.mutate({ userId: row.original.id })}
+                  >
+                    <MailPlus />
+                    {text.resend}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  disabled={
+                    membershipPending || currentUser.isOwner(row.original.id)
+                  }
+                  onClick={() => {
+                    deregister.reset();
+                    reactivate.reset();
+                    setMembershipChange({
+                      userId: row.original.id,
+                      name: row.original.name,
+                      action: 'deregister',
+                    });
+                  }}
+                >
+                  <UserRoundX />
+                  {currentUser.isOwner(row.original.id)
+                    ? text.cannotDeregisterSelf
+                    : text.deregister}
+                </DropdownMenuItem>
+              </>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -286,37 +354,77 @@ export function UserAdminContent() {
           <CreateUserDialog afterCreate={() => users.refetch()} />
         </div>
       </header>
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
-        <Input
-          aria-label={text.search}
-          className="pl-9"
-          placeholder={text.search}
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
+      <div
+        role="tablist"
+        aria-label={text.membershipStatus}
+        className="flex gap-1 border-b"
+      >
+        {(['active', 'inactive'] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            id={`users-${tab}-tab`}
+            aria-controls="users-panel"
+            aria-selected={status === tab}
+            tabIndex={status === tab ? 0 : -1}
+            className={`border-b-2 px-4 py-2 text-sm font-medium ${status === tab ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+            onClick={() => setStatus(tab)}
+            onKeyDown={(event) => {
+              let nextTab: 'active' | 'inactive' | null = null;
+              if (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+                nextTab = tab === 'active' ? 'inactive' : 'active';
+              else if (event.key === 'Home') nextTab = 'active';
+              else if (event.key === 'End') nextTab = 'inactive';
+              if (nextTab) {
+                event.preventDefault();
+                setStatus(nextTab);
+                document.getElementById(`users-${nextTab}-tab`)?.focus();
+              }
+            }}
+          >
+            {text[tab]}
+          </button>
+        ))}
       </div>
-      {users.isLoading ? (
-        <State icon={Loader2} spin title={text.loading} />
-      ) : users.isError ? (
-        <State
-          icon={ShieldAlert}
-          title={text.loadFailed}
-          detail={users.error.message}
-        />
-      ) : userRows.length === 0 ? (
-        <p className="rounded-xl border p-8 text-center text-sm text-muted-foreground">
-          {text.empty}
-        </p>
-      ) : (
-        <DataTable
-          caption={text.title}
-          columns={userColumns}
-          data={userRows}
-          getRowId={(user) => user.id}
-          presentation="stacked"
-        />
-      )}
+      <div
+        role="tabpanel"
+        id="users-panel"
+        aria-labelledby={`users-${status}-tab`}
+        className="space-y-4"
+      >
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+          <Input
+            aria-label={text.search}
+            className="pl-9"
+            placeholder={text.search}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
+        {users.isLoading ? (
+          <State icon={Loader2} spin title={text.loading} />
+        ) : users.isError ? (
+          <State
+            icon={ShieldAlert}
+            title={text.loadFailed}
+            detail={users.error.message}
+          />
+        ) : userRows.length === 0 ? (
+          <p className="rounded-xl border p-8 text-center text-sm text-muted-foreground">
+            {status === 'active' ? text.emptyActive : text.emptyInactive}
+          </p>
+        ) : (
+          <DataTable
+            caption={text.title}
+            columns={userColumns}
+            data={userRows}
+            getRowId={(user) => user.id}
+            presentation="stacked"
+          />
+        )}
+      </div>
       <Dialog
         open={roleChange !== null}
         onOpenChange={(open) => {
@@ -370,6 +478,68 @@ export function UserAdminContent() {
               {roleChange?.role === 'admin'
                 ? text.confirmGrantAdmin
                 : text.confirmRevokeAdmin}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={membershipChange !== null}
+        onOpenChange={(open) => {
+          if (!open && !membershipPending) setMembershipChange(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {membershipChange?.action === 'deregister'
+                ? text.deregisterTitle
+                : text.reactivateTitle}
+            </DialogTitle>
+            <DialogDescription>
+              {membershipChange
+                ? (membershipChange.action === 'deregister'
+                    ? text.deregisterDetail
+                    : text.reactivateDetail
+                  ).replace('{name}', membershipChange.name)
+                : ''}
+            </DialogDescription>
+          </DialogHeader>
+          {membershipError ? (
+            <p role="alert" className="text-sm text-destructive">
+              {membershipChange?.action === 'deregister'
+                ? text.deregisterFailed
+                : text.reactivateFailed}{' '}
+              {membershipError.message}
+            </p>
+          ) : null}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={membershipPending}
+              onClick={() => setMembershipChange(null)}
+            >
+              {text.cancel}
+            </Button>
+            <Button
+              type="button"
+              variant={
+                membershipChange?.action === 'deregister'
+                  ? 'destructive'
+                  : 'default'
+              }
+              disabled={!membershipChange || membershipPending}
+              onClick={() => {
+                if (!membershipChange) return;
+                if (membershipChange.action === 'deregister')
+                  deregister.mutate({ userId: membershipChange.userId });
+                else reactivate.mutate({ userId: membershipChange.userId });
+              }}
+            >
+              {membershipPending && <Loader2 className="animate-spin" />}
+              {membershipChange?.action === 'deregister'
+                ? text.confirmDeregister
+                : text.confirmReactivate}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -785,6 +955,24 @@ const copy = {
     forbiddenDetail: 'Alleen beheerders kunnen gebruikers beheren.',
     loadFailed: 'Gebruikers laden is mislukt',
     empty: 'Geen gebruikers gevonden.',
+    emptyActive: 'Geen actieve gebruikers gevonden.',
+    emptyInactive: 'Geen uitgeschreven gebruikers gevonden.',
+    membershipStatus: 'Lidmaatschapsstatus',
+    inactive: 'Uitgeschreven',
+    deregisteredOn: 'Uitgeschreven op',
+    deregister: 'Gebruiker uitschrijven',
+    cannotDeregisterSelf: 'Je kunt jezelf niet uitschrijven',
+    deregisterTitle: 'Gebruiker uitschrijven?',
+    deregisterDetail:
+      '{name} verliest direct toegang. Eerdere bijdragen blijven bewaard.',
+    confirmDeregister: 'Uitschrijven',
+    deregisterFailed: 'Uitschrijven is mislukt.',
+    reactivate: 'Gebruiker heractiveren',
+    reactivateTitle: 'Gebruiker heractiveren?',
+    reactivateDetail:
+      '{name} krijgt opnieuw toegang als lid. Eerdere team- en commissie-indelingen worden niet hersteld.',
+    confirmReactivate: 'Heractiveren',
+    reactivateFailed: 'Heractiveren is mislukt.',
     name: 'Naam',
     email: 'E-mail',
     language: 'Taal',
@@ -850,6 +1038,24 @@ const copy = {
     forbiddenDetail: 'Only administrators can manage users.',
     loadFailed: 'Could not load users',
     empty: 'No users found.',
+    emptyActive: 'No active users found.',
+    emptyInactive: 'No deregistered users found.',
+    membershipStatus: 'Membership status',
+    inactive: 'Inactive',
+    deregisteredOn: 'Deregistered on',
+    deregister: 'Deregister user',
+    cannotDeregisterSelf: 'You cannot deregister yourself',
+    deregisterTitle: 'Deregister user?',
+    deregisterDetail:
+      '{name} will lose access immediately. Past contributions will be preserved.',
+    confirmDeregister: 'Deregister',
+    deregisterFailed: 'Could not deregister the user.',
+    reactivate: 'Reactivate user',
+    reactivateTitle: 'Reactivate user?',
+    reactivateDetail:
+      '{name} will regain access as a member. Previous team and committee assignments will not be restored.',
+    confirmReactivate: 'Reactivate',
+    reactivateFailed: 'Could not reactivate the user.',
     name: 'Name',
     email: 'Email',
     language: 'Language',
@@ -903,7 +1109,7 @@ const copy = {
     sent: 'Sent',
     sending: 'Sending',
     not_queued: 'Not queued',
-    options: 'Options'
+    options: 'Options',
   },
 } as const;
 type Text = (typeof copy)[keyof typeof copy];

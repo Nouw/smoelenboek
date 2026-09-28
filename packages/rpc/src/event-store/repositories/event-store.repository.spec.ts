@@ -70,6 +70,32 @@ describe('EventStoreRepository', () => {
     });
   });
 
+  describe('appendPreparedBatch', () => {
+    it('appends every event in one transaction and none when preparation fails', async () => {
+      const saved: unknown[] = [];
+      const manager = {
+        getRepository: jest.fn().mockReturnValue({
+          create: (value: unknown) => value,
+          save: async (value: unknown) => { saved.push(value); return { id: String(saved.length) }; },
+        }),
+      };
+      const transaction = jest.fn(async (callback: (value: typeof manager) => Promise<unknown>) => callback(manager));
+      const repository = new EventStoreRepository({ transaction } as never);
+      const events = [
+        new TestEvent({ testId: 'one' }, { source: 'admin' }),
+        new TestEvent({ testId: 'two' }, { source: 'admin' }),
+      ];
+
+      const entries = await repository.appendPreparedBatch(async () => events);
+      expect(transaction).toHaveBeenCalledTimes(1);
+      expect(entries.map(({ event }) => event)).toEqual(events);
+      expect(saved).toHaveLength(2);
+
+      await expect(repository.appendPreparedBatch(async () => { throw new Error('invalid'); })).rejects.toThrow('invalid');
+      expect(saved).toHaveLength(2);
+    });
+  });
+
   describe('markDispatchFailure', () => {
     it('uses exponential backoff and marks failed after 8 attempts', async () => {
       const update = jest.fn().mockResolvedValue(undefined);

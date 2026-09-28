@@ -246,6 +246,63 @@ describe('user search tRPC route', () => {
   });
 });
 
+describe('membership lifecycle input', () => {
+  it('rejects leaveDate in general information updates before command dispatch', async () => {
+    const execute = jest.fn();
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+    const caller = appRouter.createCaller(authenticatedContext('admin'));
+
+    await expect(caller.user.updateInformation({
+      userId: '6a0d03df-8c89-4309-b4ce-d1344f801b06',
+      changes: { leaveDate: '2026-09-24' },
+    } as never)).rejects.toBeInstanceOf(TRPCError);
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  it('defaults the managed list to active and passes through inactive', async () => {
+    const execute = jest.fn().mockResolvedValue([]);
+    const appRouter = createAppRouter({
+      commandBus: { execute: jest.fn() } as never,
+      queryBus: { execute } as never,
+    });
+    const caller = appRouter.createCaller(authenticatedContext('admin'));
+
+    await expect(caller.user.admin.list()).resolves.toEqual([]);
+    await expect(caller.user.admin.list({ status: 'inactive' })).resolves.toEqual([]);
+    expect(execute).toHaveBeenNthCalledWith(1, expect.objectContaining({ status: 'active' }));
+    expect(execute).toHaveBeenNthCalledWith(2, expect.objectContaining({ status: 'inactive' }));
+  });
+
+  it('requires admin access and dispatches both lifecycle actions with the actor', async () => {
+    const targetId = '6a0d03df-8c89-4309-b4ce-d1344f801b06';
+    const execute = jest.fn()
+      .mockResolvedValueOnce({ userId: targetId, leaveDate: '2026-09-24', role: 'user' })
+      .mockResolvedValueOnce({ userId: targetId, leaveDate: null, role: 'user' });
+    const appRouter = createAppRouter({
+      commandBus: { execute } as never,
+      queryBus: { execute: jest.fn() } as never,
+    });
+    const member = appRouter.createCaller(authenticatedContext('user'));
+    await expect(member.user.admin.deregister({ userId: targetId })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(member.user.admin.reactivate({ userId: targetId })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+
+    const admin = appRouter.createCaller(authenticatedContext('admin'));
+    await expect(admin.user.admin.deregister({ userId: targetId }))
+      .resolves.toEqual({ userId: targetId, leaveDate: '2026-09-24', role: 'user' });
+    await expect(admin.user.admin.reactivate({ userId: targetId }))
+      .resolves.toEqual({ userId: targetId, leaveDate: null, role: 'user' });
+    expect(execute).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      actorUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd', targetUserId: targetId,
+    }));
+    expect(execute).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      actorUserId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd', targetUserId: targetId,
+    }));
+  });
+});
+
 function authenticatedContext(role: string) {
   return {
     userId: '5e3fb53f-6bb6-456d-9100-8513c76d1fdd',
@@ -283,7 +340,7 @@ describe('user administration tRPC routes', () => {
 
     const execute = jest.fn().mockResolvedValue({
       id: '6a0d03df-8c89-4309-b4ce-d1344f801b06', email: 'member@example.com', name: 'Example Member',
-      preferredLocale: 'nl', role: 'user', invitedAt: '2026-08-07T10:00:00.000Z', accountActivatedAt: null, invitationStatus: 'pending',
+      preferredLocale: 'nl', role: 'user', invitedAt: '2026-08-07T10:00:00.000Z', accountActivatedAt: null, leaveDate: null, invitationStatus: 'pending',
     });
     const adminRouter = createAppRouter({ commandBus: { execute } as never, queryBus: { execute: jest.fn() } as never });
     await expect(adminRouter.createCaller(authenticatedContext('admin')).user.admin.create({
