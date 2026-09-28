@@ -33,4 +33,15 @@ export class EventStorePublisher {
     const dispatched = await this.dispatcher.dispatchStored(stored, event);
     return { stored, dispatched };
   }
+
+  async appendPreparedBatchAndPublish(
+    prepare: (manager: EntityManager) => Promise<DomainEventBase[]>,
+  ): Promise<PublishResult[]> {
+    const entries = await this.eventStore.appendPreparedBatch(prepare);
+    const results: PublishResult[] = [];
+    for (const { stored, event } of entries) {
+      results.push({ stored, dispatched: await this.dispatcher.dispatchStored(stored, event) });
+    }
+    return results;
+  }
 }

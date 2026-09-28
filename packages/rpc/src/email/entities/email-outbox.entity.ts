@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export type EmailLocale = 'nl' | 'en';
-export type EmailOutboxStatus = 'pending' | 'sending' | 'sent' | 'failed';
+export type EmailOutboxStatus = 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled';
 export type EmailMessageType = 'invitation' | 'password_reset' | 'email_verification' | 'address_update' | 'bankaccount_update';
 
 @Entity({ name: 'email_outbox' })

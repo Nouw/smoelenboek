@@ -86,6 +86,22 @@ bank account number is returned only to that user or an admin. Users can update
 their own information, while admins can update any user. Updates are retained
 as `user.information_updated` events, including bank account changes.
 
+Membership status is changed only through `user.admin.deregister` and
+`user.admin.reactivate`. Deregistration records `user_information.leaveDate`,
+bans the account, revokes sessions and API keys, cancels pending access email,
+and removes active team and committee assignments. Historical user data and
+activity remain. Reactivation clears the leave date and restores access as a
+regular member. The status and assignment changes are actor-attributed events.
+
+Roll out deregistration in this order: run the RPC database migrations, deploy
+and restart RPC, reconcile existing users with a leave date, then deploy and
+restart the web app. The old admin list call defaults to active users after the
+RPC deploy. From `packages/rpc`, preview the reconciliation with
+`node -r ts-node/register -r tsconfig-paths/register scripts/reconcile-inactive-users.ts`.
+Review its `/tmp/inactive-user-reconciliation-*/report.md` and snapshot before
+running the same command with `--apply`. The script refuses snapshots over
+100,000 rows or 100 MB and writes a before/after CSV after applying changes.
+
 ## Create a login user
 
 Public registration is disabled. Create users through the RPC admin command:

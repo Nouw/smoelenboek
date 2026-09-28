@@ -54,6 +54,10 @@ import {
   USER_ROLE_CHANGED_EVENT,
   UserRoleChangedEvent,
 } from '../users/events/user-role-changed.event';
+import {
+  USER_MEMBERSHIP_STATUS_CHANGED_EVENT,
+  UserMembershipStatusChangedEvent,
+} from '../users/events/user-membership-status-changed.event';
 
 // Phase 3: polls
 import {
@@ -128,6 +132,7 @@ const EVENT_CLASS_MAP = new Map<string, DomainEventClass>([
   [USER_PROFILE_UPDATED_EVENT, UserProfileUpdatedEvent],
   [USER_INFORMATION_UPDATED_EVENT, UserInformationUpdatedEvent],
   [USER_ROLE_CHANGED_EVENT, UserRoleChangedEvent],
+  [USER_MEMBERSHIP_STATUS_CHANGED_EVENT, UserMembershipStatusChangedEvent],
   [PROTOTOTO_ROUND_SAVED_EVENT, ProtototoRoundSavedEvent],
   [PROTOTOTO_ROUND_PUBLISHED_EVENT, ProtototoRoundPublishedEvent],
   [PROTOTOTO_ROUND_ARCHIVED_EVENT, ProtototoRoundArchivedEvent],

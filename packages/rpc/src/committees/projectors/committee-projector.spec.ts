@@ -1,4 +1,5 @@
 import { describe, expect, it, jest } from '@jest/globals';
+import { getSeasonKey } from '../../seasons/season-policy';
 
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
 import { CommitteeEntity } from '../entities/committee.entity';
@@ -32,6 +33,22 @@ function makeProjector(manager: object) {
 }
 
 describe('CommitteeProjector', () => {
+  it('does not restore a current assignment after deregistration', async () => {
+    const save = jest.fn();
+    const query = jest.fn().mockResolvedValue([{ id: assignedPayload.userId, banned: true, leaveDate: '2026-09-24' }]);
+    const manager = { query, getRepository: () => ({ save }) };
+    const transaction = jest.fn(async (callback: (manager: typeof manager) => Promise<unknown>) => callback(manager));
+    const projector = new CommitteeProjector({ manager, transaction } as never);
+
+    await projector.handle(new CommitteeMemberAssignedEvent(
+      { ...assignedPayload, seasonKey: getSeasonKey(new Date()) },
+      { source: 'manual', actorUserId: 'admin' },
+    ));
+
+    expect(transaction).toHaveBeenCalledTimes(1);
+    expect(String(query.mock.calls[0]?.[0])).toContain('FOR UPDATE OF u');
+    expect(save).not.toHaveBeenCalled();
+  });
   it('projects a committee membership assignment', async () => {
     const entity = new CommitteeMembershipEntity();
     const repository = {

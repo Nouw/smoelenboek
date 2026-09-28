@@ -123,7 +123,11 @@ function harness(queryResults: unknown[][]) {
     query: jest.fn(async (sql: string) => {
       if (sql.includes('pg_advisory_xact_lock')) return [];
       if (sql.includes('UPDATE "users"')) return [];
-      return queryResults[resultIndex++] ?? [];
+      return (queryResults[resultIndex++] ?? []).map((row) =>
+        typeof row === 'object' && row !== null && 'role' in row
+          ? { banned: false, leaveDate: null, ...row }
+          : row,
+      );
     }),
   };
   const published: UserRoleChangedEvent[] = [];

@@ -126,10 +126,14 @@ function assignHandler(
   duplicate: TeamMembershipEntity | null = null,
   membershipEntity: TeamMembershipEntity | null = null,
 ) {
-  return new AssignTeamMemberHandler(
-    {
-      appendAndPublish: eventStore.appendAndPublish ?? jest.fn(),
-    } as never,
+    return new AssignTeamMemberHandler(
+      {
+        appendAndPublish: eventStore.appendAndPublish ?? jest.fn(),
+        appendPreparedAndPublish: async (prepare: (manager: unknown) => Promise<TeamMemberAssignedEvent>) => {
+          const event = await prepare({ query: async () => [{ id: userId, banned: false, leaveDate: null }] });
+          await eventStore.appendAndPublish?.(event);
+        },
+      } as never,
     {
       findById: jest.fn().mockResolvedValue({
         id: teamId,

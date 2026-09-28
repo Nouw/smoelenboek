@@ -3,6 +3,8 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { DataSource, EntityManager } from 'typeorm';
 
 import { DomainEventBase } from '../../event-store/domain-event';
+import { getSeasonKey } from '../../seasons/season-policy';
+import { lockUserMembershipState } from '../../users/user-assignment-access';
 import { CommitteeMembershipEntity } from '../entities/committee-membership.entity';
 import { CommitteeEntity } from '../entities/committee.entity';
 import {
@@ -32,7 +34,13 @@ export class CommitteeProjector implements IEventHandler<DomainEventBase> {
   async handle(event: DomainEventBase): Promise<void> {
     const manager = this.dataSource.manager;
     if (event instanceof CommitteeMemberAssignedEvent) {
-      await this.projectMemberAssigned(event.payload, manager);
+      if (event.payload.seasonKey >= getSeasonKey(new Date())) {
+        await this.dataSource.transaction(async (lockedManager) => {
+          await this.projectMemberAssigned(event.payload, lockedManager);
+        });
+      } else {
+        await this.projectMemberAssigned(event.payload, manager);
+      }
     } else if (event instanceof CommitteeMemberRemovedEvent) {
       await this.projectMemberRemoved(event.payload, manager);
     } else {
@@ -63,7 +71,11 @@ export class CommitteeProjector implements IEventHandler<DomainEventBase> {
   async projectMemberAssigned(
     payload: CommitteeMembershipAssignedPayload,
     manager: EntityManager,
-  ): Promise<CommitteeMembershipEntity> {
+  ): Promise<CommitteeMembershipEntity | null> {
+    if (payload.seasonKey >= getSeasonKey(new Date())) {
+      const state = await lockUserMembershipState(manager, payload.userId);
+      if (!state.active) return null;
+    }
     const repository = manager.getRepository(CommitteeMembershipEntity);
     const existing = await repository.findOneBy({ id: payload.membershipId });
     const entity = existing ?? repository.create({ id: payload.membershipId });

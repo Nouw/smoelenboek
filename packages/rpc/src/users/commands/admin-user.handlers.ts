@@ -30,7 +30,7 @@ export type ManagedUserRoleResult = {
   role: ManagedUserRole;
 };
 
-type RoleRow = { id: string; role: string };
+type RoleRow = { id: string; role: string; banned: boolean; leaveDate: string | null };
 
 @CommandHandler(SetManagedUserRoleCommand)
 export class SetManagedUserRoleHandler
@@ -52,17 +52,22 @@ export class SetManagedUserRoleHandler
       );
 
       const rows = (await manager.query(
-        `SELECT "id", "role" FROM "users" WHERE "id" IN ($1, $2) FOR UPDATE`,
+        `SELECT u."id", u."role", u."banned", ui."leaveDate" FROM "users" u
+         LEFT JOIN "user_information" ui ON ui."userId" = u."id"
+         WHERE u."id" IN ($1, $2) ORDER BY u."id" FOR UPDATE OF u`,
         [command.actorUserId, command.targetUserId],
       )) as RoleRow[];
       const actor = rows.find((row) => row.id === command.actorUserId);
       const target = rows.find((row) => row.id === command.targetUserId);
 
-      if (!actor || actor.role !== 'admin') {
+      if (!actor || actor.role !== 'admin' || actor.banned || actor.leaveDate !== null) {
         throw new ForbiddenException('Administrator access is required.');
       }
       if (!target) {
         throw new NotFoundException('User not found.');
+      }
+      if (target.leaveDate !== null || target.banned) {
+        throw new ConflictException('Inactive users cannot change roles.');
       }
       if (
         command.role === 'user' &&
@@ -74,7 +79,9 @@ export class SetManagedUserRoleHandler
       }
       if (command.role === 'user' && target.role === 'admin') {
         const countRows = (await manager.query(
-          `SELECT COUNT(*)::int AS "count" FROM "users" WHERE "role" = 'admin'`,
+          `SELECT COUNT(*)::int AS "count" FROM "users" u
+           LEFT JOIN "user_information" ui ON ui."userId" = u."id"
+           WHERE u."role" = 'admin' AND ui."leaveDate" IS NULL AND u."banned" = false`,
         )) as Array<{ count: number }>;
         const count = countRows[0]?.count ?? 0;
         if (count <= 1) {

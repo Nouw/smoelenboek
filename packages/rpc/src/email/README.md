@@ -4,6 +4,10 @@ Transactional email is queued in PostgreSQL before delivery. `EmailOutboxProcess
 claims rows with `FOR UPDATE SKIP LOCKED`, reclaims work after a crashed worker,
 and retries delivery eight times. SMTP delivery is at-least-once.
 
+User deregistration cancels queued and claimed invitation/password-reset mail in
+the same database transaction as the account change. The worker checks account
+status again before delivery. Cancellation preserves already sent mail history.
+
 ## Local Mailpit
 
 Mailpit is intentionally not part of this repository's Docker Compose file. Start

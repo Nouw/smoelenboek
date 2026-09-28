@@ -69,21 +69,53 @@ export function createPollsRouter(dependencies: Dependencies) {
       }),
     admin: router({
       list: adminProcedure
+        .meta({
+          name: 'List polls',
+          docs: {
+            description: 'List polls',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .output(z.array(pollSchema))
         .query(() => dependencies.queryBus.execute(new ListAdminPollsQuery())),
       get: adminProcedure
+        .meta({
+          name: 'Retrieve a Poll',
+          docs: {
+            description: 'Get a single poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(z.object({ pollId: z.uuid() }))
         .output(pollSchema.nullable())
         .query(({ input }) =>
           dependencies.queryBus.execute(new GetAdminPollQuery(input.pollId)),
         ),
       results: adminProcedure
+        .meta({
+          name: 'Results of a Poll',
+          docs: {
+            description: 'Results of a poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(z.object({ pollId: z.uuid() }))
         .output(pollAdminResultSchema)
         .query(({ input }) =>
           dependencies.queryBus.execute(new GetPollResultsQuery(input.pollId)),
         ),
       create: adminProcedure
+        .meta({
+          name: 'Create a Poll',
+          docs: {
+            description: 'Create a new poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(createPollInputSchema)
         .output(pollSchema)
         .mutation(({ ctx, input }) =>
@@ -99,6 +131,14 @@ export function createPollsRouter(dependencies: Dependencies) {
           ),
         ),
       update: adminProcedure
+        .meta({
+          name: 'Update Poll',
+          docs: {
+            description: 'Update an existing poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(updatePollInputSchema)
         .output(pollSchema)
         .mutation(({ ctx, input }) =>
@@ -115,18 +155,42 @@ export function createPollsRouter(dependencies: Dependencies) {
           ),
         ),
       publish: adminProcedure
+        .meta({
+          name: 'Publish Poll',
+          docs: {
+            description: 'Publish a poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(z.object({ pollId: z.uuid() }))
         .output(pollSchema)
         .mutation(({ ctx, input }) =>
           mutate(new PublishPollCommand(ctx.userId, input.pollId)),
         ),
       archive: adminProcedure
+        .meta({
+          name: 'Archive Poll',
+          docs: {
+            description: 'Archive a poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(z.object({ pollId: z.uuid() }))
         .output(pollSchema)
         .mutation(({ ctx, input }) =>
           mutate(new ArchivePollCommand(ctx.userId, input.pollId)),
         ),
       deleteDraft: adminProcedure
+        .meta({
+          name: 'Delete Draft Poll',
+          docs: {
+            description: 'Delete a draft poll',
+            tags: ['Polls'],
+            auth: true,
+          },
+        })
         .input(z.object({ pollId: z.uuid() }))
         .output(z.object({ pollId: z.uuid() }))
         .mutation(async ({ ctx, input }) => ({

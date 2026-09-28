@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import { randomBytes } from 'node:crypto';
-import { EmailOutboxEntity, type EmailLocale, type EmailMessageType } from './entities/email-outbox.entity';
+import { EmailOutboxEntity, type EmailLocale } from './entities/email-outbox.entity';
 
 export type QueueEmailInput =
   | {
@@ -62,6 +62,42 @@ export class EmailOutboxRepository {
     return repository.save(repository.create({ messageType, recipient, locale, payload, relatedUserId: relatedUserId ?? null, deduplicationKey }));
   }
 
+  async cancelPendingAccessMessages(relatedUserId: string, manager: EntityManager): Promise<void> {
+    await manager.query(
+      `UPDATE "email_outbox"
+       SET "status" = 'cancelled', "updatedAt" = now()
+       WHERE "relatedUserId" = $1
+         AND "messageType" IN ('invitation', 'password_reset')
+         AND "status" IN ('pending', 'sending')`,
+      [relatedUserId],
+    );
+  }
+
+  async canDeliverAccessMessage(message: EmailOutboxEntity): Promise<boolean> {
+    if (message.messageType !== 'invitation' && message.messageType !== 'password_reset') return true;
+
+    const rows: unknown = await this.dataSource.query(
+      `SELECT o."status", (
+         u."id" IS NOT NULL AND u."banned" = false
+         AND ui."leaveDate" IS NULL
+       ) AS "active"
+       FROM "email_outbox" o
+       LEFT JOIN "users" u ON u."id" = o."relatedUserId"
+       LEFT JOIN "user_information" ui ON ui."userId" = u."id"
+       WHERE o."id" = $1`,
+      [message.id],
+    );
+    const row = unwrapAffectedRows(rows)[0] as { status?: string; active?: boolean } | undefined;
+    if (!row || row.status !== 'sending') return false;
+    if (row.active) return true;
+
+    await this.dataSource.getRepository(EmailOutboxEntity).update(
+      { id: message.id, status: 'sending' },
+      { status: 'cancelled' },
+    );
+    return false;
+  }
+
   claim(limit = 20): Promise<EmailOutboxEntity[]> {
     return this.dataSource.transaction(async (manager) => {
       const result: unknown = await manager.query(
@@ -79,23 +115,43 @@ export class EmailOutboxRepository {
   }
 
   async markSent(id: string): Promise<void> {
-    await this.dataSource.getRepository(EmailOutboxEntity).update(id, { status: 'sent', sentAt: new Date(), lastError: null });
+    await this.dataSource.getRepository(EmailOutboxEntity).update(
+      { id, status: 'sending' },
+      { status: 'sent', sentAt: new Date(), lastError: null },
+    );
   }
 
   async markDeliveryFailure(message: EmailOutboxEntity, error: string): Promise<void> {
     const attempts = message.attempts + 1;
     const final = attempts >= 8;
     const delayMs = Math.min(60 * 60_000, 2 ** attempts * 60_000);
-    await this.dataSource.getRepository(EmailOutboxEntity).update(message.id, {
+    await this.dataSource.getRepository(EmailOutboxEntity).update({ id: message.id, status: 'sending' }, {
       status: final ? 'failed' : 'pending', attempts, lastError: error.slice(0, 2000), nextAttemptAt: new Date(Date.now() + delayMs),
     });
   }
 
-  async refreshExpiringInvitation(message: EmailOutboxEntity): Promise<EmailOutboxEntity> {
+  async refreshExpiringInvitation(message: EmailOutboxEntity): Promise<EmailOutboxEntity | null> {
     if (message.messageType !== 'invitation' || !message.relatedUserId) return message;
     const expiry = new Date(String(message.payload.expiresAt ?? 0));
     if (expiry.getTime() > Date.now() + 60 * 60_000) return message;
     return this.dataSource.transaction(async (manager) => {
+      const rows: unknown = await manager.query(
+        `SELECT o."status", (
+           u."id" IS NOT NULL AND u."banned" = false
+           AND ui."leaveDate" IS NULL
+         ) AS "active"
+         FROM "email_outbox" o
+         LEFT JOIN "users" u ON u."id" = o."relatedUserId"
+         LEFT JOIN "user_information" ui ON ui."userId" = u."id"
+         WHERE o."id" = $1 FOR UPDATE OF o`,
+        [message.id],
+      );
+      const row = unwrapAffectedRows(rows)[0] as { status?: string; active?: boolean } | undefined;
+      if (!row || row.status !== 'sending') return null;
+      if (!row.active) {
+        await manager.query(`UPDATE "email_outbox" SET "status" = 'cancelled', "updatedAt" = now() WHERE "id" = $1`, [message.id]);
+        return null;
+      }
       const token = randomBytes(32).toString('base64url');
       const expiresAt = new Date(Date.now() + 48 * 60 * 60_000);
       await manager.query(`DELETE FROM "verification" WHERE "value" = $1 AND "identifier" LIKE 'reset-password:%'`, [message.relatedUserId]);

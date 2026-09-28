@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rpc",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@repo/rpc", "start"],
+      "port": 3002
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "web", "dev"],
+      "port": 3001
+    }
+  ]
+}

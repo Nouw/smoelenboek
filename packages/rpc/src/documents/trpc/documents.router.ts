@@ -73,6 +73,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
       .output(contentCollectionDetailSchema)
       .query(({ input }) => getCollection(input.collectionId)),
     createCollection: adminProcedure
+      .meta({
+        name: 'Create Document Collection',
+        docs: {
+          description: 'Create a new document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(createContentCollectionInputSchema)
       .output(contentCollectionSchema)
       .mutation(async ({ ctx, input }) => {
@@ -91,6 +99,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         return getCollection(saved.id);
       }),
     updateCollection: adminProcedure
+      .meta({
+        name: 'Update Document Collection',
+        docs: {
+          description: 'Update a document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(updateContentCollectionInputSchema)
       .output(contentCollectionSchema)
       .mutation(async ({ ctx, input }) => {
@@ -106,6 +122,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         return getCollection(input.collectionId);
       }),
     reorderCollections: adminProcedure
+      .meta({
+        name: 'Reorder Document Collection',
+        docs: {
+          description: 'Change the order of a document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(
         z.object({
           seasonKey: z.number().int().min(1900).max(3000),
@@ -128,6 +152,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         );
       }),
     deleteCollection: adminProcedure
+      .meta({
+        name: 'Delete Document Collection',
+        docs: {
+          description: 'Delete a document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(z.object({ collectionId: z.uuid() }))
       .output(z.object({ collectionId: z.uuid() }))
       .mutation(async ({ ctx, input }) => {
@@ -137,6 +169,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         return { collectionId: input.collectionId };
       }),
     updateAsset: adminProcedure
+      .meta({
+        name: 'Update Document Collection Asset',
+        docs: {
+          description: 'Update an asset in a document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(
         z
           .object({
@@ -166,6 +206,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         return toContentAssetOutput(asset);
       }),
     reorderAssets: adminProcedure
+      .meta({
+        name: 'Reorder Document Collection Assets',
+        docs: {
+          description: 'Update the order of assets in a document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(
         z.object({
           collectionId: z.uuid(),
@@ -187,9 +235,15 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         return assets.map(toContentAssetOutput);
       }),
     setCoverAsset: adminProcedure
-      .input(
-        z.object({ collectionId: z.uuid(), assetId: z.uuid().nullable() }),
-      )
+      .meta({
+        name: 'Set Cover of Asset',
+        docs: {
+          description: 'Set the cover of an Asset',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
+      .input(z.object({ collectionId: z.uuid(), assetId: z.uuid().nullable() }))
       .output(contentCollectionSchema)
       .mutation(async ({ ctx, input }) => {
         await dependencies.commandBus.execute(
@@ -202,6 +256,14 @@ export function createDocumentsRouter(dependencies: Dependencies) {
         return getCollection(input.collectionId);
       }),
     deleteAsset: adminProcedure
+      .meta({
+        name: 'Delete Asset',
+        docs: {
+          description: 'Delete an asset from a document collection',
+          tags: ['Documents'],
+          auth: true,
+        },
+      })
       .input(z.object({ assetId: z.uuid() }))
       .output(z.object({ assetId: z.uuid() }))
       .mutation(async ({ ctx, input }) => {

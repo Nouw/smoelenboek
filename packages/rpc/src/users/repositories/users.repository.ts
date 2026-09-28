@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { UserEntity } from '../entities/user.entity';
 
@@ -25,19 +25,16 @@ export class UsersRepository {
 
   search(query: string, limit = 20): Promise<UserEntity[]> {
     const term = query.trim();
-    const where = term
-      ? [
-          { name: ILike(`%${term}%`) },
-          { firstName: ILike(`%${term}%`) },
-          { lastName: ILike(`%${term}%`) },
-          { email: ILike(`%${term}%`) },
-        ]
-      : undefined;
-
-    return this.repository.find({
-      where,
-      order: { firstName: 'ASC', lastName: 'ASC', name: 'ASC' },
-      take: limit,
-    });
+    const users = this.repository.createQueryBuilder('user')
+      .leftJoin('user_information', 'information', 'information."userId" = user.id')
+      .where('information."leaveDate" IS NULL')
+      .orderBy('user.firstName', 'ASC')
+      .addOrderBy('user.lastName', 'ASC')
+      .addOrderBy('user.name', 'ASC')
+      .take(limit);
+    if (term) {
+      users.andWhere('(user.name ILIKE :term OR user."firstName" ILIKE :term OR user."lastName" ILIKE :term OR user.email ILIKE :term)', { term: `%${term}%` });
+    }
+    return users.getMany();
   }
 }

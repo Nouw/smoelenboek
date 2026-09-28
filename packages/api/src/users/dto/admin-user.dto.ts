@@ -45,5 +45,6 @@ export type ManagedUserDto = {
   role: ManagedUserRole;
   invitedAt: string | null;
   accountActivatedAt: string | null;
-  invitationStatus: 'pending' | 'sending' | 'sent' | 'failed' | 'active' | 'not_queued';
+  leaveDate: string | null;
+  invitationStatus: 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled' | 'active' | 'not_queued';
 };
