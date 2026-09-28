@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/Nouw/smoelenboek/compare/v1.4.1...v1.5.0) (2026-09-28)
+
+
+### Features
+
+* added user deregistration ([d69e492](https://github.com/Nouw/smoelenboek/commit/d69e49222d6aa74ba996de9fd3b3c13c986b9d05))
+
 ## [1.4.1](https://github.com/Nouw/smoelenboek/compare/v1.4.0...v1.4.1) (2026-09-24)
 
 
