@@ -2,7 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 const root = new URL('../', import.meta.url);
-const [health, telemetry, main, appModule, deployment, compose] =
+const [health, telemetry, main, appModule, deployment, compose, trpcHost] =
   await Promise.all([
     readFile(new URL('src/health/health.controller.ts', root), 'utf8'),
     readFile(new URL('src/observability/rpc-telemetry.ts', root), 'utf8'),
@@ -10,6 +10,7 @@ const [health, telemetry, main, appModule, deployment, compose] =
     readFile(new URL('src/app.module.ts', root), 'utf8'),
     readFile(new URL('../../DEPLOYMENT.md', root), 'utf8'),
     readFile(new URL('../../docker-compose.prod.yml', root), 'utf8'),
+    readFile(new URL('src/trpc/trpc.host.ts', root), 'utf8'),
   ]);
 
 const runtimeConsoleCalls = await findRuntimeConsoleCalls(
@@ -19,6 +20,12 @@ const telemetryStartsBeforeNest =
   main.indexOf('initializeRpcTelemetry()') < main.indexOf('NestFactory.create');
 
 const criteria = [
+  [
+    'tRPC server errors reach the global Nest logger',
+    /onError:/.test(trpcHost) &&
+      /getHTTPStatusCodeFromError\(error\) < 500/.test(trpcHost) &&
+      /this\.logger\.error\(failure\)/.test(trpcHost),
+  ],
   [
     'dependency-aware public health contract',
     /@Controller\('health'\)/.test(health) &&
