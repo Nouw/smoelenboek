@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/Nouw/smoelenboek/compare/v1.5.0...v1.5.1) (2026-09-30)
+
+
+### Bug Fixes
+
+* repair user search and log RPC failures ([edf3c88](https://github.com/Nouw/smoelenboek/commit/edf3c88df180a3eedd4a7790fff444e3b79d8f97))
+
 # [1.5.0](https://github.com/Nouw/smoelenboek/compare/v1.4.1...v1.5.0) (2026-09-28)
 
 
