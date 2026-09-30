@@ -33,7 +33,7 @@ export class UsersRepository {
       .addOrderBy('user.name', 'ASC')
       .take(limit);
     if (term) {
-      users.andWhere('(user.name ILIKE :term OR user."firstName" ILIKE :term OR user."lastName" ILIKE :term OR user.email ILIKE :term)', { term: `%${term}%` });
+      users.andWhere('(user.name ILIKE :term OR user.firstName ILIKE :term OR user.lastName ILIKE :term OR user.email ILIKE :term)', { term: `%${term}%` });
     }
     return users.getMany();
   }
