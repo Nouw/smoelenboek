@@ -55,7 +55,7 @@
     "file-type": "21.3.4",
     "multer": "^2.2.0",
     "mysql2": "^3.24.2",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^10.0.9",
     "oci-common": "^2.136.0",
     "oci-objectstorage": "^2.136.0",
     "oci-sdk": "^2.136.0",
