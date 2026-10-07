@@ -221,10 +221,10 @@ describeWithDatabase('Protototo PostgreSQL fixture', () => {
         paymentClaimed: true,
         complete: false,
         matchPoints: [
-          { matchId: ids.activeMatch, points: 6 },
+          { matchId: ids.activeMatch, points: 7 },
           { matchId: ids.lateMatch, points: 0 },
         ],
-        totalPoints: 6,
+        totalPoints: 7,
       }),
       expect.objectContaining({
         id: ids.memberEntry,

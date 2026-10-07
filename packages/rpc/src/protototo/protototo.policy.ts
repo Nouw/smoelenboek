@@ -42,6 +42,13 @@ export function isValidPrediction(
   return subjectWins === 3 || opponentWins === 3;
 }
 
+/**
+ * Points for one match:
+ * - 1 per set whose winner was predicted correctly (compared by set index)
+ * - 1 if the predicted set score matches the result (e.g. 3-1)
+ * - 1 if the predicted match winner matches the result; a drawn result
+ *   (2-2 in four_sets) has no winner and awards no winner point
+ */
 export function scorePrediction(
   prediction: readonly boolean[] | null | undefined,
   result: readonly boolean[] | null | undefined,
@@ -50,14 +57,26 @@ export function scorePrediction(
     return 0;
   }
 
-  return (
-    1 +
-    result.reduce(
-      (score, setWinner, index) =>
-        score + (prediction[index] === setWinner ? 1 : 0),
-      0,
-    )
+  const correctSets = result.filter(
+    (setWinner, index) => prediction[index] === setWinner,
+  ).length;
+
+  const predictedSubjectWins = wins(prediction);
+  const predictedOpponentWins = prediction.length - predictedSubjectWins;
+  const resultSubjectWins = wins(result);
+  const resultOpponentWins = result.length - resultSubjectWins;
+
+  const correctScore =
+    predictedSubjectWins === resultSubjectWins &&
+    predictedOpponentWins === resultOpponentWins;
+
+  const resultWinner = Math.sign(resultSubjectWins - resultOpponentWins);
+  const predictedWinner = Math.sign(
+    predictedSubjectWins - predictedOpponentWins,
   );
+  const correctWinner = resultWinner !== 0 && predictedWinner === resultWinner;
+
+  return correctSets + (correctScore ? 1 : 0) + (correctWinner ? 1 : 0);
 }
 
 export function isRoundOpen(
