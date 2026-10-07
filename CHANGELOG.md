@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Nouw/smoelenboek/compare/v1.5.1...v1.6.0) (2026-10-07)
+
+
+### Features
+
+* **protototo:** score sets, exact score, and match winner ([27a009b](https://github.com/Nouw/smoelenboek/commit/27a009bc0748c16eac3c47e1b3eea313d55316cf))
+
 ## [1.5.1](https://github.com/Nouw/smoelenboek/compare/v1.5.0...v1.5.1) (2026-09-30)
 
 
