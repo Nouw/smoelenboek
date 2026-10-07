@@ -71,16 +71,16 @@ describe('GetProtototoStandingsHandler', () => {
         entryId: 'entry-a',
         displayName: 'Ada',
         participantType: 'anonymous',
-        totalPoints: 4,
-        matchPoints: [{ matchId: 'match', points: 4 }],
+        totalPoints: 5,
+        matchPoints: [{ matchId: 'match', points: 5 }],
       },
       {
         rank: 1,
         entryId: 'entry-b',
         displayName: 'Bep',
         participantType: 'anonymous',
-        totalPoints: 4,
-        matchPoints: [{ matchId: 'match', points: 4 }],
+        totalPoints: 5,
+        matchPoints: [{ matchId: 'match', points: 5 }],
       },
     ]);
     expect(JSON.stringify(standings)).not.toContain('@example.com');
