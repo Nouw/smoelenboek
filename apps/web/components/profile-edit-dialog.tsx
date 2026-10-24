@@ -50,6 +50,7 @@ const baseProfileFormSchema = z.object({
   phoneNumber: optionalText(32),
   bankAccountNumber: optionalText(64),
   backNumber: z.string().trim(),
+  refereeLicense: optionalText(64),
 });
 
 type ProfileFormValues = z.infer<typeof baseProfileFormSchema>;
@@ -102,7 +103,7 @@ export function ProfileEditDialog({
       baseProfileFormSchema.refine(
         ({ backNumber }) =>
           backNumber === '' ||
-          (/^\d+$/.test(backNumber) && Number(backNumber) <= 32767),
+          (/^\d+$/.test(backNumber) && Number(backNumber) <= 999),
         {
           message: t('profile.invalidBackNumber'),
           path: ['backNumber'],
@@ -151,6 +152,7 @@ export function ProfileEditDialog({
           bankAccountNumber: emptyToNull(values.bankAccountNumber),
           backNumber:
             values.backNumber === '' ? null : Number(values.backNumber),
+          refereeLicense: emptyToNull(values.refereeLicense),
         },
       });
 
@@ -441,6 +443,12 @@ export function ProfileEditDialog({
                   min={1}
                   max={999}
                 />
+                <TextField
+                  control={form.control}
+                  name="refereeLicense"
+                  label={t('profile.refereeLicense')}
+                  type="text"
+                />
               </fieldset>
 
               {status.kind === 'error' ? (
@@ -518,6 +526,7 @@ function toFormValues(
         phoneNumber: string | null;
         bankAccountNumber?: string | null;
         backNumber: number | null;
+        refereeLicense: string | null;
       }
     | null
     | undefined,
@@ -535,6 +544,7 @@ function toFormValues(
       information?.backNumber === undefined
         ? ''
         : String(information.backNumber),
+    refereeLicense: information?.refereeLicense ?? '',
   };
 }
 
