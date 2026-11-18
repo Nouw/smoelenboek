@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/Nouw/smoelenboek/compare/v1.6.0...v1.6.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* tikkie check removed ([657f789](https://github.com/Nouw/smoelenboek/commit/657f789614a51b9304557c3a54b464c932234676))
+
 # [1.6.0](https://github.com/Nouw/smoelenboek/compare/v1.5.1...v1.6.0) (2026-10-07)
 
 
