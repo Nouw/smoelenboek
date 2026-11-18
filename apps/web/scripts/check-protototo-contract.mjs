@@ -43,7 +43,11 @@ for (const endpoint of [
 assert.match(standings, /protototo\.standings\.useQuery/);
 assert.match(participant, /setWinners/);
 assert.match(participant, /paymentClaimed/);
-assert.match(participant, /tikkieOpened/);
+assert.match(participant, /round\.tikkieUrl && !paymentClaimed/);
+assert.doesNotMatch(participant, /tikkieOpened/);
+assert.match(participant, /sessionStorage\.getItem\(draftKey\)/);
+assert.match(participant, /sessionStorage\.setItem\(\s*draftKey/);
+assert.match(participant, /sessionStorage\.removeItem\(draftKey\)/);
 assert.match(participant, /!signedIn && round\.tikkieUrl/);
 assert.match(participant, /aria-pressed/);
 assert.match(participant, /role="group"/);

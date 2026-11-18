@@ -48,10 +48,16 @@ const criteria = [
       /lookupAnonymousEntry\.useMutation/.test(participant),
   ],
   [
-    'Anonymous payment is gated while member payment is absent',
-    /tikkieOpened/.test(participant) &&
-      /paymentClaimed/.test(participant) &&
+    'Anonymous payment confirmation checkbox is the only payment gate',
+    /!signedIn && round\.tikkieUrl && !paymentClaimed/.test(participant) &&
+      !/tikkieOpened/.test(participant) &&
       /!signedIn && round\.tikkieUrl/.test(participant),
+  ],
+  [
+    'Anonymous draft survives leaving for Tikkie and returning',
+    /sessionStorage\.getItem\(draftKey\)/.test(participant) &&
+      /sessionStorage\.setItem\(\s*draftKey/.test(participant) &&
+      /sessionStorage\.removeItem\(draftKey\)/.test(participant),
   ],
   [
     'Set predictions follow all Nevobo formats',

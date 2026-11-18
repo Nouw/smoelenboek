@@ -480,13 +480,13 @@ const dictionaries = {
       },
       payment: 'Betaling',
       paymentDescription:
-        'Open de Tikkie en bevestig daarna dat je hebt betaald.',
+        'Je kunt de Tikkie openen. Vink daarna aan dat je hebt betaald.',
       openTikkie: 'Open Tikkie',
       paidConfirmation: 'Ik heb de Tikkie betaald.',
       completePredictions:
         'Maak voor iedere wedstrijd een geldige voorspelling.',
       identityRequired: 'Vul je voornaam en een geldig e-mailadres in.',
-      paymentRequired: 'Open de Tikkie en bevestig dat je hebt betaald.',
+      paymentRequired: 'Bevestig dat je de Tikkie hebt betaald.',
       saved:
         'Je inzending is opgeslagen. Je kunt deze tot de sluitingstijd vervangen.',
       saveEntry: 'Inzending opslaan',
@@ -1061,12 +1061,12 @@ const dictionaries = {
           'Predict four sets and a fifth set when the score is 2-2.',
       },
       payment: 'Payment',
-      paymentDescription: 'Open the Tikkie, then confirm that you paid.',
+      paymentDescription: 'You can open the Tikkie, then confirm that you paid.',
       openTikkie: 'Open Tikkie',
       paidConfirmation: 'I paid the Tikkie.',
       completePredictions: 'Complete a valid prediction for every match.',
       identityRequired: 'Enter your first name and a valid email address.',
-      paymentRequired: 'Open the Tikkie and confirm that you paid.',
+      paymentRequired: 'Confirm that you paid the Tikkie.',
       saved:
         'Your entry has been saved. You can replace it until entries close.',
       saveEntry: 'Save entry',

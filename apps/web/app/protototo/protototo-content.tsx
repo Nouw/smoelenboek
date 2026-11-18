@@ -139,17 +139,71 @@ function EntryForm({
   signedIn: boolean;
 }) {
   const { t } = useI18n();
+  const matchIds = round.matches.map(({ id }) => id);
+  const matchIdsKey = JSON.stringify(matchIds);
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [anonymousLookupAttempted, setAnonymousLookupAttempted] =
     useState(false);
   const [paymentClaimed, setPaymentClaimed] = useState(false);
-  const [tikkieOpened, setTikkieOpened] = useState(false);
   const [picks, setPicks] = useState<PickState>(() =>
     emptyPicks(round.matches),
   );
   const [formError, setFormError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const draftKey = `protototo-entry:${round.id}`;
+
+  useEffect(() => {
+    try {
+      const rawDraft = window.sessionStorage.getItem(draftKey);
+      if (rawDraft) {
+        const draft: unknown = JSON.parse(rawDraft);
+        if (isRecord(draft)) {
+          if (typeof draft.firstName === 'string') setFirstName(draft.firstName);
+          if (typeof draft.email === 'string') setEmail(draft.email);
+          if (typeof draft.paymentClaimed === 'boolean') {
+            setPaymentClaimed(draft.paymentClaimed);
+          }
+          if (isRecord(draft.picks)) {
+            const currentMatchIds = new Set<string>(JSON.parse(matchIdsKey));
+            const restoredPicks = Object.fromEntries(
+              Object.entries(draft.picks).filter(
+                ([matchId, values]) =>
+                  currentMatchIds.has(matchId) &&
+                  Array.isArray(values) &&
+                  values.every(
+                    (value) =>
+                      typeof value === 'boolean' || value === null,
+                  ),
+              ),
+            ) as PickState;
+            setPicks((current) => ({ ...current, ...restoredPicks }));
+          }
+        }
+      }
+    } catch {
+      // Storage can be unavailable in private browsing; the form still works.
+    }
+    setDraftRestored(true);
+  }, [draftKey, matchIdsKey]);
+
+  useEffect(() => {
+    if (!draftRestored || saved) return;
+    try {
+      window.sessionStorage.setItem(
+        draftKey,
+        JSON.stringify({
+          firstName,
+          email,
+          paymentClaimed,
+          picks,
+        }),
+      );
+    } catch {
+      // Storage can be unavailable in private browsing; the form still works.
+    }
+  }, [draftKey, draftRestored, email, firstName, paymentClaimed, picks, saved]);
 
   const memberEntryQuery = trpc.protototo.myEntry.useQuery(
     { roundId: round.id },
@@ -161,6 +215,11 @@ function EntryForm({
     onSuccess(data) {
       const entry = normalizeEntry(data);
       if (entry) populateEntry(entry);
+      try {
+        window.sessionStorage.removeItem(draftKey);
+      } catch {
+        // Keep the successful submission visible even if storage is unavailable.
+      }
       setSaved(true);
       setFormError(null);
     },
@@ -234,7 +293,7 @@ function EntryForm({
       setFormError(t('protototo.identityRequired'));
       return;
     }
-    if (!signedIn && round.tikkieUrl && (!tikkieOpened || !paymentClaimed)) {
+    if (!signedIn && round.tikkieUrl && !paymentClaimed) {
       setFormError(t('protototo.paymentRequired'));
       return;
     }
@@ -371,7 +430,21 @@ function EntryForm({
                 href={round.tikkieUrl}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => setTikkieOpened(true)}
+                onClick={() => {
+                  try {
+                    window.sessionStorage.setItem(
+                      draftKey,
+                      JSON.stringify({
+                        firstName,
+                        email,
+                        paymentClaimed,
+                        picks,
+                      }),
+                    );
+                  } catch {
+                    // The new-tab link still works when storage is unavailable.
+                  }
+                }}
               >
                 {t('protototo.openTikkie')}
                 <ExternalLink className="size-4" aria-hidden="true" />
@@ -420,6 +493,10 @@ function EntryForm({
       </Button>
     </form>
   );
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function MatchPrediction({
